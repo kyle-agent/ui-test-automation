@@ -6,6 +6,8 @@
  *  - criteria/instructions 는 항상 문자열로 보낸다 (OpenRouter 가 구조체를 거부한다).
  * 모델 출력은 관측된 요소 인덱스와 동작 이름으로만 해석한다. 셀렉터·좌표·코드는 절대 모델에서 받지 않는다.
  */
+import { spawnSync } from 'node:child_process';
+import { EnvHttpProxyAgent, ProxyAgent, fetch as undiciFetch, type Dispatcher } from 'undici';
 import { NEXT_ACTION, TARGET, TEXT_VALUE } from './questions';
 
 export const DEFAULT_DECISIONS_URL = 'https://openrouter.ai/api/alpha/decisions';
@@ -78,20 +80,81 @@ export function decisionKey(): string {
   return key;
 }
 
+// ---------------------------------------------------------------------------
+// HTTP: Node 내장 fetch 는 프록시 환경 변수를 읽지 않는다. undici 로 HTTPS_PROXY(.env 포함) 또는 npm 의 proxy 설정을 따른다.
+// TLS 는 Node 설정(NODE_OPTIONS 의 OpenSSL 설정, NODE_USE_SYSTEM_CA, NODE_EXTRA_CA_CERTS)을 그대로 쓴다.
+// ---------------------------------------------------------------------------
+
+let dispatcher: Dispatcher | undefined | null = null;
+let proxyMode: 'auto' | 'direct' = 'auto';
+
+/** 'direct' 는 환경 변수·npm 프록시를 무시하고 직접 연결한다 (진단용). */
+export function setProxyMode(mode: 'auto' | 'direct'): void {
+  proxyMode = mode;
+  dispatcher = null;
+}
+
+function npmProxy(): string | undefined {
+  for (const key of ['https-proxy', 'proxy']) {
+    try {
+      const out = spawnSync(`npm config get ${key}`, {
+        shell: true,
+        encoding: 'utf8',
+        timeout: 15_000,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+      const v = (out.stdout ?? '').trim();
+      if (v && v !== 'null' && v !== 'undefined') return v;
+    } catch {
+      /* npm 이 없거나 실패 */
+    }
+  }
+  return undefined;
+}
+
+export function proxyDispatcher(): { dispatcher: Dispatcher | undefined; source: string } {
+  if (dispatcher !== null) return { dispatcher, source: dispatcherSource };
+  if (proxyMode === 'direct') {
+    dispatcher = undefined;
+    dispatcherSource = '직접 연결 (프록시 무시)';
+    return { dispatcher, source: dispatcherSource };
+  }
+  const env =
+    process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+  if (env) {
+    dispatcher = new EnvHttpProxyAgent();
+    dispatcherSource = `환경 변수 프록시 (${env})`;
+  } else {
+    const fromNpm = npmProxy();
+    dispatcher = fromNpm ? new ProxyAgent(fromNpm) : undefined;
+    dispatcherSource = fromNpm ? `npm 설정 프록시 (${fromNpm})` : '직접 연결';
+  }
+  return { dispatcher, source: dispatcherSource };
+}
+let dispatcherSource = '';
+
 export async function postJson(url: string, key: string, body: unknown): Promise<Raw> {
   for (let attempt = 0; attempt < 3; attempt++) {
-    let response: Response;
+    let response: Awaited<ReturnType<typeof undiciFetch>>;
     try {
-      response = await fetch(url, {
+      const { dispatcher: d } = proxyDispatcher();
+      response = await undiciFetch(url, {
         method: 'POST',
         headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(25_000),
+        ...(d ? { dispatcher: d } : {}),
       });
     } catch (err) {
+      const cause = (err as { cause?: { code?: string; message?: string } }).cause;
+      const why = cause?.code
+        ? `${cause.code}${cause.message ? `: ${cause.message}` : ''}`
+        : err instanceof Error
+          ? err.message
+          : String(err);
       throw new Error(
-        `모델 연결 실패 (${err instanceof Error ? err.message : String(err)}); 동작을 실행하지 않았습니다. ` +
-          `사내 프록시라면 NODE_OPTIONS/NODE_USE_SYSTEM_CA, 명시 프록시라면 NODE_USE_ENV_PROXY=1 과 HTTPS_PROXY 를 확인하세요.`,
+        `모델 연결 실패 (${why}; 경로: ${proxyDispatcher().source}); 동작을 실행하지 않았습니다. ` +
+          `인증서 오류면 docs/windows-node-proxy.md 의 NODE_OPTIONS/NODE_USE_SYSTEM_CA, 연결/DNS 오류면 .env 에 HTTPS_PROXY=http://프록시:포트 를 넣으세요.`,
       );
     }
     if ([429, 503, 529].includes(response.status) && attempt < 2) {
