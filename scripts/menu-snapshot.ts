@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
-import { hashUrl, isSsoUrl, sessionFile, type SessionKind } from '../src/console/env';
+import { CONSOLE_BASE_PATH, CONSOLE_URL, isSsoUrl, sessionFile, type SessionKind } from '../src/console/env';
 import {
   countScreens,
   diffScreenMaps,
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
       timezoneId: 'Asia/Seoul',
     });
     const page = await context.newPage();
-    await page.goto(hashUrl('/home/dashboard'), { waitUntil: 'domcontentloaded' });
+    await page.goto(`${CONSOLE_URL}${CONSOLE_BASE_PATH}`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(
       () => /\| Console$/.test(document.title) || /sso\./.test(location.hostname),
       null,

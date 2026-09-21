@@ -51,7 +51,17 @@ async function main(): Promise<void> {
     // 토큰이 저장소에 기록될 시간을 준다. 화면이 아직 로딩 중이어도 네트워크가 잠잠해질 때까지만 기다린다.
     await dashboard.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
     await dashboard.waitForTimeout(2_000);
-    await context.storageState({ path: file });
+    // IndexedDB 까지 포함해 저장한다 (SPA 가 토큰을 IndexedDB 에 둘 수도 있다).
+    await context.storageState({ path: file, indexedDB: true });
+    const storage = await dashboard
+      .evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage) }))
+      .catch(() => null);
+    if (storage) {
+      console.log(`  localStorage 키: ${storage.local.join(', ') || '(없음)'}`);
+      console.log(
+        `  sessionStorage 키: ${storage.session.join(', ') || '(없음)'} (sessionStorage 는 파일에 저장되지 않는다)`,
+      );
+    }
     console.log(`저장 완료: ${path.relative(process.cwd(), file)}`);
     console.log(`  화면: ${await dashboard.title()}`);
     console.log(
