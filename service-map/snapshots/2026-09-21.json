@@ -1,0 +1,1844 @@
+{
+  "generated_at": "2026-09-21T00:00:00.000Z",
+  "source": "screens.txt",
+  "services": [
+    {
+      "category": "AI-ML",
+      "name": "AI&MLOps Platform",
+      "route": "/aimlops-platform/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/aimlops-platform/dashboard"
+        },
+        {
+          "name": "AI&MLOps Platform",
+          "route": "/aimlops-platform/aimlops-platform/list"
+        }
+      ]
+    },
+    {
+      "category": "AI-ML",
+      "name": "AIOS",
+      "route": "/aios/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/aios/dashboard"
+        },
+        {
+          "name": "Report",
+          "route": "/aios/report"
+        }
+      ]
+    },
+    {
+      "category": "AI-ML",
+      "name": "CloudML",
+      "route": "/cloud-ml/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cloud-ml/dashboard"
+        },
+        {
+          "name": "CloudML",
+          "route": "/cloud-ml/cloud-ml/list"
+        }
+      ]
+    },
+    {
+      "category": "AI-ML",
+      "name": "Simple AI Inference",
+      "route": "/ai-inference/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ai-inference/dashboard"
+        },
+        {
+          "name": "모델 카탈로그",
+          "route": "/ai-inference/model-catalog/list"
+        },
+        {
+          "name": "Serverless Inference",
+          "route": "/ai-inference/serverless-endpoint/list"
+        },
+        {
+          "name": "API 키",
+          "route": "/ai-inference/apikey/list"
+        },
+        {
+          "name": "Playground",
+          "route": "/ai-inference/playground"
+        }
+      ]
+    },
+    {
+      "category": "AI-ML",
+      "name": "Simple AI Training",
+      "route": "/ai-training/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ai-training/dashboard"
+        },
+        {
+          "name": "Training Workspace",
+          "route": "/ai-training/workspace/list",
+          "resource_type": "workspace"
+        },
+        {
+          "name": "Volume",
+          "route": "/ai-training/volume/list",
+          "resource_type": "volume"
+        },
+        {
+          "name": "Training Job",
+          "route": "/ai-training/job/list",
+          "resource_type": "job"
+        }
+      ]
+    },
+    {
+      "category": "Application Service",
+      "name": "API Gateway",
+      "route": "/apigateway/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/apigateway/dashboard"
+        },
+        {
+          "name": "API",
+          "route": "/apigateway/api",
+          "resource_type": "api"
+        },
+        {
+          "name": "PrivateLink Endpoint",
+          "route": "/apigateway/privatelink-endpoint"
+        },
+        {
+          "name": "리소스",
+          "route": "/apigateway/resource"
+        },
+        {
+          "name": "스테이지",
+          "route": "/apigateway/stage"
+        },
+        {
+          "name": "인증",
+          "route": "/apigateway/authentication"
+        },
+        {
+          "name": "접근 제어",
+          "route": "/apigateway/accessControl"
+        },
+        {
+          "name": "사용량 정책",
+          "route": "/apigateway/usagePlan"
+        },
+        {
+          "name": "리소스 정책",
+          "route": "/apigateway/resourcePolicy"
+        },
+        {
+          "name": "Report",
+          "route": "/apigateway/report"
+        }
+      ]
+    },
+    {
+      "category": "Application Service",
+      "name": "Message Hub",
+      "route": "/messagehub/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/messagehub/dashboard"
+        },
+        {
+          "name": "Phone Book",
+          "route": "/messagehub/phone",
+          "resource_type": "phone"
+        },
+        {
+          "name": "Push Application",
+          "route": "/messagehub/push-application",
+          "resource_type": "push-application"
+        },
+        {
+          "name": "Email 관리",
+          "route": "/messagehub/email"
+        }
+      ]
+    },
+    {
+      "category": "Application Service",
+      "name": "Queue Service",
+      "route": "/queueservice/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/queueservice/dashboard"
+        },
+        {
+          "name": "Queue",
+          "route": "/queueservice/queueservices",
+          "resource_type": "queue"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "Bare Metal Server",
+      "route": "/baremetal/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/baremetal/dashboard"
+        },
+        {
+          "name": "Bare Metal Server",
+          "route": "/baremetal/baremetal/list",
+          "resource_type": "baremetal"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "Cloud Functions",
+      "route": "/scf/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/scf/dashboard"
+        },
+        {
+          "name": "Function",
+          "route": "/scf/cloudfunctions",
+          "resource_type": "cloud-function"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "GPU Server",
+      "route": "/gpuserver/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/gpuserver/dashboard"
+        },
+        {
+          "name": "GPU Server",
+          "route": "/gpuserver/gpuserver/list",
+          "resource_type": "gpu-server"
+        },
+        {
+          "name": "Image",
+          "route": "/gpuserver/image/list",
+          "resource_type": "image"
+        },
+        {
+          "name": "Keypair",
+          "route": "/gpuserver/keypair/list",
+          "resource_type": "keypair"
+        },
+        {
+          "name": "Block Storage",
+          "route": "/gpuserver/block-storage/list",
+          "resource_type": "volume"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "Multi-node GPU Cluster",
+      "route": "/multinodegpucluster/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/multinodegpucluster/dashboard"
+        },
+        {
+          "name": "GPU Node",
+          "route": "/multinodegpucluster/gpu-node/list",
+          "resource_type": "gpu-node"
+        },
+        {
+          "name": "Cluster Fabric",
+          "route": "/multinodegpucluster/cluster-fabric/list",
+          "resource_type": "cluster-fabric"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "Virtual Server",
+      "route": "/virtualserver/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/virtualserver/dashboard"
+        },
+        {
+          "name": "Virtual Server",
+          "route": "/virtualserver/virtualserver/list",
+          "resource_type": "virtual-server"
+        },
+        {
+          "name": "Image",
+          "route": "/virtualserver/image/list",
+          "resource_type": "image"
+        },
+        {
+          "name": "Keypair",
+          "route": "/virtualserver/keypair/list",
+          "resource_type": "keypair"
+        },
+        {
+          "name": "Server Group",
+          "route": "/virtualserver/server-group/list",
+          "resource_type": "server-group"
+        },
+        {
+          "name": "Launch Configuration",
+          "route": "/virtualserver/launch-configuration/list",
+          "resource_type": "launch-configuration"
+        },
+        {
+          "name": "Auto-Scaling Group",
+          "route": "/virtualserver/auto-scaling-group/list",
+          "resource_type": "auto-scaling-group"
+        },
+        {
+          "name": "Block Storage",
+          "route": "/virtualserver/block-storage/list",
+          "resource_type": "volume"
+        }
+      ]
+    },
+    {
+      "category": "Compute",
+      "name": "Virtual Server DR",
+      "route": "/virtualserverdr/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/virtualserverdr/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Container",
+      "name": "Container Registry",
+      "route": "/scr/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/scr/dashboard"
+        },
+        {
+          "name": "Registry",
+          "route": "/scr/registry",
+          "resource_type": "container-registry"
+        },
+        {
+          "name": "Repository",
+          "route": "/scr/repository",
+          "resource_type": "repository"
+        },
+        {
+          "name": "Image",
+          "route": "/scr/image"
+        }
+      ]
+    },
+    {
+      "category": "Container",
+      "name": "Kubernetes Engine",
+      "route": "/ske/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ske/dashboard"
+        },
+        {
+          "name": "클러스터",
+          "route": "/ske/cluster",
+          "resource_type": "cluster"
+        },
+        {
+          "name": "노드",
+          "route": "/ske/node"
+        },
+        {
+          "name": "네임스페이스",
+          "route": "/ske/namespace"
+        },
+        {
+          "name": "워크로드",
+          "route": "/ske/workload"
+        },
+        {
+          "name": "서비스 및 인그레스",
+          "route": "/ske/network"
+        },
+        {
+          "name": "스토리지",
+          "route": "/ske/storage"
+        },
+        {
+          "name": "구성",
+          "route": "/ske/configuration"
+        },
+        {
+          "name": "권한",
+          "route": "/ske/authorization"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Data Flow",
+      "route": "/data-flow/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/data-flow/dashboard"
+        },
+        {
+          "name": "Data Flow",
+          "route": "/data-flow/data-flow/list"
+        },
+        {
+          "name": "Data Flow Services",
+          "route": "/data-flow/data-flow-service/list"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Data Ops",
+      "route": "/data-ops/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/data-ops/dashboard"
+        },
+        {
+          "name": "Data Ops",
+          "route": "/data-ops/data-ops/list"
+        },
+        {
+          "name": "Data Ops Services",
+          "route": "/data-ops/data-ops-service/list"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Event Streams",
+      "route": "/eventstreams/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/eventstreams/dashboard"
+        },
+        {
+          "name": "Event Streams",
+          "route": "/eventstreams/eventstreams/list",
+          "resource_type": "event-streams"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Quick Query",
+      "route": "/quick-query/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/quick-query/dashboard"
+        },
+        {
+          "name": "Quick Query",
+          "route": "/quick-query/quick-query/list"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Search Engine",
+      "route": "/searchengine/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/searchengine/dashboard"
+        },
+        {
+          "name": "Search Engine",
+          "route": "/searchengine/searchengine/list",
+          "resource_type": "search-engine"
+        }
+      ]
+    },
+    {
+      "category": "Data Analytics",
+      "name": "Vertica(DBaaS)",
+      "route": "/vertica/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/vertica/dashboard"
+        },
+        {
+          "name": "Vertica(DBaaS)",
+          "route": "/vertica/vertica/list",
+          "resource_type": "vertica"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "CacheStore(DBaaS)",
+      "route": "/cachestore/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cachestore/dashboard"
+        },
+        {
+          "name": "CacheStore(DBaaS)",
+          "route": "/cachestore/cachestore/list",
+          "resource_type": "cache-store"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "EPAS(DBaaS)",
+      "route": "/epas/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/epas/dashboard"
+        },
+        {
+          "name": "EPAS(DBaaS)",
+          "route": "/epas/epas/list",
+          "resource_type": "epas"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "MariaDB(DBaaS)",
+      "route": "/mariadb/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/mariadb/dashboard"
+        },
+        {
+          "name": "MariaDB(DBaaS)",
+          "route": "/mariadb/mariadb/list",
+          "resource_type": "mariadb"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "Microsoft SQL Server(DBaaS)",
+      "route": "/sqlserver/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/sqlserver/dashboard"
+        },
+        {
+          "name": "Microsoft SQL Server(DBaaS)",
+          "route": "/sqlserver/sqlserver/list",
+          "resource_type": "sqlserver"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "MySQL(DBaaS)",
+      "route": "/mysql/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/mysql/dashboard"
+        },
+        {
+          "name": "MySQL(DBaaS)",
+          "route": "/mysql/mysql/list",
+          "resource_type": "mysql"
+        }
+      ]
+    },
+    {
+      "category": "Database",
+      "name": "PostgreSQL(DBaaS)",
+      "route": "/postgresql/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/postgresql/dashboard"
+        },
+        {
+          "name": "PostgreSQL(DBaaS)",
+          "route": "/postgresql/postgresql/list",
+          "resource_type": "postgresql"
+        }
+      ]
+    },
+    {
+      "category": "DevOps Tools",
+      "name": "DevOps Service",
+      "route": "/devopsservice/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/devopsservice/dashboard"
+        },
+        {
+          "name": "DevOps Service",
+          "route": "/devopsservice/devops-service",
+          "resource_type": "devops-service"
+        }
+      ]
+    },
+    {
+      "category": "Financial Management",
+      "name": "Cost Management",
+      "route": "/costmanagement",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/costmanagement/dashboard"
+        },
+        {
+          "name": "이용 및 청구 내역",
+          "route": "/costmanagement/usage-and-billing-report"
+        },
+        {
+          "name": "납부 내역",
+          "route": "/costmanagement/payment-report"
+        },
+        {
+          "name": "Cost Navigator",
+          "route": "/costmanagement/cost-navigator"
+        },
+        {
+          "name": "빌링 태그",
+          "route": "/costmanagement/billing-tag"
+        },
+        {
+          "name": "Credit 관리",
+          "route": "/costmanagement/credit"
+        },
+        {
+          "name": "예산 관리",
+          "route": "/costmanagement/budget"
+        },
+        {
+          "name": "Cost Savings",
+          "route": "/costmanagement/cost-savings"
+        },
+        {
+          "name": "Account",
+          "route": "/costmanagement/cost-account-management"
+        },
+        {
+          "name": "결제 관리",
+          "route": "/costmanagement/cost-payment-management"
+        },
+        {
+          "name": "탄소 배출량",
+          "route": "/costmanagement/carbon-emissions"
+        },
+        {
+          "name": "EDP Report",
+          "route": "/costmanagement/edp-report"
+        },
+        {
+          "name": "레거시 페이지",
+          "route": "/costmanagement/explorer"
+        }
+      ]
+    },
+    {
+      "category": "Financial Management",
+      "name": "Marketplace",
+      "route": "/marketplace",
+      "screens": [
+        {
+          "name": "구독 관리",
+          "route": "/marketplace/management/list"
+        },
+        {
+          "name": "상품 Catalog",
+          "route": "/marketplace/catalog/list"
+        }
+      ]
+    },
+    {
+      "category": "Financial Management",
+      "name": "Planned Compute",
+      "route": "/plannedcompute",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/plannedcompute/dashboard"
+        },
+        {
+          "name": "Planned Compute",
+          "route": "/plannedcompute/planned-compute/list",
+          "resource_type": "planned-compute"
+        },
+        {
+          "name": "Coverage",
+          "route": "/plannedcompute/coverage/list"
+        }
+      ]
+    },
+    {
+      "category": "Hybrid Cloud",
+      "name": "Dedicated Cloud",
+      "route": "/dedicatedcloud/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/dedicatedcloud/dashboard"
+        },
+        {
+          "name": "Dedicated Cloud",
+          "route": "/dedicatedcloud/dedicated-cloud",
+          "resource_type": "connected"
+        }
+      ]
+    },
+    {
+      "category": "Hybrid Cloud",
+      "name": "Edge Server",
+      "route": "/edgeserver/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/edgeserver/dashboard"
+        },
+        {
+          "name": "Edge Server",
+          "route": "/edgeserver/edgeserver/list"
+        }
+      ]
+    },
+    {
+      "category": "Hybrid Cloud",
+      "name": "Oracle Services",
+      "route": "/oracleservices/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/oracleservices/dashboard"
+        },
+        {
+          "name": "Oracle Services",
+          "route": "/oracleservices/oracle-services",
+          "resource_type": "oracle-services"
+        }
+      ]
+    },
+    {
+      "category": "Hybrid Cloud",
+      "name": "Private Zone",
+      "route": "/privatezone/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/privatezone/dashboard"
+        },
+        {
+          "name": "Private Zone",
+          "route": "/privatezone/private-zone",
+          "resource_type": "private-zone"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Architecture Diagram",
+      "route": "/architecturediagram",
+      "screens": []
+    },
+    {
+      "category": "Management",
+      "name": "Cloud Control",
+      "route": "/cloudcontrol",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cloudcontrol/dashboard"
+        },
+        {
+          "name": "조직",
+          "route": "/cloudcontrol/organization"
+        },
+        {
+          "name": "Account 팩토리",
+          "route": "/cloudcontrol/account-factory"
+        },
+        {
+          "name": "가드레일",
+          "route": "/cloudcontrol/guardrail"
+        },
+        {
+          "name": "사용자 및 액세스",
+          "route": "/cloudcontrol/user-and-access"
+        },
+        {
+          "name": "공유 Account",
+          "route": "/cloudcontrol/share-account"
+        },
+        {
+          "name": "랜딩 존 설정",
+          "route": "/cloudcontrol/landing-zone-setting"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Cloud Monitoring",
+      "route": "/cloudmonitoring/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cloudmonitoring/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "IAM",
+      "route": "/iam",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/iam/dashboard"
+        },
+        {
+          "name": "사용자 그룹",
+          "route": "/iam/group/list",
+          "resource_type": "group"
+        },
+        {
+          "name": "사용자",
+          "route": "/iam/user/list",
+          "resource_type": "user"
+        },
+        {
+          "name": "정책",
+          "route": "/iam/policy/list",
+          "resource_type": "policy"
+        },
+        {
+          "name": "역할",
+          "route": "/iam/role",
+          "resource_type": "role"
+        },
+        {
+          "name": "자격 증명 공급자",
+          "route": "/iam/idp/list",
+          "resource_type": "saml-provider"
+        },
+        {
+          "name": "My Info.",
+          "route": "/iam/my-info"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "ID Center",
+      "route": "/idcenter",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/idcenter/dashboard"
+        },
+        {
+          "name": "사용자",
+          "route": "/idcenter/user/list",
+          "resource_type": "user"
+        },
+        {
+          "name": "사용자 그룹",
+          "route": "/idcenter/group/list",
+          "resource_type": "group"
+        },
+        {
+          "name": "ID Center 설정",
+          "route": "/idcenter/setting/main"
+        },
+        {
+          "name": "Account 할당",
+          "route": "/idcenter/account/organization-list",
+          "resource_type": "account"
+        },
+        {
+          "name": "권한 세트",
+          "route": "/idcenter/permission-set/list",
+          "resource_type": "permission-set"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Logging&Audit",
+      "route": "/loggingaudit",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/loggingaudit/dashboard"
+        },
+        {
+          "name": "Trail",
+          "route": "/loggingaudit/trail",
+          "resource_type": "trail"
+        },
+        {
+          "name": "활동 내역",
+          "route": "/loggingaudit/log"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Network Logging",
+      "route": "/network-logging/firewall-logging/list",
+      "screens": [
+        {
+          "name": "Firewall Logging",
+          "route": "/network-logging/firewall-logging/list"
+        },
+        {
+          "name": "Security Group Logging",
+          "route": "/network-logging/security-group-logging/list"
+        },
+        {
+          "name": "NAT Logging",
+          "route": "/network-logging/nat-logging/list"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Notification Manager",
+      "route": "/notification",
+      "screens": [
+        {
+          "name": "알림 그룹",
+          "route": "/notification/group",
+          "resource_type": "receiver-group"
+        },
+        {
+          "name": "알림 정책",
+          "route": "/notification/policy"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Organization",
+      "route": "/organization",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/organization/dashboard"
+        },
+        {
+          "name": "받은 초대",
+          "route": "/organization/invitations-received"
+        },
+        {
+          "name": "초대 내역",
+          "route": "/organization/invitations-sent"
+        },
+        {
+          "name": "조직 구성",
+          "route": "/organization/structure",
+          "resource_type": "ou"
+        },
+        {
+          "name": "통제 정책",
+          "route": "/organization/control-policy",
+          "resource_type": "service-control-policy"
+        },
+        {
+          "name": "조직 설정",
+          "route": "/organization/settings"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Quota Service",
+      "route": "/quota",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/quota/dashboard"
+        },
+        {
+          "name": "Quota Service",
+          "route": "/quota/service/list"
+        },
+        {
+          "name": "요청 내역",
+          "route": "/quota/request-history"
+        },
+        {
+          "name": "조직 할당량 템플릿",
+          "route": "/quota/template"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Resource Explorer",
+      "route": "/resourceexplorer",
+      "screens": [
+        {
+          "name": "Resource Search",
+          "route": "/resourceexplorer/resource-search"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Resource Groups",
+      "route": "/resourcegroups",
+      "screens": [
+        {
+          "name": "Resource Groups",
+          "route": "/resourcegroups/resource-group/list",
+          "resource_type": "resource-group"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Resource Optimizer",
+      "route": "/resourceoptimizer/home",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/resourceoptimizer/home"
+        },
+        {
+          "name": "대시보드",
+          "route": "/resourceoptimizer/dashboard"
+        },
+        {
+          "name": "Rightsizing",
+          "route": "/resourceoptimizer/rightsizing"
+        },
+        {
+          "name": "유휴 자원",
+          "route": "/resourceoptimizer/idle-resource"
+        },
+        {
+          "name": "기본 설정",
+          "route": "/resourceoptimizer/settings"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "ServiceWatch",
+      "route": "/service-watch",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/service-watch/home"
+        },
+        {
+          "name": "대시보드",
+          "route": "/service-watch/dashboard"
+        },
+        {
+          "name": "경보",
+          "route": "/service-watch/alert"
+        },
+        {
+          "name": "지표",
+          "route": "/service-watch/metric"
+        },
+        {
+          "name": "로그",
+          "route": "/service-watch/log/group"
+        },
+        {
+          "name": "이벤트 규칙",
+          "route": "/service-watch/event/rule"
+        }
+      ]
+    },
+    {
+      "category": "Management",
+      "name": "Support Center",
+      "route": "/support",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/support/dashboard"
+        },
+        {
+          "name": "서비스 요청",
+          "route": "/support/sr/list"
+        },
+        {
+          "name": "문의하기",
+          "route": "/support/inquiry/list"
+        },
+        {
+          "name": "Support Plan",
+          "route": "/support/plan"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud Fabric Connect",
+      "route": "/cfc/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cfc/dashboard"
+        },
+        {
+          "name": "Fabric",
+          "route": "/cfc/fabric",
+          "resource_type": "fabric"
+        },
+        {
+          "name": "Port",
+          "route": "/cfc/port",
+          "resource_type": "port"
+        },
+        {
+          "name": "Connection",
+          "route": "/cfc/connection",
+          "resource_type": "connection"
+        },
+        {
+          "name": "Policy",
+          "route": "/cfc/policy",
+          "resource_type": "policy"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud LAN-Campus",
+      "route": "/clancampus/sr/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/clancampus/sr/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud LAN-Data Center",
+      "route": "/clandc/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/clandc/dashboard"
+        },
+        {
+          "name": "Cloud LAN Network",
+          "route": "/clandc/network",
+          "resource_type": "cloud-lan-network"
+        },
+        {
+          "name": "vDevice",
+          "route": "/clandc/device",
+          "resource_type": "vdevice"
+        },
+        {
+          "name": "Interface",
+          "route": "/clandc/interface",
+          "resource_type": "interface"
+        },
+        {
+          "name": "vCable",
+          "route": "/clandc/cable",
+          "resource_type": "vcable"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud Last Mile",
+      "route": "/clm/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/clm/dashboard"
+        },
+        {
+          "name": "Cloud Last Mile",
+          "route": "/clm/clm/list",
+          "resource_type": "cloud-lastmile"
+        },
+        {
+          "name": "Circuit and Edge",
+          "route": "/clm/circuit-edges/list",
+          "resource_type": "circuit-and-edge"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud Secured SD-LAN",
+      "route": "/cssdlan/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cssdlan/dashboard"
+        },
+        {
+          "name": "Network",
+          "route": "/cssdlan/cssdlan-network",
+          "resource_type": "cssdlan-network"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud Virtual Circuit",
+      "route": "/vc/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/vc/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Cloud WAN",
+      "route": "/cwan/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cwan/dashboard"
+        },
+        {
+          "name": "Cloud WAN Network",
+          "route": "/cwan/network",
+          "resource_type": "network"
+        },
+        {
+          "name": "Segment",
+          "route": "/cwan/segment",
+          "resource_type": "segment"
+        },
+        {
+          "name": "Attachment",
+          "route": "/cwan/attachment",
+          "resource_type": "attachment"
+        },
+        {
+          "name": "Site VPN",
+          "route": "/cwan/sitevpn",
+          "resource_type": "cloudwan-sitevpn"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Direct Connect",
+      "route": "/directconnect/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/directconnect/dashboard"
+        },
+        {
+          "name": "Direct Connect",
+          "route": "/directconnect/directconnect/list",
+          "resource_type": "direct-connect"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "DNS",
+      "route": "/dns/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/dns/dashboard"
+        },
+        {
+          "name": "Private DNS",
+          "route": "/dns/private-dns/list",
+          "resource_type": "private-dns"
+        },
+        {
+          "name": "Hosted Zone",
+          "route": "/dns/hosted-zone/list",
+          "resource_type": "hosted-zone"
+        },
+        {
+          "name": "Public Domain Name",
+          "route": "/dns/public-domain-name/list",
+          "resource_type": "public-domain-name"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Firewall",
+      "route": "/firewall/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/firewall/dashboard"
+        },
+        {
+          "name": "Firewall",
+          "route": "/firewall/firewall/list",
+          "resource_type": "firewall"
+        },
+        {
+          "name": "Migration Rules",
+          "route": "/firewall/migration-rules"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Global CDN",
+      "route": "/cdn/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/cdn/dashboard"
+        },
+        {
+          "name": "Global CDN",
+          "route": "/cdn/cdn/list",
+          "resource_type": "cdn"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "GSLB",
+      "route": "/gslb/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/gslb/dashboard"
+        },
+        {
+          "name": "GSLB",
+          "route": "/gslb/gslb/list",
+          "resource_type": "gslb"
+        },
+        {
+          "name": "Regional Routing Controller",
+          "route": "/gslb/rrc/list",
+          "resource_type": "gslb-rrc"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Load Balancer",
+      "route": "/loadbalancer/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/loadbalancer/dashboard"
+        },
+        {
+          "name": "Load Balancer",
+          "route": "/loadbalancer/loadbalancer/list",
+          "resource_type": "loadbalancer"
+        },
+        {
+          "name": "LB 서버 그룹",
+          "route": "/loadbalancer/loadbalancer-server-group/list",
+          "resource_type": "lb-server-group"
+        },
+        {
+          "name": "LB 헬스 체크",
+          "route": "/loadbalancer/loadbalancer-health-check/list",
+          "resource_type": "lb-health-check"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Private 5G Cloud",
+      "route": "/private-fivegen-cloud/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/private-fivegen-cloud/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "SASE",
+      "route": "/sase/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/sase/dashboard"
+        },
+        {
+          "name": "SASE 서비스",
+          "route": "/sase/sase",
+          "resource_type": "sase"
+        },
+        {
+          "name": "SASE Lastmile",
+          "route": "/sase/last-mile/list",
+          "resource_type": "lastmile"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "Security Group",
+      "route": "/securitygroup/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/securitygroup/dashboard"
+        },
+        {
+          "name": "Security Group",
+          "route": "/securitygroup/securitygroup/list",
+          "resource_type": "security-group"
+        },
+        {
+          "name": "Address Group",
+          "route": "/securitygroup/addressgroup/list",
+          "resource_type": "address-group"
+        },
+        {
+          "name": "Migration Rules",
+          "route": "/securitygroup/migration-rules"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "VPC",
+      "route": "/vpc/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/vpc/dashboard"
+        },
+        {
+          "name": "VPC",
+          "route": "/vpc/vpc/list",
+          "resource_type": "vpc"
+        },
+        {
+          "name": "Subnet",
+          "route": "/vpc/subnet/list",
+          "resource_type": "subnet"
+        },
+        {
+          "name": "Port",
+          "route": "/vpc/port/list",
+          "resource_type": "port"
+        },
+        {
+          "name": "Internet Gateway",
+          "route": "/vpc/internet-gateway/list",
+          "resource_type": "internet-gateway"
+        },
+        {
+          "name": "NAT Gateway",
+          "route": "/vpc/nat-gateway/list",
+          "resource_type": "nat-gateway"
+        },
+        {
+          "name": "Public IP",
+          "route": "/vpc/public-ip/list",
+          "resource_type": "publicip"
+        },
+        {
+          "name": "Private NAT",
+          "route": "/vpc/private-nat/list",
+          "resource_type": "private-nat"
+        },
+        {
+          "name": "VPC Endpoint",
+          "route": "/vpc/vpc-endpoint/list",
+          "resource_type": "vpc-endpoint"
+        },
+        {
+          "name": "VPC Peering",
+          "route": "/vpc/vpc-peering/list",
+          "resource_type": "vpc-peering"
+        },
+        {
+          "name": "Transit Gateway",
+          "route": "/vpc/transit-gateway/list",
+          "resource_type": "transit-gateway"
+        },
+        {
+          "name": "PrivateLink Service",
+          "route": "/vpc/privatelink-service/list",
+          "resource_type": "privatelink-service"
+        },
+        {
+          "name": "PrivateLink Endpoint",
+          "route": "/vpc/privatelink-endpoint/list",
+          "resource_type": "privatelink-endpoint"
+        }
+      ]
+    },
+    {
+      "category": "Networking",
+      "name": "VPN",
+      "route": "/vpn/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/vpn/dashboard"
+        },
+        {
+          "name": "VPN",
+          "route": "/vpn/vpn/list",
+          "resource_type": "vpn-gateway"
+        },
+        {
+          "name": "VPN Tunnel",
+          "route": "/vpn/vpn-tunnel/list",
+          "resource_type": "vpn-tunnel"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Certificate Manager",
+      "route": "/certificate-manager/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/certificate-manager/dashboard"
+        },
+        {
+          "name": "Certificate Manager",
+          "route": "/certificate-manager/certificate-manager/list",
+          "resource_type": "certificate"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Config Inspection",
+      "route": "/configinspection/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/configinspection/dashboard"
+        },
+        {
+          "name": "Config Inspection",
+          "route": "/configinspection/configinspection/list",
+          "resource_type": "config-inspection"
+        },
+        {
+          "name": "대시보드",
+          "route": "/configinspection/configinspection-report/reportDashboard"
+        },
+        {
+          "name": "진단 결과",
+          "route": "/configinspection/configinspection-report/history"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "DDoS Protection",
+      "route": "/ddosprotection/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ddosprotection/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Endpoint Security Suite",
+      "route": "/ess/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ess/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "FPMS",
+      "route": "/fpms/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/fpms/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "IPS",
+      "route": "/ips/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/ips/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Key Management Service",
+      "route": "/kms/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/kms/dashboard"
+        },
+        {
+          "name": "플랫폼 관리형 키",
+          "route": "/kms/managedkms/list",
+          "resource_type": "managed-kms"
+        },
+        {
+          "name": "고객 관리형 키",
+          "route": "/kms/kms/list",
+          "resource_type": "kms"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Log Transmission",
+      "route": "/logtransmission/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/logtransmission/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Secret Vault",
+      "route": "/secretvault/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/secretvault/dashboard"
+        },
+        {
+          "name": "Secret Vault",
+          "route": "/secretvault/secretvault/list",
+          "resource_type": "secretvault"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Secrets Manager",
+      "route": "/secretsmanager/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/secretsmanager/dashboard"
+        },
+        {
+          "name": "Secrets Manager",
+          "route": "/secretsmanager/secretsmanager/list",
+          "resource_type": "secret"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Secured Firewall",
+      "route": "/securedfirewall/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/securedfirewall/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "Secured VPN",
+      "route": "/securedvpn/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/securedvpn/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "SingleID",
+      "route": "/singleid/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/singleid/dashboard"
+        },
+        {
+          "name": "SingleID",
+          "route": "/singleid/singleid/list",
+          "resource_type": "singleid"
+        }
+      ]
+    },
+    {
+      "category": "Security",
+      "name": "WAF",
+      "route": "/webfirewall/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/webfirewall/dashboard"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "Archive Storage",
+      "route": "/archivestorage/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/archivestorage/dashboard"
+        },
+        {
+          "name": "Archive Storage",
+          "route": "/archivestorage/archivestorage/list",
+          "resource_type": "bucket"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "Backup",
+      "route": "/backup",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/backup/dashboard"
+        },
+        {
+          "name": "Backup",
+          "route": "/backup/backup/list",
+          "resource_type": "backup"
+        },
+        {
+          "name": "Backup Agent",
+          "route": "/backup/backup-agent/list",
+          "resource_type": "backup-agent"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "Block Storage(BM)",
+      "route": "/baremetal-blockstorage/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/baremetal-blockstorage/dashboard"
+        },
+        {
+          "name": "Block Storage(BM)",
+          "route": "/baremetal-blockstorage/baremetal-blockstorage/list",
+          "resource_type": "volume"
+        },
+        {
+          "name": "Volume Group(BM)",
+          "route": "/baremetal-blockstorage/volume-group/list",
+          "resource_type": "volume-group"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "File Storage",
+      "route": "/filestorage/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/filestorage/dashboard"
+        },
+        {
+          "name": "File Storage",
+          "route": "/filestorage/filestorage/list",
+          "resource_type": "volume"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "Object Storage",
+      "route": "/objectstorage/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/objectstorage/dashboard"
+        },
+        {
+          "name": "Object Storage",
+          "route": "/objectstorage/objectstorage/list",
+          "resource_type": "bucket"
+        }
+      ]
+    },
+    {
+      "category": "Storage",
+      "name": "Parallel File Storage",
+      "route": "/parallelfilestorage/dashboard",
+      "screens": [
+        {
+          "name": "Service Home",
+          "route": "/parallelfilestorage/dashboard"
+        },
+        {
+          "name": "Parallel File Storage",
+          "route": "/parallelfilestorage/parallelfilestorage/list",
+          "resource_type": "volume"
+        }
+      ]
+    }
+  ]
+}

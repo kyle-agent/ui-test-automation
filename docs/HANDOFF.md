@@ -59,3 +59,33 @@
 2. Playwright 프로젝트 초기화. `storageState` 재사용 절차. 스모크 89개를 URL 직접 진입 + title/text 단언으로 spec 변환(Jev 기록 불필요).
 3. 전용 테스트 계정 준비 후 서비스 하나(예: Virtual Server 또는 IAM)부터: Jev 기록 파이프라인을 생성 폼 같은 CRUD 흐름에 적용. 그 전에 snapshot.js 가 콘솔 폼 요소를 잡는지 확인, 필요하면 `cursor:pointer`/클릭 핸들러 div 수집 확장.
 4. 치유·분류 루프: 로케이터 실패 → Jev fallback → drift/regression 분류 → spec 갱신.
+
+## 7. 클라우드 세션 진행 기록 (2026-09-21, 브랜치 `claude/laughing-gauss-6nuvax`)
+
+이 저장소(로컬 `C:\jev\scp-console-tests` 의 두 커밋)를 그대로 이어받아 아래를 추가했다. 자세한 사용법은 `README.md`.
+
+- **Playwright 프로젝트 초기화**: `@playwright/test@1.56.1`(파이썬 playwright 1.56 과 같은 Chromium 1194 를 쓴다), `playwright.config.ts`
+  (프로젝트 `unit` / `auth-public` / `session` / `smoke` / `regression`, `RUN_DESTRUCTIVE=1` 이 아니면 `@destructive` 제외).
+- **storageState 절차**: `npm run auth:login -- --session root|iam` 이 headed 브라우저를 열고 사람이 SSO/MFA 로그인을 마치면
+  `recordings/session-<type>.json` 을 저장한다(자격 증명을 읽지 않는다). `session` 프로젝트(`tests/setup/session.setup.ts`)가
+  파일 존재·만료를 먼저 확인하고, 실패하면 smoke/regression 전체를 건너뛴다. **클라우드 세션에서는 창을 못 띄우므로 로컬에서만.**
+- **메뉴 API 스냅샷 + diff**: `npm run menu:snapshot`(로그인 세션으로 `/console/api/product/v1/menus` 전 페이지 수집 →
+  `service-map/raw/<date>.json`(gitignore), `service-map/snapshots/<date>.json`, `screens.json`, `screens.txt` 갱신 → 직전 스냅샷과 diff),
+  `npm run menu:diff [-- --fail-on-change]`. API 항목의 실제 키 이름은 아직 모르므로 `src/service-map/screens.ts` 의 `KEYS`
+  후보 목록으로 관대하게 읽고, 못 읽은 항목은 경고한다. 첫 실제 응답을 받으면 KEYS 를 좁힐 것.
+  첫 스냅샷 `snapshots/2026-09-21.json` 은 기존 `screens.txt` 를 `npm run menu:import-txt` 로 변환한 것(89 서비스, 276 화면, Service Home 포함).
+- **스모크 spec**: `scenarios/smoke/*.yaml`(89) → `npm run gen:smoke-specs` → `tests/smoke/*.spec.ts`(282 테스트).
+  각 테스트는 `expect.url` 로 직접 진입 → SSO 튕김 감지 → `document.title` 형식 단언 → `service-map/titles.json` 에 등록된 라우트면 정확 일치
+  → `text`/`not_text`. 관측한 제목은 `test-results/observed-titles.jsonl` 에 쌓이고 `npm run titles:merge` 로 레지스트리에 반영한다.
+  `titles.json` 은 `/iam/user/list` 하나로 시작한다.
+- **공개 로그인 페이지 스모크** (`tests/auth/login-page.spec.ts`, 세션 불필요): 클라우드 세션에서 실제 SSO 페이지에 대해 5/5 통과.
+  확인된 사실: 제목 `로그인 | Samsung Cloud Platform Console`(영문 `Sign-In | …`), 버튼은 전부 div, IAM 선택 시 "Account 정보" 와
+  placeholder "Account Id 또는 별칭을 입력하세요.", 같은 placeholder 입력란이 숨겨진 다음 단계 폼에도 있어 `filter({ visible: true })` 필요,
+  빈 이메일로 "다음" 을 눌러도 검증 문구가 뜨지 않음(이동 없음만 판정), 언어 메뉴는 `#dropdownMenuButton`(English/한국어),
+  하단 링크 href 는 테마 JS 가 로드 후 `signup.e.samsungsdscloud.com/accounts-management/#/…` 로 바꿔 쓴다.
+- **클라우드 환경 확인**: `OPENROUTER_API_KEY` 만 설정돼 있고 `TYPESAFE_API_KEY`/`TEXT_MODEL_API_KEY` 는 비어 있다(러너는 OpenRouter 키로
+  fallback 하게 만들 것). `openrouter.ai` decisions 엔드포인트 실호출 확인(0.46 초, $0.000025, 응답에 `usage.input_tokens/output_tokens/cost`,
+  `id`, `provider: "TypeSafe"` 포함). `*.samsungsdscloud.com` 은 클라우드에서 열린다(로그인 페이지까지). 헤드리스 Chromium 이 세션 프록시 CA 를
+  신뢰하려면 `certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n ccr-agent-proxy -i /root/.ccr/agent-proxy-ca.crt` 가 필요했다(세션마다 다시).
+- **미완/보류**: Jev 기록 러너(Python, `uv`)는 `decide.py`(OpenRouter decisions 클라이언트, jev-ultrafast model.py 기반)와 프롬프트까지
+  작성했으나 사용자가 시나리오를 다시 정하기로 해 이번 푸시에서 제외했다. 시나리오가 정해지면 record → trace → spec 변환 → heal 순으로 잇는다.

@@ -1,0 +1,41 @@
+{
+  "name": "scp-console-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Samsung Cloud Platform v2 Enterprise 콘솔 UI 회귀 테스트 (Playwright + Jev 기록 파이프라인)",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "auth:login": "tsx scripts/auth-login.ts",
+    "auth:check": "playwright test --project=session",
+    "menu:snapshot": "tsx scripts/menu-snapshot.ts",
+    "menu:diff": "tsx scripts/menu-diff.ts",
+    "menu:import-txt": "tsx scripts/menu-import-txt.ts",
+    "gen:smoke-scenarios": "bash runner/gen_smoke.sh",
+    "gen:smoke-specs": "tsx scripts/gen-smoke-specs.ts",
+    "gen:spec": "tsx scripts/trace-to-spec.ts",
+    "titles:merge": "tsx scripts/titles-merge.ts",
+    "test": "playwright test",
+    "test:unit": "playwright test --project=unit",
+    "test:auth-public": "playwright test --project=auth-public",
+    "test:smoke": "playwright test --project=smoke",
+    "test:regression": "playwright test --project=regression",
+    "test:headed": "playwright test --project=smoke --headed",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm run format:check && npm run test:unit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "22.20.4",
+    "dotenv": "17.4.2",
+    "prettier": "3.9.8",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "yaml": "2.9.1"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+test-results/
+playwright-report/
+recordings/
+service-map/raw/
+service-map/snapshots/
+service-map/screens.json
+service-map/titles.json
+tests/smoke/
+.venv/
+*.md
+*.yaml
+*.yml

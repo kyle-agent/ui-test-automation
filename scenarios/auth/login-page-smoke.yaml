@@ -1,41 +1,49 @@
 id: auth.login.page-smoke
 title: 로그인 페이지 기본 동작 (읽기 전용, 자격 증명 없음)
 service: auth
-tags: [smoke, readonly]
+tags: [smoke, readonly, public]
 precondition:
-  session: none          # 로그인 전 화면. 세션 불필요.
+  session: none          # 로그인 전 화면. 세션 불필요. 클라우드 세션/GitHub 러너에서도 돈다.
   language: ko
 
+# 2026-09-21 헤드리스 Chromium 으로 실제 확인한 값. 버튼은 전부 div(cursor:pointer) 이고 role/label 이 없다.
 steps:
   - goal: "콘솔 URL 로 진입하면 SSO 로그인 페이지로 이동한다"
     expect:
       url: "sso.e.samsungsdscloud.com/realms/scp"
-      text: ["로그인", "Root 사용자", "IAM 사용자", "ID(이메일)"]
+      title: "로그인 | Samsung Cloud Platform Console"
+      text: ["로그인", "Root 사용자", "IAM 사용자", "ID(이메일)", "다음"]
 
   - goal: "IAM 사용자 유형을 선택한다"
     expect:
-      text: ["IAM 사용자 로그인", "Account 정보", "IAM 사용자 ID"]
+      text: ["Account 정보"]        # 입력란 placeholder: "Account Id 또는 별칭을 입력하세요."
+      not_text: ["ID(이메일)", "회원가입"]
 
   - goal: "Root 사용자 유형으로 되돌린다"
     expect:
-      text: ["Root 사용자 로그인", "ID(이메일)"]
+      text: ["ID(이메일)", "회원가입"]
       not_text: ["Account 정보"]
 
   - goal: "이메일을 비운 채 다음 버튼을 누른다"
     expect:
       url: "sso.e.samsungsdscloud.com/realms/scp"     # 페이지 이동 없음
-      # 검증 메시지 문구는 기록 단계에서 확인해 채운다
+      title: "로그인 | Samsung Cloud Platform Console"
+      text: ["ID(이메일)"]
+      # 확인 결과 빈 값으로 눌러도 화면에 검증 문구가 뜨지 않는다. 이동하지 않는 것만 판정한다.
 
   - goal: "언어를 English 로 바꾼다"
     expect:
-      text: ["Sign In"]
+      title: "Sign-In | Samsung Cloud Platform Console"
+      text: ["Sign In", "Root User", "IAM User", "ID(Email)"]
       not_text: ["로그인"]
 
   - goal: "언어를 한국어로 되돌린다"
     expect:
-      text: ["로그인"]
+      title: "로그인 | Samsung Cloud Platform Console"
+      text: ["로그인", "Root 사용자"]
 
-links:                     # href 는 클릭하지 않고 속성만 검사한다 (외부 페이지 이동 방지)
+links:                     # href 속성만 검사한다(부분 일치). 클릭하지 않는다.
+  # 서버가 준 초기 href 는 Keycloak login-actions 경로지만, 테마 JS 가 로드 직후 아래 signup 주소로 바꿔 쓴다. 단언은 바뀐 값을 기다린다.
   - text: "ID/비밀번호 찾기"
     href: "signup.e.samsungsdscloud.com/accounts-management/#/find-id-pw"
   - text: "접근 IP 제어 해제"
