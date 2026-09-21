@@ -1,0 +1,24 @@
+id: smoke.data-ops
+title: "Data Ops 화면 진입 스모크 (읽기 전용)"
+service: "Data Ops"
+category: "Data Analytics"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Data Analytics > Data Ops 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/data-ops/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Data Ops 을(를) 클릭한다"
+    expect:
+      url: "#/data-ops/data-ops/list"
+      text: ["Data Ops"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Data Ops Services 을(를) 클릭한다"
+    expect:
+      url: "#/data-ops/data-ops-service/list"
+      text: ["Data Ops Services"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

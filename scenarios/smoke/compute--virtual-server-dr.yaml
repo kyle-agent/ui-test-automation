@@ -1,0 +1,14 @@
+id: smoke.virtual-server-dr
+title: "Virtual Server DR 화면 진입 스모크 (읽기 전용)"
+service: "Virtual Server DR"
+category: "Compute"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Compute > Virtual Server DR 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/virtualserverdr/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

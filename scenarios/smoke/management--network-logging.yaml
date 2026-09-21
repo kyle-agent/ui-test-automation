@@ -1,0 +1,29 @@
+id: smoke.network-logging
+title: "Network Logging 화면 진입 스모크 (읽기 전용)"
+service: "Network Logging"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > Network Logging 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/network-logging/firewall-logging/list"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Firewall Logging 을(를) 클릭한다"
+    expect:
+      url: "#/network-logging/firewall-logging/list"
+      text: ["Firewall Logging"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Security Group Logging 을(를) 클릭한다"
+    expect:
+      url: "#/network-logging/security-group-logging/list"
+      text: ["Security Group Logging"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 NAT Logging 을(를) 클릭한다"
+    expect:
+      url: "#/network-logging/nat-logging/list"
+      text: ["NAT Logging"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

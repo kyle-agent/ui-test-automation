@@ -1,0 +1,74 @@
+id: smoke.vpc
+title: "VPC 화면 진입 스모크 (읽기 전용)"
+service: "VPC"
+category: "Networking"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Networking > VPC 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/vpc/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 VPC 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["VPC"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Subnet 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["Subnet"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Port 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/port/list"
+      text: ["Port"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Internet Gateway 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/internet-gateway/list"
+      text: ["Internet Gateway"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 NAT Gateway 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/nat-gateway/list"
+      text: ["NAT Gateway"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Public IP 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+      text: ["Public IP"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Private NAT 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/private-nat/list"
+      text: ["Private NAT"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 VPC Endpoint 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/vpc-endpoint/list"
+      text: ["VPC Endpoint"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 VPC Peering 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/vpc-peering/list"
+      text: ["VPC Peering"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Transit Gateway 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/transit-gateway/list"
+      text: ["Transit Gateway"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 PrivateLink Service 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/privatelink-service/list"
+      text: ["PrivateLink Service"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 PrivateLink Endpoint 을(를) 클릭한다"
+    expect:
+      url: "#/vpc/privatelink-endpoint/list"
+      text: ["PrivateLink Endpoint"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

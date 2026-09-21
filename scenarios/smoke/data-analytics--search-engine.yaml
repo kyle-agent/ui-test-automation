@@ -1,0 +1,19 @@
+id: smoke.search-engine
+title: "Search Engine 화면 진입 스모크 (읽기 전용)"
+service: "Search Engine"
+category: "Data Analytics"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Data Analytics > Search Engine 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/searchengine/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Search Engine 을(를) 클릭한다"
+    expect:
+      url: "#/searchengine/searchengine/list"
+      text: ["Search Engine"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

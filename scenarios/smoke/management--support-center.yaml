@@ -1,0 +1,29 @@
+id: smoke.support-center
+title: "Support Center 화면 진입 스모크 (읽기 전용)"
+service: "Support Center"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > Support Center 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/support"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 서비스 요청 을(를) 클릭한다"
+    expect:
+      url: "#/support/sr/list"
+      text: ["서비스 요청"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 문의하기 을(를) 클릭한다"
+    expect:
+      url: "#/support/inquiry/list"
+      text: ["문의하기"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Support Plan 을(를) 클릭한다"
+    expect:
+      url: "#/support/plan"
+      text: ["Support Plan"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

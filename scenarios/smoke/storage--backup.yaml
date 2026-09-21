@@ -1,0 +1,24 @@
+id: smoke.backup
+title: "Backup 화면 진입 스모크 (읽기 전용)"
+service: "Backup"
+category: "Storage"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Storage > Backup 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/backup"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Backup 을(를) 클릭한다"
+    expect:
+      url: "#/backup/backup/list"
+      text: ["Backup"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Backup Agent 을(를) 클릭한다"
+    expect:
+      url: "#/backup/backup-agent/list"
+      text: ["Backup Agent"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

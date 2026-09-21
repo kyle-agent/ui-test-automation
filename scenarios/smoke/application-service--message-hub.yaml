@@ -1,0 +1,29 @@
+id: smoke.message-hub
+title: "Message Hub 화면 진입 스모크 (읽기 전용)"
+service: "Message Hub"
+category: "Application Service"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Application Service > Message Hub 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/messagehub/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Phone Book 을(를) 클릭한다"
+    expect:
+      url: "#/messagehub/phone"
+      text: ["Phone Book"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Push Application 을(를) 클릭한다"
+    expect:
+      url: "#/messagehub/push-application"
+      text: ["Push Application"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Email 관리 을(를) 클릭한다"
+    expect:
+      url: "#/messagehub/email"
+      text: ["Email 관리"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

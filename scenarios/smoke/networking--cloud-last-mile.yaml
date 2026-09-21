@@ -1,0 +1,24 @@
+id: smoke.cloud-last-mile
+title: "Cloud Last Mile 화면 진입 스모크 (읽기 전용)"
+service: "Cloud Last Mile"
+category: "Networking"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Networking > Cloud Last Mile 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/clm/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Cloud Last Mile 을(를) 클릭한다"
+    expect:
+      url: "#/clm/clm/list"
+      text: ["Cloud Last Mile"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Circuit and Edge 을(를) 클릭한다"
+    expect:
+      url: "#/clm/circuit-edges/list"
+      text: ["Circuit and Edge"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

@@ -1,0 +1,29 @@
+id: smoke.container-registry
+title: "Container Registry 화면 진입 스모크 (읽기 전용)"
+service: "Container Registry"
+category: "Container"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Container > Container Registry 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/scr/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Registry 을(를) 클릭한다"
+    expect:
+      url: "#/scr/registry"
+      text: ["Registry"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Repository 을(를) 클릭한다"
+    expect:
+      url: "#/scr/repository"
+      text: ["Repository"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Image 을(를) 클릭한다"
+    expect:
+      url: "#/scr/image"
+      text: ["Image"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

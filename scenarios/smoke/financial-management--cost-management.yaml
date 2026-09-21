@@ -1,0 +1,74 @@
+id: smoke.cost-management
+title: "Cost Management 화면 진입 스모크 (읽기 전용)"
+service: "Cost Management"
+category: "Financial Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Financial Management > Cost Management 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/costmanagement"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 이용 및 청구 내역 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/usage-and-billing-report"
+      text: ["이용 및 청구 내역"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 납부 내역 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/payment-report"
+      text: ["납부 내역"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Cost Navigator 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/cost-navigator"
+      text: ["Cost Navigator"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 빌링 태그 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/billing-tag"
+      text: ["빌링 태그"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Credit 관리 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/credit"
+      text: ["Credit 관리"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 예산 관리 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/budget"
+      text: ["예산 관리"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Cost Savings 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/cost-savings"
+      text: ["Cost Savings"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Account 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/cost-account-management"
+      text: ["Account"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 결제 관리 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/cost-payment-management"
+      text: ["결제 관리"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 탄소 배출량 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/carbon-emissions"
+      text: ["탄소 배출량"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 EDP Report 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/edp-report"
+      text: ["EDP Report"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 레거시 페이지 을(를) 클릭한다"
+    expect:
+      url: "#/costmanagement/explorer"
+      text: ["레거시 페이지"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

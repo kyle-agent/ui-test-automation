@@ -1,0 +1,44 @@
+id: smoke.cloud-control
+title: "Cloud Control 화면 진입 스모크 (읽기 전용)"
+service: "Cloud Control"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > Cloud Control 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/cloudcontrol"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 조직 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/organization"
+      text: ["조직"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Account 팩토리 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/account-factory"
+      text: ["Account 팩토리"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 가드레일 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/guardrail"
+      text: ["가드레일"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용자 및 액세스 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/user-and-access"
+      text: ["사용자 및 액세스"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 공유 Account 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/share-account"
+      text: ["공유 Account"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 랜딩 존 설정 을(를) 클릭한다"
+    expect:
+      url: "#/cloudcontrol/landing-zone-setting"
+      text: ["랜딩 존 설정"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

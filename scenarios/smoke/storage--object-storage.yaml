@@ -1,0 +1,19 @@
+id: smoke.object-storage
+title: "Object Storage 화면 진입 스모크 (읽기 전용)"
+service: "Object Storage"
+category: "Storage"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Storage > Object Storage 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/objectstorage/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Object Storage 을(를) 클릭한다"
+    expect:
+      url: "#/objectstorage/objectstorage/list"
+      text: ["Object Storage"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

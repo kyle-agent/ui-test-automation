@@ -1,0 +1,107 @@
+# SCP v2 Enterprise 콘솔 서비스 카탈로그 (pinia containerCommonStore.serviceCategoryList 에서 추출, 2026-09-21)
+# 계정 API_RegressionTest, 리전 kr-west1. route 는 https://console.kr-west1.e.samsungsdscloud.com/console/#<route>
+# 좌측 메뉴(화면 목록)는 screens.txt 참조 (/console/api/product/v1/menus 에서 추출)
+shell:
+  - {name: Console Home, route: /home/dashboard}
+  - {name: 모든 서비스, route: /home/all-service}
+  - {name: 공지사항, route: /notice}
+categories:
+  Compute:
+    - {name: Virtual Server, route: /virtualserver/dashboard}
+    - {name: GPU Server, route: /gpuserver/dashboard}
+    - {name: Bare Metal Server, route: /baremetal/dashboard}
+    - {name: Multi-node GPU Cluster, route: /multinodegpucluster/dashboard}
+    - {name: Cloud Functions, route: /scf/dashboard}
+    - {name: Virtual Server DR, route: /virtualserverdr/dashboard}
+  Storage:
+    - {name: Block Storage(BM), route: /baremetal-blockstorage/dashboard}
+    - {name: File Storage, route: /filestorage/dashboard}
+    - {name: Parallel File Storage, route: /parallelfilestorage/dashboard}
+    - {name: Object Storage, route: /objectstorage/dashboard}
+    - {name: Archive Storage, route: /archivestorage/dashboard}
+    - {name: Backup, route: /backup}
+  Container:
+    - {name: Kubernetes Engine, route: /ske/dashboard}
+    - {name: Container Registry, route: /scr/dashboard}
+  Networking:
+    - {name: Cloud Fabric Connect, route: /cfc/dashboard}
+    - {name: VPC, route: /vpc/dashboard}
+    - {name: Security Group, route: /securitygroup/dashboard}
+    - {name: Load Balancer, route: /loadbalancer/dashboard}
+    - {name: DNS, route: /dns/dashboard}
+    - {name: VPN, route: /vpn/dashboard}
+    - {name: Firewall, route: /firewall/dashboard}
+    - {name: Direct Connect, route: /directconnect/dashboard}
+    - {name: Cloud LAN-Data Center, route: /clandc/dashboard}
+    - {name: Cloud Secured SD-LAN, route: /cssdlan/dashboard}
+    - {name: Cloud WAN, route: /cwan/dashboard}
+    - {name: Cloud Virtual Circuit, route: /vc/dashboard}
+    - {name: SASE, route: /sase/dashboard}
+    - {name: Cloud Last Mile, route: /clm/dashboard}
+    - {name: Global CDN, route: /cdn/dashboard}
+    - {name: GSLB, route: /gslb/dashboard}
+    - {name: Private 5G Cloud, route: /private-fivegen-cloud/dashboard}
+  Database:
+    - {name: EPAS(DBaaS), route: /epas/dashboard}
+    - {name: PostgreSQL(DBaaS), route: /postgresql/dashboard}
+    - {name: MariaDB(DBaaS), route: /mariadb/dashboard}
+    - {name: MySQL(DBaaS), route: /mysql/dashboard}
+    - {name: Microsoft SQL Server(DBaaS), route: /sqlserver/dashboard}
+    - {name: CacheStore(DBaaS), route: /cachestore/dashboard}
+  Data Analytics:
+    - {name: Event Streams, route: /eventstreams/dashboard}
+    - {name: Search Engine, route: /searchengine/dashboard}
+    - {name: Vertica(DBaaS), route: /vertica/dashboard}
+    - {name: Data Flow, route: /data-flow/dashboard}
+    - {name: Data Ops, route: /data-ops/dashboard}
+    - {name: Quick Query, route: /quick-query/dashboard}
+  Application Service:
+    - {name: Message Hub, route: /messagehub/dashboard}
+    - {name: API Gateway, route: /apigateway/dashboard}
+    - {name: Queue Service, route: /queueservice/dashboard}
+  Security:
+    - {name: Endpoint Security Suite, route: /ess/dashboard}
+    - {name: Key Management Service, route: /kms/dashboard}
+    - {name: FPMS, route: /fpms/dashboard}
+    - {name: Config Inspection, route: /configinspection/dashboard}
+    - {name: Certificate Manager, route: /certificate-manager/dashboard}
+    - {name: Secrets Manager, route: /secretsmanager/dashboard}
+    - {name: Secret Vault, route: /secretvault/dashboard}
+    - {name: SingleID, route: /singleid/dashboard}
+    - {name: WAF, route: /webfirewall/dashboard}
+    - {name: DDoS Protection, route: /ddosprotection/dashboard}
+    - {name: IPS, route: /ips/dashboard}
+    - {name: Secured Firewall, route: /securedfirewall/dashboard}
+    - {name: Secured VPN, route: /securedvpn/dashboard}
+    - {name: Log Transmission, route: /logtransmission/dashboard}
+  Management:
+    - {name: Architecture Diagram, route: /architecturediagram}
+    - {name: Cloud Control, route: /cloudcontrol}
+    - {name: IAM, route: /iam}
+    - {name: ID Center, route: /idcenter}
+    - {name: Logging&Audit, route: /loggingaudit}
+    - {name: Network Logging, route: /network-logging/firewall-logging/list}
+    - {name: Notification Manager, route: /notification}
+    - {name: Organization, route: /organization}
+    - {name: Resource Explorer, route: /resourceexplorer}
+    - {name: Resource Groups, route: /resourcegroups}
+    - {name: Resource Optimizer, route: /resourceoptimizer/home}
+    - {name: ServiceWatch, route: /service-watch}
+    - {name: Support Center, route: /support}
+    - {name: Quota Service, route: /quota}
+  Financial Management:
+    - {name: Cost Management, route: /costmanagement}
+    - {name: Planned Compute, route: /plannedcompute}
+    - {name: Marketplace, route: /marketplace}
+  DevOps Tools:
+    - {name: DevOps Service, route: /devopsservice/dashboard}
+  AI-ML:
+    - {name: Simple AI Training, route: /ai-training/dashboard}
+    - {name: Simple AI Inference, route: /ai-inference/dashboard}
+    - {name: CloudML, route: /cloud-ml/dashboard}
+    - {name: AI&MLOps Platform, route: /aimlops-platform/dashboard}
+  Hybrid Cloud:
+    - {name: Dedicated Cloud, route: /dedicatedcloud/dashboard}
+    - {name: Edge Server, route: /edgeserver/dashboard}
+    - {name: Oracle Services, route: /oracleservices/dashboard}
+    - {name: Private Zone, route: /privatezone/dashboard}

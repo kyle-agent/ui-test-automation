@@ -1,0 +1,368 @@
+# /console/api/product/v1/menus (5 pages, 89 menus) 의 service_menu_ko 를 평탄화. 2026-09-21
+# 형식: "## 카테고리 > 서비스 | 진입 route" 다음 줄부터 "화면명 | route (resource_type)"
+# 주의: AIOS, Cloud LAN-Campus, Cloud Monitoring 은 모든 서비스 페이지에는 없고 API 에만 있음(종료/미노출 서비스)
+## Hybrid Cloud > Private Zone | /privatezone/dashboard
+Service Home | /privatezone/dashboard
+Private Zone | /privatezone/private-zone (private-zone)
+## Application Service > Message Hub | /messagehub/dashboard
+Service Home | /messagehub/dashboard
+Phone Book | /messagehub/phone (phone)
+Push Application | /messagehub/push-application (push-application)
+Email 관리 | /messagehub/email
+## Management > Resource Optimizer | /resourceoptimizer/home
+Service Home | /resourceoptimizer/home
+대시보드 | /resourceoptimizer/dashboard
+Rightsizing | /resourceoptimizer/rightsizing
+유휴 자원 | /resourceoptimizer/idle-resource
+기본 설정 | /resourceoptimizer/settings
+## Networking > Cloud Fabric Connect | /cfc/dashboard
+Service Home | /cfc/dashboard
+Fabric | /cfc/fabric (fabric)
+Port | /cfc/port (port)
+Connection | /cfc/connection (connection)
+Policy | /cfc/policy (policy)
+## Networking > Cloud LAN-Data Center | /clandc/dashboard
+Service Home | /clandc/dashboard
+Cloud LAN Network | /clandc/network (cloud-lan-network)
+vDevice | /clandc/device (vdevice)
+Interface | /clandc/interface (interface)
+vCable | /clandc/cable (vcable)
+## Networking > Cloud WAN | /cwan/dashboard
+Service Home | /cwan/dashboard
+Cloud WAN Network | /cwan/network (network)
+Segment | /cwan/segment (segment)
+Attachment | /cwan/attachment (attachment)
+Site VPN | /cwan/sitevpn (cloudwan-sitevpn)
+## Hybrid Cloud > Dedicated Cloud | /dedicatedcloud/dashboard
+Service Home | /dedicatedcloud/dashboard
+Dedicated Cloud | /dedicatedcloud/dedicated-cloud (connected)
+## AI-ML > Simple AI Training | /ai-training/dashboard
+Service Home | /ai-training/dashboard
+Training Workspace | /ai-training/workspace/list (workspace)
+Volume | /ai-training/volume/list (volume)
+Training Job | /ai-training/job/list (job)
+## Networking > Cloud Secured SD-LAN | /cssdlan/dashboard
+Service Home | /cssdlan/dashboard
+Network | /cssdlan/cssdlan-network (cssdlan-network)
+## AI-ML > Simple AI Inference | /ai-inference/dashboard
+Service Home | /ai-inference/dashboard
+모델 카탈로그 | /ai-inference/model-catalog/list
+Serverless Inference | /ai-inference/serverless-endpoint/list
+API 키 | /ai-inference/apikey/list
+Playground | /ai-inference/playground
+## Security > Endpoint Security Suite | /ess/dashboard
+Service Home | /ess/dashboard
+## Security > FPMS | /fpms/dashboard
+Service Home | /fpms/dashboard
+## Hybrid Cloud > Oracle Services | /oracleservices/dashboard
+Service Home | /oracleservices/dashboard
+Oracle Services | /oracleservices/oracle-services (oracle-services)
+## Security > Secrets Manager | /secretsmanager/dashboard
+Service Home | /secretsmanager/dashboard
+Secrets Manager | /secretsmanager/secretsmanager/list (secret)
+## Application Service > Queue Service | /queueservice/dashboard
+Service Home | /queueservice/dashboard
+Queue | /queueservice/queueservices (queue)
+## Storage > Parallel File Storage | /parallelfilestorage/dashboard
+Service Home | /parallelfilestorage/dashboard
+Parallel File Storage | /parallelfilestorage/parallelfilestorage/list (volume)
+## Security > Log Transmission | /logtransmission/dashboard
+Service Home | /logtransmission/dashboard
+## Management > ServiceWatch | /service-watch
+Service Home | /service-watch/home
+대시보드 | /service-watch/dashboard
+경보 | /service-watch/alert
+지표 | /service-watch/metric
+로그 | /service-watch/log/group
+이벤트 규칙 | /service-watch/event/rule
+## Management > Cloud Control | /cloudcontrol
+Service Home | /cloudcontrol/dashboard
+조직 | /cloudcontrol/organization
+Account 팩토리 | /cloudcontrol/account-factory
+가드레일 | /cloudcontrol/guardrail
+사용자 및 액세스 | /cloudcontrol/user-and-access
+공유 Account | /cloudcontrol/share-account
+랜딩 존 설정 | /cloudcontrol/landing-zone-setting
+## Networking > Private 5G Cloud | /private-fivegen-cloud/dashboard
+Service Home | /private-fivegen-cloud/dashboard
+## Networking > Cloud Virtual Circuit | /vc/dashboard
+Service Home | /vc/dashboard
+## Security > Secured Firewall | /securedfirewall/dashboard
+Service Home | /securedfirewall/dashboard
+## Security > Secured VPN | /securedvpn/dashboard
+Service Home | /securedvpn/dashboard
+## Security > IPS | /ips/dashboard
+Service Home | /ips/dashboard
+## Security > DDoS Protection | /ddosprotection/dashboard
+Service Home | /ddosprotection/dashboard
+## Security > WAF | /webfirewall/dashboard
+Service Home | /webfirewall/dashboard
+## Security > SingleID | /singleid/dashboard
+Service Home | /singleid/dashboard
+SingleID | /singleid/singleid/list (singleid)
+## Data Analytics > Vertica(DBaaS) | /vertica/dashboard
+Service Home | /vertica/dashboard
+Vertica(DBaaS) | /vertica/vertica/list (vertica)
+## Financial Management > Marketplace | /marketplace
+구독 관리 | /marketplace/management/list
+상품 Catalog | /marketplace/catalog/list
+## Security > Secret Vault | /secretvault/dashboard
+Service Home | /secretvault/dashboard
+Secret Vault | /secretvault/secretvault/list (secretvault)
+## AI-ML > CloudML | /cloud-ml/dashboard
+Service Home | /cloud-ml/dashboard
+CloudML | /cloud-ml/cloud-ml/list
+## Data Analytics > Quick Query | /quick-query/dashboard
+Service Home | /quick-query/dashboard
+Quick Query | /quick-query/quick-query/list
+## AI-ML > AIOS | /aios/dashboard
+Service Home | /aios/dashboard
+Report | /aios/report
+## Management > Organization | /organization
+Service Home | /organization/dashboard
+받은 초대 | /organization/invitations-received
+초대 내역 | /organization/invitations-sent
+조직 구성 | /organization/structure (ou)
+통제 정책 | /organization/control-policy (service-control-policy)
+조직 설정 | /organization/settings
+## Security > Certificate Manager | /certificate-manager/dashboard
+Service Home | /certificate-manager/dashboard
+Certificate Manager | /certificate-manager/certificate-manager/list (certificate)
+## Compute > Virtual Server DR | /virtualserverdr/dashboard
+Service Home | /virtualserverdr/dashboard
+## Networking > Global CDN | /cdn/dashboard
+Service Home | /cdn/dashboard
+Global CDN | /cdn/cdn/list (cdn)
+## Networking > GSLB | /gslb/dashboard
+Service Home | /gslb/dashboard
+GSLB | /gslb/gslb/list (gslb)
+Regional Routing Controller | /gslb/rrc/list (gslb-rrc)
+## Compute > Cloud Functions | /scf/dashboard
+Service Home | /scf/dashboard
+Function | /scf/cloudfunctions (cloud-function)
+## Storage > Archive Storage | /archivestorage/dashboard
+Service Home | /archivestorage/dashboard
+Archive Storage | /archivestorage/archivestorage/list (bucket)
+## Management > ID Center | /idcenter
+Service Home | /idcenter/dashboard
+사용자 | /idcenter/user/list (user)
+사용자 그룹 | /idcenter/group/list (group)
+ID Center 설정 | /idcenter/setting/main
+Account 할당 | /idcenter/account/organization-list (account)
+권한 세트 | /idcenter/permission-set/list (permission-set)
+## Application Service > API Gateway | /apigateway/dashboard
+Service Home | /apigateway/dashboard
+API | /apigateway/api (api)
+PrivateLink Endpoint | /apigateway/privatelink-endpoint
+리소스 | /apigateway/resource
+스테이지 | /apigateway/stage
+인증 | /apigateway/authentication
+접근 제어 | /apigateway/accessControl
+사용량 정책 | /apigateway/usagePlan
+리소스 정책 | /apigateway/resourcePolicy
+Report | /apigateway/report
+## Networking > Cloud LAN-Campus | /clancampus/sr/dashboard
+Service Home | /clancampus/sr/dashboard
+## Networking > SASE | /sase/dashboard
+Service Home | /sase/dashboard
+SASE 서비스 | /sase/sase (sase)
+SASE Lastmile | /sase/last-mile/list (lastmile)
+## Networking > Cloud Last Mile | /clm/dashboard
+Service Home | /clm/dashboard
+Cloud Last Mile | /clm/clm/list (cloud-lastmile)
+Circuit and Edge | /clm/circuit-edges/list (circuit-and-edge)
+## Management > Quota Service | /quota
+Service Home | /quota/dashboard
+Quota Service | /quota/service/list
+요청 내역 | /quota/request-history
+조직 할당량 템플릿 | /quota/template
+## Management > Network Logging | /network-logging/firewall-logging/list
+Firewall Logging | /network-logging/firewall-logging/list
+Security Group Logging | /network-logging/security-group-logging/list
+NAT Logging | /network-logging/nat-logging/list
+## Container > Container Registry | /scr/dashboard
+Service Home | /scr/dashboard
+Registry | /scr/registry (container-registry)
+Repository | /scr/repository (repository)
+Image | /scr/image
+## Financial Management > Planned Compute | /plannedcompute
+Service Home | /plannedcompute/dashboard
+Planned Compute | /plannedcompute/planned-compute/list (planned-compute)
+Coverage | /plannedcompute/coverage/list
+## Networking > Load Balancer | /loadbalancer/dashboard
+Service Home | /loadbalancer/dashboard
+Load Balancer | /loadbalancer/loadbalancer/list (loadbalancer)
+LB 서버 그룹 | /loadbalancer/loadbalancer-server-group/list (lb-server-group)
+LB 헬스 체크 | /loadbalancer/loadbalancer-health-check/list (lb-health-check)
+## Management > Architecture Diagram | /architecturediagram
+## Hybrid Cloud > Edge Server | /edgeserver/dashboard
+Service Home | /edgeserver/dashboard
+Edge Server | /edgeserver/edgeserver/list
+## AI-ML > AI&MLOps Platform | /aimlops-platform/dashboard
+Service Home | /aimlops-platform/dashboard
+AI&MLOps Platform | /aimlops-platform/aimlops-platform/list
+## Data Analytics > Data Flow | /data-flow/dashboard
+Service Home | /data-flow/dashboard
+Data Flow | /data-flow/data-flow/list
+Data Flow Services | /data-flow/data-flow-service/list
+## Data Analytics > Data Ops | /data-ops/dashboard
+Service Home | /data-ops/dashboard
+Data Ops | /data-ops/data-ops/list
+Data Ops Services | /data-ops/data-ops-service/list
+## Financial Management > Cost Management | /costmanagement
+Service Home | /costmanagement/dashboard
+이용 및 청구 내역 | /costmanagement/usage-and-billing-report
+납부 내역 | /costmanagement/payment-report
+Cost Navigator | /costmanagement/cost-navigator
+빌링 태그 | /costmanagement/billing-tag
+Credit 관리 | /costmanagement/credit
+예산 관리 | /costmanagement/budget
+Cost Savings | /costmanagement/cost-savings
+Account | /costmanagement/cost-account-management
+결제 관리 | /costmanagement/cost-payment-management
+탄소 배출량 | /costmanagement/carbon-emissions
+EDP Report | /costmanagement/edp-report
+레거시 페이지 | /costmanagement/explorer
+## Management > IAM | /iam
+Service Home | /iam/dashboard
+사용자 그룹 | /iam/group/list (group)
+사용자 | /iam/user/list (user)
+정책 | /iam/policy/list (policy)
+역할 | /iam/role (role)
+자격 증명 공급자 | /iam/idp/list (saml-provider)
+My Info. | /iam/my-info
+## Management > Logging&Audit | /loggingaudit
+Service Home | /loggingaudit/dashboard
+Trail | /loggingaudit/trail (trail)
+활동 내역 | /loggingaudit/log
+## Management > Support Center | /support
+Service Home | /support/dashboard
+서비스 요청 | /support/sr/list
+문의하기 | /support/inquiry/list
+Support Plan | /support/plan
+## Management > Notification Manager | /notification
+알림 그룹 | /notification/group (receiver-group)
+알림 정책 | /notification/policy
+## Management > Resource Explorer | /resourceexplorer
+Resource Search | /resourceexplorer/resource-search
+## Management > Resource Groups | /resourcegroups
+Resource Groups | /resourcegroups/resource-group/list (resource-group)
+## DevOps Tools > DevOps Service | /devopsservice/dashboard
+Service Home | /devopsservice/dashboard
+DevOps Service | /devopsservice/devops-service (devops-service)
+## Compute > Multi-node GPU Cluster | /multinodegpucluster/dashboard
+Service Home | /multinodegpucluster/dashboard
+GPU Node | /multinodegpucluster/gpu-node/list (gpu-node)
+Cluster Fabric | /multinodegpucluster/cluster-fabric/list (cluster-fabric)
+## Security > Config Inspection | /configinspection/dashboard
+Service Home | /configinspection/dashboard
+Config Inspection | /configinspection/configinspection/list (config-inspection)
+대시보드 | /configinspection/configinspection-report/reportDashboard
+진단 결과 | /configinspection/configinspection-report/history
+## Security > Key Management Service | /kms/dashboard
+Service Home | /kms/dashboard
+플랫폼 관리형 키 | /kms/managedkms/list (managed-kms)
+고객 관리형 키 | /kms/kms/list (kms)
+## Data Analytics > Event Streams | /eventstreams/dashboard
+Service Home | /eventstreams/dashboard
+Event Streams | /eventstreams/eventstreams/list (event-streams)
+## Data Analytics > Search Engine | /searchengine/dashboard
+Service Home | /searchengine/dashboard
+Search Engine | /searchengine/searchengine/list (search-engine)
+## Database > EPAS(DBaaS) | /epas/dashboard
+Service Home | /epas/dashboard
+EPAS(DBaaS) | /epas/epas/list (epas)
+## Database > Microsoft SQL Server(DBaaS) | /sqlserver/dashboard
+Service Home | /sqlserver/dashboard
+Microsoft SQL Server(DBaaS) | /sqlserver/sqlserver/list (sqlserver)
+## Networking > VPN | /vpn/dashboard
+Service Home | /vpn/dashboard
+VPN | /vpn/vpn/list (vpn-gateway)
+VPN Tunnel | /vpn/vpn-tunnel/list (vpn-tunnel)
+## Database > MySQL(DBaaS) | /mysql/dashboard
+Service Home | /mysql/dashboard
+MySQL(DBaaS) | /mysql/mysql/list (mysql)
+## Compute > GPU Server | /gpuserver/dashboard
+Service Home | /gpuserver/dashboard
+GPU Server | /gpuserver/gpuserver/list (gpu-server)
+Image | /gpuserver/image/list (image)
+Keypair | /gpuserver/keypair/list (keypair)
+Block Storage | /gpuserver/block-storage/list (volume)
+## Database > MariaDB(DBaaS) | /mariadb/dashboard
+Service Home | /mariadb/dashboard
+MariaDB(DBaaS) | /mariadb/mariadb/list (mariadb)
+## Networking > VPC | /vpc/dashboard
+Service Home | /vpc/dashboard
+VPC | /vpc/vpc/list (vpc)
+Subnet | /vpc/subnet/list (subnet)
+Port | /vpc/port/list (port)
+Internet Gateway | /vpc/internet-gateway/list (internet-gateway)
+NAT Gateway | /vpc/nat-gateway/list (nat-gateway)
+Public IP | /vpc/public-ip/list (publicip)
+Private NAT | /vpc/private-nat/list (private-nat)
+VPC Endpoint | /vpc/vpc-endpoint/list (vpc-endpoint)
+VPC Peering | /vpc/vpc-peering/list (vpc-peering)
+Transit Gateway | /vpc/transit-gateway/list (transit-gateway)
+PrivateLink Service | /vpc/privatelink-service/list (privatelink-service)
+PrivateLink Endpoint | /vpc/privatelink-endpoint/list (privatelink-endpoint)
+## Storage > Block Storage(BM) | /baremetal-blockstorage/dashboard
+Service Home | /baremetal-blockstorage/dashboard
+Block Storage(BM) | /baremetal-blockstorage/baremetal-blockstorage/list (volume)
+Volume Group(BM) | /baremetal-blockstorage/volume-group/list (volume-group)
+## Networking > Direct Connect | /directconnect/dashboard
+Service Home | /directconnect/dashboard
+Direct Connect | /directconnect/directconnect/list (direct-connect)
+## Networking > Security Group | /securitygroup/dashboard
+Service Home | /securitygroup/dashboard
+Security Group | /securitygroup/securitygroup/list (security-group)
+Address Group | /securitygroup/addressgroup/list (address-group)
+Migration Rules | /securitygroup/migration-rules
+## Networking > Firewall | /firewall/dashboard
+Service Home | /firewall/dashboard
+Firewall | /firewall/firewall/list (firewall)
+Migration Rules | /firewall/migration-rules
+## Compute > Bare Metal Server | /baremetal/dashboard
+Service Home | /baremetal/dashboard
+Bare Metal Server | /baremetal/baremetal/list (baremetal)
+## Storage > Backup | /backup
+Service Home | /backup/dashboard
+Backup | /backup/backup/list (backup)
+Backup Agent | /backup/backup-agent/list (backup-agent)
+## Storage > File Storage | /filestorage/dashboard
+Service Home | /filestorage/dashboard
+File Storage | /filestorage/filestorage/list (volume)
+## Compute > Virtual Server | /virtualserver/dashboard
+Service Home | /virtualserver/dashboard
+Virtual Server | /virtualserver/virtualserver/list (virtual-server)
+Image | /virtualserver/image/list (image)
+Keypair | /virtualserver/keypair/list (keypair)
+Server Group | /virtualserver/server-group/list (server-group)
+Launch Configuration | /virtualserver/launch-configuration/list (launch-configuration)
+Auto-Scaling Group | /virtualserver/auto-scaling-group/list (auto-scaling-group)
+Block Storage | /virtualserver/block-storage/list (volume)
+## Networking > DNS | /dns/dashboard
+Service Home | /dns/dashboard
+Private DNS | /dns/private-dns/list (private-dns)
+Hosted Zone | /dns/hosted-zone/list (hosted-zone)
+Public Domain Name | /dns/public-domain-name/list (public-domain-name)
+## Storage > Object Storage | /objectstorage/dashboard
+Service Home | /objectstorage/dashboard
+Object Storage | /objectstorage/objectstorage/list (bucket)
+## Database > PostgreSQL(DBaaS) | /postgresql/dashboard
+Service Home | /postgresql/dashboard
+PostgreSQL(DBaaS) | /postgresql/postgresql/list (postgresql)
+## Database > CacheStore(DBaaS) | /cachestore/dashboard
+Service Home | /cachestore/dashboard
+CacheStore(DBaaS) | /cachestore/cachestore/list (cache-store)
+## Container > Kubernetes Engine | /ske/dashboard
+Service Home | /ske/dashboard
+클러스터 | /ske/cluster (cluster)
+노드 | /ske/node
+네임스페이스 | /ske/namespace
+워크로드 | /ske/workload
+서비스 및 인그레스 | /ske/network
+스토리지 | /ske/storage
+구성 | /ske/configuration
+권한 | /ske/authorization
+## Management > Cloud Monitoring | /cloudmonitoring/dashboard
+Service Home | /cloudmonitoring/dashboard

@@ -1,0 +1,19 @@
+id: smoke.cachestore-dbaas
+title: "CacheStore(DBaaS) 화면 진입 스모크 (읽기 전용)"
+service: "CacheStore(DBaaS)"
+category: "Database"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Database > CacheStore(DBaaS) 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/cachestore/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 CacheStore(DBaaS) 을(를) 클릭한다"
+    expect:
+      url: "#/cachestore/cachestore/list"
+      text: ["CacheStore(DBaaS)"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

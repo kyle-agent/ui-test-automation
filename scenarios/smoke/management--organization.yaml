@@ -1,0 +1,39 @@
+id: smoke.organization
+title: "Organization 화면 진입 스모크 (읽기 전용)"
+service: "Organization"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > Organization 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/organization"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 받은 초대 을(를) 클릭한다"
+    expect:
+      url: "#/organization/invitations-received"
+      text: ["받은 초대"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 초대 내역 을(를) 클릭한다"
+    expect:
+      url: "#/organization/invitations-sent"
+      text: ["초대 내역"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 조직 구성 을(를) 클릭한다"
+    expect:
+      url: "#/organization/structure"
+      text: ["조직 구성"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 통제 정책 을(를) 클릭한다"
+    expect:
+      url: "#/organization/control-policy"
+      text: ["통제 정책"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 조직 설정 을(를) 클릭한다"
+    expect:
+      url: "#/organization/settings"
+      text: ["조직 설정"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

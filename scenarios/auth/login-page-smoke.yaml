@@ -1,0 +1,44 @@
+id: auth.login.page-smoke
+title: 로그인 페이지 기본 동작 (읽기 전용, 자격 증명 없음)
+service: auth
+tags: [smoke, readonly]
+precondition:
+  session: none          # 로그인 전 화면. 세션 불필요.
+  language: ko
+
+steps:
+  - goal: "콘솔 URL 로 진입하면 SSO 로그인 페이지로 이동한다"
+    expect:
+      url: "sso.e.samsungsdscloud.com/realms/scp"
+      text: ["로그인", "Root 사용자", "IAM 사용자", "ID(이메일)"]
+
+  - goal: "IAM 사용자 유형을 선택한다"
+    expect:
+      text: ["IAM 사용자 로그인", "Account 정보", "IAM 사용자 ID"]
+
+  - goal: "Root 사용자 유형으로 되돌린다"
+    expect:
+      text: ["Root 사용자 로그인", "ID(이메일)"]
+      not_text: ["Account 정보"]
+
+  - goal: "이메일을 비운 채 다음 버튼을 누른다"
+    expect:
+      url: "sso.e.samsungsdscloud.com/realms/scp"     # 페이지 이동 없음
+      # 검증 메시지 문구는 기록 단계에서 확인해 채운다
+
+  - goal: "언어를 English 로 바꾼다"
+    expect:
+      text: ["Sign In"]
+      not_text: ["로그인"]
+
+  - goal: "언어를 한국어로 되돌린다"
+    expect:
+      text: ["로그인"]
+
+links:                     # href 는 클릭하지 않고 속성만 검사한다 (외부 페이지 이동 방지)
+  - text: "ID/비밀번호 찾기"
+    href: "signup.e.samsungsdscloud.com/accounts-management/#/find-id-pw"
+  - text: "접근 IP 제어 해제"
+    href: "signup.e.samsungsdscloud.com/accounts-management/#/ip-access-control-reset"
+  - text: "회원가입"
+    href: "signup.e.samsungsdscloud.com/accounts-management/#/signup"

@@ -1,0 +1,59 @@
+id: smoke.api-gateway
+title: "API Gateway 화면 진입 스모크 (읽기 전용)"
+service: "API Gateway"
+category: "Application Service"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Application Service > API Gateway 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/apigateway/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 API 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/api"
+      text: ["API"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 PrivateLink Endpoint 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/privatelink-endpoint"
+      text: ["PrivateLink Endpoint"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 리소스 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/resource"
+      text: ["리소스"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 스테이지 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/stage"
+      text: ["스테이지"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 인증 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/authentication"
+      text: ["인증"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 접근 제어 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/accessControl"
+      text: ["접근 제어"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용량 정책 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/usagePlan"
+      text: ["사용량 정책"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 리소스 정책 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/resourcePolicy"
+      text: ["리소스 정책"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Report 을(를) 클릭한다"
+    expect:
+      url: "#/apigateway/report"
+      text: ["Report"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

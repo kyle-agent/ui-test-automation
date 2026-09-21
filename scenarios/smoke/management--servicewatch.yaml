@@ -1,0 +1,39 @@
+id: smoke.servicewatch
+title: "ServiceWatch 화면 진입 스모크 (읽기 전용)"
+service: "ServiceWatch"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > ServiceWatch 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/service-watch"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 대시보드 을(를) 클릭한다"
+    expect:
+      url: "#/service-watch/dashboard"
+      text: ["대시보드"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 경보 을(를) 클릭한다"
+    expect:
+      url: "#/service-watch/alert"
+      text: ["경보"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 지표 을(를) 클릭한다"
+    expect:
+      url: "#/service-watch/metric"
+      text: ["지표"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 로그 을(를) 클릭한다"
+    expect:
+      url: "#/service-watch/log/group"
+      text: ["로그"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 이벤트 규칙 을(를) 클릭한다"
+    expect:
+      url: "#/service-watch/event/rule"
+      text: ["이벤트 규칙"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

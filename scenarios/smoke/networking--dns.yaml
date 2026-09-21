@@ -1,0 +1,29 @@
+id: smoke.dns
+title: "DNS 화면 진입 스모크 (읽기 전용)"
+service: "DNS"
+category: "Networking"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Networking > DNS 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/dns/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Private DNS 을(를) 클릭한다"
+    expect:
+      url: "#/dns/private-dns/list"
+      text: ["Private DNS"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Hosted Zone 을(를) 클릭한다"
+    expect:
+      url: "#/dns/hosted-zone/list"
+      text: ["Hosted Zone"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Public Domain Name 을(를) 클릭한다"
+    expect:
+      url: "#/dns/public-domain-name/list"
+      text: ["Public Domain Name"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

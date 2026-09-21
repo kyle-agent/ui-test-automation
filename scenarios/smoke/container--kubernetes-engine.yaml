@@ -1,0 +1,54 @@
+id: smoke.kubernetes-engine
+title: "Kubernetes Engine 화면 진입 스모크 (읽기 전용)"
+service: "Kubernetes Engine"
+category: "Container"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Container > Kubernetes Engine 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/ske/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 클러스터 을(를) 클릭한다"
+    expect:
+      url: "#/ske/cluster"
+      text: ["클러스터"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 노드 을(를) 클릭한다"
+    expect:
+      url: "#/ske/node"
+      text: ["노드"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 네임스페이스 을(를) 클릭한다"
+    expect:
+      url: "#/ske/namespace"
+      text: ["네임스페이스"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 워크로드 을(를) 클릭한다"
+    expect:
+      url: "#/ske/workload"
+      text: ["워크로드"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 서비스 및 인그레스 을(를) 클릭한다"
+    expect:
+      url: "#/ske/network"
+      text: ["서비스 및 인그레스"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 스토리지 을(를) 클릭한다"
+    expect:
+      url: "#/ske/storage"
+      text: ["스토리지"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 구성 을(를) 클릭한다"
+    expect:
+      url: "#/ske/configuration"
+      text: ["구성"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 권한 을(를) 클릭한다"
+    expect:
+      url: "#/ske/authorization"
+      text: ["권한"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

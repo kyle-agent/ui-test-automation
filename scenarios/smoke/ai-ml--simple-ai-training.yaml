@@ -1,0 +1,29 @@
+id: smoke.simple-ai-training
+title: "Simple AI Training 화면 진입 스모크 (읽기 전용)"
+service: "Simple AI Training"
+category: "AI-ML"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 AI-ML > Simple AI Training 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/ai-training/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Training Workspace 을(를) 클릭한다"
+    expect:
+      url: "#/ai-training/workspace/list"
+      text: ["Training Workspace"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Volume 을(를) 클릭한다"
+    expect:
+      url: "#/ai-training/volume/list"
+      text: ["Volume"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Training Job 을(를) 클릭한다"
+    expect:
+      url: "#/ai-training/job/list"
+      text: ["Training Job"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

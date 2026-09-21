@@ -1,0 +1,24 @@
+id: smoke.data-flow
+title: "Data Flow 화면 진입 스모크 (읽기 전용)"
+service: "Data Flow"
+category: "Data Analytics"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Data Analytics > Data Flow 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/data-flow/dashboard"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Data Flow 을(를) 클릭한다"
+    expect:
+      url: "#/data-flow/data-flow/list"
+      text: ["Data Flow"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Data Flow Services 을(를) 클릭한다"
+    expect:
+      url: "#/data-flow/data-flow-service/list"
+      text: ["Data Flow Services"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

@@ -1,0 +1,44 @@
+id: smoke.iam
+title: "IAM 화면 진입 스모크 (읽기 전용)"
+service: "IAM"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > IAM 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/iam"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용자 그룹 을(를) 클릭한다"
+    expect:
+      url: "#/iam/group/list"
+      text: ["사용자 그룹"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용자 을(를) 클릭한다"
+    expect:
+      url: "#/iam/user/list"
+      text: ["사용자"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 정책 을(를) 클릭한다"
+    expect:
+      url: "#/iam/policy/list"
+      text: ["정책"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 역할 을(를) 클릭한다"
+    expect:
+      url: "#/iam/role"
+      text: ["역할"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 자격 증명 공급자 을(를) 클릭한다"
+    expect:
+      url: "#/iam/idp/list"
+      text: ["자격 증명 공급자"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 My Info. 을(를) 클릭한다"
+    expect:
+      url: "#/iam/my-info"
+      text: ["My Info."]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

@@ -1,0 +1,39 @@
+id: smoke.id-center
+title: "ID Center 화면 진입 스모크 (읽기 전용)"
+service: "ID Center"
+category: "Management"
+tags: [smoke, readonly, generated]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+steps:
+  - goal: "모든 서비스에서 Management > ID Center 를 열어 서비스에 진입한다"
+    expect:
+      url: "#/idcenter"
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용자 을(를) 클릭한다"
+    expect:
+      url: "#/idcenter/user/list"
+      text: ["사용자"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 사용자 그룹 을(를) 클릭한다"
+    expect:
+      url: "#/idcenter/group/list"
+      text: ["사용자 그룹"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 ID Center 설정 을(를) 클릭한다"
+    expect:
+      url: "#/idcenter/setting/main"
+      text: ["ID Center 설정"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 Account 할당 을(를) 클릭한다"
+    expect:
+      url: "#/idcenter/account/organization-list"
+      text: ["Account 할당"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]
+  - goal: "좌측 메뉴에서 권한 세트 을(를) 클릭한다"
+    expect:
+      url: "#/idcenter/permission-set/list"
+      text: ["권한 세트"]
+      not_text: ["오류가 발생", "Error", "권한이 없습니다"]

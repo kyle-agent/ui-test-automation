@@ -1,0 +1,5 @@
+recordings/session-*.json
+recordings/**/screenshots/
+node_modules/
+test-results/
+.env
