@@ -60,6 +60,35 @@ export interface TraceAction {
   cost: number | null;
   screenshot: string | null;
   note?: string;
+  /** 결정 시점에 모델에 보낸 요소 표 요약 (진단·spec 다듬기용) */
+  observed?: ObservedSummary;
+}
+
+export interface ObservedSummary {
+  elements: number;
+  omitted: number;
+  frames: { index: number; url: string; selector: string | null; shadow_hosts: number }[];
+  sample: string[];
+}
+
+export function summarize(state: PageState, candidates: ObservedAction[]): ObservedSummary {
+  const elements = candidates.filter((a) => a.kind !== 'scroll' && a.kind !== 'wait');
+  return {
+    elements: elements.length,
+    omitted: state.omitted_actions,
+    frames: (state.frames ?? []).map((f) => ({
+      index: f.index,
+      url: f.url.slice(0, 120),
+      selector: f.selector,
+      shadow_hosts: f.shadow_hosts,
+    })),
+    sample: elements
+      .slice(0, 80)
+      .map(
+        (a) =>
+          `[${a.id}] ${a.role ?? a.kind} "${a.label.slice(0, 60)}"${a.frame ? ` (frame ${a.frame})` : ''}`,
+      ),
+  };
 }
 
 export type StepResult = 'passed' | 'failed' | 'blocked' | 'budget' | 'aborted' | 'skipped' | 'error';
@@ -315,10 +344,11 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
           `(p=${prob === null ? '-' : prob.toFixed(2)}, conf=${decision.confidence.toFixed(2)}, ${decision.latencyMs}ms)`,
       );
 
+      const observed = summarize(state, candidates);
       if (decision.operation === 'DONE') {
         const failures = await checkExpectation(page, exp, { consoleTitle: consoleChecks });
-        record.actions.push(
-          traceAction(
+        record.actions.push({
+          ...traceAction(
             n + 1,
             'DONE',
             'wait',
@@ -331,13 +361,14 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
             await page.title(),
             decision,
           ),
-        );
+          observed,
+        });
         await finish(failures.length ? 'failed' : 'passed', failures);
         return;
       }
       if (decision.operation === 'BLOCKED' || !action) {
-        record.actions.push(
-          traceAction(
+        record.actions.push({
+          ...traceAction(
             n + 1,
             'BLOCKED',
             'wait',
@@ -350,7 +381,12 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
             await page.title(),
             decision,
           ),
+          observed,
+        });
+        log(
+          `  관측된 요소 ${observed.elements}개 (프레임 ${observed.frames.length}개${observed.frames.some((f) => f.shadow_hosts) ? ', shadow DOM 있음' : ''}):`,
         );
+        for (const line of observed.sample.slice(0, 40)) log(`    ${line}`);
         await finish('blocked', ['Jev 가 진행할 동작이 없다고 판단']);
         return;
       }
@@ -391,8 +427,7 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
           continue;
         }
       }
-      const descriptor =
-        typeof action.node === 'number' ? await describe(page, action.node).catch(() => null) : null;
+      const descriptor = await describe(page, state, action).catch(() => null);
       if (opts.dryRun) {
         record.actions.push(
           traceAction(
@@ -455,6 +490,7 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
         text,
         textVar,
       );
+      ta.observed = observed;
       ta.page_changed = pageChanged;
       ta.screenshot = path.relative(opts.outDir, shot);
       if (action.kind === 'select') ta.select_value = action.value ?? null;

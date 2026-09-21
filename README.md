@@ -105,11 +105,13 @@ RUN_DESTRUCTIVE=1 npx playwright test --project=regression                 # 결
   벗어나면 멈춘다. `--confirm` 이면 사람이 모든 동작을 승인한다. `--dry-run` 은 첫 선택만 보여준다.
 - teardown 은 앞 step 이 실패해도 실행된다(리소스가 남았을 수 있으므로). `--no-teardown` 은 리소스가 남을 수 있으니 주의.
 - 트레이스(`recordings/<id>/trace.json`)는 커밋한다. 클라우드 세션이 이걸 읽고 spec 을 다듬는다. 스크린샷은 gitignore.
-- 파이프라인 검증용 픽스처: `tests/fixtures/fake-vpc.html` (가짜 VPC 콘솔). 콘솔 없이 기록과 재생을 끝까지 돌려볼 수 있다.
+- 콘솔 화면 내용이 micro-app 의 iframe 이나 shadow DOM 안에 있어도 관측·판정·spec 로케이터가 모두 그 안을 본다.
+  BLOCKED 가 나오면 트레이스의 `observed`(요소 표 요약, 프레임 목록)로 Jev 가 무엇을 봤는지 확인한다.
+- 파이프라인 검증용 픽스처: `tests/fixtures/fake-vpc.html?mode=plain|shadow|iframe` (가짜 VPC 콘솔, 세 가지 구조). 콘솔 없이 기록과 재생을 끝까지 돌려볼 수 있다.
 
 ```bash
-npm run record -- scenarios/networking/vpc-create-delete.yaml --base-url file:///$PWD/tests/fixtures/fake-vpc.html --out recordings/tmp
-CONSOLE_URL=file:///$PWD/tests/fixtures/fake-vpc.html CONSOLE_BASE_PATH= RUN_DESTRUCTIVE=1 npx playwright test --project=regression
+npm run record -- scenarios/networking/vpc-create-delete.yaml --base-url "file:///$PWD/tests/fixtures/fake-vpc.html?mode=iframe" --out recordings/tmp
+CONSOLE_URL="file:///$PWD/tests/fixtures/fake-vpc.html?mode=iframe" CONSOLE_BASE_PATH= RUN_DESTRUCTIVE=1 npx playwright test --project=regression
 ```
 
 ### 세션 없이 되는 것 (클라우드/CI)

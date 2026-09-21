@@ -42,16 +42,18 @@ const templ = (s: string): string => {
 };
 
 function locator(d: Descriptor | null, label: string): string {
-  if (!d) return `page.getByText(${templ(label)}, { exact: true }).filter({ visible: true }).first()`;
+  // micro-app 이 iframe 안에 있으면 frameLocator 로 들어간다. shadow DOM 은 Playwright 로케이터가 자동으로 뚫는다.
+  const scope = d?.frame?.selector ? `page.frameLocator(${q(d.frame.selector)})` : 'page';
+  if (!d) return `${scope}.getByText(${templ(label)}, { exact: true }).filter({ visible: true }).first()`;
   const nth = d.count > 1 && d.nth >= 0 ? `.nth(${d.nth})` : '';
   if (d.role && d.name && !d.pointer)
-    return `page.getByRole(${q(d.role)}, { name: ${templ(d.name)}, exact: true })${nth}`;
+    return `${scope}.getByRole(${q(d.role)}, { name: ${templ(d.name)}, exact: true })${nth}`;
   if (d.placeholder)
-    return `page.getByPlaceholder(${templ(d.placeholder)}).filter({ visible: true }).first()`;
+    return `${scope}.getByPlaceholder(${templ(d.placeholder)}).filter({ visible: true }).first()`;
   if (d.fallbackText)
-    return `page.getByText(${templ(d.fallbackText)}, { exact: true }).filter({ visible: true }).first()`;
-  if (d.id) return `page.locator(${q('#' + d.id)})`;
-  return `page.getByText(${templ(label)}, { exact: true }).filter({ visible: true }).first()`;
+    return `${scope}.getByText(${templ(d.fallbackText)}, { exact: true }).filter({ visible: true }).first()`;
+  if (d.id) return `${scope}.locator(${q('#' + d.id)})`;
+  return `${scope}.getByText(${templ(label)}, { exact: true }).filter({ visible: true }).first()`;
 }
 
 function actionCode(a: TraceAction): string[] {
@@ -118,6 +120,7 @@ lines.push(
 );
 lines.push(`import { test } from '../../src/fixtures/test';`);
 lines.push(`import { expectStep, gotoRoute } from '../../src/console/expect';`);
+lines.push(`import { visibleText } from '../../src/console/frames';`);
 lines.push(`import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';`);
 lines.push('');
 lines.push(`const scenario = loadScenario(${q(scenario.file)});`);
@@ -138,9 +141,7 @@ if (teardown.length) {
   for (const s of teardown) {
     if (guardText && !s.goto) {
       lines.push(`    // 생성 전에 실패했으면 지울 것이 없다.`);
-      lines.push(
-        `    if (!(await page.getByText(${templ(guardText)}).first().isVisible().catch(() => false))) return;`,
-      );
+      lines.push(`    if ((await visibleText(page, ${templ(guardText)}, 3_000)) === null) return;`);
     }
     lines.push(...stepCode(s, 'teardown').map((l) => `    ${l}`));
   }

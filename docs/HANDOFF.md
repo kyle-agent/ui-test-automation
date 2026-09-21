@@ -98,5 +98,33 @@
   `browser.py` 의 신선도·가림 가드 → `src/jev/browser.ts`, `questions.py` → `src/jev/questions.ts`. 루프는 `src/jev/recorder.ts`, CLI 는 `npm run record`,
   트레이스 → spec 초안은 `npm run gen:spec`. 가짜 VPC 콘솔 픽스처(`tests/fixtures/fake-vpc.html`)에 대해 실제 Jev 로 기록(결정 7회, $0.00077)하고
   생성된 spec 을 재생해 통과시켰다. 첫 실제 시나리오는 `scenarios/networking/vpc-create-delete.yaml` (VPC 생성 → 목록 확인 → 삭제, destructive).
-- **다음**: 로컬에서 `npm run record -- scenarios/networking/vpc-create-delete.yaml --confirm` 으로 실제 콘솔에 기록 → `recordings/<id>/trace.json` 커밋 →
-  클라우드에서 spec 다듬기 → 4단계(치유·분류 루프).
+- **실제 콘솔 첫 기록 결과와 대응**: `npm run record -- scenarios/networking/vpc-create-delete.yaml --confirm` 에서 step 0(목록 직접 진입)은
+  통과, step 1 에서 Jev 가 BLOCKED(p=0.74, 입력 토큰 600 수준 = 요소 표가 거의 비어 있음). 콘솔 셸이 서비스를 micro-app 으로 띄우므로
+  "VPC 생성" 버튼이 iframe 또는 shadow DOM 안에 있어 최상위 문서만 훑는 snapshot 이 못 본 것으로 판단했다. 대응:
+  `snapshot.js` 가 shadow root 를 뚫고 수집하고(hit-test 도 shadow 호환), `src/jev/browser.ts` 가 같은 출처의 자식 iframe 마다 snapshot 을 돌려
+  하나의 요소 표로 합친다(동작에 `frame` 인덱스, 클릭 좌표는 iframe 위치 보정). 판정(`text`/`not_text`/`count`)도 모든 프레임과 shadow DOM 을
+  본다(`src/console/frames.ts`). 트레이스의 각 결정에 `observed`(요소 표 요약, 프레임, shadow host 수)를 남기고, BLOCKED 면 터미널에도 찍는다.
+  spec 생성기는 iframe 요소를 `page.frameLocator(<iframe 셀렉터>)` 로 감싼다. 픽스처 `tests/fixtures/fake-vpc.html?mode=plain|shadow|iframe`
+  세 구조 모두 실제 Jev 로 기록·재생을 통과시켰다. **실제 콘솔에서는 아직 재확인 전**: 다음 기록 실행에서 BLOCKED 가 또 나오면 트레이스의
+  `observed.sample` 과 `observed.frames` 로 버튼이 어디 있는지(다른 출처 iframe? 캔버스? 지연 렌더?) 바로 볼 수 있다.
+- **tsx 주의**: `page.evaluate(() => …)` 안에 이름 있는 함수(`const f = () => {}`)를 두면 esbuild 의 `__name` helper 때문에 브라우저에서
+  `__name is not defined` 로 깨진다. 브라우저에서 돌 코드는 문자열 표현식으로 넘긴다(`snapshot.js`, `frames.ts` 의 `ALL_TEXT`).
+- **Jev 호출 경로**: 사내망은 명시 프록시(70.10.15.10:8080)로만 나간다. Node 내장 fetch 는 HTTPS_PROXY 를 무시하므로 `src/jev/decide.ts` 는
+  undici 로 환경 변수 프록시 → npm proxy 설정 → 직접 연결 순으로 시도한다. `npm run jev:ping [-- --no-proxy]` 로 1초 만에 진단한다.
+
+## 8. 로컬 Claude Code CLI 로 이어받기 (2026-09-21 결정)
+
+클라우드 ↔ 로컬 붙여넣기 왕복이 느려서, 기록·회귀 실행이 필요한 작업은 로컬 PC 의 Claude Code CLI 에서 진행한다. 로컬 세션이 시작할 때 알아야 할 것:
+
+1. 저장소: `C:\jev\scp-console-tests`, 브랜치 `claude/laughing-gauss-6nuvax` (원격에 `main` 은 없음). `git pull` 후 `npm install`.
+2. 터미널 환경(사내 프록시): `set NODE_OPTIONS=--openssl-config=C:\jev\node-openssl.cnf`, `set NODE_USE_SYSTEM_CA=1`, `set NODE_EXTRA_CA_CERTS=C:\SDS.crt`,
+   `HTTPS_PROXY` 는 환경에 이미 있음. `.env` 에 `PW_CHANNEL=msedge`, `PW_CDP_URL=http://127.0.0.1:9222`, `OPENROUTER_API_KEY` 가 있다(커밋 금지).
+3. 로그인 브라우저: 별도 터미널에서 `npm run auth:login -- --session root --channel msedge --keep-open` 을 띄워 두고 사람이 로그인한다.
+   창을 닫으면 콘솔 세션이 무효화되고 SSO 도 끊긴다. 확인은 `npm run auth:check`.
+4. 지금 할 일: `npm run record -- scenarios/networking/vpc-create-delete.yaml --confirm` 을 돌려 step 1 이 통과하는지 본다.
+   BLOCKED 면 `recordings/networking.vpc.create-delete/trace.json` 의 `steps[1].actions[0].observed` 를 읽고 원인을 고친다
+   (다른 출처 iframe 이면 `src/console/frames.ts` 의 `contentFrames` 필터를 넓힌다). 통과하면 `npm run gen:spec -- recordings/networking.vpc.create-delete/trace.json`
+   → `tests/regression/networking.vpc.create-delete.spec.ts` 를 다듬고 `RUN_DESTRUCTIVE=1 npx playwright test --project=regression` 으로 재생한다.
+5. 원칙은 그대로: 자격 증명·OTP 는 코드/LLM 에 넣지 않는다. Jev 는 고르기만, 판정은 코드. destructive 는 `{{run_id}}` 이름 + teardown.
+6. 클라우드 세션에서 검증 가능한 것: `npm run check`(typecheck·prettier·unit 18개), `npm run test:auth-public`(실제 SSO 페이지),
+   픽스처 기록·재생(`--base-url file://…/fake-vpc.html?mode=iframe`). 실제 콘솔이 필요한 것은 전부 로컬.

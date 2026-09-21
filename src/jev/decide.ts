@@ -30,6 +30,8 @@ export interface ObservedAction {
   rect?: { x: number; y: number; w: number; h: number };
   delta?: number;
   pointer?: boolean;
+  /** 요소가 있는 프레임 인덱스 (0 = 메인). browser.ts 가 채운다 */
+  frame?: number;
 }
 
 export interface PageState {
@@ -45,6 +47,8 @@ export interface PageState {
   guards: Record<string, unknown>;
   omitted_actions: number;
   fingerprint: string;
+  /** 관측에 포함된 프레임 (메인 + micro-app iframe) */
+  frames?: import('./browser').FrameInfo[];
 }
 
 export interface HistoryEntry {

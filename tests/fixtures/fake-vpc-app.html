@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>micro-app</title>
+    <script src="fake-vpc-app.js"></script>
+  </head>
+  <body>
+    <script>
+      // iframe 안에서 도는 micro-app. 제목과 라우트는 부모 셸에 postMessage 로 알린다.
+      document.body.innerHTML = FAKE_VPC_MARKUP;
+      let hash = location.hash;
+      const listeners = [];
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'hash' && e.data.hash !== hash) {
+          hash = e.data.hash;
+          listeners.forEach((fn) => fn());
+        }
+      });
+      mountFakeVpc(document, {
+        setTitle: (t) => parent.postMessage({ type: 'title', title: t }, '*'),
+        setHash: (h) => {
+          hash = h;
+          parent.postMessage({ type: 'hash', hash: h }, '*');
+          listeners.forEach((fn) => fn());
+        },
+        getHash: () => hash,
+        onHashChange: (fn) => listeners.push(fn),
+      });
+    </script>
+  </body>
+</html>

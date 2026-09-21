@@ -3,6 +3,7 @@
  */
 import { expect, type Page, type TestInfo } from '@playwright/test';
 import { hashUrl, isSsoUrl } from './env';
+import { allBodyText, countRole, visibleText } from './frames';
 import { waitForConsole } from './session';
 import { TITLE_PATTERN, knownTitle, recordObservedTitle } from './titles';
 import type { Expectation } from '../scenario/schema';
@@ -84,16 +85,15 @@ export async function expectStep(page: Page, exp: Expectation, ctx: ExpectContex
       .toContain(part);
   }
   for (const t of exp.text ?? []) {
-    await expect(
-      page.getByText(t).filter({ visible: true }).first(),
-      `"${t}" 텍스트가 보여야 합니다`,
-    ).toBeVisible({ timeout });
+    // 콘솔 화면 내용은 iframe 안에 있을 수 있으므로 모든 프레임을 본다.
+    const found = await visibleText(page, t, timeout ?? 15_000);
+    expect(found !== null, `"${t}" 텍스트가 보여야 합니다 (모든 프레임 검사)`).toBe(true);
   }
   if (exp.not_text?.length) {
     // 대소문자 구분 부분 일치로 화면 텍스트에 없어야 한다 (오류 배너·권한 안내·삭제된 리소스 이름). 사라질 때까지 기다린다.
     for (const t of exp.not_text) {
       await expect
-        .poll(async () => (await page.locator('body').innerText()).includes(t), {
+        .poll(async () => (await allBodyText(page)).includes(t), {
           message: `"${t}" 텍스트가 보이면 안 됩니다`,
           timeout,
         })
@@ -102,7 +102,7 @@ export async function expectStep(page: Page, exp: Expectation, ctx: ExpectContex
   }
   for (const [what, cond] of Object.entries(exp.count ?? {})) {
     const role = what.replace(/^table\s+/, '').trim() as Parameters<Page['getByRole']>[0];
-    const n = await page.getByRole(role).count();
+    const n = await countRole(page, role);
     expect(compareCount(n, cond), `${what} 개수 ${n} 이(가) ${cond} 를 만족해야 합니다`).toBe(true);
   }
 }
@@ -166,21 +166,17 @@ export async function checkExpectation(
       (await page.title()).includes(exp.title_contains!),
     );
   for (const t of exp.text ?? []) {
-    await poll(`"${t}" 텍스트 표시`, async () => {
-      await page
-        .getByText(t)
-        .filter({ visible: true })
-        .first()
-        .waitFor({ state: 'visible', timeout: Math.min(remaining(), 2_000) });
-      return true;
-    });
+    await poll(
+      `"${t}" 텍스트 표시`,
+      async () => (await visibleText(page, t, Math.min(remaining(), 1_000))) !== null,
+    );
   }
   for (const t of exp.not_text ?? []) {
-    await poll(`"${t}" 텍스트 없음`, async () => !(await page.locator('body').innerText()).includes(t));
+    await poll(`"${t}" 텍스트 없음`, async () => !(await allBodyText(page)).includes(t));
   }
   for (const [what, cond] of Object.entries(exp.count ?? {})) {
     const role = what.replace(/^table\s+/, '').trim() as Parameters<Page['getByRole']>[0];
-    await poll(`${what} 개수 ${cond}`, async () => compareCount(await page.getByRole(role).count(), cond));
+    await poll(`${what} 개수 ${cond}`, async () => compareCount(await countRole(page, role), cond));
   }
   return failures;
 }
