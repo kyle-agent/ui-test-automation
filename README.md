@@ -42,9 +42,11 @@ cp .env.example .env              # CONSOLE_URL, SESSION 확인
 
 - Node.js LTS 가 필요하다. `winget install OpenJS.NodeJS.LTS` 후 PowerShell 을 새로 연다 (`node -v` 확인). 없으면 https://nodejs.org 설치 파일.
 - PowerShell 5 는 `&&` 를 지원하지 않는다. 명령을 한 줄씩 실행하거나 `;` 로 잇는다. `cp` 대신 `copy .env.example .env`.
-- 사내 프록시가 TLS 를 가로채면 `npm install` 이 인증서 오류를 낸다. Node 22.16 이상이면 `$env:NODE_USE_SYSTEM_CA=1`
-  (영구 설정은 `setx NODE_USE_SYSTEM_CA 1`) 로 Windows 인증서 저장소를 쓰게 한다. 그래도 안 되면 사내 루트 CA 를 PEM 으로 내보내
-  `$env:NODE_EXTRA_CA_CERTS="C:\path\corp-root-ca.pem"` 를 준다. 프록시 주소가 필요하면 `$env:HTTPS_PROXY` 도 함께.
+- 사내 프록시가 TLS 를 가로채면 `npm install` 이 `CA certificate key too weak` 또는 `self signed certificate in chain` 을 낸다.
+  프록시 CA 의 키가 약해 Node 의 OpenSSL 기본 보안 수준(2)에 걸리는 것이므로, Node 전용 OpenSSL 설정으로 수준을 낮추고
+  Windows 인증서 저장소를 쓰게 한다 (`docs/windows-node-proxy.md` 에 그대로 붙여 넣을 수 있는 명령이 있다).
+  이 설정은 `npm install` 과 `npx playwright install` 같은 Node 쪽 다운로드에만 필요하고, 테스트·로그인은 브라우저가 TLS 를 처리하므로 영향이 없다.
+  `npm config set strict-ssl false` 는 검증 자체를 끄므로 마지막 수단으로만.
 - 브라우저 다운로드(`npx playwright install`)가 막히면 `.env` 에 `PW_CHANNEL=msedge` (또는 `chrome`) 를 넣어 설치된 브라우저를 그대로 쓴다.
   이 경우 `npx playwright install` 은 건너뛴다.
 
