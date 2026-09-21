@@ -1,10 +1,13 @@
 import 'dotenv/config';
+import fs from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 import { CONSOLE_URL, sessionFile } from './src/console/env';
 
 const CI = !!process.env.CI;
 const runDestructive = process.env.RUN_DESTRUCTIVE === '1';
 const liveBrowser = !!process.env.PW_CDP_URL;
+// storageState 파일은 있을 때만 넘긴다. 없으면 session 프로젝트가 안내 메시지와 함께 먼저 실패한다.
+const savedState = !liveBrowser && fs.existsSync(sessionFile()) ? sessionFile() : undefined;
 // 살아 있는 로그인 브라우저 하나에 붙을 때는 탭을 순서대로 여는 편이 안전하다. PW_WORKERS 로 올릴 수 있다.
 const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : liveBrowser ? 1 : CI ? 2 : 4;
 /** 사내 PC 처럼 브라우저 다운로드가 막힌 곳에서는 PW_CHANNEL=msedge(또는 chrome) 로 설치된 브라우저를 쓴다. */
@@ -60,13 +63,13 @@ export default defineConfig({
       name: 'smoke',
       testDir: 'tests/smoke',
       dependencies: ['session'],
-      use: { ...devices['Desktop Chrome'], storageState: liveBrowser ? undefined : sessionFile() },
+      use: { ...devices['Desktop Chrome'], storageState: savedState },
     },
     {
       name: 'regression',
       testDir: 'tests/regression',
       dependencies: ['session'],
-      use: { ...devices['Desktop Chrome'], storageState: liveBrowser ? undefined : sessionFile() },
+      use: { ...devices['Desktop Chrome'], storageState: savedState },
     },
   ],
 });

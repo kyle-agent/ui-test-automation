@@ -16,8 +16,11 @@ import { expiredMessage, waitForConsole } from '../../src/console/session';
 const file = sessionFile();
 const rel = path.relative(process.cwd(), file);
 
+/** 픽스처(file://) 에 대해 spec 을 검증할 때는 로그인 세션이 필요 없다. */
+const FIXTURE = CONSOLE_URL.startsWith('file:');
+
 setup.beforeAll(() => {
-  if (!usingLiveBrowser() && !fs.existsSync(file)) {
+  if (!FIXTURE && !usingLiveBrowser() && !fs.existsSync(file)) {
     throw new Error(
       `${rel} 이(가) 없고 PW_CDP_URL 도 없습니다. 콘솔 로그인은 사람이 합니다: 로컬 PC 에서 ` +
         `\`npm run auth:login -- --session ${SESSION} --keep-open\` 으로 로그인한 브라우저를 열어 두고, .env 에 ` +
@@ -40,7 +43,7 @@ setup(
     const title = await page.title();
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
     // 살아 있는 브라우저의 최신 쿠키를 파일에도 남겨 둔다 (CDP 없이 도는 스크립트의 차선책).
-    await context.storageState({ path: file, indexedDB: true }).catch(() => undefined);
+    if (!FIXTURE) await context.storageState({ path: file, indexedDB: true }).catch(() => undefined);
     console.log(`세션 ${state === 'recovered' ? '복구' : 'OK'}: ${title}`);
   },
 );

@@ -26,8 +26,10 @@ tests/
 src/console/            콘솔 URL/세션 env, 결정적 expect, 제목 레지스트리
 src/service-map/        메뉴 트리 파서·정규화·diff
 src/scenario/           YAML 로더, {{run_id}} 치환
-scripts/                auth-login, menu-snapshot, menu-diff, gen-smoke-specs, titles-merge
-recordings/             session-*.json (gitignore) 와 Jev 기록 트레이스
+src/jev/                Jev 결정 클라이언트(decide), 관측·실행(browser, snapshot.js), 기록 루프(recorder)
+src/fixtures/test.ts    콘솔 테스트용 test 객체 (PW_CDP_URL 이면 살아 있는 로그인 브라우저에 붙는다)
+scripts/                auth-login, menu-snapshot, menu-diff, gen-smoke-specs, titles-merge, record, trace-to-spec
+recordings/             profile-*/ 와 session-*.json (gitignore), Jev 기록 트레이스 <id>/trace.json (커밋)
 ```
 
 ## 시작하기 (로컬 PC)
@@ -86,6 +88,28 @@ npm run gen:smoke-specs      # scenarios/smoke → tests/smoke/*.spec.ts
 npm run test:smoke           # 세션 확인 → 89 서비스 282 화면 직접 진입 + title/text 단언
 npm run titles:merge         # 관측한 제목을 service-map/titles.json 에 반영 (이후 정확 일치로 판정)
 npm run report               # HTML 리포트
+```
+
+### 4. Jev 기록 → spec 고정 (CRUD 시나리오)
+
+```bash
+npm run record -- scenarios/networking/vpc-create-delete.yaml --confirm   # 로그인 브라우저에 붙어 기록. 동작마다 y/n/q
+npm run gen:spec -- recordings/networking.vpc.create-delete/trace.json    # 트레이스 → tests/regression/<id>.spec.ts 초안
+RUN_DESTRUCTIVE=1 npx playwright test --project=regression                 # 결정적 재생 (Jev 없음)
+```
+
+- 기록 러너는 step 의 `goal` 을 Jev 에게 주고, Jev 가 관측 요소 표에서 고른 동작(CLICK / TYPE_TEXT / SELECT / DONE …)을 코드가 실행한다.
+  매 동작 뒤 코드가 `expect` 를 판정하고, 만족되면 다음 step 으로 넘어간다. `goto` 가 있는 step 은 Jev 없이 직접 이동한다.
+- TYPE_TEXT 값은 시나리오 `vars` 에서만 온다(필드 라벨로 매칭). 못 고르면 소형 텍스트 모델이 `vars` 값 중 하나를 고르고, 그것도 없으면 멈춘다.
+- 안전장치: 삭제·결제·승인 라벨은 goal 이 그 단어를 쓸 때만 후보에 들어가고, 로그아웃은 절대 후보가 아니다. 첫 `goto` 의 라우트 접두어를
+  벗어나면 멈춘다. `--confirm` 이면 사람이 모든 동작을 승인한다. `--dry-run` 은 첫 선택만 보여준다.
+- teardown 은 앞 step 이 실패해도 실행된다(리소스가 남았을 수 있으므로). `--no-teardown` 은 리소스가 남을 수 있으니 주의.
+- 트레이스(`recordings/<id>/trace.json`)는 커밋한다. 클라우드 세션이 이걸 읽고 spec 을 다듬는다. 스크린샷은 gitignore.
+- 파이프라인 검증용 픽스처: `tests/fixtures/fake-vpc.html` (가짜 VPC 콘솔). 콘솔 없이 기록과 재생을 끝까지 돌려볼 수 있다.
+
+```bash
+npm run record -- scenarios/networking/vpc-create-delete.yaml --base-url file:///$PWD/tests/fixtures/fake-vpc.html --out recordings/tmp
+CONSOLE_URL=file:///$PWD/tests/fixtures/fake-vpc.html CONSOLE_BASE_PATH= RUN_DESTRUCTIVE=1 npx playwright test --project=regression
 ```
 
 ### 세션 없이 되는 것 (클라우드/CI)

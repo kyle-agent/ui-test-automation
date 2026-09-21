@@ -9,8 +9,9 @@ export const CONSOLE_URL = (
   process.env.CONSOLE_URL ?? 'https://console.kr-west1.e.samsungsdscloud.com'
 ).replace(/\/+$/, '');
 
-/** 콘솔 SPA 의 base path. 모든 화면은 `${CONSOLE_URL}${CONSOLE_BASE_PATH}#<route>` 형태의 hash 라우트다. */
-export const CONSOLE_BASE_PATH = '/console/';
+/** 콘솔 SPA 의 base path. 모든 화면은 `${CONSOLE_URL}${CONSOLE_BASE_PATH}#<route>` 형태의 hash 라우트다.
+ *  픽스처 페이지(file://…/fake-vpc.html)에 대해 spec 을 돌릴 때는 CONSOLE_BASE_PATH= (빈 값) 으로 둔다. */
+export const CONSOLE_BASE_PATH = process.env.CONSOLE_BASE_PATH ?? '/console/';
 
 /** SSO(Keycloak) 호스트. 여기로 리다이렉트되면 세션이 없거나 만료된 것이다. */
 export const SSO_HOST_PATTERN = /(^|\.)sso\./;

@@ -75,15 +75,29 @@ export async function expectStep(page: Page, exp: Expectation, ctx: ExpectContex
     }
     ctx.testInfo?.annotations.push({ type: 'title', description: title });
   }
-  if (exp.title) await expect(page).toHaveTitle(exp.title);
+  const timeout = exp.timeout;
+  if (exp.title) await expect(page).toHaveTitle(exp.title, { timeout });
+  if (exp.title_contains) {
+    const part = exp.title_contains;
+    await expect
+      .poll(() => page.title(), { message: `document.title 에 "${part}" 가 포함되어야 합니다`, timeout })
+      .toContain(part);
+  }
   for (const t of exp.text ?? []) {
-    await expect(page.getByText(t).first(), `"${t}" 텍스트가 보여야 합니다`).toBeVisible();
+    await expect(
+      page.getByText(t).filter({ visible: true }).first(),
+      `"${t}" 텍스트가 보여야 합니다`,
+    ).toBeVisible({ timeout });
   }
   if (exp.not_text?.length) {
-    // 화면이 안정된 뒤 한 번 읽어 대소문자 구분 부분 일치로 검사한다 (오류 배너·권한 안내 탐지용).
-    const body = await page.locator('body').innerText();
+    // 대소문자 구분 부분 일치로 화면 텍스트에 없어야 한다 (오류 배너·권한 안내·삭제된 리소스 이름). 사라질 때까지 기다린다.
     for (const t of exp.not_text) {
-      expect(body.includes(t), `"${t}" 텍스트가 보이면 안 됩니다`).toBe(false);
+      await expect
+        .poll(async () => (await page.locator('body').innerText()).includes(t), {
+          message: `"${t}" 텍스트가 보이면 안 됩니다`,
+          timeout,
+        })
+        .toBe(false);
     }
   }
   for (const [what, cond] of Object.entries(exp.count ?? {})) {
@@ -110,4 +124,74 @@ export function compareCount(n: number, cond: string): boolean {
     default:
       return n === v;
   }
+}
+
+// ---------------------------------------------------------------------------
+// 기록 러너용 비파괴 판정: 예외 대신 실패 목록을 돌려준다. 판정 규칙은 expectStep 과 같다.
+// ---------------------------------------------------------------------------
+
+export interface CheckOptions {
+  /** 기본 15초. 기록 중 "아직인지" 빨리 보려면 짧게 준다 */
+  timeoutMs?: number;
+  consoleTitle?: boolean;
+}
+
+export async function checkExpectation(
+  page: Page,
+  exp: Expectation,
+  opts: CheckOptions = {},
+): Promise<string[]> {
+  const timeout = exp.timeout ?? opts.timeoutMs ?? 15_000;
+  const failures: string[] = [];
+  const deadline = Date.now() + timeout;
+  const remaining = () => Math.max(250, deadline - Date.now());
+  const poll = async (label: string, test: () => Promise<boolean>): Promise<void> => {
+    for (;;) {
+      if (await test().catch(() => false)) return;
+      if (Date.now() >= deadline) {
+        failures.push(label);
+        return;
+      }
+      await page.waitForTimeout(250);
+    }
+  };
+  if (exp.url) await poll(`URL 에 "${exp.url}" 포함`, async () => page.url().includes(exp.url!));
+  if (opts.consoleTitle !== false) {
+    if (isSsoUrl(page.url())) return [...failures, 'SSO 로그인 페이지로 이동함 (세션 만료)'];
+    await poll('document.title 이 "… | Console" 형식', async () => TITLE_PATTERN.test(await page.title()));
+  }
+  if (exp.title) await poll(`title == "${exp.title}"`, async () => (await page.title()) === exp.title);
+  if (exp.title_contains)
+    await poll(`title 에 "${exp.title_contains}" 포함`, async () =>
+      (await page.title()).includes(exp.title_contains!),
+    );
+  for (const t of exp.text ?? []) {
+    await poll(`"${t}" 텍스트 표시`, async () => {
+      await page
+        .getByText(t)
+        .filter({ visible: true })
+        .first()
+        .waitFor({ state: 'visible', timeout: Math.min(remaining(), 2_000) });
+      return true;
+    });
+  }
+  for (const t of exp.not_text ?? []) {
+    await poll(`"${t}" 텍스트 없음`, async () => !(await page.locator('body').innerText()).includes(t));
+  }
+  for (const [what, cond] of Object.entries(exp.count ?? {})) {
+    const role = what.replace(/^table\s+/, '').trim() as Parameters<Page['getByRole']>[0];
+    await poll(`${what} 개수 ${cond}`, async () => compareCount(await page.getByRole(role).count(), cond));
+  }
+  return failures;
+}
+
+export function describeExpectation(exp: Expectation): string {
+  const parts: string[] = [];
+  if (exp.url) parts.push(`URL 에 "${exp.url}" 포함`);
+  if (exp.title) parts.push(`제목 "${exp.title}"`);
+  if (exp.title_contains) parts.push(`제목에 "${exp.title_contains}" 포함`);
+  if (exp.text?.length) parts.push(`화면에 ${exp.text.map((t) => `"${t}"`).join(', ')} 표시`);
+  if (exp.not_text?.length) parts.push(`${exp.not_text.map((t) => `"${t}"`).join(', ')} 는 없음`);
+  for (const [k, v] of Object.entries(exp.count ?? {})) parts.push(`${k} 개수 ${v}`);
+  return parts.join('; ') || '(기대값 없음)';
 }

@@ -10,14 +10,20 @@ import { parse as parseYaml } from 'yaml';
 export interface Expectation {
   url?: string;
   title?: string;
+  /** document.title 부분 일치 (예: "생성" → 생성 화면이 열렸다) */
+  title_contains?: string;
   text?: string[];
   not_text?: string[];
   /** 예: { "table row": ">=1" } → getByRole('row') 개수 */
   count?: Record<string, string>;
+  /** 이 기대를 기다리는 최대 시간(ms). 삭제 완료처럼 오래 걸리는 것에 쓴다. 기본 15초 */
+  timeout?: number;
 }
 
 export interface Step {
   goal: string;
+  /** 있으면 Jev 없이 이 hash 라우트로 직접 이동한다 (화면 진입 step) */
+  goto?: string;
   vars?: Record<string, string>;
   expect?: Expectation;
 }
@@ -118,6 +124,7 @@ function stepList(value: unknown, field: string, fail: (m: string) => never): St
     if (!isRecord(s)) return fail(`${field}[${i}] 가 객체가 아닙니다`);
     const goal = str(s.goal) ?? fail(`${field}[${i}].goal 이 없습니다`);
     const step: Step = { goal };
+    if (s.goto !== undefined) step.goto = str(s.goto) ?? fail(`${field}[${i}].goto 는 문자열이어야 합니다`);
     if (s.vars !== undefined) {
       if (!isRecord(s.vars)) fail(`${field}[${i}].vars 는 객체여야 합니다`);
       step.vars = Object.fromEntries(Object.entries(s.vars).map(([k, v]) => [k, String(v)]));
@@ -125,17 +132,28 @@ function stepList(value: unknown, field: string, fail: (m: string) => never): St
     if (s.expect !== undefined) {
       if (!isRecord(s.expect)) fail(`${field}[${i}].expect 는 객체여야 합니다`);
       const e = s.expect;
-      const known = new Set(['url', 'title', 'text', 'not_text', 'count']);
-      for (const k of Object.keys(e))
-        if (!known.has(k))
+      const known = new Set(['url', 'title', 'title_contains', 'text', 'not_text', 'count', 'timeout']);
+      for (const k of Object.keys(e)) {
+        if (!known.has(k)) {
           fail(
-            `${field}[${i}].expect.${k} 는 지원하지 않는 기대값입니다 (url/title/text/not_text/count 만 가능)`,
+            `${field}[${i}].expect.${k} 는 지원하지 않는 기대값입니다 (url/title/title_contains/text/not_text/count/timeout 만 가능)`,
           );
+        }
+      }
       const expect: Expectation = {};
       if (e.url !== undefined)
         expect.url = str(e.url) ?? fail(`${field}[${i}].expect.url 은 문자열이어야 합니다`);
       if (e.title !== undefined)
         expect.title = str(e.title) ?? fail(`${field}[${i}].expect.title 은 문자열이어야 합니다`);
+      if (e.title_contains !== undefined) {
+        expect.title_contains =
+          str(e.title_contains) ?? fail(`${field}[${i}].expect.title_contains 는 문자열이어야 합니다`);
+      }
+      if (e.timeout !== undefined) {
+        if (typeof e.timeout !== 'number' || e.timeout <= 0)
+          fail(`${field}[${i}].expect.timeout 은 양수(ms)여야 합니다`);
+        expect.timeout = e.timeout;
+      }
       if (e.text !== undefined) expect.text = strList(e.text, `${field}[${i}].expect.text`, fail);
       if (e.not_text !== undefined)
         expect.not_text = strList(e.not_text, `${field}[${i}].expect.not_text`, fail);
@@ -189,9 +207,11 @@ export function resolveExpectation(exp: Expectation | undefined, vars: Record<st
   const out: Expectation = {};
   if (exp.url !== undefined) out.url = r(exp.url);
   if (exp.title !== undefined) out.title = r(exp.title);
+  if (exp.title_contains !== undefined) out.title_contains = r(exp.title_contains);
   if (exp.text) out.text = exp.text.map(r);
   if (exp.not_text) out.not_text = exp.not_text.map(r);
   if (exp.count) out.count = exp.count;
+  if (exp.timeout !== undefined) out.timeout = exp.timeout;
   return out;
 }
 

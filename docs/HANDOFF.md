@@ -87,5 +87,16 @@
   fallback 하게 만들 것). `openrouter.ai` decisions 엔드포인트 실호출 확인(0.46 초, $0.000025, 응답에 `usage.input_tokens/output_tokens/cost`,
   `id`, `provider: "TypeSafe"` 포함). `*.samsungsdscloud.com` 은 클라우드에서 열린다(로그인 페이지까지). 헤드리스 Chromium 이 세션 프록시 CA 를
   신뢰하려면 `certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n ccr-agent-proxy -i /root/.ccr/agent-proxy-ca.crt` 가 필요했다(세션마다 다시).
-- **미완/보류**: Jev 기록 러너(Python, `uv`)는 `decide.py`(OpenRouter decisions 클라이언트, jev-ultrafast model.py 기반)와 프롬프트까지
-  작성했으나 사용자가 시나리오를 다시 정하기로 해 이번 푸시에서 제외했다. 시나리오가 정해지면 record → trace → spec 변환 → heal 순으로 잇는다.
+- **세션 재사용 방식 변경(중요)**: 콘솔은 브라우저를 닫거나 시간이 지나면 서버 세션을 무효화하고("권한 없음 / Session Invalid" 모달, `#/login`),
+  "확인" 을 누르면 SSO 까지 로그아웃시킨다(KEYCLOAK_IDENTITY/SESSION 쿠키 소멸). 그래서 storageState 파일 재생은 로그인 직후만 동작한다.
+  지금은 `npm run auth:login -- --keep-open` 이 **영구 프로필(recordings/profile-<type>/) + --remote-debugging-port 9222** 로 브라우저를 띄우고,
+  테스트·스크립트는 `.env` 의 `PW_CDP_URL` 로 그 브라우저에 붙어 기본 컨텍스트에 새 탭을 연다(`src/fixtures/test.ts`, `src/console/browser.ts`).
+  `browser.newContext()` 로 만든 컨텍스트는 시크릿 창처럼 분리돼 CDP 클라이언트의 새 탭에 쿠키가 없으므로 반드시 `launchPersistentContext` 여야 한다.
+  로컬 PC 의 Node 24 는 사내 프록시 CA 가 약해 `docs/windows-node-proxy.md` 의 OpenSSL 설정이 필요했고, 브라우저는 `PW_CHANNEL=msedge` 로 설치된 Edge 를 쓴다.
+- **Jev 기록 파이프라인(3단계) 구현, TypeScript**: 인수인계의 Python/uv 대신 TS 로 옮겼다(로그인 브라우저 연결·판정·시나리오 로더가 전부 TS 이고
+  로컬 PC 에 런타임을 하나 더 얹지 않기 위해). jev-ultrafast 의 `model.py` → `src/jev/decide.ts`, `snapshot.js` → `src/jev/snapshot.js`(cursor:pointer div 확장),
+  `browser.py` 의 신선도·가림 가드 → `src/jev/browser.ts`, `questions.py` → `src/jev/questions.ts`. 루프는 `src/jev/recorder.ts`, CLI 는 `npm run record`,
+  트레이스 → spec 초안은 `npm run gen:spec`. 가짜 VPC 콘솔 픽스처(`tests/fixtures/fake-vpc.html`)에 대해 실제 Jev 로 기록(결정 7회, $0.00077)하고
+  생성된 spec 을 재생해 통과시켰다. 첫 실제 시나리오는 `scenarios/networking/vpc-create-delete.yaml` (VPC 생성 → 목록 확인 → 삭제, destructive).
+- **다음**: 로컬에서 `npm run record -- scenarios/networking/vpc-create-delete.yaml --confirm` 으로 실제 콘솔에 기록 → `recordings/<id>/trace.json` 커밋 →
+  클라우드에서 spec 다듬기 → 4단계(치유·분류 루프).
