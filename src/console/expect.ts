@@ -3,6 +3,7 @@
  */
 import { expect, type Page, type TestInfo } from '@playwright/test';
 import { hashUrl, isSsoUrl } from './env';
+import { waitForConsole } from './session';
 import { TITLE_PATTERN, knownTitle, recordObservedTitle } from './titles';
 import type { Expectation } from '../scenario/schema';
 
@@ -21,21 +22,23 @@ export function assertNotSso(page: Page): void {
   if (isSsoUrl(url)) throw new SessionExpiredError(url);
 }
 
-/** hash 라우트로 직접 진입하고, 화면이 제목을 세팅할 때까지(또는 SSO 로 튕길 때까지) 기다린다. */
+/** hash 라우트로 직접 진입하고, 화면이 제목을 세팅할 때까지(또는 SSO 로 튕길 때까지) 기다린다.
+ *  콘솔 세션이 무효("Session Invalid")여도 SSO 쿠키로 자동 복구되면 원래 라우트로 다시 들어간다. */
 export async function gotoRoute(page: Page, route: string, opts: { timeout?: number } = {}): Promise<void> {
-  const timeout = opts.timeout ?? 45_000;
+  const timeout = opts.timeout ?? 60_000;
   await page.goto(hashUrl(route), { waitUntil: 'domcontentloaded', timeout });
-  await page
-    .waitForFunction(
-      () => /\| Console$/.test(document.title) || /(^|\.)sso\./.test(location.hostname),
-      null,
-      {
-        timeout,
-        polling: 250,
-      },
-    )
-    .catch(() => undefined); // 제목 판정은 아래 expectStep 이 더 좋은 메시지로 한다
+  const state = await waitForConsole(page, timeout);
+  if (state === 'expired') throw new SessionExpiredError(page.url());
+  if (state === 'recovered' && !page.url().includes(`#${normalizeHash(route)}`)) {
+    await page.goto(hashUrl(route), { waitUntil: 'domcontentloaded', timeout });
+    if ((await waitForConsole(page, timeout)) === 'expired') throw new SessionExpiredError(page.url());
+  }
   assertNotSso(page);
+}
+
+function normalizeHash(route: string): string {
+  const clean = route.startsWith('#') ? route.slice(1) : route;
+  return clean.startsWith('/') ? clean : `/${clean}`;
 }
 
 export interface ExpectContext {
