@@ -34,9 +34,19 @@ recordings/             session-*.json (gitignore) 와 Jev 기록 트레이스
 
 ```bash
 npm install
-npx playwright install chromium
-cp .env.example .env            # CONSOLE_URL, SESSION 확인
+npx playwright install chromium   # PW_CHANNEL=msedge 를 쓰면 생략 가능
+cp .env.example .env              # CONSOLE_URL, SESSION 확인
 ```
+
+### Windows PowerShell 에서
+
+- Node.js LTS 가 필요하다. `winget install OpenJS.NodeJS.LTS` 후 PowerShell 을 새로 연다 (`node -v` 확인). 없으면 https://nodejs.org 설치 파일.
+- PowerShell 5 는 `&&` 를 지원하지 않는다. 명령을 한 줄씩 실행하거나 `;` 로 잇는다. `cp` 대신 `copy .env.example .env`.
+- 사내 프록시가 TLS 를 가로채면 `npm install` 이 인증서 오류를 낸다. Node 22.16 이상이면 `$env:NODE_USE_SYSTEM_CA=1`
+  (영구 설정은 `setx NODE_USE_SYSTEM_CA 1`) 로 Windows 인증서 저장소를 쓰게 한다. 그래도 안 되면 사내 루트 CA 를 PEM 으로 내보내
+  `$env:NODE_EXTRA_CA_CERTS="C:\path\corp-root-ca.pem"` 를 준다. 프록시 주소가 필요하면 `$env:HTTPS_PROXY` 도 함께.
+- 브라우저 다운로드(`npx playwright install`)가 막히면 `.env` 에 `PW_CHANNEL=msedge` (또는 `chrome`) 를 넣어 설치된 브라우저를 그대로 쓴다.
+  이 경우 `npx playwright install` 은 건너뛴다.
 
 ### 1. 로그인 세션 저장 (사람이 직접 로그인)
 

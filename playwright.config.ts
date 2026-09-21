@@ -5,6 +5,8 @@ import { CONSOLE_URL, sessionFile } from './src/console/env';
 const CI = !!process.env.CI;
 const runDestructive = process.env.RUN_DESTRUCTIVE === '1';
 const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : CI ? 2 : 4;
+/** 사내 PC 처럼 브라우저 다운로드가 막힌 곳에서는 PW_CHANNEL=msedge(또는 chrome) 로 설치된 브라우저를 쓴다. */
+const channel = process.env.PW_CHANNEL || undefined;
 
 /**
  * 프로젝트
@@ -36,6 +38,7 @@ export default defineConfig({
     locale: 'ko-KR',
     timezoneId: 'Asia/Seoul',
     viewport: { width: 1440, height: 900 },
+    channel,
     actionTimeout: 15_000,
     navigationTimeout: 45_000,
     trace: 'retain-on-failure',

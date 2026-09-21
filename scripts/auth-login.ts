@@ -2,7 +2,8 @@
  * 사람이 브라우저에서 직접 로그인(비밀번호·MFA·캡차)하고, 완료되면 Playwright storageState 를 저장한다.
  * 이 스크립트는 자격 증명을 읽지도, 입력하지도 않는다. 대시보드가 뜨는 것만 기다린다.
  *
- *   npm run auth:login -- [--session root|iam] [--channel chrome] [--timeout 15]
+ *   npm run auth:login -- [--session root|iam] [--channel msedge|chrome] [--timeout 15]
+ *   (--channel 을 생략하면 .env 의 PW_CHANNEL 을, 그것도 없으면 Playwright 가 설치한 Chromium 을 쓴다)
  *
  * 저장 위치: recordings/session-<session>.json (gitignore). 이 파일은 로그인 세션 그 자체이므로 공유·커밋 금지.
  * 클라우드 세션에서는 headed 브라우저를 띄울 수 없으므로 반드시 로컬 PC 또는 회사망 러너에서 실행한다.
@@ -28,7 +29,7 @@ async function main(): Promise<void> {
 
   const browser = await chromium.launch({
     headless: false,
-    channel: typeof flags.channel === 'string' ? flags.channel : undefined,
+    channel: typeof flags.channel === 'string' ? flags.channel : process.env.PW_CHANNEL || undefined,
   });
   try {
     const context = await browser.newContext({
