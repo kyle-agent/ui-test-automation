@@ -2,6 +2,7 @@
  * 콘솔 접속 환경. 값은 .env 또는 실행 환경 변수에서만 읽는다.
  * 자격 증명은 여기에도, 다른 어디에도 두지 않는다. 로그인 세션은 storageState 파일로만 재사용한다.
  */
+import 'dotenv/config'; // 스크립트(tsx)와 테스트 모두 .env 를 본다
 import path from 'node:path';
 
 export const CONSOLE_URL = (
