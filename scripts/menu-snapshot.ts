@@ -12,8 +12,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from '@playwright/test';
+import { openConsoleSession } from '../src/console/browser';
 import { CONSOLE_BASE_PATH, CONSOLE_URL, isSsoUrl, sessionFile, type SessionKind } from '../src/console/env';
+import { waitForConsole } from '../src/console/session';
 import {
   countScreens,
   diffScreenMaps,
@@ -48,32 +49,19 @@ async function main(): Promise<void> {
   const { flags } = parseArgs(process.argv.slice(2));
   const session = (flags.session === 'iam' ? 'iam' : 'root') as SessionKind;
   const date = typeof flags.date === 'string' ? flags.date : today();
-  const state = sessionFile(session);
-  if (!fs.existsSync(state)) {
-    throw new Error(
-      `${path.relative(process.cwd(), state)} 이(가) 없습니다. npm run auth:login -- --session ${session} 으로 먼저 로그인 세션을 저장하세요.`,
-    );
-  }
+  if (session !== 'root') process.env.SESSION = session;
+  const stateFile = sessionFile(session);
 
-  const browser = await chromium.launch({ headless: !flags.headed });
+  const consoleSession = await openConsoleSession({ headless: !flags.headed });
   try {
-    const context = await browser.newContext({
-      storageState: state,
-      locale: 'ko-KR',
-      timezoneId: 'Asia/Seoul',
-    });
-    const page = await context.newPage();
+    const page = await consoleSession.context.newPage();
     await page.goto(`${CONSOLE_URL}${CONSOLE_BASE_PATH}`, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(
-      () => /\| Console$/.test(document.title) || /sso\./.test(location.hostname),
-      null,
-      {
-        timeout: 60_000,
-      },
-    );
-    if (isSsoUrl(page.url())) {
+    const state = await waitForConsole(page, 90_000);
+    if (state === 'expired' || isSsoUrl(page.url())) {
       throw new Error(
-        'SSO 로그인 페이지로 이동했습니다. 세션이 만료되었으니 npm run auth:login 으로 갱신하세요.',
+        consoleSession.live
+          ? '로그인 브라우저의 세션이 끝났습니다. npm run auth:login -- --keep-open 으로 다시 로그인하세요.'
+          : `${path.relative(process.cwd(), stateFile)} 세션이 만료되었습니다. npm run auth:login 으로 갱신하세요.`,
       );
     }
 
@@ -174,8 +162,9 @@ async function main(): Promise<void> {
         '\n' + formatDiffMarkdown(diff, path.basename(previous.file, '.json'), path.basename(snap, '.json')),
       );
     }
+    if (consoleSession.live) await page.close().catch(() => undefined);
   } finally {
-    await browser.close();
+    await consoleSession.close();
   }
 }
 

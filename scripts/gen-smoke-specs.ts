@@ -28,7 +28,7 @@ for (const sc of scenarios) {
   const lines: string[] = [];
   lines.push(`// 자동 생성: scripts/gen-smoke-specs.ts ← ${sc.file}`);
   lines.push('// 직접 수정하지 말고 YAML 을 고친 뒤 npm run gen:smoke-specs 를 다시 실행할 것.');
-  lines.push(`import { test } from '@playwright/test';`);
+  lines.push(`import { test } from '../../src/fixtures/test';`);
   lines.push(`import { runSmokeStep } from '../../src/console/smoke';`);
   lines.push('');
   lines.push(`const SCENARIO = ${q(sc.file)};`);

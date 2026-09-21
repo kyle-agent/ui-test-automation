@@ -2,8 +2,12 @@
  * 사람이 브라우저에서 직접 로그인(비밀번호·MFA·캡차)하고, 완료되면 Playwright storageState 를 저장한다.
  * 이 스크립트는 자격 증명을 읽지도, 입력하지도 않는다. 콘솔 대시보드가 뜨는 것만 기다린다.
  *
- *   npm run auth:login -- [--session root|iam] [--channel msedge|chrome] [--timeout 15] [--keep-open]
+ *   npm run auth:login -- [--session root|iam] [--channel msedge|chrome] [--timeout 15] [--keep-open] [--cdp-port 9222]
  *   (--channel 을 생략하면 .env 의 PW_CHANNEL 을, 그것도 없으면 Playwright 가 설치한 Chromium 을 쓴다)
+ *
+ * --keep-open 이면 브라우저를 닫지 않고 --remote-debugging-port 를 열어 둔다. 테스트와 스크립트는 .env 의
+ * PW_CDP_URL=http://127.0.0.1:9222 로 이 브라우저에 붙어 같은 로그인 세션 안에서 새 탭을 연다.
+ * 콘솔은 창을 닫거나 시간이 지나면 서버 세션을 무효화하므로(SSO 까지 로그아웃), 이 방식이 storageState 파일 재생보다 안전하다.
  *
  * 저장 위치: recordings/session-<session>.json (gitignore). 이 파일은 로그인 세션 그 자체이므로 공유·커밋 금지.
  * 클라우드 세션에서는 headed 브라우저를 띄울 수 없으므로 반드시 로컬 PC 또는 회사망 러너에서 실행한다.
@@ -31,7 +35,13 @@ async function main(): Promise<void> {
   const file = sessionFile(kind);
   fs.mkdirSync(path.dirname(file), { recursive: true });
 
-  const browser = await chromium.launch({ headless: false, channel });
+  const cdpPort = typeof flags['cdp-port'] === 'string' ? Number(flags['cdp-port']) : 9222;
+  const keepOpen = !!flags['keep-open'];
+  const browser = await chromium.launch({
+    headless: false,
+    channel,
+    args: keepOpen ? [`--remote-debugging-port=${cdpPort}`] : [],
+  });
   const context = await browser.newContext({
     locale: 'ko-KR',
     timezoneId: 'Asia/Seoul',
@@ -67,8 +77,15 @@ async function main(): Promise<void> {
     console.log(
       '이 파일은 gitignore 대상입니다. 만료되면 같은 명령으로 다시 저장하세요. 확인: npm run auth:check',
     );
-    if (flags['keep-open']) {
-      console.log('--keep-open: 브라우저를 열어 둡니다. 이 터미널에서 Ctrl+C 로 종료하세요.');
+    if (keepOpen) {
+      console.log('');
+      console.log(
+        `--keep-open: 브라우저를 열어 둡니다 (CDP http://127.0.0.1:${cdpPort}). 이 터미널은 그대로 두고 Ctrl+C 로만 종료하세요.`,
+      );
+      console.log(
+        `다른 터미널에서 실행: .env 에 PW_CDP_URL=http://127.0.0.1:${cdpPort} 를 넣은 뒤 npm run auth:check → npm run menu:snapshot → npm run test:smoke`,
+      );
+      console.log('이 창을 닫으면 콘솔 세션이 무효화되고 SSO 도 로그아웃됩니다.');
       await new Promise(() => undefined);
     }
   } finally {

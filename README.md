@@ -50,16 +50,22 @@ cp .env.example .env              # CONSOLE_URL, SESSION 확인
 - 브라우저 다운로드(`npx playwright install`)가 막히면 `.env` 에 `PW_CHANNEL=msedge` (또는 `chrome`) 를 넣어 설치된 브라우저를 그대로 쓴다.
   이 경우 `npx playwright install` 은 건너뛴다.
 
-### 1. 로그인 세션 저장 (사람이 직접 로그인)
+### 1. 로그인 브라우저 띄우기 (사람이 직접 로그인)
 
 ```bash
-npm run auth:login -- --session root     # 창이 열리면 비밀번호·MFA·캡차를 직접 입력
+npm run auth:login -- --session root --keep-open   # 창이 열리면 비밀번호·MFA·캡차를 직접 입력하고, 그 창을 그대로 둔다
 ```
 
-대시보드가 뜨면 `recordings/session-root.json` 이 저장된다. 이 파일은 로그인 세션 자체이므로 커밋·공유하지 않는다.
-만료되면 같은 명령으로 다시 저장한다. 유효성 확인은 `npm run auth:check`.
+대시보드가 뜨면 `recordings/session-root.json` 을 저장하고, 브라우저를 닫지 않은 채 CDP 포트(기본 9222)를 열어 둔다.
+`.env` 에 `PW_CDP_URL=http://127.0.0.1:9222` 가 있으면 테스트와 스크립트는 **이 브라우저에 붙어 같은 세션 안에서 새 탭을 연다**.
+다른 터미널에서 `npm run auth:check` 로 확인한다.
 
-클라우드 세션(Claude Code on the web)에서는 브라우저 창을 띄울 수 없으므로 이 단계는 반드시 로컬에서 한다.
+왜 이렇게 하나: 콘솔은 브라우저를 닫거나 시간이 지나면 서버 세션을 무효화하고("권한 없음 / Session Invalid") SSO 까지 로그아웃시킨다.
+그래서 쿠키를 파일로 복사해 새 브라우저에서 재생하는 방식(storageState)은 로그인 직후 잠깐만 동작한다. `PW_CDP_URL` 이 없을 때만
+그 파일을 차선책으로 쓴다. 로그인 브라우저를 닫으면(Ctrl+C) 세션이 끝나므로 다시 로그인해야 한다.
+
+세션 파일은 로그인 세션 자체이므로 커밋·공유하지 않는다. 클라우드 세션(Claude Code on the web)에서는 브라우저 창을 띄울 수 없으므로
+이 단계는 반드시 로컬에서 한다.
 
 ### 2. 메뉴 스냅샷과 변경 감지
 

@@ -1,6 +1,6 @@
 // 자동 생성: scripts/gen-smoke-specs.ts ← scenarios/smoke/application-service--api-gateway.yaml
 // 직접 수정하지 말고 YAML 을 고친 뒤 npm run gen:smoke-specs 를 다시 실행할 것.
-import { test } from '@playwright/test';
+import { test } from '../../src/fixtures/test';
 import { runSmokeStep } from '../../src/console/smoke';
 
 const SCENARIO = "scenarios/smoke/application-service--api-gateway.yaml";

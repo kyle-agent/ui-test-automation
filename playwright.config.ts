@@ -4,7 +4,9 @@ import { CONSOLE_URL, sessionFile } from './src/console/env';
 
 const CI = !!process.env.CI;
 const runDestructive = process.env.RUN_DESTRUCTIVE === '1';
-const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : CI ? 2 : 4;
+const liveBrowser = !!process.env.PW_CDP_URL;
+// 살아 있는 로그인 브라우저 하나에 붙을 때는 탭을 순서대로 여는 편이 안전하다. PW_WORKERS 로 올릴 수 있다.
+const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : liveBrowser ? 1 : CI ? 2 : 4;
 /** 사내 PC 처럼 브라우저 다운로드가 막힌 곳에서는 PW_CHANNEL=msedge(또는 chrome) 로 설치된 브라우저를 쓴다. */
 const channel = process.env.PW_CHANNEL || undefined;
 
@@ -12,7 +14,8 @@ const channel = process.env.PW_CHANNEL || undefined;
  * 프로젝트
  *  - unit         브라우저 없이 도는 모듈 테스트 (파서, diff, 시나리오 로더)
  *  - auth-public  로그인 전 공개 화면. 세션 불필요 → 클라우드/GitHub 러너에서도 실행 가능
- *  - session      recordings/session-<SESSION>.json 이 있고 아직 유효한지 확인 (smoke/regression 의 선행 조건)
+ *  - session      로그인 세션 확인 (smoke/regression 의 선행 조건). PW_CDP_URL 이 있으면 살아 있는 로그인 브라우저에,
+ *                 없으면 recordings/session-<SESSION>.json 으로 새 브라우저에 들어가 본다
  *  - smoke        화면 진입 스모크 (URL 직접 진입 + title/text 단언). tests/smoke 는 생성물
  *  - regression   Jev 트레이스에서 변환한 회귀 spec
  *
@@ -57,13 +60,13 @@ export default defineConfig({
       name: 'smoke',
       testDir: 'tests/smoke',
       dependencies: ['session'],
-      use: { ...devices['Desktop Chrome'], storageState: sessionFile() },
+      use: { ...devices['Desktop Chrome'], storageState: liveBrowser ? undefined : sessionFile() },
     },
     {
       name: 'regression',
       testDir: 'tests/regression',
       dependencies: ['session'],
-      use: { ...devices['Desktop Chrome'], storageState: sessionFile() },
+      use: { ...devices['Desktop Chrome'], storageState: liveBrowser ? undefined : sessionFile() },
     },
   ],
 });
