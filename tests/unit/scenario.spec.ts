@@ -97,6 +97,8 @@ test.describe('판정 도우미', () => {
       service: 'Identity and Access Management(IAM)',
       region: 'Global',
     });
+    expect(TITLE_PATTERN.test('모든 서비스 | Global | Console')).toBe(true);
+    expect(parseTitle('모든 서비스 | Global | Console')).toEqual({ screen: '모든 서비스', region: 'Global' });
     expect(TITLE_PATTERN.test('Samsung Cloud Platform Console')).toBe(false);
     expect(parseTitle('로그인 | Samsung Cloud Platform Console')).toBeNull();
     expect(normalizeRouteKey('#/iam/user/list/')).toBe('/iam/user/list');

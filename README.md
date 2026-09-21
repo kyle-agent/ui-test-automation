@@ -91,7 +91,8 @@ npm run test:auth-public     # 공개 로그인 페이지 스모크 (자격 증�
 ## 판정 규칙
 
 - `expect.url` 부분 일치, `expect.title` 정확 일치, `expect.text` 는 모두 보여야, `expect.not_text` 는 화면 텍스트에 없어야, `expect.count` 는 role 개수.
-- 콘솔 화면은 `document.title` 이 `"<화면명> | <서비스명> | <리전> | Console"` 형식이어야 하고, `service-map/titles.json` 에 등록된 라우트는 정확히 같아야 한다.
+- 콘솔 화면은 `document.title` 이 `"<화면명> | <서비스명> | <리전> | Console"` (셸 화면은 서비스명 없이 `"<화면명> | <리전> | Console"`) 형식이어야 하고,
+  `service-map/titles.json` 에 등록된 라우트는 정확히 같아야 한다.
 - SSO 로그인 페이지로 튕기면 세션 만료로 보고 즉시 실패시킨다(테스트 실패가 아니라 환경 문제).
 - `destructive` 태그(과금 리소스 생성/삭제)는 `RUN_DESTRUCTIVE=1` 일 때만 실행된다. 이름은 `{{run_id}}` 로 짓고 teardown 을 반드시 둔다.
 

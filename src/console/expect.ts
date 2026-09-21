@@ -59,7 +59,7 @@ export async function expectStep(page: Page, exp: Expectation, ctx: ExpectContex
     assertNotSso(page);
     await expect
       .poll(() => page.title(), {
-        message: 'document.title 이 "<화면명> | <서비스명> | <리전> | Console" 형식이어야 합니다',
+        message: 'document.title 이 "<화면명> | [<서비스명> |] <리전> | Console" 형식이어야 합니다',
         timeout: 30_000,
       })
       .toMatch(TITLE_PATTERN);
