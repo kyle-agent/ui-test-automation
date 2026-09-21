@@ -21,6 +21,7 @@ import { chromium, type BrowserContext, type Page } from '@playwright/test';
 import {
   CONSOLE_BASE_PATH,
   CONSOLE_URL,
+  RECORDINGS_DIR,
   consoleHost,
   sessionFile,
   type SessionKind,
@@ -37,18 +38,20 @@ async function main(): Promise<void> {
 
   const cdpPort = typeof flags['cdp-port'] === 'string' ? Number(flags['cdp-port']) : 9222;
   const keepOpen = !!flags['keep-open'];
-  const browser = await chromium.launch({
+  // 영구 프로필 = 브라우저의 기본 컨텍스트. CDP 로 붙는 쪽이 여는 새 탭이 같은 쿠키를 공유하려면 반드시 기본 컨텍스트여야 한다.
+  // (browser.newContext() 로 만든 컨텍스트는 시크릿 창처럼 분리돼 있어 CDP 클라이언트의 새 탭에 쿠키가 없다.)
+  const userDataDir = path.join(RECORDINGS_DIR, `profile-${kind}`);
+  fs.mkdirSync(userDataDir, { recursive: true });
+  const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
     channel,
     args: keepOpen ? [`--remote-debugging-port=${cdpPort}`] : [],
-  });
-  const context = await browser.newContext({
     locale: 'ko-KR',
     timezoneId: 'Asia/Seoul',
     viewport: { width: 1440, height: 900 },
   });
   try {
-    const page = await context.newPage();
+    const page = context.pages()[0] ?? (await context.newPage());
     await page.goto(`${CONSOLE_URL}${CONSOLE_BASE_PATH}`, { waitUntil: 'domcontentloaded' });
     console.log(
       `열린 브라우저(${channel ?? 'chromium'})에서 ${kind} 사용자로 로그인하세요 (비밀번호, MFA 인증번호, 캡차 포함).`,
@@ -89,7 +92,7 @@ async function main(): Promise<void> {
       await new Promise(() => undefined);
     }
   } finally {
-    await browser.close().catch(() => undefined);
+    await context.close().catch(() => undefined);
   }
 }
 

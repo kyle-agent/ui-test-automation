@@ -1,5 +1,6 @@
-# 사람이 만든 로그인 세션 (쿠키/토큰). 절대 커밋하지 않는다.
+# 사람이 만든 로그인 세션 (쿠키/토큰)과 로그인 브라우저 프로필. 절대 커밋하지 않는다.
 recordings/session-*.json
+recordings/profile-*/
 recordings/**/screenshots/
 recordings/**/*.jpg
 recordings/**/*.png

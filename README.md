@@ -56,7 +56,8 @@ cp .env.example .env              # CONSOLE_URL, SESSION 확인
 npm run auth:login -- --session root --keep-open   # 창이 열리면 비밀번호·MFA·캡차를 직접 입력하고, 그 창을 그대로 둔다
 ```
 
-대시보드가 뜨면 `recordings/session-root.json` 을 저장하고, 브라우저를 닫지 않은 채 CDP 포트(기본 9222)를 열어 둔다.
+브라우저는 `recordings/profile-root/` 영구 프로필(gitignore)로 뜬다. 대시보드가 뜨면 `recordings/session-root.json` 을 저장하고,
+브라우저를 닫지 않은 채 CDP 포트(기본 9222)를 열어 둔다.
 `.env` 에 `PW_CDP_URL=http://127.0.0.1:9222` 가 있으면 테스트와 스크립트는 **이 브라우저에 붙어 같은 세션 안에서 새 탭을 연다**.
 다른 터미널에서 `npm run auth:check` 로 확인한다.
 
