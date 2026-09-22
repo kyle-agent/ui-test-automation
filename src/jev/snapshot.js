@@ -122,8 +122,27 @@
     }
     return el;
   };
+  // 확장 3: label/aria 연결이 없는 폼 컨트롤(콘솔의 scp-form-group-label 구조)은 조상들의 바로 앞 형제에서 짧은 라벨 텍스트를 찾는다.
+  //         예) .scp-form-group-label "VPC명" 다음에 오는 .field-wrap > .scp-textfield > input.
+  const nearbyLabel = (e) => {
+    let cur = e;
+    for (let i = 0; i < 6 && cur && cur.nodeType === 1 && cur !== document.body; i++) {
+      const prev = cur.previousElementSibling;
+      if (prev && !prev.matches(selector) && !prev.querySelector(selector)) {
+        const holder = prev.querySelector('.label-text,label,legend') || prev;
+        const line = (holder.innerText || '')
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean)[0];
+        if (line && line.length <= 40) return line.replace(/\s*\*$/, '');
+      }
+      cur = cur.parentElement;
+    }
+    return '';
+  };
   cache.role = (e) => role(e) || (pointerLike(e) ? 'button' : null);
   cache.name = name;
+  cache.nearLabel = nearbyLabel;
   cache.visible = visible;
   cache.deepAll = () => deepAll(document);
   cache.deepFromPoint = deepFromPoint;
@@ -166,16 +185,37 @@
     r.y + r.height / 2 >= 0 &&
     r.x + r.width / 2 < innerWidth &&
     r.y + r.height / 2 < innerHeight;
+  // 확장 4: 중심점 hit-test 로 가려진 요소를 뺀다. 콘솔의 확인 모달(.modal-dimmed)은 뒤 화면을 inert 로 만들지 않아
+  //         뒤의 버튼이 그대로 보이는데, 실행 단계(browser.ts TARGET_POINT)가 같은 hit-test 로 거부하므로 후보에서도 뺀다.
+  const reachable = (e, r) => {
+    const hit = deepFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    return (
+      !!hit &&
+      (e === hit ||
+        e.contains(hit) ||
+        (e.getRootNode() instanceof ShadowRoot && e.getRootNode().host === hit))
+    );
+  };
+  let occluded = 0;
   for (const e of deepQuery(selector)) {
     if (!safe(e) || !visible(e) || e.matches(':disabled') || e.closest('[aria-disabled="true"]')) continue;
     const r = e.getBoundingClientRect(),
       rname = role(e);
     if (!rname || !inViewport(r)) continue;
+    if (!reachable(e, r)) {
+      occluded++;
+      continue;
+    }
     if (rname === 'gridcell' && e.querySelector('button,[role="button"]')) continue;
     const base = {
       node: identity(e),
       role: rname,
-      label: name(e) || rname,
+      label:
+        name(e) ||
+        (['textbox', 'searchbox', 'spinbutton', 'combobox', 'checkbox', 'radio', 'switch'].includes(rname)
+          ? nearbyLabel(e)
+          : '') ||
+        rname,
       rect: { x: r.x, y: r.y, w: r.width, h: r.height },
     };
     for (const key of ['checked', 'selected', 'expanded']) {
@@ -216,6 +256,10 @@
     if (!visible(e) || e.closest('[aria-disabled="true"],[inert]') || !pointerLike(e)) continue;
     const r = e.getBoundingClientRect();
     if (!inViewport(r)) continue;
+    if (!reachable(e, r)) {
+      occluded++;
+      continue;
+    }
     const label = name(e) || e.id || e.getAttribute('class')?.split(/\s+/)[0] || e.tagName.toLowerCase();
     actions.push({
       node: identity(e),
@@ -294,6 +338,7 @@
     page_key,
     guards,
     omitted_actions,
+    occluded,
     shadow_hosts: shadowHosts.length,
     iframes,
   };

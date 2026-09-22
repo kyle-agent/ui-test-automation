@@ -63,6 +63,39 @@
         shell.innerHTML = FAKE_VPC_MARKUP;
         mountFakeVpc(document, hashHost);
       }
+
+      // ?shell=loader,notice : 실제 콘솔 셸이 화면 위에 얹는 것들을 흉내 낸다 (src/console/overlays.ts 가 걷어내는 대상).
+      //  loader  진입 직후 1.2초 동안 전체 화면 .loader-overlay 를 띄우고 앱 루트를 [inert] 로 만든다.
+      //  notice  .scp-modal.notice-info-container 공지 모달 (닫기 아이콘 .modal-header-icon, "확인" 버튼).
+      const shellFlags = (new URLSearchParams(location.search).get('shell') || '').split(',');
+      if (shellFlags.includes('loader')) {
+        const loader = document.createElement('div');
+        loader.className = 'loader-overlay is-fixed';
+        loader.style.cssText =
+          'position:fixed;inset:0;z-index:9999;background:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center';
+        loader.textContent = '…';
+        document.body.appendChild(loader);
+        shell.setAttribute('inert', '');
+        setTimeout(() => {
+          loader.remove();
+          shell.removeAttribute('inert');
+        }, 1200);
+      }
+      if (shellFlags.includes('notice')) {
+        const modal = document.createElement('div');
+        modal.className = 'scp-modal notice-info-container';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:3010;background:rgba(0,0,0,.4)';
+        modal.innerHTML =
+          '<div style="background:#fff;margin:80px auto;width:640px;padding:16px">' +
+          '<div style="display:flex;justify-content:space-between"><strong>공지 사항</strong>' +
+          '<i class="modal-header-icon scp-icon i-del-s" style="cursor:pointer">✕</i></div>' +
+          '<p>테스트용 공지 본문</p><label><input type="checkbox" /> 오늘 하루 보지 않기</label> ' +
+          '<button class="scp-button" type="button">확인</button></div>';
+        const close = () => modal.remove();
+        modal.querySelector('.modal-header-icon').addEventListener('click', close);
+        modal.querySelector('button').addEventListener('click', close);
+        document.body.appendChild(modal);
+      }
     </script>
   </body>
 </html>

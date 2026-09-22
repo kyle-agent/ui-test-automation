@@ -1,0 +1,103 @@
+id: compute.vm-stack-net
+title: SG·IGW·Public IP 를 포함한 VPC → Subnet → Virtual Server 스택 생성 후 역순 삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud, stack, network]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 근거: docs/service-facts/compute-vm-stack.md, docs/service-facts/networking-sg-publicip.md
+#   생성: SG(VPC 무관) → VPC → IGW(VPC 당 1개, 이름 자동 IGW_<vpc>) → Subnet(PUBLIC/PRIMARY) → Public IP 예약(Reserved) → 서버(SG 선택) → 서버에 Public IP 연결
+#   삭제: Public IP 연결 해제 → 반납 → IGW 삭제 → 서버 해지 → Subnet 삭제 → VPC 해지 → SG 해지 (IGW 는 VPC 보다 먼저, SG 는 서버 소멸 뒤)
+steps:
+  - goal: "Keypair {{keypair}} 를 준비한다 (있으면 재사용)"
+    goto: "#/virtualserver/keypair/list"
+    vars:
+      keypair: "qa-shared-keypair"
+    expect:
+      url: "#/virtualserver/keypair/list"
+      text: ["{{keypair}}"]
+
+  - goal: "Security Group {{sg}} 를 로그 저장 없이 생성한다"
+    vars:
+      sg: "sg-{{run_id}}"
+    expect:
+      url: "#/securitygroup/securitygroup/list"
+      text: ["{{sg}}"]
+
+  - goal: "VPC {{vpc}} 를 {{vpc_cidr}} 로 생성하고 Active 를 기다린다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      vpc_cidr: "10.250.0.0/20"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+
+  - goal: "VPC {{vpc}} 에 Internet Gateway(Firewall 미사용)를 생성하고 Active 를 기다린다"
+    expect:
+      url: "#/vpc/internet-gateway/list"
+      text: ["{{vpc}}"]
+
+  - goal: "Public/Primary Subnet {{subnet}} 을 {{subnet_cidr}} 로 생성하고 Active 를 기다린다"
+    vars:
+      subnet: "sub-{{run_id}}"
+      subnet_cidr: "10.250.0.0/24"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+      timeout: 900000
+
+  - goal: "Public IP(Internet Gateway, kr-west1-b)를 예약하고 Reserved 를 확인한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+      text: ["Reserved"]
+
+  - goal: "Ubuntu / Standard-1 / s1v1m2 / SSD 서버 {{vm}} 을 {{subnet}} 에 Security Group {{sg}} 를 붙여 생성하고 Active 를 기다린다"
+    vars:
+      vm: "vm-{{run_id}}"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+      timeout: 600000
+
+  - goal: "서버 {{vm}} 상세에서 예약한 Public IP 를 연결하고, Public IP 목록에서 연결 리소스가 {{vm}} 으로 보이는지 확인한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+      text: ["{{vm}}"]
+      timeout: 300000
+
+# 정리 순서: 서버를 먼저 해지하면 포트·static NAT 가 함께 사라져 Public IP 가 Reserved 로 돌아온다 → 반납 → IGW → Subnet → VPC → SG.
+teardown:
+  - goal: "서버 {{vm}} 을 해지하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{vm}}"]
+      timeout: 600000
+
+  - goal: "Public IP 가 Reserved 로 돌아오면 반납하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      url: "#/vpc/public-ip/list"
+      not_text: ["{{vm}}"]
+      timeout: 600000
+
+  - goal: "Internet Gateway 를 삭제하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 600000
+
+  - goal: "Subnet {{subnet}} 을 삭제하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{subnet}}"]
+      timeout: 1200000
+
+  - goal: "VPC {{vpc}} 를 해지하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 180000
+
+  - goal: "Security Group {{sg}} 를 해지한다"
+    expect:
+      not_text: ["{{sg}}"]
+      timeout: 60000

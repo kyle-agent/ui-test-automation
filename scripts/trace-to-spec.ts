@@ -50,6 +50,9 @@ function locator(d: Descriptor | null, label: string): string {
     return `${scope}.getByRole(${q(d.role)}, { name: ${templ(d.name)}, exact: true })${nth}`;
   if (d.placeholder)
     return `${scope}.getByPlaceholder(${templ(d.placeholder)}).filter({ visible: true }).first()`;
+  // 콘솔 폼은 label/aria 연결이 없다(.scp-form-group-label "VPC명" 아래에 input). 라벨 텍스트 바로 아래의 가장 가까운 컨트롤을 잡는다.
+  if (d.nearLabel)
+    return `${scope}.locator(${q(`${d.tag}:below(:text-is(${JSON.stringify(d.nearLabel)}))`)}).first()`;
   if (d.fallbackText)
     return `${scope}.getByText(${templ(d.fallbackText)}, { exact: true }).filter({ visible: true }).first()`;
   if (d.id) return `${scope}.locator(${q('#' + d.id)})`;

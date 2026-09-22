@@ -9,6 +9,7 @@
  *  2. storageState 파일로 새 브라우저 띄우기 (PW_CDP_URL 이 없을 때)
  *     로그인 직후 짧은 시간에는 동작한다. 러너가 브라우저를 계속 살려 둘 수 없을 때의 차선책.
  */
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium, type Browser, type BrowserContext } from '@playwright/test';
@@ -20,14 +21,128 @@ export function usingLiveBrowser(): boolean {
   return CDP_URL !== '';
 }
 
-export async function connectLiveBrowser(): Promise<Browser> {
+const connectError = (err: unknown) =>
+  new Error(
+    `PW_CDP_URL=${CDP_URL} 에 연결하지 못했습니다. \`npm run auth:login -- --keep-open\` 으로 띄운 브라우저가 열려 있어야 합니다. ` +
+      `(${err instanceof Error ? err.message.split('\n')[0] : String(err)})`,
+  );
+
+async function cdpAlive(timeoutMs = 3_000): Promise<boolean> {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
   try {
-    return await chromium.connectOverCDP(CDP_URL);
-  } catch (err) {
-    throw new Error(
-      `PW_CDP_URL=${CDP_URL} 에 연결하지 못했습니다. \`npm run auth:login -- --keep-open\` 으로 띄운 브라우저가 열려 있어야 합니다. ` +
-        `(${err instanceof Error ? err.message.split('\n')[0] : String(err)})`,
+    const res = await fetch(`${CDP_URL}/json/version`, { signal: ctl.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** CDP 타깃 중 브라우저 내부 페이지(edge://, chrome://). Playwright 는 여기에 붙으려다 멈춘다 (edge://downloads-hub/, 2026-09-21 실측). */
+async function internalTargets(): Promise<string[]> {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 3_000);
+  try {
+    const res = await fetch(`${CDP_URL}/json/list`, { signal: ctl.signal });
+    const list = (await res.json()) as { type: string; url: string }[];
+    return list.filter((t) => t.type === 'page' && /^(edge|chrome):\/\//.test(t.url)).map((t) => t.url);
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** 로그인 브라우저 프로세스를 강제 종료한다 (영구 프로필 디렉터리로 식별). 강제 종료는 로그아웃을 일으키지 않는다. */
+export async function killLoginBrowser(log: (line: string) => void = console.log): Promise<void> {
+  const session = process.env.SESSION?.trim() || 'root';
+  const marker = `profile-${session}`;
+  log(`로그인 브라우저(${marker})를 강제 종료합니다.`);
+  await new Promise<void>((resolve) => {
+    const ps = spawn(
+      'powershell.exe',
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        `Get-CimInstance Win32_Process | Where-Object { ($_.Name -eq 'msedge.exe' -or $_.Name -eq 'chrome.exe') -and $_.CommandLine -like '*${marker}*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`,
+      ],
+      { stdio: 'ignore', windowsHide: true },
     );
+    ps.on('exit', () => resolve());
+    ps.on('error', () => resolve());
+  });
+  for (let i = 0; i < 10 && (await cdpAlive(1_000)); i++) await new Promise((r) => setTimeout(r, 500));
+}
+
+/**
+ * 로그인 브라우저를 같은 영구 프로필로 다시 띄운다 (죽었을 때, 또는 force 면 강제 종료 후).
+ * 콘솔의 .pem 다운로드로 Edge 가 크래시하거나 내부 페이지 타깃 때문에 붙지 못할 때 쓴다 (2026-09-21).
+ * 크래시·강제 종료는 로그아웃이 아니라서 프로필의 쿠키가 살아 있고, 다시 띄우기만 하면 콘솔 세션이 돌아온다 (재로그인 불필요, 실측).
+ * 세션이 정말 만료됐으면 띄운 브라우저가 SSO 화면에서 사람을 기다리고, 테스트는 세션 만료로 실패한다.
+ * PW_AUTO_RELAUNCH=0 이면 하지 않는다.
+ */
+export async function relaunchLoginBrowser(
+  log: (line: string) => void = console.log,
+  opts: { force?: boolean } = {},
+): Promise<boolean> {
+  if (process.env.PW_AUTO_RELAUNCH === '0') return false;
+  if (await cdpAlive()) {
+    if (!opts.force) return true;
+    await killLoginBrowser(log);
+  }
+  const session = process.env.SESSION?.trim() || 'root';
+  const channel = process.env.PW_CHANNEL?.trim();
+  const port = new URL(CDP_URL).port || '9222';
+  const args = ['tsx', 'scripts/auth-login.ts', '--session', session, '--keep-open', '--cdp-port', port];
+  if (channel) args.push('--channel', channel);
+  log(`로그인 브라우저가 응답하지 않아 다시 띄웁니다: npx ${args.join(' ')}`);
+  const logDir = path.resolve(process.cwd(), 'test-results');
+  fs.mkdirSync(logDir, { recursive: true });
+  const out = fs.openSync(path.join(logDir, 'auth-login.relaunch.log'), 'a');
+  const child = spawn('cmd.exe', ['/d', '/s', '/c', `npx ${args.join(' ')}`], {
+    cwd: process.cwd(),
+    detached: true,
+    stdio: ['ignore', out, out],
+    windowsHide: true,
+  });
+  child.unref();
+  const deadline = Date.now() + 90_000;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 2_000));
+    if (await cdpAlive()) {
+      await new Promise((r) => setTimeout(r, 3_000)); // 프로필 로드·첫 탭 이동 시간
+      log(`로그인 브라우저 복구됨 (${CDP_URL})`);
+      return true;
+    }
+  }
+  log('로그인 브라우저를 90초 안에 다시 띄우지 못했습니다.');
+  return false;
+}
+
+export async function connectLiveBrowser(log: (line: string) => void = console.log): Promise<Browser> {
+  // 내부 페이지 타깃이 있으면 connectOverCDP 가 거기에 붙으려다 타임아웃된다. /json/close 로는 닫히지 않으므로 재기동한다.
+  if (process.env.PW_AUTO_RELAUNCH !== '0' && (await cdpAlive())) {
+    const internal = await internalTargets();
+    if (internal.length) {
+      log(
+        `브라우저 내부 페이지 타깃(${internal.join(', ')}) 때문에 연결이 막히므로 로그인 브라우저를 재기동합니다.`,
+      );
+      if (!(await relaunchLoginBrowser(log, { force: true }))) throw connectError(new Error('재기동 실패'));
+    }
+  }
+  try {
+    return await chromium.connectOverCDP(CDP_URL, { timeout: 20_000 });
+  } catch (err) {
+    // 죽었거나(ECONNREFUSED) 붙지 못하는 상태(타임아웃). 둘 다 강제 종료 후 재기동으로 푼다.
+    if (!(await relaunchLoginBrowser(log, { force: true }))) throw connectError(err);
+    try {
+      return await chromium.connectOverCDP(CDP_URL, { timeout: 20_000 });
+    } catch (err2) {
+      throw connectError(err2);
+    }
   }
 }
 

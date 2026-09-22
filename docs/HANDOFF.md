@@ -128,3 +128,75 @@
 5. 원칙은 그대로: 자격 증명·OTP 는 코드/LLM 에 넣지 않는다. Jev 는 고르기만, 판정은 코드. destructive 는 `{{run_id}}` 이름 + teardown.
 6. 클라우드 세션에서 검증 가능한 것: `npm run check`(typecheck·prettier·unit 18개), `npm run test:auth-public`(실제 SSO 페이지),
    픽스처 기록·재생(`--base-url file://…/fake-vpc.html?mode=iframe`). 실제 콘솔이 필요한 것은 전부 로컬.
+
+## 9. 로컬 세션 진행 기록 (2026-09-21 저녁, 실제 콘솔 기록)
+
+8절 4번을 실행한 결과와 대응. 모두 `claude/laughing-gauss-6nuvax` 작업 트리에 있다(커밋 전).
+
+- **step 1 BLOCKED 의 원인은 iframe/shadow DOM 이 아니라 로딩 오버레이였다.** 라우트 진입·화면 전환 직후 2~3초 동안 전체 화면
+  `.loader-overlay`(z-index 9999) 가 뜨고 앱 루트가 `[inert]` 가 되어 snapshot 이 요소 0개를 본다. 생성 화면에서는 같은 클래스의
+  섹션 단위 오버레이(absolute, z 1001)가 클릭 후 약 0.4초 뒤에 붙고 `.tem-container-contents[inert]` 가 된다.
+  → `src/console/overlays.ts`: `waitForIdle`(오버레이 사라질 때까지, 동작 직후에는 0.5초 등장 유예), `dismissNotices`(공지 모달
+  `.scp-modal.notice-info-container` 를 닫기 아이콘 `.modal-header-icon` 또는 "확인" 으로 닫음; "오늘 하루 보지 않기" 는 건드리지 않음),
+  `settleConsole`. `gotoRoute` 와 기록 루프의 매 관측 앞에서 호출한다. 공지 모달은 새 탭(sessionStorage `isFirstView`)으로 홈에 들어갈 때 뜬다.
+- **레코더 보강** (`src/jev/recorder.ts`): 요소 0개 관측이면 최대 10초 재관측(Jev 호출 없음), BLOCKED 는 1.5초 간격으로 3회 연속일 때만 포기,
+  BLOCKED 시 스크린샷 `screenshots/<phase>-<n>-<k>-blocked.jpg` 저장, step 에 `notices_closed` 기록.
+- **폼 라벨**: 콘솔 폼은 label/aria 연결이 없다(`.scp-form-group-label` "VPC명" 뒤에 `.field-wrap > .scp-textfield > input`). snapshot.js 가
+  조상들의 앞 형제에서 짧은 라벨을 찾아 "VPC명"/"IP 대역"/"설명" 으로 이름 붙인다(`nearbyLabel`). spec 생성기는 `input:below(:text-is("VPC명"))` 로케이터를 낸다.
+  `pickVarForField` 의 name 힌트가 "…명" 도 받는다("설명" 제외).
+- **가려진 요소 제외**: 생성 확인 모달("VPC를 생성하시겠습니까?")은 뒤 화면을 inert 로 만들지 않아 뒤의 "생성" 과 모달의 "확인" 이 같이 관측됐고
+  Jev 가 가려진 "생성" 을 골라 hit-test 에서 계속 실패했다. snapshot.js 가 중심점 hit-test 로 가려진 요소를 후보에서 뺀다(`occluded` 수 반환).
+  이후 기록에서 Jev 가 "확인" 을 p=0.99 로 골랐다.
+- **VPC명 20자 제한**: `qa-vpc-<run_id>`(21자)가 잘려 판정이 어긋났다. 시나리오 이름을 `vpc-{{run_id}}`(18자)로 바꿨다.
+- **세 번째 전체 기록 결과**: steps 0~2 통과(VPC 생성 성공), teardown 1 막힘. 삭제 버튼 라벨이 **"서비스 해지"** 인데 goal 에 "삭제" 만 있어
+  안전장치(`DANGER_GROUPS` 의 해지)가 후보에서 뺐고, Jev 는 이름 링크(상세 화면 이동)만 반복했다. 남은 VPC 는 행의 "서비스 해지" → 모달 "확인" 으로
+  직접 지웠다(해지 후 수 초 안에 목록에서 사라짐). teardown goal 을 "…행의 서비스 해지 버튼을 누르고 … 확인을 눌러 해지를 확정한다 (이름 링크는 누르지 않는다)" 로 바꿨다.
+  **아직 이 goal 로 재기록하지 않았다.** 다음 실행: `npm run record -- scenarios/networking/vpc-create-delete.yaml` → 통과하면 `npm run gen:spec` → 재생.
+- **목록 화면 구조**: 행 `tr.scp-body-row`, 행 앞 선택 아이콘 `i.table-select`(텍스트 없음, cursor:pointer), 행 끝 "서비스 해지" 버튼(항상 활성),
+  상단 "서비스 해지" 는 행 선택 전까지 비활성. 이름은 `span.scp-hypertext[role=button]` 링크(상세로 이동).
+- **주의**: 프로브 스크립트에서 `replace(/\s+/g)` 를 문자열 evaluate 에 넣을 때 백슬래시가 빠져 출력의 's' 가 지워진 적이 있다("kr-we t1", "cp-body-row").
+  콘솔 클래스는 전부 `scp-` 접두어다.
+- **작업 트리의 기존 변경**: `service-map/screens.json`/`screens.txt` 가 이전 `menu:snapshot` 실행으로 서비스 0개로 덮여 있어 `tests/unit/screens.spec.ts` 가 실패한다
+  (이번 작업과 무관, 되돌리지 않음). `prettier --check .` 도 기존 36개 파일(CRLF)에 경고를 낸다.
+
+### 9.1 Jev 활용 판단과 직접 작성 결과 (2026-09-21 저녁)
+
+- **판단**: 오늘 막힌 문제는 모두 관측 계층(오버레이, 라벨, 가림)과 goal 문구였고 Jev 의 판단 자체가 병목은 아니었다. 그러나 같은 디자인 시스템에서는
+  DOM 프로브 → spec 직접 작성이 더 빠르고 결정적이다. 합의: **spec 은 직접 쓴다. 레코더는 낯선 화면의 초안과 치유 용도로 한정**하고,
+  다음 3~5개 시나리오에서 "통과까지 기록 1회, 생성 spec 손질 5줄 이하" 가 아니면 Jev 경로는 접는다.
+- **`tests/regression/networking.vpc.create-delete.spec.ts` 를 직접 작성해 실제 콘솔에서 통과** (`RUN_DESTRUCTIVE=1 npx playwright test --project=regression`, 18.6초).
+  재생하며 알게 된 콘솔 사실 두 가지:
+  1. 생성 화면 진입 직후 섹션 로더가 걷히기 전에 `fill()` 하면 로딩이 끝나며 폼이 초기화되어 값이 사라진다 → 입력 전에 `settleConsole(page, { appearGraceMs: 800 })`.
+  2. `fill()` 만으로는 "생성" 버튼(aria-disabled)이 살아나지 않는다. 검증이 change/blur 에서 돌기 때문 → 각 입력 뒤 `press('Tab')`. 레코더는 키보드 입력 + 다음 클릭으로 우연히 blur 가 났던 것.
+  spec 생성기(`trace-to-spec.ts`)가 내는 `fill()` 초안에는 이 두 가지가 없으므로, 콘솔 폼 spec 은 항상 settle + Tab 을 붙여야 한다(생성기에 반영은 아직).
+- 트레이스 `recordings/networking.vpc.create-delete/trace.json` 은 세 번째 기록(steps 통과, teardown 막힘) 상태 그대로 둔다.
+
+### 9.2 VPC → Subnet → Virtual Server 스택 시나리오 (2026-09-21 밤)
+
+- 참조 저장소 `kyle-agent/api-test-automation` 을 분석해 의존관계·필수 항목·검증된 제약을 `docs/service-facts/compute-vm-stack.md` 에 정리했다
+  (순서 keypair → vpc(PUBLIC) → subnet(PUBLIC/PRIMARY, 하위 /24, ACTIVE ≈2분) → server(ubuntu, s1v1m2, 볼륨 8의 배수, AZ kr-west1-b); 삭제는 서버 소멸 → 서브넷 소멸 → vpc).
+  다른 서비스도 같은 절차로: 그 저장소의 `regression/scenarios/dependencies.json` + lifecycle 의 `_note` → 콘솔 프로브 → spec.
+- **공통 UI 헬퍼 `src/console/ui.ts`**: 라벨 아래 컨트롤(`:visible:below(:text-is(...))`, fill + Tab + 값 확인), 커스텀 드롭다운(`.scp-dropdown` → `.scp-menu` → `.scp-menu-item`),
+  확인 모달, 행 선택 `i.table-select`·상단 버튼, 목록 새로고침 폴링 `waitForRow`(등장/상태/소멸). `gotoRoute` 는 same-document 해시 이동도 해시 일치 + 로더 종료까지 기다리게 고쳤다.
+- **시나리오 `scenarios/compute/vm-stack.yaml` + spec `tests/regression/compute.vm-stack.spec.ts`**: 테스트 타임아웃 60분, afterEach 가 역순 정리를 단계별 try/catch 로 돌고 실패를 모아 보고한다.
+- **로그인 브라우저(Edge 153) 크래시**: 콘솔의 Keypair `.pem` 다운로드 순간 CDP 로 붙은 Edge 가 프로세스째 죽는 일이 4회 중 3회(다운로드 이벤트를 구독한 경우). 새 프로필의 data: 다운로드는 안 죽는다.
+  **크래시는 로그아웃이 아니라서 브라우저만 다시 띄우면 세션이 돌아온다**(사용자 확인 + 실측). `src/console/browser.ts` 의 `connectLiveBrowser` 가 연결 실패 시
+  `scripts/auth-login.ts --keep-open` 을 분리 프로세스로 띄워 자동 복구한다(`PW_AUTO_RELAUNCH=0` 으로 끔, 로그는 `test-results/auth-login.relaunch.log`).
+  스택 시나리오는 공유 Keypair `qa-shared-keypair`(생성해 둠, 무과금)를 재사용해 다운로드 자체를 피한다.
+- **실행 시 주의**: 20분 넘게 걸리는 실행은 Claude Code 의 Bash 백그라운드(최대 10분)가 아니라 PowerShell `Start-Process` 로 분리해 띄우고 로그 파일을 지켜본다.
+  Playwright 의 `test.use({ trace })` 는 describe 안에서 못 쓴다(새 워커 강제).
+- **결과 (2026-09-21 21:34 실행)**: `RUN_DESTRUCTIVE=1 npx playwright test tests/regression/compute.vm-stack.spec.ts --project=regression` **2/2 통과, 11.7분**
+  (Keypair 재사용 → VPC Active → Subnet Active ≈3.5분 → VM Active ≈1분 → 서버 해지 소멸 ≈40초 → Subnet 소멸 ≈6분 → VPC 해지). 목록에 남은 리소스 없음(공유 Keypair 만).
+  앞선 실패 원인 두 가지를 고쳤다: Virtual Server 목록은 행 버튼이 없어 행 선택 → 상단 "서비스 해지" 여야 하고, 서버를 담았던 Subnet 의 Deleting 은 5분을 넘긴다(대기 20분).
+  콘솔의 서버 완료 상태는 "Active" 다("Running" 아님).
+
+### 9.3 SG · Internet Gateway · Public IP 확장 스택 (2026-09-22~23)
+
+- 참조 저장소 조사 + 콘솔 프로브 결과는 `docs/service-facts/networking-sg-publicip.md`. 시나리오 `scenarios/compute/vm-stack-net.yaml`, spec `tests/regression/compute.vm-stack-net.spec.ts`.
+- **결과 (2026-09-23 08:00)**: `RUN_DESTRUCTIVE=1 npx playwright test tests/regression/compute.vm-stack-net.spec.ts --project=regression` **2/2 통과, 14.5분**, 남은 리소스 없음.
+  순서: Keypair 확인 → SG(로그 저장 해제, 모달 2개) → VPC → IGW(Firewall·로그 해제, 경고 모달 동의 체크, 생성 확인) → Subnet(Active ≤15분 대기) → Public IP 예약(새 IP 폴링으로 특정)
+  → VM(SG 선택 모달) → 서버 상세 "Public NAT IP ✎" → "Public NAT 사용" 체크 → IP 드롭다운 → 확인 → Public IP 목록에 서버명 표시 확인.
+  정리: 서버 해지(포트·NAT 함께 소멸) → IP Reserved 확인 후 반납 → IGW 행 "삭제" → Subnet → VPC → SG 상세 "서비스 해지". 정리 판정 전 새로고침(토스트에 이름이 남는 문제).
+- **공통 헬퍼 추가** (`src/console/ui.ts`): 커스텀 체크박스 `checkbox/isChecked/setCheckbox`, `confirmModal(..., { agree: true })`(모달 안 동의 체크), `pickOption` 이 항목 0개면 닫았다 다시 열기(앞 필드에 따라 비동기로 채워지는 드롭다운).
+- **콘솔 사실 요약**: SG 목록엔 선택·삭제가 없다(상세에서 해지). IGW 는 로그 저장이 켜진 채면 토스트로 실패, 둘 다 끄면 동의 체크 모달. Public IP 상세엔 연결 버튼이 없고 서버 상세에서 NAT 로 연결. VPC CIDR 10.251/10.252 는 콘솔이 막는다(10.250.0.0/20 사용).
+- **세션**: 콘솔 세션은 하루가 지나면(또는 몇 시간 유휴) 만료돼 SSO 재로그인이 필요하다. 브라우저 크래시와 달리 이건 사람이 해야 한다. 브라우저를 띄우는 명령은 `npm run auth:login -- --session root --channel msedge --keep-open`.

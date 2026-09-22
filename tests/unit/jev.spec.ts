@@ -160,7 +160,9 @@ test.describe('기록 안전장치', () => {
   test('TYPE_TEXT 값은 vars 에서 라벨로 고른다', () => {
     const vars = { name: 'qa-vpc-1', cidr: '10.250.0.0/16', description: '테스트' };
     expect(pickVarForField('VPC 이름', vars)).toBe('name');
+    expect(pickVarForField('VPC명', vars)).toBe('name'); // 실제 콘솔 라벨 (인접 라벨 추론 결과)
     expect(pickVarForField('IP 대역(CIDR)', vars)).toBe('cidr');
+    expect(pickVarForField('IP 대역', vars)).toBe('cidr');
     expect(pickVarForField('설명', vars)).toBe('description');
     expect(pickVarForField('알 수 없는 필드', vars)).toBeNull();
     expect(pickVarForField('아무 필드', { only: 'x' })).toBe('only');

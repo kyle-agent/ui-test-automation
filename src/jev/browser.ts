@@ -47,6 +47,8 @@ export interface Descriptor {
   pointer: boolean;
   /** getByRole 로 잡을 수 없을 때(role 없음/이름 없음) getByText 로 대신 잡을 텍스트 */
   fallbackText: string;
+  /** label/aria 연결이 없는 폼 컨트롤에 대해 조상들의 앞 형제에서 찾은 라벨 텍스트 (예: "VPC명"). 없으면 '' */
+  nearLabel: string;
   /** 요소가 있는 프레임. 메인이면 null */
   frame: FrameInfo | null;
 }
@@ -310,7 +312,8 @@ export async function describe(
       return {role, name, nth: all.indexOf(e), count: all.length, tag: e.tagName.toLowerCase(), id: e.id||'',
         placeholder: e.getAttribute('placeholder')||'', text, href: e.getAttribute('href'),
         pointer: !e.matches('a[href],button,input,textarea,select,summary,[contenteditable="true"],[role]'),
-        fallbackText: text || name};
+        fallbackText: text || name,
+        nearLabel: !name && c.nearLabel && e.matches('input,textarea,select,[role="combobox"],[role="textbox"]') ? c.nearLabel(e) : ''};
     })(${action.node})`,
   );
   return d ? { ...d, frame: info && info.index !== 0 ? info : null } : null;

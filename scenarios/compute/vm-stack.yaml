@@ -1,0 +1,81 @@
+id: compute.vm-stack
+title: VPC → Subnet → Virtual Server 생성 후 역순 삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 의존관계 (참조: kyle-agent/api-test-automation 의 knowledge/resource-dependencies.md, regression/scenarios/dependencies.json)
+#   keypair → vpc(PUBLIC, /20) → subnet(PUBLIC, PRIMARY, VPC CIDR 의 하위 /24, ACTIVE 까지 ≈2분) → virtual server(ubuntu, s1v1m2, 볼륨 8의 배수, AZ kr-west1-b)
+#   삭제는 역순: server 소멸 확인 → subnet 소멸 확인(30초~3분) → vpc → keypair.  Security Group 은 콘솔에서 선택 사항이라 넣지 않는다.
+# 콘솔 제한: VPC명/Subnet명 3~20자(영문·숫자·-), 서버명 63자, Keypair명 255자. run_id 는 14자.
+# 한도: 계정당 VPC 5개, VPC당 PRIMARY 서브넷 3개.
+steps:
+  - goal: "Keypair 목록으로 이동한다"
+    goto: "#/virtualserver/keypair/list"
+    expect:
+      url: "#/virtualserver/keypair/list"
+
+  # Keypair 는 무과금이고 생성 시 .pem 다운로드가 Edge 내부 페이지를 열어 로그인 브라우저를 불안정하게 만든다.
+  # 그래서 고정 이름의 공유 Keypair 를 쓴다: 있으면 재사용(정리 때 남김), 없으면 생성(정리 때 삭제).
+  - goal: "Keypair {{keypair}} 를 준비한다 (있으면 재사용, 없으면 SSH 로 생성)"
+    vars:
+      keypair: "qa-shared-keypair"
+    expect:
+      url: "#/virtualserver/keypair/list"
+      text: ["{{keypair}}"]
+
+  - goal: "VPC {{vpc}} 를 {{vpc_cidr}} 로 생성하고 Active 가 될 때까지 기다린다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      vpc_cidr: "10.250.0.0/20"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+      not_text: ["오류가 발생", "실패"]
+
+  - goal: "VPC {{vpc}} 에 Public/Primary Subnet {{subnet}} 을 {{subnet_cidr}} 로 생성하고 Active 가 될 때까지 기다린다"
+    vars:
+      subnet: "sub-{{run_id}}"
+      subnet_cidr: "10.250.0.0/24"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+      not_text: ["오류가 발생", "실패"]
+      timeout: 900000
+
+  # 콘솔 목록의 서버 상태는 Block Device Mapping → Build → Active (≈1분). "Running" 이 아니라 "Active" 가 완료 상태다.
+  - goal: "Ubuntu 이미지, Standard-1 / s1v1m2, SSD 볼륨으로 서버 {{vm}} 을 {{subnet}} 에 생성하고 Active 가 될 때까지 기다린다"
+    vars:
+      vm: "vm-{{run_id}}"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+      not_text: ["오류가 발생", "실패"]
+      timeout: 600000
+
+teardown:
+  - goal: "서버 {{vm}} 을 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{vm}}"]
+      timeout: 600000
+
+  # 서버를 담았던 서브넷은 Deleting 이 5분을 넘긴다 (실측 ≈6분, 모달 문구 "규모에 따라 수십 분").
+  - goal: "Subnet {{subnet}} 을 삭제하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{subnet}}"]
+      timeout: 1200000
+
+  - goal: "VPC {{vpc}} 를 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 180000
+
+  - goal: "Keypair {{keypair}} 를 삭제한다 (이 실행에서 새로 만들었을 때만; 공유 Keypair 면 건너뜀)"
+    expect:
+      not_text: ["{{keypair}}"]
+      timeout: 60000

@@ -4,6 +4,7 @@
 import { expect, type Page, type TestInfo } from '@playwright/test';
 import { hashUrl, isSsoUrl } from './env';
 import { allBodyText, countRole, visibleText } from './frames';
+import { settleConsole } from './overlays';
 import { waitForConsole } from './session';
 import { TITLE_PATTERN, knownTitle, recordObservedTitle } from './titles';
 import type { Expectation } from '../scenario/schema';
@@ -35,6 +36,14 @@ export async function gotoRoute(page: Page, route: string, opts: { timeout?: num
     if ((await waitForConsole(page, timeout)) === 'expired') throw new SessionExpiredError(page.url());
   }
   assertNotSso(page);
+  // 이미 콘솔 화면에 있을 때 해시만 바뀌면(same-document) 제목이 아직 이전 화면 것이라 waitForConsole 이 즉시 통과한다.
+  // 해시가 목표 라우트가 될 때까지 기다린 뒤, 화면 전환 로더가 붙었다 걷힐 때까지(등장 유예 포함) 기다린다.
+  const wantHash = `#${normalizeHash(route)}`;
+  await page
+    .waitForFunction((h) => location.hash.startsWith(h), wantHash, { timeout: 10_000 })
+    .catch(() => undefined);
+  // 로딩 오버레이가 걷히고 공지 모달이 닫힌 뒤에 판정·조작을 시작한다.
+  await settleConsole(page, { appearGraceMs: 800 });
 }
 
 function normalizeHash(route: string): string {

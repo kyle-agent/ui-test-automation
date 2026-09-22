@@ -15,6 +15,7 @@ import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { checkExpectation, describeExpectation } from '../console/expect';
 import { hashUrl } from '../console/env';
+import { settleConsole } from '../console/overlays';
 import { waitForConsole } from '../console/session';
 import {
   choose,
@@ -104,6 +105,8 @@ export interface TraceStep {
   result: StepResult;
   failures: string[];
   already_satisfied: boolean;
+  /** 이 step 동안 코드가 닫은 콘솔 공지 모달 수 */
+  notices_closed: number;
   final_url: string;
   final_title: string;
   started_at: string;
@@ -160,6 +163,18 @@ const DANGER_GROUPS: RegExp[] = [
 ];
 const NEVER = /로그아웃|logout|sign\s?out/i;
 
+/** 관측에 클릭·입력 대상이 하나도 없으면(로딩 오버레이, 지연 렌더) 이 시간까지는 Jev 에게 묻지 않고 다시 관측한다. */
+export const EMPTY_OBSERVATION_WAIT_MS = 10_000;
+/** Jev 가 BLOCKED 를 내면 이 횟수만큼 연속으로 막혔을 때만 포기한다 (그 사이에는 기다렸다가 다시 관측). */
+export const BLOCKED_RETRIES = 3;
+export const BLOCKED_RETRY_WAIT_MS = 1_500;
+/** 동작 직후 콘솔의 로딩 오버레이가 붙기까지 걸리는 시간(실측 0.3~0.5초). 이 동안은 나타나는지 지켜본다. */
+const LOADER_APPEAR_GRACE_MS = 500;
+
+export function hasElements(state: Pick<PageState, 'actions'>): boolean {
+  return state.actions.some((a) => a.kind !== 'scroll' && a.kind !== 'wait');
+}
+
 export function filterCandidates(actions: ObservedAction[], goal: string): ObservedAction[] {
   return actions.filter((a) => {
     if (a.kind === 'scroll' || a.kind === 'wait') return true;
@@ -170,7 +185,8 @@ export function filterCandidates(actions: ObservedAction[], goal: string): Obser
 }
 
 const FIELD_HINTS: Record<string, RegExp> = {
-  name: /이름|\bname\b/i,
+  // "VPC명" 처럼 "명" 으로 끝나는 라벨도 이름이다. "설명" 은 description 이므로 제외.
+  name: /이름|\bname\b|(?:^|[^설])명\s*$/i,
   cidr: /cidr|대역|ip\b/i,
   description: /설명|description|desc/i,
   email: /이메일|email/i,
@@ -234,6 +250,7 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
       result: 'failed',
       failures: [],
       already_satisfied: false,
+      notices_closed: 0,
       final_url: '',
       final_title: '',
       started_at: new Date().toISOString(),
@@ -251,6 +268,17 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
     };
     log(`\n[${phase} ${index}] ${goal}`);
     log(`  완료 조건: ${describeExpectation(exp)}`);
+
+    // 로딩 오버레이(앱 루트 [inert], 요소 0개로 보임)가 걷히고 공지 모달이 닫힌 뒤에만 관측·판정한다.
+    const settleShell = async (afterAction = false) => {
+      const closed = await settleConsole(page, {
+        appearGraceMs: afterAction ? LOADER_APPEAR_GRACE_MS : 0,
+      });
+      if (closed) {
+        record.notices_closed += closed;
+        log(`  공지 모달 ${closed}개 닫음`);
+      }
+    };
 
     if (step.goto) {
       const urlBefore = page.url();
@@ -290,6 +318,7 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
           null,
         ),
       );
+      await settleShell();
       const failures = await checkExpectation(page, exp, { consoleTitle: consoleChecks });
       await finish(failures.length ? 'failed' : 'passed', failures);
       return;
@@ -301,10 +330,22 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
     const stepVars: Record<string, string> = {};
     for (const k of Object.keys(step.vars ?? {})) stepVars[k] = vars[k]!;
     let staleStreak = 0;
+    let blockedStreak = 0;
     for (let n = 0; n < budget; n++) {
       let state: PageState;
       try {
+        // 직전 동작(앞 step 의 마지막 클릭 포함) 직후일 수 있으므로 로더가 붙을 유예를 둔다.
+        await settleShell(true);
         state = await observe(page);
+        // 요소가 하나도 안 보이면(화면 전환 중, 지연 렌더) Jev 에게 묻지 않고 잠시 기다려 다시 관측한다.
+        for (
+          const start = Date.now();
+          !hasElements(state) && Date.now() - start < EMPTY_OBSERVATION_WAIT_MS;
+        ) {
+          await page.waitForTimeout(400);
+          await settleShell();
+          state = await observe(page);
+        }
       } catch (err) {
         await finish('error', [`관측 실패: ${err instanceof Error ? err.message : String(err)}`]);
         return;
@@ -367,6 +408,12 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
         return;
       }
       if (decision.operation === 'BLOCKED' || !action) {
+        // 막힌 화면을 그대로 남긴다 (관측 요소 표만으로는 오버레이·팝업을 알아보기 어렵다).
+        const shot = path.join(shotDir, `${phase}-${index}-${String(n + 1).padStart(2, '0')}-blocked.jpg`);
+        const saved = await page
+          .screenshot({ path: shot, type: 'jpeg', quality: 60 })
+          .then(() => true)
+          .catch(() => false);
         record.actions.push({
           ...traceAction(
             n + 1,
@@ -382,14 +429,23 @@ export async function recordScenario(opts: RecordOptions): Promise<Trace> {
             decision,
           ),
           observed,
+          screenshot: saved ? path.relative(opts.outDir, shot) : null,
         });
         log(
           `  관측된 요소 ${observed.elements}개 (프레임 ${observed.frames.length}개${observed.frames.some((f) => f.shadow_hosts) ? ', shadow DOM 있음' : ''}):`,
         );
         for (const line of observed.sample.slice(0, 40)) log(`    ${line}`);
+        // 화면이 아직 다 그려지지 않았을 수 있다(섹션 로더, 지연 렌더). 잠시 기다려 다시 관측하고, 연속으로 막힐 때만 포기한다.
+        if (++blockedStreak < BLOCKED_RETRIES) {
+          log(`  ${BLOCKED_RETRY_WAIT_MS / 1000}초 뒤 다시 관측 (${blockedStreak}/${BLOCKED_RETRIES - 1})`);
+          save();
+          await page.waitForTimeout(BLOCKED_RETRY_WAIT_MS);
+          continue;
+        }
         await finish('blocked', ['Jev 가 진행할 동작이 없다고 판단']);
         return;
       }
+      blockedStreak = 0;
 
       let text: string | null = null;
       let textVar: string | null = null;
