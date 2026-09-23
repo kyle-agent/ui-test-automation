@@ -26,6 +26,7 @@
     "stacks:check": "tsx scripts/stacks-cleanup.ts",
     "stacks:cleanup": "tsx scripts/stacks-cleanup.ts --yes",
     "explore": "tsx scripts/explore.ts",
+    "probe": "tsx scripts/probe-form.ts",
     "coverage": "tsx scripts/coverage.ts",
     "results": "tsx scripts/results.ts",
     "test:headed": "playwright test --project=smoke --headed",
