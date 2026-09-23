@@ -14,7 +14,6 @@
  * 20분 넘게 걸리므로 터미널에서 직접 띄운다 (Claude Code 의 Bash 백그라운드는 10분에서 끊긴다).
  */
 import { spawnSync } from 'node:child_process';
-import path from 'node:path';
 import '../src/console/env';
 import { connectLiveBrowser } from '../src/console/browser';
 import { listLeftovers } from '../src/console/inventory';
@@ -69,7 +68,7 @@ async function preflight(): Promise<void> {
 }
 
 function runOne(id: string): { ok: boolean; seconds: number } {
-  const file = path.join('tests', 'regression', `${id}.spec.ts`);
+  const file = `tests/regression/${id}.spec.ts`; // 슬래시 고정: Windows 의 역슬래시는 Playwright 필터에 안 맞는다
   const started = Date.now();
   console.log(`\n===== ${id} (${new Date().toLocaleTimeString()}) =====`);
   const result = spawnSync('npx', ['playwright', 'test', file, '--project=regression', '--reporter=line'], {
