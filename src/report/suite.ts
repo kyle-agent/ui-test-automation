@@ -16,5 +16,6 @@ export const SUITE_ORDER: readonly string[] = [
   'networking.vpc-port', // VPC → Subnet → Port (≈10분)
   'networking.private-dns', // ≈2분. 생성 → Active → 상세 서비스 해지
   'storage.file-storage',
+  'networking.dns-hosted-zone', // ≈8분. Private DNS → Hosted Zone(Private) → 역순 삭제
   'networking.vpc-peering', // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지 // ≈2분. NFS 볼륨 생성·해지 (용량 과금, 짧게)
 ];

@@ -13,6 +13,7 @@ export const ROUTES = {
   pip: '#/vpc/public-ip/list',
   igw: '#/vpc/internet-gateway/list',
   volume: '#/virtualserver/block-storage/list',
+  hz: '#/dns/hosted-zone/list',
   pdns: '#/dns/private-dns/list',
   fs: '#/filestorage/filestorage/list',
   port: '#/vpc/port/list',
@@ -34,6 +35,8 @@ export type Kind = keyof typeof ROUTES;
 const TEST_NAME = /^(vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
+/** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
+const TEST_HZ = /^hz-\d{4}-\d{4}-[0-9a-f]{4}\.[a-z.]+$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -65,7 +68,13 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
         continue;
       }
       const name = words.find((w) =>
-        kind === 'igw' ? TEST_IGW.test(w) : kind === 'fs' ? TEST_FS.test(w) : TEST_NAME.test(w),
+        kind === 'igw'
+          ? TEST_IGW.test(w)
+          : kind === 'fs'
+            ? TEST_FS.test(w)
+            : kind === 'hz'
+              ? TEST_HZ.test(w)
+              : TEST_NAME.test(w),
       );
       if (name) leftovers.push({ kind, name, rowText });
     }
@@ -79,6 +88,7 @@ const ORDER: Kind[] = [
   'igw',
   'volume',
   'fs',
+  'hz',
   'pdns',
   'port',
   'subnet',
@@ -152,6 +162,12 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await selectRow(page, item.name);
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    case 'hz':
+      // Hosted Zone: 행 끝 "삭제" → "Hosted Zone을 삭제하시겠습니까?"
+      await row(page, item.name).getByRole('button', { name: '삭제', exact: true }).click();
+      await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
       return;
     case 'pdns':
