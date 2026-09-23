@@ -15,6 +15,7 @@ import {
   waitForRow,
   below,
   terminateVpc,
+  terminateServer,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
@@ -62,15 +63,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       if ((await row(page, vars.vm!).count()) === 0) return;
       await test.step('teardown[0] 서버 해지', async () => {
         // Virtual Server 목록은 행에 버튼이 없다. 행 선택 → 상단 "서비스 해지" → "Virtual Server 1대를 해지하시겠습니까?" → 확인. 소멸까지 ≈40초 실측.
-        await selectRow(page, vars.vm!);
-        await topButton(page, '서비스 해지').click();
-        await confirmModal(page, /해지하시겠습니까/);
-        await waitForRow(page, ROUTES.vm, vars.vm!, {
-          gone: true,
-          timeoutMs: 600_000,
-          intervalMs: 15_000,
-          log,
-        });
+        await terminateServer(page, ROUTES.vm, vars.vm!, log);
         await expectStep(page, resolveExpectation(scenario.teardown[0]!.expect, vars), stepCtx(0));
       });
     });

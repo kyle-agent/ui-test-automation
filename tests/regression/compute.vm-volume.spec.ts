@@ -18,6 +18,7 @@ import {
   visibleModal,
   waitForRow,
   terminateVpc,
+  terminateServer,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
@@ -146,15 +147,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await gotoRoute(page, ROUTES.vm);
       if ((await row(page, vars.vm!).count()) === 0) return;
       await test.step('teardown[1] 서버 해지', async () => {
-        await selectRow(page, vars.vm!);
-        await topButton(page, '서비스 해지').click();
-        await confirmModal(page, /해지하시겠습니까/);
-        await waitForRow(page, ROUTES.vm, vars.vm!, {
-          gone: true,
-          timeoutMs: 600_000,
-          intervalMs: 15_000,
-          log,
-        });
+        await terminateServer(page, ROUTES.vm, vars.vm!, log);
         await refreshedExpect(page, resolveExpectation(scenario.teardown[1]!.expect, vars), stepCtx(1));
       });
     });

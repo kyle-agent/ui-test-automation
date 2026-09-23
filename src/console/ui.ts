@@ -262,3 +262,38 @@ export async function terminateVpc(
   await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
   await settleConsole(page, { appearGraceMs: 800 });
 }
+
+/**
+ * Virtual Server 해지 (행 선택 → 상단 "서비스 해지" → "…해지하시겠습니까?" 확인). 실측(2026-09-23 스위트 run 2): 확인을 눌러도 요청이 조용히 무시되어
+ * 서버가 Active 로 남는 경우가 있다 → 2분 안에 상태가 바뀌지(사라지거나 Deleting/Terminating) 않으면 최대 3회 다시 누른다. 소멸까지는 보통 40초~1분.
+ */
+export async function terminateServer(
+  page: Page,
+  route: string,
+  name: string,
+  log?: (line: string) => void,
+): Promise<void> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await gotoRoute(page, route);
+    const r = row(page, name);
+    if ((await r.count()) === 0) return;
+    const text = (
+      await r
+        .first()
+        .innerText({ timeout: 5_000 })
+        .catch(() => '')
+    ).replace(/\s+/g, ' ');
+    if (!/Deleting|Terminating|Stopping/i.test(text)) {
+      await selectRow(page, name);
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지하시겠습니까/);
+    }
+    try {
+      await waitForRow(page, route, name, { gone: true, timeoutMs: 120_000, intervalMs: 15_000, log });
+      return;
+    } catch {
+      log?.(`  서버 ${name} 해지 재시도 ${attempt}/3 (아직 남아 있음)`);
+    }
+  }
+  await waitForRow(page, route, name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+}

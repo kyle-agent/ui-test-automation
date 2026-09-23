@@ -6,7 +6,7 @@
 import type { Page } from '@playwright/test';
 import { gotoRoute } from './expect';
 import { settleConsole } from './overlays';
-import { confirmModal, row, selectRow, topButton, waitForRow } from './ui';
+import { confirmModal, row, selectRow, terminateServer, topButton, waitForRow } from './ui';
 
 export const ROUTES = {
   vm: '#/virtualserver/virtualserver/list',
@@ -134,10 +134,7 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
   if ((await row(page, item.name).count()) === 0) return;
   switch (item.kind) {
     case 'vm':
-      await selectRow(page, item.name);
-      await topButton(page, '서비스 해지').click();
-      await confirmModal(page, /해지하시겠습니까/);
-      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+      await terminateServer(page, route, item.name, log);
       return;
     case 'pip':
       await waitForRow(page, route, item.name, {
