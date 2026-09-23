@@ -36,6 +36,8 @@ export interface SimpleCrudConfig {
   confirmText?: RegExp;
   /** 생성 후 목록에서 기다릴 상태 (없으면 등장만) */
   createdStatus?: RegExp;
+  /** 생성(등장·상태) 대기 한도. 기본 3분; Private DNS 처럼 Creating 이 오래가는 서비스는 늘린다 */
+  createTimeoutMs?: number;
   /** 삭제 버튼 문구 (기본 "삭제"; 해지형 서비스는 "서비스 해지") */
   deleteButton?: string;
   deleteConfirmText?: RegExp;
@@ -88,7 +90,7 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
           if (config.deletableStatus)
             await waitForRow(page, config.route, vars.name!, {
               status: config.deletableStatus,
-              timeoutMs: 300_000,
+              timeoutMs: config.createTimeoutMs ?? 300_000,
               intervalMs: 15_000,
               log,
             });
@@ -143,7 +145,7 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
           await waitForRow(page, config.route, vars.name!, {
             status: config.createdStatus,
-            timeoutMs: 180_000,
+            timeoutMs: config.createTimeoutMs ?? 180_000,
             intervalMs: 10_000,
             log,
           });

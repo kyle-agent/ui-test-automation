@@ -11,6 +11,7 @@ defineSimpleCrudSpec({
   ],
   confirmText: /생성|신청/,
   createdStatus: /Active/i,
+  createTimeoutMs: 900_000, // 실측(2026-09-23): Creating 이 3분을 넘긴다
   deleteButton: '서비스 해지',
   deleteFrom: 'detail', // 목록에는 삭제 버튼이 없다
   deletableStatus: /Active/i, // Creating 동안 해지 버튼이 비활성

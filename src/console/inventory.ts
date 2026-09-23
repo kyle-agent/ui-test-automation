@@ -17,6 +17,7 @@ export const ROUTES = {
   fs: '#/filestorage/filestorage/list',
   port: '#/vpc/port/list',
   subnet: '#/vpc/subnet/list',
+  peer: '#/vpc/vpc-peering/list',
   vpc: '#/vpc/vpc/list',
   sg: '#/securitygroup/securitygroup/list',
   sgrp: '#/virtualserver/server-group/list',
@@ -30,7 +31,7 @@ export const ROUTES = {
 export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
-const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+const TEST_NAME = /^(vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
@@ -81,6 +82,7 @@ const ORDER: Kind[] = [
   'pdns',
   'port',
   'subnet',
+  'peer',
   'vpc',
   'sg',
   'sgrp',
@@ -178,6 +180,20 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제하시겠습니까/);
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+      return;
+    case 'peer':
+      // VPC Peering: 목록에 선택·삭제가 없고 상세의 "VPC Peering 삭제" 만 있다. Creating 동안은 기다린다
+      await waitForRow(page, route, item.name, {
+        status: /Active/i,
+        timeoutMs: 300_000,
+        intervalMs: 15_000,
+        log,
+      });
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await topButton(page, 'VPC Peering 삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
       return;
     case 'vpc':
       await row(page, item.name).getByRole('button', { name: '서비스 해지', exact: true }).click();
