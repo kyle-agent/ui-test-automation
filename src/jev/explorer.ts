@@ -80,6 +80,22 @@ const GOAL = (route: string, opened: string | null) =>
   `입력란이면 값을 넣고, 드롭다운은 열어 다른 항목을 골라라. 모달이 뜨면 내용을 확인한 뒤 "취소" 로 닫아라. ` +
   `현재 화면 안에 머물러라 (목록으로 돌아가거나 다른 메뉴로 가지 마라). 더 시도할 것이 없으면 DONE.`;
 
+async function retry<T>(times: number, fn: () => Promise<T>, log: (line: string) => void): Promise<T> {
+  let last: unknown;
+  for (let i = 1; i <= times; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      last = err;
+      if (i < times) {
+        log(`  Jev 호출 실패 (${i}/${times}): ${err instanceof Error ? err.message : String(err)} → 재시도`);
+        await new Promise((r) => setTimeout(r, 2_000 * i));
+      }
+    }
+  }
+  throw last;
+}
+
 /** 컨트롤 서명. 모달이 떠 있을 때의 "취소/확인" 은 폼의 같은 라벨과 다른 컨트롤이므로 모달 여부를 넣는다. */
 const sig = (a: ObservedAction, inModal = false) =>
   `${inModal ? 'modal' : 'page'}|${a.frame ?? 0}|${a.role ?? a.kind}|${a.label}`;
@@ -195,7 +211,12 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
 
     let decision;
     try {
-      decision = await choose({ ...state, actions: candidates }, goal, history.slice(-6));
+      // 모델 응답이 잠깐 깨질 수 있다("모델 응답이 유효하지 않습니다") → 3회까지 재시도한 뒤에만 멈춘다
+      decision = await retry(
+        3,
+        () => choose({ ...state, actions: candidates }, goal, history.slice(-6)),
+        log,
+      );
     } catch (err) {
       return stop(`Jev 호출 실패: ${err instanceof Error ? err.message : String(err)}`);
     }

@@ -28,8 +28,9 @@
   const deepQuery = (sel) => everything.filter((e) => e.matches(sel));
   const safe = (e) => !['password', 'file', 'hidden'].includes(e.type);
   // 화면 골격(상단 바·왼쪽 메뉴·빵부스러기)은 탐색 대상이 아니다: 눌러 봐야 다른 화면으로 나갈 뿐이다 (SCP 콘솔: .scp-breadcrumb, .scp-con-header 의 링크).
+  // 주의: `[class*="lnb"]` 같은 와일드카드는 본문 래퍼(div.main-layout.is-lnb)까지 잡아 후보가 0개가 된다 → 정확한 클래스만.
   const CHROME =
-    'header,nav,aside,[role="navigation"],[role="banner"],.scp-breadcrumb,.scp-con-header-breadcrumb,[class*="lnb"],[class*="gnb"],[class*="sidebar"],[class*="side-nav"]';
+    'header,nav,aside,[role="navigation"],[role="banner"],.scp-breadcrumb,.scp-con-header-breadcrumb,.main-layout-lnb,.scp-gnb,[class*="sidebar"],[class*="side-nav"]';
   const chrome = (e) => !!e.closest(CHROME);
   const visible = (e) =>
     !e.closest('[aria-hidden="true"],[inert]') &&

@@ -254,3 +254,21 @@
 - 탐색기 개선: 드롭다운을 열면 안 고른 항목을 코드가 이어서 고른다(보고서 입력 열 `→ 항목`), `--prereq vpc[,subnet]` 로 선행 리소스를 만들고 끝나면 run_id 이름을 자동 정리.
   발견 → 단언 승격 절차는 README §6.
 - 커버리지: L2 이상 9/80(11%). 전체 스위트 실행 기록은 `reports/runs/`, 정리는 `npm run results` → `reports/RESULTS.md`.
+
+### 9.9 자율 진행: 인증키·대시보드·가벼운 spec 3종·탐색 배치 (2026-09-23 저녁~밤)
+
+- **Object Storage 인증키**: 사용자 승인으로 IAM > My Info > 인증키(`#/iam/my-info/detail/auth-key`, Object Storage 생성 폼의 "인증키 관리 바로가기" 링크가 여기로 온다)에서
+  **영구** 옵션으로 1개 생성(만료 9999-12-31, 상태 사용). 비밀키는 어디에도 기록하지 않았다. 그 뒤 `storage.object-storage-bucket` 의 `skipReason` 을 지우고 통과 → bucket@object-storage L2.
+  버킷 해지 모달은 "확인을 위해 버킷명을 입력" — 단어 '버킷명' 이 아니라 **실제 버킷 이름**을 쳐야 한다(사용자 지적). `confirmModal` 이 "라벨 : 값" 에서 값을 찾거나 `resourceName` 을 쓴다.
+- **스위트 run 1**(`npm run test:stacks`, 17:09~17:55): vpc 42초 PASS · vm-stack 13분 PASS · vm-volume 15분 PASS · **vm-stack-net 16분 FAIL** — 본 단계 8개 모두 통과, teardown "Public IP 반납" 에서
+  `waitForRow` 가 행 텍스트를 읽는 사이 행이 사라져 `innerText` 15초 타임아웃(리소스는 다 지워짐, 잔여 0). `waitForRow` 가 5초 제한으로 읽고 못 읽으면 다시 세도록 고쳤다. 다음 스위트에서 확인.
+- **HTML 대시보드** `reports/dashboard.html`(`src/report/dashboard.ts`, `npm run results` 가 RESULTS.md 와 함께 생성, `npm run dashboard` 로 열기): 요약 카드·날짜별 막대·spec 별 최근 10회·실행 기록(필터)·
+  카테고리/리소스별 level·탐색 목록·알려진 이슈. 외부 요청 없는 한 파일이라 그대로 공유 가능. 단위 테스트 `tests/unit/dashboard.spec.ts`.
+- **가벼운 L2 spec 3종**(프로브 → `simple-crud` 팩토리): `management.resource-group`(그룹 정의 태그 key/value + "태그 추가" 가 생성 조건 → `beforeSubmit` 훅),
+  `iam.user-group`(이름·설명만, Global 화면), `compute.launch-configuration`(Standard-1/s1v1m2, **기본 OS 디스크를 SSD 로** — 기본값 SSD_Provisioned 는 Max IOPS·Throughput 필수라 생성이 비활성, 공유 Keypair).
+  셋 다 통과(각 ≈1분). 정리 스크립트 이름 규칙에 `rg-`/`grp-`/`lc-` 추가. 프로브만 한 후보: Secrets Manager·KMS(요금 확인 버튼·삭제 예정일 = 과금/지연 삭제라 보류), IAM 정책(다단계 마법사),
+  LB 서버 그룹·LB 헬스 체크·Port·Private DNS(VPC/Subnet 선행 → 네트워크 확장 스택 후보), Backup(서버 필요).
+- **런처 없이 직접 돌린 결과**는 `scripts/run-record-import.ts --spec <id> --json <playwright json> --rm` 으로 실행 기록으로 바꾼다(원본 JSON 을 `reports/runs/` 에 두면 `readRunRecords` 가 건너뛴다).
+- **탐색 배치** `scripts/explore-batch.ts --plan plans/explore-default.json`(Subnet 폼·VM 폼·VPC 목록·Server Group 폼). 첫 Subnet 폼 탐색은 Jev 가 빵부스러기 "VPC" 를 눌러 폼을 떠난 뒤 BLOCKED 2회로 끝났다(결정 3회) →
+  `snapshot.js` 가 header/nav/aside/`.scp-breadcrumb` 안의 컨트롤을 후보에서 빼고, `--open` 폼에서 URL 이 바뀌면 폼으로 되돌아오도록 고쳤다(`plans/explore-followup.json` 으로 재실행).
+  주의: `spawnSync(..., {shell:true})` 는 "Subnet 생성" 같은 공백 인자를 쪼갠다 → node 로 tsx 를 직접 부른다. Windows 에서 오래 도는 배치는 PowerShell `Start-Process cmd '/c …'` 로 띄운다(Git Bash `-lc` 로 띄우면 멈춤).

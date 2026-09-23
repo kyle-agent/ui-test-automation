@@ -1,0 +1,49 @@
+[
+  {
+    "name": "subnet-form",
+    "args": [
+      "--route",
+      "#/vpc/subnet/list",
+      "--open",
+      "Subnet 생성",
+      "--prereq",
+      "vpc",
+      "--budget",
+      "30",
+      "--cost",
+      "0.05",
+      "--minutes",
+      "10"
+    ]
+  },
+  {
+    "name": "sg-form",
+    "args": [
+      "--route",
+      "#/securitygroup/securitygroup/list",
+      "--open",
+      "서비스 생성",
+      "--budget",
+      "20",
+      "--cost",
+      "0.03",
+      "--minutes",
+      "6"
+    ]
+  },
+  {
+    "name": "addr-form",
+    "args": [
+      "--route",
+      "#/securitygroup/addressgroup/list",
+      "--open",
+      "Address Group 생성",
+      "--budget",
+      "20",
+      "--cost",
+      "0.03",
+      "--minutes",
+      "6"
+    ]
+  }
+]
