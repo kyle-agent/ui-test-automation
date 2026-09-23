@@ -1,0 +1,38 @@
+{
+  "name": "vpc-form",
+  "route": "#/vpc/vpc/list",
+  "run_id": "0923-1649-714b",
+  "started_at": "2026-09-23T07:49:35.038Z",
+  "ended_at": "2026-09-23T07:49:43.619Z",
+  "stop_reason": "Jev 호출 실패: 모델 연결 실패 (UNSPECIFIED: CA certificate key too weak; 경로: 환경 변수 프록시 (http://70.10.15.10:8080)); 동작을 실행하지 않았습니다. 인증서 오류면 docs/windows-node-proxy.md 의 NODE_OPTIONS/NODE_USE_SYSTEM_CA, 연결/DNS 오류면 .env 에 HTTPS_PROXY=http://프록시:포트 를 넣으세요.",
+  "steps": [],
+  "totals": {
+    "decisions": 0,
+    "actions": 0,
+    "cost": 0,
+    "anomalies": 0,
+    "infos": 0
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"VPC\"",
+    "button \"VPC 목록\"",
+    "button \"VPC 생성\"",
+    "textbox \"VPC명\"",
+    "textbox \"Open VPC명\"",
+    "button \"Public Zone\"",
+    "textbox \"IP 대역\"",
+    "textbox \"Open IP 대역\"",
+    "textbox \"설명\"",
+    "textbox \"Open 설명\"",
+    "button \"태그 추가\"",
+    "button \"서비스 정보\"",
+    "button \"서비스 정보\"",
+    "button \"button\"",
+    "button \"취소\""
+  ],
+  "names_used": []
+}

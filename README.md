@@ -14,6 +14,9 @@ Samsung Cloud Platform v2 Enterprise 콘솔(https://console.e.samsungsdscloud.co
 service-map/            서비스·화면 트리 (메뉴 API 스냅샷). screens.json 이 기준, screens.txt 는 사람용
   snapshots/<date>.json 날짜별 정규화 스냅샷 (커밋) → npm run menu:diff 로 변경 감지
   titles.json           라우트별로 확인된 document.title. 있으면 정확히 일치해야 한다
+  coverage.yaml         커버리지 장부: 리소스 키가 있는 목록 화면(80개)별 level 0~4 · spec · last_pass (npm run coverage 로 검증)
+data/known-issues.yaml  알려진 이슈 (실패 분류에 쓰는 오류 메시지 정규식)
+reports/                runs/<시각>-<spec id>.json 실행 기록(런처가 남김, 커밋) · RESULTS.md 결과 정리(npm run results 생성물)
 scenarios/              사람이 읽는 시나리오 YAML (goal + 결정적 expect)
   smoke/                89개 서비스 화면 진입 스모크 (runner/gen_smoke.sh 가 screens.txt 에서 생성)
   auth/                 로그인 전 공개 화면 (세션 불필요)
@@ -139,6 +142,41 @@ npm run stacks:cleanup                     # 실패로 남은 리소스를 의�
 - 각 spec 은 실패해도 afterEach 에서 역순 정리를 끝까지 시도하고, 못 지운 것을 "정리 중 실패" 로 보고한다. 그때는 `npm run stacks:check` → `npm run stacks:cleanup`.
 - 시간이 오래 걸리는 대기: Subnet Active 최대 15분(IGW 가 붙은 VPC 는 5분 이상), 서버를 담았던 Subnet 삭제 약 6분, 볼륨 연결·분리 각 약 30초.
 - 콘솔 세션은 몇 시간~하루 뒤 만료된다(SSO 재로그인 필요). 브라우저 크래시는 `connectLiveBrowser` 가 자동 재기동하지만 세션 만료는 사람이 로그인해야 한다.
+
+#### 커버리지 장부와 결과 정리 (콘솔 불필요)
+
+```bash
+npm run coverage             # service-map/coverage.yaml 을 서비스 맵과 맞춰 검증하고 level 별 수치·카테고리 표 출력 (--md 로 Markdown)
+npm run results              # reports/runs/*.json → reports/RESULTS.md (spec 별 최근 상태, 최근 실패, 알려진 이슈, 커버리지)
+```
+
+- **`service-map/coverage.yaml`**: 모집단은 `screens.txt` 의 "리소스 키가 붙은 목록 화면"(`… | /x/y/list (key)`, 80개)이고 한 줄이 리소스 하나다.
+  `level` 은 0 없음 · 1 진입(스모크가 화면에 들어간다) · 2 CRUD(생성·확인·삭제, teardown 포함) · 3 동작(연결/분리·시작/중지·크기 변경 같은 상태 변화) ·
+  4 통합(다른 리소스와 의존관계를 맺는 스택 안에서 통과). `specs` 는 `tests/regression/<id>.spec.ts` 또는 시나리오 id, `last_pass` 는 그 level 로 마지막 통과한 날짜.
+  같은 resource_type 이 여러 서비스에 있으면(volume·image·keypair·user·group·bucket) key 가 `keypair@virtual-server` 처럼 서비스 slug 를 달고 있다.
+  **갱신 규칙**: spec 이 실제 콘솔에서 통과하면 그 spec 이 다루는 리소스의 level 을 올리고 `specs` 에 id 를 더하고 `last_pass` 를 그 날짜로 바꾼 뒤 `npm run coverage` 로 검증한다.
+- **`reports/runs/<YYYYMMDD-HHMM>-<spec id>.json`**: `npm run test:stacks` 가 spec 하나를 마칠 때마다 남기는 실행 기록(커밋 대상). 시작·종료 시각, 소요, PASS/FAIL,
+  test.step 제목·상태·시간, annotation(scenario/run_id/phase), 실패 시 오류 첫 줄과 첨부 경로, 실패 분류 `class`(기본 `unclassified`, 세션 만료·SSO 이동·브라우저 연결 실패 문구면 `environment`,
+  알려진 이슈에 맞으면 그 항목의 kind 와 `known_issue`). stdout 은 넣지 않는다.
+- **`reports/RESULTS.md`**: `npm run results` 가 만드는 생성 파일. spec 별 마지막 실행·결과·소요·최근 5회(`PPFPP`)·통과 평균, 최근 실패, 적용된 알려진 이슈, 커버리지 요약.
+  기록이 없으면 "기록 없음". 스위트를 돌린 뒤 `npm run results` 로 다시 만든다.
+- **`data/known-issues.yaml`**: 알려진 이슈(id `KI-000` 형식, `spec` 또는 `*`, 오류 메시지 정규식 `match`, `kind` product|test|environment, `since`, `note`, 선택 `expires`·`enabled`).
+  매칭된 실패는 숨기지 않고 `FAIL(known: KI-xxx)` 로 표시한다. 지금은 형식을 보여 주는 비활성 예시(`KI-000`)만 있다.
+
+### 6. Jev 탐색 (Level 5, 모수 밖의 탐색적 확장)
+
+```bash
+MSYS_NO_PATHCONV=1 npm run explore -- --route '#/vpc/vpc/list' --open '서비스 생성' --name vpc-form --budget 30
+# Git Bash 는 '#/…' 인자를 Windows 경로로 바꾸므로 MSYS_NO_PATHCONV=1 이 필요. Jev 호출은 프록시 CA 설정(docs/HANDOFF.md 8절) 필요.
+```
+
+- 이미 확보된 화면에서 Jev 가 "아직 시도하지 않은 컨트롤" 을 골라 동작시키고, 코드가 판정한다. 입력값은 폼이 써 준 규칙(3~20자, /16~/28, 8GB 단위)을 읽어
+  유효·경계·금지값을 순서대로 낸다(`src/explore/values.ts`). 판정은 치명(세션 상실·빈 화면 → 중단) / 이상(오류 문구·HTTP 5xx·JS 예외) / 정보(서버 거부·검증 문구)(`src/explore/oracles.ts`).
+- 안전: 삭제·해지·결제 등 기존 필터에 더해 리전/계정/설정/요금·구매·신청/화면 이탈 링크/이름 없는 버튼 제외, 라우트 접두어 이탈 시 복귀, 결정·비용·시간 예산.
+  유효 이름은 정리 규칙을 따르므로 탐색 중 실제로 생성된 리소스는 `npm run stacks:cleanup` 이 지운다.
+- 결과: `recordings/explore/<이름>-<시각>/report.md`(단계 표, 판정, 미시도 컨트롤, 스크린샷). 발견은 사람이 제품 결함 후보 / 새 단언 후보 / 노이즈로 분류하고,
+  단언으로 승격되면 `coverage.yaml` 의 L2/L3 에 반영된다. 탐색 자체는 커버리지 분모에 넣지 않는다.
+- 파일럿(2026-09-23, VPC 생성 폼): 결정 11회·20회, 비용 $0.0014·$0.0025, 이상 0, 검증 문구 2·6건, 생성 확정·취소·화면 이동 모달 처리.
 
 ### 세션 없이 되는 것 (클라우드/CI)
 

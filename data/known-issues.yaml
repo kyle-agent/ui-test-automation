@@ -1,0 +1,21 @@
+# 알려진 이슈. scripts/run-stacks.ts 가 실행 기록(reports/runs/*.json)을 쓸 때 실패 오류 메시지를 여기 항목과 맞춰 보고,
+# 맞으면 class 를 항목의 kind 로, known_issue 를 id 로 기록한다. 실패를 숨기지는 않는다 (RESULTS.md 에 FAIL(known: KI-xxx) 로 남는다).
+# 형식은 src/report/known-issues.ts 머리말 참조.
+#   id       KI-000 형식, 유일
+#   spec     spec id (tests/regression/<id>.spec.ts) 또는 "*" (모든 spec)
+#   match    오류 메시지(ANSI 제거, 여러 줄) 에 대한 정규식
+#   kind     product(제품 결함) | test(테스트 결함) | environment(세션·브라우저·네트워크)
+#   since    YYYY-MM-DD. 언제부터 알려졌나
+#   note     무엇이 왜 문제인지, 참고 문서
+#   expires  선택. YYYY-MM-DD. 지나면 매칭하지 않는다 (임시 우회에 만료일을 두는 용도)
+#   enabled  선택. false 면 매칭하지 않는다 (기본 true)
+#
+# 2026-09-23 현재 테스트에 영향을 주는 확인된 제품 결함은 없다. 아래는 형식을 보여 주는 예시이며 비활성이다.
+issues:
+  - id: KI-000
+    spec: "*"
+    match: "예시: 이 정규식은 어떤 오류와도 맞지 않도록 enabled: false 로 둔다"
+    kind: product
+    since: 2026-09-23
+    note: "예시 항목 (형식 안내용). 실제 항목을 추가할 때 이 줄을 참고하고, 이 항목은 그대로 둔다."
+    enabled: false

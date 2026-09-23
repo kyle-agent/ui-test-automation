@@ -218,3 +218,28 @@
 - **세션 만료 원인은 약 30분 유휴 타임아웃**(절대 수명 아님): 테스트가 연속으로 도는 동안엔 끊긴 적이 없고 35~60분 비면 SSO 로그인 폼까지 갔다.
   `auth-login --keep-open` 이 로그인 후 5분마다 대시보드 탭을 새로 고친다(`--keepalive <분>`, 0 이면 끔). 자동 재기동이 띄우는 브라우저에도 적용. 로그에 "keep-alive: OK/세션 만료로 보임" 이 찍힌다.
 - 커밋: `9d5e8aa`(볼륨), `667efe4`(런처·정리), `23dd27a`(keep-alive), `3bc72f4`(경로 수정).
+
+### 9.6 커버리지 기준과 결과 정리 (2026-09-23)
+
+- **모집단은 커밋된 서비스 맵**(`service-map/screens.txt`, `git show HEAD:` 기준): 서비스 89 · 화면 276(Service Home 83, 그 외 193) · 스모크 진입 282(서비스 진입 89 + 비홈 화면 193) ·
+  목록 화면 100, 그중 **리소스 키가 붙은 목록 화면 80개**가 커버리지 단위다. 작업 트리의 `screens.txt` 가 비어 있으면(실패한 `menu:snapshot`) `loadServiceMap` 이 git HEAD 를 대신 읽는다.
+- **장부 `service-map/coverage.yaml`**(`src/report/coverage.ts`): 리소스마다 `key`·`service`·`category`·`route`·`level`(0 없음/1 진입/2 CRUD/3 동작/4 통합)·`specs`·`last_pass`·`note`.
+  resource_type 이 겹치는 것(volume 6, image·keypair·user·group·bucket 각 2)은 key 가 `keypair@virtual-server` 처럼 서비스 slug 를 단다. `npm run coverage` 가 맵과 대조(빠짐·모르는 route·틀린 key·없는 spec id·level 에 맞지 않는 specs/last_pass)하고 요약한다.
+- **오늘 수치**: 80개 중 L4 5(vpc·subnet·virtual-server·security-group·internet-gateway), L3 2(publicip 는 서버 NAT 연결/해제, volume@virtual-server 는 서버 연결/분리), 나머지 73 은 L1(스모크만).
+  **L2 이상 7/80 = 9%, L3 이상(L3+L4) 7/80 = 9%, 정확히 L3 은 2개.** keypair@virtual-server 는 공유 `qa-shared-keypair` 재사용만이라 L1 에 두고 note 에 이유를 적었다(.pem 다운로드가 Edge 를 죽임, 9.2 절).
+- **갱신 규칙**: spec 이 실제 콘솔에서 통과하면 (1) 그 spec 이 다루는 리소스의 `level` 을 올리고 (2) `specs` 에 spec id 를 더하고 (3) `last_pass` 를 그 날짜로 바꾼 뒤 (4) `npm run coverage` 로 검증, (5) `npm run results` 로 RESULTS.md 갱신.
+  level 을 올리는 기준: 2 는 생성·확인·삭제(teardown 포함)가 통과, 3 은 상태를 바꾸는 동작까지, 4 는 다른 리소스와의 의존 체인 안에서 통과. 스모크만 있으면 1.
+- **실행 기록**: `npm run test:stacks` 가 spec 마다 `--reporter=line,json`(`PLAYWRIGHT_JSON_OUTPUT_FILE` → `test-results/stacks/`) 으로 돌리고 `reports/runs/<YYYYMMDD-HHMM>-<spec id>.json` 을 쓴다
+  (`src/report/run-record.ts`: step 제목·상태·시간, annotation scenario/run_id/phase, 오류 첫 줄, 첨부 경로, `class`). 실패 분류는 `data/known-issues.yaml` 매칭 → 세션·브라우저 문구(`세션이 끝났습니다`, `SSO 로그인 페이지로 이동`, `PW_CDP_URL`, `connectOverCDP`) → `unclassified`.
+  아직 기록이 없다(이 구조를 넣은 뒤 스위트를 돌리지 않았다). 다음 `npm run test:stacks` 가 첫 기록을 남긴다.
+- **`reports/RESULTS.md`** 는 `npm run results` 의 생성물(`src/report/results.ts`): spec 별 최근 상태(최근 5회 `PPFPP`, 통과 평균), 최근 실패, 적용된 알려진 이슈, 커버리지 요약. 지금은 spec 4개 모두 "기록 없음" + 커버리지 절.
+- **알려진 이슈** `data/known-issues.yaml`: 확인된 제품 결함이 없어 비활성 예시 `KI-000` 만 있다. 항목이 매칭돼도 실패는 `FAIL(known: KI-xxx)` 로 남긴다(숨기지 않음).
+- 단위 테스트 `tests/unit/coverage.spec.ts`(장부 검증·요약 수치, 알려진 이슈 매칭, JSON 리포트 → 기록, 결과 표).
+
+### 9.7 Jev 탐색 모드 (Level 5) (2026-09-23)
+
+- 합의: 탐색은 모수(80 리소스) 밖. Jev 는 "다음에 뭘 눌러볼지" 만 고르고 판정·안전·예산·보고서는 코드. 발견이 단언으로 승격될 때만 L2/L3 숫자에 반영.
+- 구현: `src/jev/explorer.ts`(루프), `src/explore/values.ts`(폼 힌트 기반 입력 변형), `src/explore/oracles.ts`(치명/이상/정보), `scripts/explore.ts`(`npm run explore`).
+  Git Bash 는 `MSYS_NO_PATHCONV=1`, Jev 호출은 8절의 프록시 CA 환경 변수가 필요(`npm run jev:ping` 으로 확인).
+- 파일럿(VPC 생성 폼): 11회·20회 결정, $0.0014·$0.0025, 이상 0, 검증 문구 2·6건. 모달 안 "취소/확인" 은 폼과 별도 서명으로 취급해야 탐색이 이어진다.
+- 다음 개선: 드롭다운은 열기만 하고 항목을 안 고르는 경우가 있음 → 열기+선택을 한 동작으로; 목록 화면(행 링크·정렬·검색) 탐색; Subnet·VM 폼으로 확대; 발견 → 단언 승격 절차.
