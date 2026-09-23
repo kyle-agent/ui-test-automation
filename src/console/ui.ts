@@ -125,6 +125,14 @@ export async function confirmModal(
         .nth(i)
         .check()
         .catch(() => undefined);
+    // 입력 확인: "확인을 위해 삭제를 입력해주세요" 처럼 지정한 단어를 텍스트 입력란에 쳐야 "확인" 이 활성화되는 모달 (예: Block Storage 삭제).
+    const text = (await modal.innerText().catch(() => '')).replace(/\s+/g, ' ');
+    const word = text.match(/확인을 위해\s*(\S+?)(?:을|를)?\s*입력/)?.[1];
+    const input = modal.locator('input[type=text]:visible').first();
+    if (word && (await input.count())) {
+      await input.fill(word);
+      await input.press('Tab');
+    }
   }
   await modal.getByRole('button', { name: button, exact: true }).click();
   await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined);

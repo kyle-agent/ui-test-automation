@@ -200,3 +200,12 @@
 - **공통 헬퍼 추가** (`src/console/ui.ts`): 커스텀 체크박스 `checkbox/isChecked/setCheckbox`, `confirmModal(..., { agree: true })`(모달 안 동의 체크), `pickOption` 이 항목 0개면 닫았다 다시 열기(앞 필드에 따라 비동기로 채워지는 드롭다운).
 - **콘솔 사실 요약**: SG 목록엔 선택·삭제가 없다(상세에서 해지). IGW 는 로그 저장이 켜진 채면 토스트로 실패, 둘 다 끄면 동의 체크 모달. Public IP 상세엔 연결 버튼이 없고 서버 상세에서 NAT 로 연결. VPC CIDR 10.251/10.252 는 콘솔이 막는다(10.250.0.0/20 사용).
 - **세션**: 콘솔 세션은 하루가 지나면(또는 몇 시간 유휴) 만료돼 SSO 재로그인이 필요하다. 브라우저 크래시와 달리 이건 사람이 해야 한다. 브라우저를 띄우는 명령은 `npm run auth:login -- --session root --channel msedge --keep-open`.
+
+### 9.4 Block Storage 볼륨 생성·연결·분리·삭제 (2026-09-23)
+
+- 시나리오 `scenarios/compute/vm-volume.yaml`, spec `tests/regression/compute.vm-volume.spec.ts`, 사실 `docs/service-facts/compute-block-storage.md`.
+- **결과 (2026-09-23 09:25)**: 2/2 통과, 15.8분, 남은 리소스 없음. VPC → Subnet → 서버 → 볼륨(SSD 1 unit = 8GB) Available → 서버 상세 "추가" 모달에서 이름 검색 후 연결 → 볼륨 목록 "In Use" 확인
+  → 정리: 서버 상세 행 ⋮ "연결 해제" → Available → 볼륨 삭제(모달에 "삭제" 입력) → 서버 해지 → Subnet → VPC.
+- 새로 확인한 콘솔 사실: 삭제 모달의 **입력 확인**("확인을 위해 삭제를 입력해주세요") — `confirmModal(..., { agree: true })` 가 문구를 읽어 자동 입력한다.
+  상태 표기는 "In Use"(띄어쓰기). 서버 상세의 "Block Storage" 텍스트는 숨은 내비게이션에도 있어 `:visible` 필요. 추가 모달은 검색 전엔 빈 표.
+- 반복 4회(서버 상세 텍스트 매칭 → 모달 검색 → 상태 표기 → 통과). 각 반복 12~24분. 실패해도 정리는 매번 완료됐다(볼륨 1개 수동 삭제 2회).

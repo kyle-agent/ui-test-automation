@@ -1,0 +1,85 @@
+id: compute.vm-volume
+title: Virtual Server 에 Block Storage 볼륨 생성·연결·분리·삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud, stack, storage]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 근거: docs/service-facts/compute-vm-stack.md, docs/service-facts/compute-block-storage.md
+#   생성: Keypair(공유) → VPC → Subnet → 서버 → 볼륨(SSD, 8GB 단위, kr-west1-b) → 서버에 연결(서버 상세 Block Storage "추가")
+#   검증: 서버 상세 Block Storage 표에 볼륨명, 볼륨 목록 상태 In-use
+#   정리: 분리(서버 상세 표의 행 메뉴) → 볼륨 Available 확인 → 볼륨 삭제 → 서버 해지 → Subnet → VPC
+steps:
+  - goal: "Keypair {{keypair}} 를 확인한다"
+    goto: "#/virtualserver/keypair/list"
+    vars:
+      keypair: "qa-shared-keypair"
+    expect:
+      url: "#/virtualserver/keypair/list"
+      text: ["{{keypair}}"]
+
+  - goal: "VPC {{vpc}} 를 {{vpc_cidr}} 로 생성하고 Active 를 기다린다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      vpc_cidr: "10.250.0.0/20"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+
+  - goal: "Public/Primary Subnet {{subnet}} 을 {{subnet_cidr}} 로 생성하고 Active 를 기다린다"
+    vars:
+      subnet: "sub-{{run_id}}"
+      subnet_cidr: "10.250.0.0/24"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+      timeout: 900000
+
+  - goal: "Ubuntu / Standard-1 / s1v1m2 / SSD 서버 {{vm}} 을 생성하고 Active 를 기다린다"
+    vars:
+      vm: "vm-{{run_id}}"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+      timeout: 600000
+
+  - goal: "Block Storage 볼륨 {{volume}} 을 SSD {{volume_units}} unit(8GB 단위)으로 생성하고 Available 을 기다린다"
+    vars:
+      volume: "vol-{{run_id}}"
+      volume_units: "1"
+    expect:
+      url: "#/virtualserver/block-storage/list"
+      text: ["{{volume}}"]
+      timeout: 300000
+
+  - goal: "서버 {{vm}} 상세의 Block Storage 에서 볼륨 {{volume}} 을 연결하고, 볼륨 목록 상태가 In-use 인지 확인한다"
+    expect:
+      url: "#/virtualserver/block-storage/list"
+      text: ["{{volume}}"]
+      timeout: 300000
+
+teardown:
+  - goal: "서버 {{vm}} 상세에서 볼륨 {{volume}} 을 분리하고 볼륨이 Available 로 돌아오면 삭제한다"
+    expect:
+      url: "#/virtualserver/block-storage/list"
+      not_text: ["{{volume}}"]
+      timeout: 600000
+
+  - goal: "서버 {{vm}} 을 해지하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{vm}}"]
+      timeout: 600000
+
+  - goal: "Subnet {{subnet}} 을 삭제하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{subnet}}"]
+      timeout: 1200000
+
+  - goal: "VPC {{vpc}} 를 해지하고 소멸을 기다린다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 180000
