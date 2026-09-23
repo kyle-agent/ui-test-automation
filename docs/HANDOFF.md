@@ -272,3 +272,18 @@
 - **탐색 배치** `scripts/explore-batch.ts --plan plans/explore-default.json`(Subnet 폼·VM 폼·VPC 목록·Server Group 폼). 첫 Subnet 폼 탐색은 Jev 가 빵부스러기 "VPC" 를 눌러 폼을 떠난 뒤 BLOCKED 2회로 끝났다(결정 3회) →
   `snapshot.js` 가 header/nav/aside/`.scp-breadcrumb` 안의 컨트롤을 후보에서 빼고, `--open` 폼에서 URL 이 바뀌면 폼으로 되돌아오도록 고쳤다(`plans/explore-followup.json` 으로 재실행).
   주의: `spawnSync(..., {shell:true})` 는 "Subnet 생성" 같은 공백 인자를 쪼갠다 → node 로 tsx 를 직접 부른다. Windows 에서 오래 도는 배치는 PowerShell `Start-Process cmd '/c …'` 로 띄운다(Git Bash `-lc` 로 띄우면 멈춤).
+
+**9.9 (계속) 밤 진행분 — 스택 확장과 탐색 결과**
+
+- 새 spec(모두 실제 콘솔 통과, 실행 기록 `reports/runs/`): `networking.vpc-port`(VPC → Subnet → Port, 9.5분, port L4), `networking.private-dns`(6.5분, Creating 3~5분 → 상세 "서비스 해지"),
+  `storage.file-storage`(1.3분, NFS/Single-AZ/HDD, 이름 뒤에 6자리 UUID → `run_id_compact`), `networking.vpc-peering`(11.6분, VPC 2개 → 동일 Account Peering → 상세 "VPC Peering 삭제" → VPC 해지),
+  `networking.dns-hosted-zone`(6.9분, Private DNS → Private 용도 .com 존 → 행 삭제 → DNS 해지). **커버리지 L2+ 18/80(23%), L3+ 11/80(14%)**, 스위트 16개 spec(순서 `src/report/suite.ts`).
+- 콘솔 사실(새로 확인): Private DNS 는 목록에 삭제가 없고 상세 "서비스 해지" 만 있으며 Creating 동안 비활성. VPC Peering 도 목록 선택·삭제가 없고 상세 버튼만.
+  **Peering 을 지운 직후의 VPC 해지는 확인을 눌러도 조용히 무시**된다(행이 Active 로 남고 토스트 없음) → 60초 간격 최대 5회 재시도(`deleteVpc`, inventory vpc). Hosted Zone 은 "사용 가능 여부 조회" 를 눌러야 생성이 활성.
+  LB 헬스 체크·LB 서버 그룹은 "Service Subnet"(LB 전용) 이 필요해 일반 Subnet 으로는 못 만든다(보류). Secrets Manager·KMS 는 "요금 확인" 과 삭제 예정일(지연 삭제)이 있어 보류. IAM 정책은 3단계 마법사(기본 정보 → 권한 설정(JSON 모드 있음) → 확인).
+- 정리 스크립트 종류 추가: port·pdns·fs·hz·peer(+ vpcb 접두어). 프로브·탐색이 만든 리소스도 같은 규칙이라 `npm run stacks:cleanup` 이 지운다.
+  **주의: spec 이 도는 동안 `stacks:cleanup --yes` 를 돌리면 그 spec 의 리소스를 지워 버린다**(오늘 Private DNS 2차 실행이 이렇게 깨져 기록을 지웠다). 정리는 반드시 실행이 끝난 뒤에.
+- 탐색 배치 결과(2·3차, 8건: Subnet·VM·SG·Address Group·Resource Group·Server Group 폼, VPC·VM 목록): 결정 15~27회, 건당 $0.0016~0.0035, **이상 0건**, 정보 1~5건. 정보는 대부분 항상 보이는 힌트 문구(3~20자 등)라 노이즈 →
+  오라클이 오류 스타일 요소(`.scp-form-group-error` 등)를 `validation-error` 로 따로 올리고, 힌트만 있으면 `validation-text` 로 남기도록 고쳤다(다음 탐색부터 적용). Jev 응답 불량은 3회 재시도로 흡수(2회 발생, 모두 회복).
+- 스위트 run 2(16 spec, 약 2시간)를 20:03 에 시작했다 — 끝나면 `npm run results` 로 RESULTS.md·dashboard.html 을 갱신하고 실행 기록을 커밋한다. run 1 의 vm-stack-net 실패(waitForRow) 재현 여부를 여기서 확인.
+- 다음 후보: Auto-Scaling Group(LC + VPC/Subnet, 최소 0대로), NAT Gateway(Public IP + Subnet, 과금), IAM 정책(JSON 모드), Public 도메인·인증서(외부 의존), LB(Service Subnet 필요).
