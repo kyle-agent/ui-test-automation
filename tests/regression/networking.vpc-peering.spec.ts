@@ -37,12 +37,21 @@ async function createVpc(page: Parameters<typeof gotoRoute>[0], name: string, ci
   await waitForRow(page, ROUTES.vpc, name, { status: /Active/, timeoutMs: 180_000, log });
 }
 
+// 실측(2026-09-23): Peering 을 지운 직후의 VPC 해지는 확인을 눌러도 조용히 무시된다(행이 Active 로 남음). 잠시 뒤 다시 누르면 "VPC 해지가 성공하였습니다" → 최대 5회 재시도.
 async function deleteVpc(page: Parameters<typeof gotoRoute>[0], name: string) {
-  await gotoRoute(page, ROUTES.vpc);
-  if ((await row(page, name).count()) === 0) return;
-  await row(page, name).getByRole('button', { name: '서비스 해지', exact: true }).click();
-  await confirmModal(page, /해지하시겠습니까/);
-  await waitForRow(page, ROUTES.vpc, name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    await gotoRoute(page, ROUTES.vpc);
+    if ((await row(page, name).count()) === 0) return;
+    await row(page, name).getByRole('button', { name: '서비스 해지', exact: true }).click();
+    await confirmModal(page, /해지하시겠습니까/);
+    try {
+      await waitForRow(page, ROUTES.vpc, name, { gone: true, timeoutMs: 60_000, intervalMs: 15_000, log });
+      return;
+    } catch {
+      log(`  VPC ${name} 해지 재시도 ${attempt}/5 (아직 Active)`);
+    }
+  }
+  await waitForRow(page, ROUTES.vpc, name, { gone: true, timeoutMs: 120_000, intervalMs: 15_000, log });
 }
 
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@network'] }, () => {

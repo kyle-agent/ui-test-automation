@@ -196,9 +196,25 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
       return;
     case 'vpc':
-      await row(page, item.name).getByRole('button', { name: '서비스 해지', exact: true }).click();
-      await confirmModal(page, /해지하시겠습니까/);
-      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, log });
+      // Peering 삭제 직후엔 해지가 조용히 무시된다 → 60초 단위로 최대 5회 다시 누른다
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        await gotoRoute(page, route);
+        if ((await row(page, item.name).count()) === 0) return;
+        await row(page, item.name).getByRole('button', { name: '서비스 해지', exact: true }).click();
+        await confirmModal(page, /해지하시겠습니까/);
+        try {
+          await waitForRow(page, route, item.name, {
+            gone: true,
+            timeoutMs: 60_000,
+            intervalMs: 15_000,
+            log,
+          });
+          return;
+        } catch {
+          log(`  VPC ${item.name} 해지 재시도 ${attempt}/5`);
+        }
+      }
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 120_000, log });
       return;
     case 'sgrp':
     case 'addr':
