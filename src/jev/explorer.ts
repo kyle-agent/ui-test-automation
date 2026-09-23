@@ -50,6 +50,8 @@ export interface ExploreStep {
   url_after: string;
   title_after: string;
   page_changed: boolean | null;
+  /** 드롭다운을 열었을 때 이어서 고른 항목 */
+  menu_pick: string | null;
   modal: string | null;
   findings: Finding[];
   screenshot: string | null;
@@ -118,6 +120,7 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
   const homeUrl = page.url();
   const goal = GOAL(route, opened);
   const tried = new Map<string, number>(); // signature → 시도 횟수
+  const menuPicked = new Map<string, string[]>(); // 드롭다운 라벨 → 고른 항목들
   const history: HistoryEntry[] = [];
   const started = Date.now();
   let noChange = 0;
@@ -231,6 +234,38 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
     await settle(page, action);
     await page.waitForTimeout(700);
 
+    // 드롭다운을 열었으면 항목 선택까지 한 동작으로 묶는다 (Jev 가 열기만 하고 다른 곳으로 가는 것을 막는다).
+    // 같은 드롭다운에서는 아직 안 고른 항목을 순서대로 고른다.
+    let menuPick: string | null = null;
+    const menu = page.locator('.scp-menu:visible').last();
+    if (await menu.isVisible().catch(() => false)) {
+      const items = (await menu.locator('.scp-menu-item').allInnerTexts()).map((s) =>
+        s.replace(/\s+/g, ' ').trim(),
+      );
+      const key = `menu|${action.label}`;
+      const picked = new Set((tried.get(key) ? menuPicked.get(key) : undefined) ?? []);
+      const next = items.find((t) => t && !picked.has(t) && !FORBID.test(t) && !/개씩 보기/.test(t));
+      if (next) {
+        await menu
+          .locator('.scp-menu-item')
+          .filter({ hasText: next })
+          .first()
+          .click()
+          .catch(() => undefined);
+        picked.add(next);
+        menuPicked.set(key, [...picked]);
+        tried.set(key, picked.size);
+        menuPick = next;
+        log(`     드롭다운 항목 선택: ${JSON.stringify(next)} (${picked.size}/${items.length})`);
+        await page.waitForTimeout(500);
+        // 항목이 남아 있으면 이 드롭다운을 다시 열어볼 수 있게 시도 횟수를 되돌린다
+        if (picked.size < items.filter((t) => t && !FORBID.test(t) && !/개씩 보기/.test(t)).length)
+          tried.set(sig(action, inModal), 0);
+      } else {
+        await page.keyboard.press('Escape').catch(() => undefined);
+      }
+    }
+
     const findings = [...collectors.drain(), ...(await checkPage(page, beforeText))];
     const modal = visibleModal(page);
     const modalText = (await modal.isVisible().catch(() => false))
@@ -258,6 +293,7 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
       url_after: page.url(),
       title_after: await page.title().catch(() => ''),
       page_changed: pageChanged,
+      menu_pick: menuPick,
       modal: modalText,
       findings,
       screenshot: path.relative(opts.outDir, shot),
@@ -323,7 +359,7 @@ export function renderReport(r: ExploreReport): string {
   lines.push('| --- | --- | --- | --- | --- | --- | --- |');
   for (const s of r.steps)
     lines.push(
-      `| ${s.n} | ${s.operation} ${s.role ?? ''} "${s.label}" | ${s.text === null ? '' : JSON.stringify(s.text)} | ${s.why ?? ''} | ${s.probability === null ? '-' : s.probability.toFixed(2)} | ${s.page_changed === null ? '?' : s.page_changed ? '예' : '아니오'} | ${(s.modal ?? '').slice(0, 60)} |`,
+      `| ${s.n} | ${s.operation} ${s.role ?? ''} "${s.label}" | ${s.text === null ? (s.menu_pick ? `→ ${s.menu_pick}` : '') : JSON.stringify(s.text)} | ${s.why ?? ''} | ${s.probability === null ? '-' : s.probability.toFixed(2)} | ${s.page_changed === null ? '?' : s.page_changed ? '예' : '아니오'} | ${(s.modal ?? '').slice(0, 60)} |`,
     );
   lines.push('');
   lines.push('## 시도하지 않은 컨트롤');
