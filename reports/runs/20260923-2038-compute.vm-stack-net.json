@@ -1,0 +1,100 @@
+{
+  "spec": "compute.vm-stack-net",
+  "started": "2026-09-23T11:38:16.424Z",
+  "ended": "2026-09-23T12:41:47.558Z",
+  "seconds": 3811,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.vm-stack-net",
+    "run_id": "0923-2038-71f4",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "SG·IGW·Public IP 를 포함한 VPC → Subnet → Virtual Server 스택 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 3672.1,
+      "annotations": {
+        "scenario": "compute.vm-stack-net",
+        "run_id": "0923-2038-71f4",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 확인",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] Security Group sg-0923-2038-71f4 생성",
+          "status": "pass",
+          "seconds": 31.3
+        },
+        {
+          "title": "steps[2] VPC vpc-0923-2038-71f4 생성",
+          "status": "pass",
+          "seconds": 25.6
+        },
+        {
+          "title": "steps[3] Internet Gateway 생성",
+          "status": "pass",
+          "seconds": 61.7
+        },
+        {
+          "title": "steps[4] Subnet sub-0923-2038-71f4 생성",
+          "status": "pass",
+          "seconds": 208.2
+        },
+        {
+          "title": "steps[5] Public IP 예약",
+          "status": "pass",
+          "seconds": 17.3
+        },
+        {
+          "title": "steps[6] Virtual Server vm-0923-2038-71f4 생성 (SG sg-0923-2038-71f4)",
+          "status": "pass",
+          "seconds": 91.3
+        },
+        {
+          "title": "steps[7] 서버 vm-0923-2038-71f4 에 Public IP 123.41.32.35 연결",
+          "status": "pass",
+          "seconds": 46.6
+        }
+      ],
+      "error": "Error: 정리 중 실패 (남은 리소스를 확인하세요):",
+      "attachments": [
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/screenshot-compute.vm-stack-net.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 정리 중 실패 (남은 리소스를 확인하세요):",
+  "attachments": [
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/screenshot-compute.vm-stack-net.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}
