@@ -243,3 +243,14 @@
   Git Bash 는 `MSYS_NO_PATHCONV=1`, Jev 호출은 8절의 프록시 CA 환경 변수가 필요(`npm run jev:ping` 으로 확인).
 - 파일럿(VPC 생성 폼): 11회·20회 결정, $0.0014·$0.0025, 이상 0, 검증 문구 2·6건. 모달 안 "취소/확인" 은 폼과 별도 서명으로 취급해야 탐색이 이어진다.
 - 다음 개선: 드롭다운은 열기만 하고 항목을 안 고르는 경우가 있음 → 열기+선택을 한 동작으로; 목록 화면(행 링크·정렬·검색) 탐색; Subnet·VM 폼으로 확대; 발견 → 단언 승격 절차.
+
+### 9.8 가벼운 L2 spec 과 탐색 확장 (2026-09-23 저녁)
+
+- `npm run probe -- --route '#/…/list'`(`scripts/probe-form.ts`): 리소스를 만들지 않고 목록 버튼·헤더·생성 폼 라벨·힌트·드롭다운 항목을 찍는다. 결과 `recordings/probe/<slug>.md`.
+  새 서비스는 프로브 → `src/console/simple-crud.ts` 팩토리로 spec 작성(선행 리소스가 없으면 10줄) → 실행 → `coverage.yaml` 갱신 순서로 붙인다.
+- 새 spec: `compute.server-group`(정책 Anti-Affinity), `security.address-group`(대상 주소 CIDR) 통과(각 ≈1분). `storage.object-storage-bucket` 은 **계정에 Object Storage 인증키가 없어**
+  버킷명 조회가 실패("사용할 수 있는 인증키가 없습니다")하고 생성이 비활성 → 인증키는 자격 증명이라 테스트가 만들지 않고 `skipReason` 으로 건너뛴다. 인증키를 만들면 그 줄을 지운다.
+  Secret Vault(인증키 필요)·Private DNS(VPC 연결 필요)는 프로브만 해 두었다.
+- 탐색기 개선: 드롭다운을 열면 안 고른 항목을 코드가 이어서 고른다(보고서 입력 열 `→ 항목`), `--prereq vpc[,subnet]` 로 선행 리소스를 만들고 끝나면 run_id 이름을 자동 정리.
+  발견 → 단언 승격 절차는 README §6.
+- 커버리지: L2 이상 9/80(11%). 전체 스위트 실행 기록은 `reports/runs/`, 정리는 `npm run results` → `reports/RESULTS.md`.
