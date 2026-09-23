@@ -1,0 +1,33 @@
+[
+  {
+    "name": "iam-group-form",
+    "args": ["--route", "#/iam/group/list", "--open", "사용자 그룹 생성", "--budget", "20", "--cost", "0.03", "--minutes", "6"]
+  },
+  {
+    "name": "lc-form",
+    "args": [
+      "--route",
+      "#/virtualserver/launch-configuration/list",
+      "--open",
+      "Launch Configuration 생성",
+      "--budget",
+      "25",
+      "--cost",
+      "0.04",
+      "--minutes",
+      "8"
+    ]
+  },
+  {
+    "name": "bucket-form",
+    "args": ["--route", "#/objectstorage/objectstorage/list", "--open", "서비스 생성", "--budget", "15", "--cost", "0.03", "--minutes", "5"]
+  },
+  {
+    "name": "subnet-list",
+    "args": ["--route", "#/vpc/subnet/list", "--budget", "15", "--cost", "0.03", "--minutes", "5"]
+  },
+  {
+    "name": "volume-list",
+    "args": ["--route", "#/virtualserver/block-storage/list", "--budget", "15", "--cost", "0.03", "--minutes", "5"]
+  }
+]
