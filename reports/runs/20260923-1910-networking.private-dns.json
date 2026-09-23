@@ -1,0 +1,72 @@
+{
+  "spec": "networking.private-dns",
+  "started": "2026-09-23T10:10:01.769Z",
+  "ended": "2026-09-23T10:16:39.029Z",
+  "seconds": 397,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.private-dns",
+    "run_id": "0923-1910-ec9a",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS 생성 후 해지",
+      "status": "failed",
+      "seconds": 360.4,
+      "annotations": {
+        "scenario": "networking.private-dns",
+        "run_id": "0923-1910-ec9a",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.8
+        },
+        {
+          "title": "steps[1] pdns-0923-1910-ec9a 생성",
+          "status": "fail",
+          "seconds": 192.4
+        }
+      ],
+      "error": "Error: pdns-0923-1910-ec9a 상태 /Active/i 대기 180초 초과. 마지막: pdns-0923-1910-ec9a kr-west1 Creating",
+      "attachments": [
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: pdns-0923-1910-ec9a 상태 /Active/i 대기 180초 초과. 마지막: pdns-0923-1910-ec9a kr-west1 Creating",
+  "attachments": [
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/trace.zip"
+  ]
+}
