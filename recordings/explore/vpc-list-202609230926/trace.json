@@ -1,0 +1,23 @@
+{
+  "name": "vpc-list",
+  "route": "#/vpc/vpc/list",
+  "run_id": "0923-1826-8332",
+  "started_at": "2026-09-23T09:26:25.758Z",
+  "ended_at": "2026-09-23T09:26:31.734Z",
+  "stop_reason": "시도할 컨트롤이 더 없음",
+  "steps": [],
+  "totals": {
+    "decisions": 0,
+    "actions": 0,
+    "cost": 0,
+    "anomalies": 0,
+    "infos": 0
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\""
+  ],
+  "names_used": []
+}

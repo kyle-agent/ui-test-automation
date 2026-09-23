@@ -1,0 +1,60 @@
+{
+  "name": "subnet-form",
+  "route": "#/vpc/subnet/list",
+  "run_id": "0923-1814-8d59",
+  "started_at": "2026-09-23T09:14:47.869Z",
+  "ended_at": "2026-09-23T09:14:55.592Z",
+  "stop_reason": "Jev 가 두 번 연속 BLOCKED",
+  "steps": [
+    {
+      "n": 1,
+      "operation": "CLICK",
+      "label": "VPC",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.68,
+      "confidence": 0.84,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/dashboard",
+      "title_after": "Service Home | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "9f0 10.250.0.0/20 Active 자원 검색 정확한 검색어를 입력하세요. 최근 검색 내역이 없습니다. 자원을 검색하세요."
+        }
+      ],
+      "screenshot": "screenshots\\01.jpg",
+      "cost": 0.00012306
+    }
+  ],
+  "totals": {
+    "decisions": 3,
+    "actions": 1,
+    "cost": 0.000340452,
+    "anomalies": 0,
+    "infos": 1
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"Service Home\"",
+    "button \"Overview\"",
+    "button \"How-to guides\"",
+    "button \"API Reference\"",
+    "button \"CLI Reference\"",
+    "button \"서비스 목록\"",
+    "button \"vpc-0923-1814-8d59 10.250.0.0/20 Active\"",
+    "button \"vpc-0923-1814-8d59\"",
+    "button \"vpc-0923-1812-c9f0 10.250.0.0/20 Active\"",
+    "button \"vpc-0923-1812-c9f0\"",
+    "button \"VPC 생성\""
+  ],
+  "names_used": []
+}

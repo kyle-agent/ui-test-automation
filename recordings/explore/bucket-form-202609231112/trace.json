@@ -1,0 +1,203 @@
+{
+  "name": "bucket-form",
+  "route": "#/objectstorage/objectstorage/list",
+  "run_id": "0923-2012-3201",
+  "started_at": "2026-09-23T11:12:14.900Z",
+  "ended_at": "2026-09-23T11:12:38.171Z",
+  "stop_reason": "Jev 가 DONE",
+  "steps": [
+    {
+      "n": 1,
+      "operation": "TYPE_TEXT",
+      "label": "버킷명",
+      "role": "textbox",
+      "text": "xp-0923-2012-3201",
+      "why": "유효 이름 (3~63자)",
+      "probability": 1,
+      "confidence": 0.65,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "숫자로 시작하며 소문자, 숫자와 특수문자(-.)를 사용하여 3~63자로 입력하세요. - 마침표가 2개 이상 연속될 수 없습니다. - 마침표와 대시는 인접할 수 없습니다. - 마침표나 대시로 끝날 수 없습니다. - IP 형식을 사용할 수 없습니다. - 'admin'은 사용할 수 없습니다."
+        }
+      ],
+      "screenshot": "screenshots\\01.jpg",
+      "cost": 0.000110586
+    },
+    {
+      "n": 2,
+      "operation": "CLICK",
+      "label": "태그 추가",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.58,
+      "confidence": 0.84,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)"
+        }
+      ],
+      "screenshot": "screenshots\\02.jpg",
+      "cost": 0.000120078
+    },
+    {
+      "n": 3,
+      "operation": "CLICK",
+      "label": "서비스 정보",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.36,
+      "confidence": 0.61,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": false,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\03.jpg",
+      "cost": 0.000130872
+    },
+    {
+      "n": 4,
+      "operation": "CLICK",
+      "label": "Open 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요.",
+      "role": "textbox",
+      "text": null,
+      "why": null,
+      "probability": 0.66,
+      "confidence": 0.47,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\04.jpg",
+      "cost": 0.000126252
+    },
+    {
+      "n": 5,
+      "operation": "CLICK",
+      "label": "취소",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.78,
+      "confidence": 0.51,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": "알림 현재 화면을 나가시겠습니까? 변경사항이 저장되지 않습니다. 취소 확인",
+      "findings": [],
+      "screenshot": "screenshots\\05.jpg",
+      "cost": 0.000124278
+    },
+    {
+      "n": 6,
+      "operation": "CLICK",
+      "label": "확인",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.65,
+      "confidence": 0.65,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/list",
+      "title_after": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "총 0 서비스 해지 버킷명을 대소문자 구분하여 입력하세요. 상세 검색 서비스 생성 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요. 서비스 생성"
+        }
+      ],
+      "screenshot": "screenshots\\06.jpg",
+      "cost": 0.000088578
+    },
+    {
+      "n": 7,
+      "operation": "TYPE_TEXT",
+      "label": "버킷명",
+      "role": "textbox",
+      "text": "xp",
+      "why": "2자 (최소 3) (거부 기대)",
+      "probability": 1,
+      "confidence": 0.27,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "숫자로 시작하며 소문자, 숫자와 특수문자(-.)를 사용하여 3~63자로 입력하세요. - 마침표가 2개 이상 연속될 수 없습니다. - 마침표와 대시는 인접할 수 없습니다. - 마침표나 대시로 끝날 수 없습니다. - IP 형식을 사용할 수 없습니다. - 'admin'은 사용할 수 없습니다."
+        }
+      ],
+      "screenshot": "screenshots\\07.jpg",
+      "cost": 0.000108738
+    },
+    {
+      "n": 8,
+      "operation": "CLICK",
+      "label": "Open 버킷명",
+      "role": "textbox",
+      "text": null,
+      "why": null,
+      "probability": 1,
+      "confidence": 0.71,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/objectstorage/objectstorage/request",
+      "title_after": "Object Storage 생성 | Object Storage | kr-west1 | Console",
+      "page_changed": false,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\08.jpg",
+      "cost": 0.000112938
+    }
+  ],
+  "totals": {
+    "decisions": 9,
+    "actions": 8,
+    "cost": 0.001010814,
+    "anomalies": 0,
+    "infos": 4
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\""
+  ],
+  "names_used": [
+    "xp-0923-2012-3201"
+  ]
+}
