@@ -287,3 +287,12 @@
   오라클이 오류 스타일 요소(`.scp-form-group-error` 등)를 `validation-error` 로 따로 올리고, 힌트만 있으면 `validation-text` 로 남기도록 고쳤다(다음 탐색부터 적용). Jev 응답 불량은 3회 재시도로 흡수(2회 발생, 모두 회복).
 - 스위트 run 2(16 spec, 약 2시간)를 20:03 에 시작했다 — 끝나면 `npm run results` 로 RESULTS.md·dashboard.html 을 갱신하고 실행 기록을 커밋한다. run 1 의 vm-stack-net 실패(waitForRow) 재현 여부를 여기서 확인.
 - 다음 후보: Auto-Scaling Group(LC + VPC/Subnet, 최소 0대로), NAT Gateway(Public IP + Subnet, 과금), IAM 정책(JSON 모드), Public 도메인·인증서(외부 의존), LB(Service Subnet 필요).
+
+**9.9 (계속) 스위트 run 2 결과 (20:03~22:27, 16 spec)**
+
+- PASS 14 / FAIL 2. 실패 둘 다 teardown: `compute.vm-stack` 은 VPC 는 지워졌는데 성공 토스트("VPC명: vpc-…")가 본문에 남아 not_text 검사가 실패(새로 고침 누락),
+  `compute.vm-stack-net` 은 서버 "서비스 해지" 확인이 **조용히 무시**되어 서버가 10분간 Active → Subnet(20분)·VPC 까지 연쇄 실패(63분). 리소스는 run_id 로 골라 지웠다(스위트 도중이라 전체 정리는 안 함).
+- 대응: `terminateVpc`·`terminateServer`(`src/console/ui.ts`) — 해지 확인 뒤 1~2분 안에 안 사라지면 다시 누르고(각 5회/3회), 사라진 뒤 새로 고쳐 토스트를 지운다. VM 스택 3종·Port·정리 스크립트가 모두 이 둘을 쓴다.
+  **콘솔 사실: VPC·서버·(Peering 직후) 해지 요청이 가끔 무시된다. 요청 후 상태 변화를 확인하고 재시도하는 것이 규칙.** 22:29 에 vm-stack·vm-stack-net 만 다시 돌려 확인 중.
+- IAM 정책은 보류: 마법사 2단계의 JSON 모드 편집기(ACE)에 값을 넣어도(타이핑·붙여넣기·API) "다음" 이 활성화되지 않고, 기본 모드는 서비스 선택 뒤 액션 그룹(Create/Delete/List…)을 펼쳐 개별 액션을 골라야 한다. spec·기록은 지웠다.
+- 탐색 4차(선행 없는 폼 5건)까지 합쳐 오늘 탐색 20회, 이상 0. 대시보드 "탐색" 절에 모두 보인다.
