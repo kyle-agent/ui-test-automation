@@ -209,3 +209,12 @@
 - 새로 확인한 콘솔 사실: 삭제 모달의 **입력 확인**("확인을 위해 삭제를 입력해주세요") — `confirmModal(..., { agree: true })` 가 문구를 읽어 자동 입력한다.
   상태 표기는 "In Use"(띄어쓰기). 서버 상세의 "Block Storage" 텍스트는 숨은 내비게이션에도 있어 `:visible` 필요. 추가 모달은 검색 전엔 빈 표.
 - 반복 4회(서버 상세 텍스트 매칭 → 모달 검색 → 상태 표기 → 통과). 각 반복 12~24분. 실패해도 정리는 매번 완료됐다(볼륨 1개 수동 삭제 2회).
+
+### 9.5 스위트 런처와 세션 유지 (2026-09-23)
+
+- `npm run test:stacks`(`scripts/run-stacks.ts`): spec 을 정해진 순서로 하나씩 직렬 실행(vpc → vm-stack → vm-volume → vm-stack-net, 약 45분). 사전 점검으로 VPC 5개 한도·잔여 리소스를 확인.
+  `--only a,b` / `--from x` / `--no-preflight`. Windows 에서 spec 경로는 슬래시로 넘겨야 한다(역슬래시는 "No tests found").
+- `npm run stacks:check` / `npm run stacks:cleanup`(`src/console/inventory.ts`): 이름 규칙(`<종류>-MMDD-HHMM-xxxx`, `IGW_vpc-…`, Reserved·미연결 Public IP)에 맞는 잔여 리소스를 찾고 의존관계 역순으로 지운다.
+- **세션 만료 원인은 약 30분 유휴 타임아웃**(절대 수명 아님): 테스트가 연속으로 도는 동안엔 끊긴 적이 없고 35~60분 비면 SSO 로그인 폼까지 갔다.
+  `auth-login --keep-open` 이 로그인 후 5분마다 대시보드 탭을 새로 고친다(`--keepalive <분>`, 0 이면 끔). 자동 재기동이 띄우는 브라우저에도 적용. 로그에 "keep-alive: OK/세션 만료로 보임" 이 찍힌다.
+- 커밋: `9d5e8aa`(볼륨), `667efe4`(런처·정리), `23dd27a`(keep-alive), `3bc72f4`(경로 수정).
