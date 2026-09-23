@@ -137,16 +137,16 @@ resources:
     service: "DNS"
     category: "Networking"
     route: /dns/hosted-zone/list
-    level: 1
-    specs: [smoke.dns]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.dns, networking.dns-hosted-zone]
+    last_pass: "2026-09-23"
+    note: "Private DNS 위에 Private 용도 .com 존 생성(사용 가능 여부 조회 후 생성 활성, 즉시 Active) → 행 삭제. Public 존·실제 도메인은 미구현"
   - key: private-dns
     service: "DNS"
     category: "Networking"
     route: /dns/private-dns/list
-    level: 2
-    specs: [smoke.dns, networking.private-dns]
+    level: 4
+    specs: [smoke.dns, networking.private-dns, networking.dns-hosted-zone]
     last_pass: "2026-09-23"
     note: "VPC 연결 없이 생성(Creating 3~5분 → Active) → 상세 서비스 해지(Creating 동안 비활성). 목록엔 삭제 없음"
   - key: public-domain-name
@@ -617,10 +617,10 @@ resources:
     service: "VPC"
     category: "Networking"
     route: /vpc/vpc-peering/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.vpc, networking.vpc-peering]
+    last_pass: "2026-09-23"
+    note: "VPC 2개 → 동일 Account Peering(승인 불필요, Creating → Active ≈1분) → 상세 VPC Peering 삭제 → VPC 해지(직후 요청은 무시되므로 재시도)"
   - key: vpc
     service: "VPC"
     category: "Networking"

@@ -1,0 +1,51 @@
+{
+  "spec": "networking.vpc-peering",
+  "started": "2026-09-23T10:49:05.928Z",
+  "ended": "2026-09-23T11:00:41.617Z",
+  "seconds": 696,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-peering",
+    "run_id": "0923-1949-a7dd",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC 2개 → VPC Peering 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 672.1,
+      "annotations": {
+        "scenario": "networking.vpc-peering",
+        "run_id": "0923-1949-a7dd",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.4
+        },
+        {
+          "title": "steps[1] VPC vpc-0923-1949-a7dd, vpcb-0923-1949-a7dd 생성",
+          "status": "pass",
+          "seconds": 49.5
+        },
+        {
+          "title": "steps[2] VPC Peering peer-0923-1949-a7dd 생성",
+          "status": "pass",
+          "seconds": 349.9
+        }
+      ]
+    }
+  ]
+}
