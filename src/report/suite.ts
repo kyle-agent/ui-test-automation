@@ -14,4 +14,6 @@ export const SUITE_ORDER: readonly string[] = [
   'iam.user-group',
   'compute.launch-configuration',
   'networking.vpc-port', // VPC → Subnet → Port (≈10분)
+  'networking.private-dns', // ≈2분. 생성 → Active → 상세 서비스 해지
+  'storage.file-storage', // ≈2분. NFS 볼륨 생성·해지 (용량 과금, 짧게)
 ];

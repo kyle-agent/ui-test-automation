@@ -39,6 +39,10 @@ export interface SimpleCrudConfig {
   /** 삭제 버튼 문구 (기본 "삭제"; 해지형 서비스는 "서비스 해지") */
   deleteButton?: string;
   deleteConfirmText?: RegExp;
+  /** 'detail' 이면 목록에 삭제 버튼이 없어 이름 링크로 상세에 들어간 뒤 상단 deleteButton 을 누른다 (예: Private DNS). 기본 'list' */
+  deleteFrom?: 'list' | 'detail';
+  /** 삭제 전에 행이 이 상태여야 한다 (예: Private DNS 는 Creating 동안 해지 버튼이 비활성) */
+  deletableStatus?: RegExp;
   tags?: string[];
   /** 폼을 채운 뒤 '생성' 을 누르기 전 추가 동작 (예: key/value 태그 입력 후 '태그 추가') */
   beforeSubmit?: (page: Page, vars: Record<string, string>) => Promise<void>;
@@ -81,9 +85,20 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
         await gotoRoute(page, config.route);
         if ((await row(page, vars.name!).count()) === 0) return;
         await test.step(`teardown[0] ${vars.name} 삭제`, async () => {
+          if (config.deletableStatus)
+            await waitForRow(page, config.route, vars.name!, {
+              status: config.deletableStatus,
+              timeoutMs: 300_000,
+              intervalMs: 15_000,
+              log,
+            });
           const r = row(page, vars.name!);
           const inRow = r.getByRole('button', { name: deleteButton, exact: true });
-          if (await inRow.count()) await inRow.click();
+          if (config.deleteFrom === 'detail') {
+            await r.getByText(vars.name!, { exact: true }).first().click();
+            await settleConsole(page, { appearGraceMs: 800 });
+            await topButton(page, deleteButton).click();
+          } else if (await inRow.count()) await inRow.click();
           else {
             await selectRow(page, vars.name!);
             await topButton(page, deleteButton).click();

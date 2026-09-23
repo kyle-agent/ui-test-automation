@@ -194,7 +194,8 @@ export function resolveVars(template: string, vars: Record<string, string>): str
 
 /** 시나리오 전체의 vars 를 run_id 기준으로 한 번에 풀어 돌려준다 (teardown 이 같은 이름을 참조할 수 있게). */
 export function scenarioVars(scenario: Scenario, runId = newRunId()): Record<string, string> {
-  const vars: Record<string, string> = { run_id: runId };
+  // run_id_compact: '-' 를 뺀 run_id (소문자·숫자·_ 만 허용하는 이름, 예: File Storage 볼륨명)
+  const vars: Record<string, string> = { run_id: runId, run_id_compact: runId.replace(/-/g, '') };
   for (const step of [...scenario.steps, ...scenario.teardown]) {
     for (const [k, v] of Object.entries(step.vars ?? {})) vars[k] = resolveVars(v, vars);
   }

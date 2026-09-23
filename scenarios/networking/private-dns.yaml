@@ -1,0 +1,32 @@
+id: networking.private-dns
+title: Private DNS 생성 후 해지
+service: DNS
+category: Networking
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브): 목록 #/dns/private-dns/list, 버튼 "서비스 생성"(폼 제목 "Private DNS 신청"). 목록에는 삭제 버튼이 없고("활성화" 만)
+# 이름 링크 → 상세(#/dns/private-dns/detail/info) 의 상단 "서비스 해지" 가 유일한 삭제 경로이며 상태 Creating 동안 비활성 → Active 를 기다린다.
+# 폼: "Private DNS명"(소문자·숫자·- 로 3~20자), "VPC 연결"(선택 모달, 선택 사항), "설명"(50자). VPC 없이 생성된다. 생성 직후 상태 Creating → Active.
+steps:
+  - goal: "Private DNS 목록으로 이동한다"
+    goto: "#/dns/private-dns/list"
+    expect:
+      url: "#/dns/private-dns/list"
+
+  - goal: "Private DNS {{name}} 을 VPC 연결 없이 생성하고 Active 를 기다린다"
+    vars:
+      name: "pdns-{{run_id}}"
+    expect:
+      url: "#/dns/private-dns/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "상세 화면의 서비스 해지로 Private DNS {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

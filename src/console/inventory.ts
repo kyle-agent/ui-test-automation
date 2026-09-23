@@ -14,6 +14,7 @@ export const ROUTES = {
   igw: '#/vpc/internet-gateway/list',
   volume: '#/virtualserver/block-storage/list',
   pdns: '#/dns/private-dns/list',
+  fs: '#/filestorage/filestorage/list',
   port: '#/vpc/port/list',
   subnet: '#/vpc/subnet/list',
   vpc: '#/vpc/vpc/list',
@@ -30,6 +31,8 @@ export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
 const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+/** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
+const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -60,7 +63,9 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
           leftovers.push({ kind, name: ip, rowText });
         continue;
       }
-      const name = words.find((w) => (kind === 'igw' ? TEST_IGW.test(w) : TEST_NAME.test(w)));
+      const name = words.find((w) =>
+        kind === 'igw' ? TEST_IGW.test(w) : kind === 'fs' ? TEST_FS.test(w) : TEST_NAME.test(w),
+      );
       if (name) leftovers.push({ kind, name, rowText });
     }
   }
@@ -72,6 +77,7 @@ const ORDER: Kind[] = [
   'pip',
   'igw',
   'volume',
+  'fs',
   'pdns',
   'port',
   'subnet',
@@ -188,6 +194,13 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제/, '확인', { agree: true });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
+      return;
+    case 'fs':
+      // File Storage: 행 선택 → 상단 "서비스 해지" (모달이 볼륨명 입력을 요구할 수 있음)
+      await selectRow(page, item.name);
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
       return;
     case 'bkt':
       // 행 선택 → 상단 "서비스 해지" (Object Storage 버킷)
