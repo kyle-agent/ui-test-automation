@@ -1,0 +1,32 @@
+id: compute.server-group
+title: Server Group 생성 후 삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브): 목록 #/virtualserver/server-group/list, 버튼 "Server Group 생성" / 상단 "삭제"(행 선택 후).
+# 폼: "Server Group명"(255자, 영문·숫자·공백·-_), "정책" 드롭다운(Affinity(근접 배치) / Anti-Affinity(분산 배치) / Partition(서버와 Block Storage 분산배치)).
+# 선행 리소스 없음, 무과금.
+steps:
+  - goal: "Server Group 목록으로 이동한다"
+    goto: "#/virtualserver/server-group/list"
+    expect:
+      url: "#/virtualserver/server-group/list"
+
+  - goal: "Server Group {{name}} 을 Anti-Affinity 정책으로 생성한다"
+    vars:
+      name: "sgrp-{{run_id}}"
+    expect:
+      url: "#/virtualserver/server-group/list"
+      text: ["{{name}}", "Anti-Affinity"]
+
+teardown:
+  - goal: "Server Group {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

@@ -1,0 +1,33 @@
+id: security.address-group
+title: Address Group 생성 후 삭제
+service: Security Group
+category: Security
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브): 목록 #/securitygroup/addressgroup/list, 버튼 "Address Group 생성" / 상단 "삭제"(행 선택 후).
+# 폼: "Address Group명"(영문·숫자로 시작, 영문·숫자·-_ 로 100자 이내), "대상 주소"(textarea, CIDR/IP/범위를 ','로 구분), "설명"(255자).
+# 선행 리소스 없음, 무과금.
+steps:
+  - goal: "Address Group 목록으로 이동한다"
+    goto: "#/securitygroup/addressgroup/list"
+    expect:
+      url: "#/securitygroup/addressgroup/list"
+
+  - goal: "Address Group {{name}} 을 대상 주소 {{cidr}} 로 생성한다"
+    vars:
+      name: "addr-{{run_id}}"
+      cidr: "10.250.0.0/24"
+    expect:
+      url: "#/securitygroup/addressgroup/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "Address Group {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

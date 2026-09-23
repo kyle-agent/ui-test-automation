@@ -372,7 +372,7 @@ resources:
     level: 1
     specs: [smoke.object-storage]
     last_pass: null
-    note: ""
+    note: "spec storage.object-storage-bucket 은 있으나 skip: 계정에 Object Storage 인증키가 없어 버킷명 조회가 실패하고 생성이 비활성 (환경 전제). 인증키 생성 후 skipReason 제거"
   - key: volume@parallel-file-storage
     service: "Parallel File Storage"
     category: "Storage"
@@ -441,10 +441,10 @@ resources:
     service: "Security Group"
     category: "Networking"
     route: /securitygroup/addressgroup/list
-    level: 1
-    specs: [smoke.security-group]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.security-group, security.address-group]
+    last_pass: 2026-09-23
+    note: "생성(대상 주소 CIDR) → 목록 → 삭제. 선행 리소스 없음"
   - key: security-group
     service: "Security Group"
     category: "Networking"
@@ -521,10 +521,10 @@ resources:
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/server-group/list
-    level: 1
-    specs: [smoke.virtual-server]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.virtual-server, compute.server-group]
+    last_pass: 2026-09-23
+    note: "생성(정책 Anti-Affinity) → 목록 → 삭제. 선행 리소스 없음"
   - key: virtual-server
     service: "Virtual Server"
     category: "Compute"
