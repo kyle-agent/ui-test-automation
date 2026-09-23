@@ -1,0 +1,371 @@
+{
+  "config": {
+    "configFile": "C:\\jev\\scp-console-tests\\playwright.config.ts",
+    "rootDir": "C:/jev/scp-console-tests/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/jev/scp-console-tests/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "unit",
+        "name": "unit",
+        "testDir": "C:/jev/scp-console-tests/tests/unit",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "C:/jev/scp-console-tests/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "auth-public",
+        "name": "auth-public",
+        "testDir": "C:/jev/scp-console-tests/tests/auth",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "C:/jev/scp-console-tests/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "session",
+        "name": "session",
+        "testDir": "C:/jev/scp-console-tests/tests/setup",
+        "testIgnore": [],
+        "testMatch": [
+          "/session\\.setup\\.ts/"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "C:/jev/scp-console-tests/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "smoke",
+        "name": "smoke",
+        "testDir": "C:/jev/scp-console-tests/tests/smoke",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "C:/jev/scp-console-tests/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "regression",
+        "name": "regression",
+        "testDir": "C:/jev/scp-console-tests/tests/regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "setup\\session.setup.ts",
+      "file": "setup/session.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "session",
+              "projectName": "session",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11892,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "세션 OK: kr-west1 | Console\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T08:37:03.609Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "197417cd478845ac4982-f5120e52e90b918f0183",
+          "file": "setup/session.setup.ts",
+          "line": 32,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "regression\\storage.object-storage-bucket.spec.ts",
+      "file": "regression/storage.object-storage-bucket.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Object Storage 버킷 생성 후 해지",
+          "file": "../src/console/simple-crud.ts",
+          "line": 65,
+          "column": 8,
+          "specs": [
+            {
+              "title": "Object Storage 버킷 생성 후 해지",
+              "ok": false,
+              "tags": [
+                "regression",
+                "destructive",
+                "crud",
+                "light"
+              ],
+              "tests": [
+                {
+                  "timeout": 900000,
+                  "annotations": [
+                    {
+                      "type": "scenario",
+                      "description": "storage.object-storage-bucket"
+                    },
+                    {
+                      "type": "run_id",
+                      "description": "0923-1737-374b"
+                    },
+                    {
+                      "type": "title",
+                      "description": "Object Storage 목록 | Object Storage | kr-west1 | Console"
+                    },
+                    {
+                      "type": "title",
+                      "description": "Object Storage 목록 | Object Storage | kr-west1 | Console"
+                    },
+                    {
+                      "type": "scenario",
+                      "description": "storage.object-storage-bucket"
+                    },
+                    {
+                      "type": "phase",
+                      "description": "teardown"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "regression",
+                  "projectName": "regression",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 46499,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.scp-modal:visible').last().getByRole('button', { name: '확인', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button items=\"\" tabindex=\"-1\" modelvalue=\"\" data-v-3f523e1c=\"\" data-v-ad0a345c=\"\" visibility=\"false\" aria-select=\"false\" aria-disabled=\"true\" class=\"scp-button scp-button-disabled scp-size-md scp-color-primary xuxw1ft xjyslct x1rg5ohu x1y0btm7 x87ps6o xlv0868 xcytg0a xgoclth x1r9hyfe x2mxmcj xqgmtff x9r1u3d x12d8qxm x1t61ilq x1lvx875 x1n2onr6 xb3r6kr x1vjfegm xc342km x11dsqji x1th8s2z x1cpjm7i x1hmns74 x1y3wzot xb0dqd5 xhq5o37 x1wlytlt x124lp2h xy5mcqj xgufkyt xl507ny x1s928wv x1j6awrg x1m1drc7 xnbfe…>확인</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    27 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.scp-modal:visible').last().getByRole('button', { name: '확인', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button items=\"\" tabindex=\"-1\" modelvalue=\"\" data-v-3f523e1c=\"\" data-v-ad0a345c=\"\" visibility=\"false\" aria-select=\"false\" aria-disabled=\"true\" class=\"scp-button scp-button-disabled scp-size-md scp-color-primary xuxw1ft xjyslct x1rg5ohu x1y0btm7 x87ps6o xlv0868 xcytg0a xgoclth x1r9hyfe x2mxmcj xqgmtff x9r1u3d x12d8qxm x1t61ilq x1lvx875 x1n2onr6 xb3r6kr x1vjfegm xc342km x11dsqji x1th8s2z x1cpjm7i x1hmns74 x1y3wzot xb0dqd5 xhq5o37 x1wlytlt x124lp2h xy5mcqj xgufkyt xl507ny x1s928wv x1j6awrg x1m1drc7 xnbfe…>확인</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    27 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at confirmModal (C:\\jev\\scp-console-tests\\src\\console\\ui.ts:137:66)\n    at C:\\jev\\scp-console-tests\\src\\console\\simple-crud.ts:89:11\n    at C:\\jev\\scp-console-tests\\src\\console\\simple-crud.ts:81:9",
+                        "location": {
+                          "file": "C:\\jev\\scp-console-tests\\src\\console\\ui.ts",
+                          "column": 66,
+                          "line": 137
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m..\\src\\console\\ui.ts:137\n\n\u001b[0m \u001b[90m 135 |\u001b[39m     }\n \u001b[90m 136 |\u001b[39m   }\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 137 |\u001b[39m   \u001b[36mawait\u001b[39m modal\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m button\u001b[33m,\u001b[39m exact\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 138 |\u001b[39m   \u001b[36mawait\u001b[39m modal\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'hidden'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10\u001b[39m_000 })\u001b[33m.\u001b[39m\u001b[36mcatch\u001b[39m(() \u001b[33m=>\u001b[39m undefined)\u001b[33m;\u001b[39m\n \u001b[90m 139 |\u001b[39m }\n \u001b[90m 140 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\jev\\scp-console-tests\\src\\console\\ui.ts",
+                            "column": 66,
+                            "line": 137
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.scp-modal:visible').last().getByRole('button', { name: '확인', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button items=\"\" tabindex=\"-1\" modelvalue=\"\" data-v-3f523e1c=\"\" data-v-ad0a345c=\"\" visibility=\"false\" aria-select=\"false\" aria-disabled=\"true\" class=\"scp-button scp-button-disabled scp-size-md scp-color-primary xuxw1ft xjyslct x1rg5ohu x1y0btm7 x87ps6o xlv0868 xcytg0a xgoclth x1r9hyfe x2mxmcj xqgmtff x9r1u3d x12d8qxm x1t61ilq x1lvx875 x1n2onr6 xb3r6kr x1vjfegm xc342km x11dsqji x1th8s2z x1cpjm7i x1hmns74 x1y3wzot xb0dqd5 xhq5o37 x1wlytlt x124lp2h xy5mcqj xgufkyt xl507ny x1s928wv x1j6awrg x1m1drc7 xnbfe…>확인</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    27 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n   at ..\\src\\console\\ui.ts:137\n\n  135 |     }\n  136 |   }\n> 137 |   await modal.getByRole('button', { name: button, exact: true }).click();\n      |                                                                  ^\n  138 |   await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined);\n  139 | }\n  140 |\n    at confirmModal (C:\\jev\\scp-console-tests\\src\\console\\ui.ts:137:66)\n    at C:\\jev\\scp-console-tests\\src\\console\\simple-crud.ts:89:11\n    at C:\\jev\\scp-console-tests\\src\\console\\simple-crud.ts:81:9"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  [2s] bkt-0923-1737-374b 등장 대기… (행 없음)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "steps[0] Object Storage 목록으로 이동한다",
+                          "duration": 6341
+                        },
+                        {
+                          "title": "steps[1] bkt-0923-1737-374b 생성",
+                          "duration": 22775
+                        }
+                      ],
+                      "startTime": "2026-09-23T08:37:17.768Z",
+                      "annotations": [
+                        {
+                          "type": "scenario",
+                          "description": "storage.object-storage-bucket"
+                        },
+                        {
+                          "type": "run_id",
+                          "description": "0923-1737-374b"
+                        },
+                        {
+                          "type": "title",
+                          "description": "Object Storage 목록 | Object Storage | kr-west1 | Console"
+                        },
+                        {
+                          "type": "title",
+                          "description": "Object Storage 목록 | Object Storage | kr-west1 | Console"
+                        },
+                        {
+                          "type": "scenario",
+                          "description": "storage.object-storage-bucket"
+                        },
+                        {
+                          "type": "phase",
+                          "description": "teardown"
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\screenshot-simple-crud.ts.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-6.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-2.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-4.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-3.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-7.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\test-failed-5.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\jev\\scp-console-tests\\test-results\\artifacts\\storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\jev\\scp-console-tests\\src\\console\\ui.ts",
+                        "column": 66,
+                        "line": 137
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c098808726a6cf756442-d68f91695904112eac69",
+              "file": "../src/console/simple-crud.ts",
+              "line": 103,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-23T08:37:02.005Z",
+    "duration": 66482.213,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

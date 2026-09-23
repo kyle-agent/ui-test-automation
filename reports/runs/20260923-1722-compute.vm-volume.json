@@ -1,0 +1,66 @@
+{
+  "spec": "compute.vm-volume",
+  "started": "2026-09-23T08:22:50.813Z",
+  "ended": "2026-09-23T08:38:17.808Z",
+  "seconds": 927,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-volume",
+    "run_id": "0923-1723-923d",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 9.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Virtual Server 에 Block Storage 볼륨 생성·연결·분리·삭제",
+      "status": "passed",
+      "seconds": 901.3,
+      "annotations": {
+        "scenario": "compute.vm-volume",
+        "run_id": "0923-1723-923d",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 확인",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] VPC vpc-0923-1723-923d 생성",
+          "status": "pass",
+          "seconds": 26.6
+        },
+        {
+          "title": "steps[2] Subnet sub-0923-1723-923d 생성",
+          "status": "pass",
+          "seconds": 227.2
+        },
+        {
+          "title": "steps[3] Virtual Server vm-0923-1723-923d 생성",
+          "status": "pass",
+          "seconds": 104.1
+        },
+        {
+          "title": "steps[4] Block Storage vol-0923-1723-923d 생성",
+          "status": "pass",
+          "seconds": 24.9
+        },
+        {
+          "title": "steps[5] 서버 vm-0923-1723-923d 에 볼륨 vol-0923-1723-923d 연결",
+          "status": "pass",
+          "seconds": 74.2
+        }
+      ]
+    }
+  ]
+}

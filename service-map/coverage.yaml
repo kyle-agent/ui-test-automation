@@ -369,10 +369,10 @@ resources:
     service: "Object Storage"
     category: "Storage"
     route: /objectstorage/objectstorage/list
-    level: 1
-    specs: [smoke.object-storage]
-    last_pass: null
-    note: "spec storage.object-storage-bucket 은 있으나 skip: 계정에 Object Storage 인증키가 없어 버킷명 조회가 실패하고 생성이 비활성 (환경 전제). 인증키 생성 후 skipReason 제거"
+    level: 2
+    specs: [smoke.object-storage, storage.object-storage-bucket]
+    last_pass: "2026-09-23"
+    note: "전제: 계정에 Object Storage 인증키(IAM > My Info > 인증키, 영구) 1개 — 2026-09-23 생성. 해지 모달은 실제 버킷명 입력 필요"
   - key: volume@parallel-file-storage
     service: "Parallel File Storage"
     category: "Storage"

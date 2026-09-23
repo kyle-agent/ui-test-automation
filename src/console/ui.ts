@@ -108,7 +108,7 @@ export async function confirmModal(
   page: Page,
   containing?: string | RegExp,
   button: string = '확인',
-  opts: { agree?: boolean } = {},
+  opts: { agree?: boolean; resourceName?: string } = {},
 ): Promise<void> {
   const modal = visibleModal(page);
   await modal.waitFor({ timeout: 10_000 });
@@ -126,11 +126,16 @@ export async function confirmModal(
         .check()
         .catch(() => undefined);
     // 입력 확인: "확인을 위해 삭제를 입력해주세요" 처럼 지정한 단어를 텍스트 입력란에 쳐야 "확인" 이 활성화되는 모달 (예: Block Storage 삭제).
+    // 단어가 "버킷명"처럼 라벨이면(…명/이름) 그 단어가 아니라 실제 이름을 쳐야 한다: 모달의 "버킷명 : <값>" 에서 찾고, 없으면 opts.resourceName (예: Object Storage 해지).
     const text = (await modal.innerText().catch(() => '')).replace(/\s+/g, ' ');
     const word = text.match(/확인을 위해\s*(\S+?)(?:을|를)?\s*입력/)?.[1];
+    const isLabel = !!word && /(명|이름)$/.test(word);
+    const typed = isLabel
+      ? (text.match(new RegExp(`${word}\\s*:\\s*(\\S+)`))?.[1] ?? opts.resourceName)
+      : word;
     const input = modal.locator('input[type=text]:visible').first();
-    if (word && (await input.count())) {
-      await input.fill(word);
+    if (typed && (await input.count())) {
+      await input.fill(typed);
       await input.press('Tab');
     }
   }

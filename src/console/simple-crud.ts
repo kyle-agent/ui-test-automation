@@ -86,7 +86,7 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
             await selectRow(page, vars.name!);
             await topButton(page, deleteButton).click();
           }
-          await confirmModal(page, config.deleteConfirmText ?? /삭제|해지/, '확인', { agree: true });
+          await confirmModal(page, config.deleteConfirmText ?? /삭제|해지/, '확인', { agree: true, resourceName: vars.name });
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
           await waitForRow(page, config.route, vars.name!, {
             gone: true,

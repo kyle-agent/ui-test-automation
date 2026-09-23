@@ -1,0 +1,61 @@
+{
+  "spec": "compute.vm-stack",
+  "started": "2026-09-23T08:09:48.578Z",
+  "ended": "2026-09-23T08:22:50.805Z",
+  "seconds": 782,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-stack",
+    "run_id": "0923-1710-a2d1",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Virtual Server 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 757.1,
+      "annotations": {
+        "scenario": "compute.vm-stack",
+        "run_id": "0923-1710-a2d1",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 목록으로 이동",
+          "status": "pass",
+          "seconds": 5.4
+        },
+        {
+          "title": "steps[1] Keypair qa-shared-keypair 준비 (있으면 재사용, 없으면 생성)",
+          "status": "pass",
+          "seconds": 1
+        },
+        {
+          "title": "steps[2] VPC vpc-0923-1710-a2d1 생성",
+          "status": "pass",
+          "seconds": 27.1
+        },
+        {
+          "title": "steps[3] Subnet sub-0923-1710-a2d1 생성",
+          "status": "pass",
+          "seconds": 282.2
+        },
+        {
+          "title": "steps[4] Virtual Server vm-0923-1710-a2d1 생성",
+          "status": "pass",
+          "seconds": 86.4
+        }
+      ]
+    }
+  ]
+}

@@ -148,7 +148,7 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       // 행 선택 → 상단 "서비스 해지" (Object Storage 버킷)
       await selectRow(page, item.name);
       await topButton(page, '서비스 해지').click();
-      await confirmModal(page, /해지/, '확인', { agree: true });
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name }); // 모달이 실제 버킷명 입력을 요구
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
       return;
     case 'sg':
