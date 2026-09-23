@@ -26,13 +26,15 @@ export const ROUTES = {
   addr: '#/securitygroup/addressgroup/list',
   rg: '#/resourcegroups/resource-group/list',
   grp: '#/iam/group/list',
+  pol: '#/iam/policy/list',
   lc: '#/virtualserver/launch-configuration/list',
 } as const;
 
 export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
-const TEST_NAME = /^(vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+const TEST_NAME =
+  /^(vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
@@ -100,6 +102,7 @@ const ORDER: Kind[] = [
   'addr',
   'rg',
   'grp',
+  'pol',
   'lc',
 ];
 
@@ -236,6 +239,7 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
     case 'addr':
     case 'rg':
     case 'grp':
+    case 'pol':
     case 'lc':
       // 행 선택 → 상단 "삭제" (Server Group, Address Group, Resource Group, IAM 사용자 그룹, Launch Configuration)
       await selectRow(page, item.name);

@@ -12,6 +12,7 @@ export const SUITE_ORDER: readonly string[] = [
   'storage.object-storage-bucket', // 전제: 계정에 Object Storage 인증키 1개 (2026-09-23 생성)
   'management.resource-group',
   'iam.user-group',
+  'iam.policy', // ≈1분. JSON 모드 마법사
   'compute.launch-configuration',
   'networking.vpc-port', // VPC → Subnet → Port (≈10분)
   'networking.private-dns', // ≈2분. 생성 → Active → 상세 서비스 해지

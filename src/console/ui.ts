@@ -235,3 +235,30 @@ export async function waitForRow(
     await settleConsole(page, { appearGraceMs: 800 });
   }
 }
+
+/**
+ * VPC 해지 (행 끝 "서비스 해지" → "해지하시겠습니까?" 확인). 실측(2026-09-23): Peering·Subnet 을 지운 직후의 해지 요청은 조용히 무시되어 행이 Active 로 남는다
+ * → 60초 안에 사라지지 않으면 최대 5회 다시 누른다. 사라진 뒤엔 토스트("VPC명: …")가 본문에 남으므로 새로 고친다 (not_text 검사용).
+ */
+export async function terminateVpc(
+  page: Page,
+  route: string,
+  name: string,
+  log?: (line: string) => void,
+): Promise<void> {
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    await gotoRoute(page, route);
+    if ((await row(page, name).count()) === 0) break;
+    await row(page, name).getByRole('button', { name: '서비스 해지', exact: true }).click();
+    await confirmModal(page, /해지하시겠습니까/);
+    try {
+      await waitForRow(page, route, name, { gone: true, timeoutMs: 60_000, intervalMs: 15_000, log });
+      break;
+    } catch {
+      log?.(`  VPC ${name} 해지 재시도 ${attempt}/5 (아직 남아 있음)`);
+      if (attempt === 5) await waitForRow(page, route, name, { gone: true, timeoutMs: 120_000, log });
+    }
+  }
+  await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+  await settleConsole(page, { appearGraceMs: 800 });
+}

@@ -17,6 +17,7 @@ import {
   topButton,
   visibleModal,
   waitForRow,
+  terminateVpc,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
@@ -179,9 +180,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await gotoRoute(page, ROUTES.vpc);
       if ((await row(page, vars.vpc!).count()) === 0) return;
       await test.step('teardown[3] VPC 해지', async () => {
-        await row(page, vars.vpc!).getByRole('button', { name: '서비스 해지', exact: true }).click();
-        await confirmModal(page, /해지하시겠습니까/);
-        await waitForRow(page, ROUTES.vpc, vars.vpc!, { gone: true, timeoutMs: 180_000, log });
+        await terminateVpc(page, ROUTES.vpc, vars.vpc!, log);
         await refreshedExpect(page, resolveExpectation(scenario.teardown[3]!.expect, vars), stepCtx(3));
       });
     });

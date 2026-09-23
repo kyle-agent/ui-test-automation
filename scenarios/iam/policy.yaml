@@ -1,0 +1,32 @@
+id: iam.policy
+title: IAM 정책 생성(JSON 모드) 후 삭제
+service: Identity and Access Management(IAM)
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브): 목록 #/iam/policy/list (Global), 버튼 "정책 생성" / 상단 "삭제"(행 선택 후). 3단계 마법사:
+# 1) 기본 정보(정책명 3~128자, 설명) → "다음"  2) 권한 설정: "JSON 모드"(첫 전환 시 안내 모달 "확인") → ACE 편집기(.ace_editor)에 정책 JSON → "다음"  3) 입력 정보 확인 → "생성".
+# 기본 템플릿: {"Version":"2024-07-01","Statement":[{"Sid":"VisualEditor0","Effect":"Allow","Action":[],"Resource":["*"]}]}. 무과금.
+steps:
+  - goal: "정책 목록으로 이동한다"
+    goto: "#/iam/policy/list"
+    expect:
+      url: "#/iam/policy/list"
+
+  - goal: "정책 {{name}} 을 JSON 모드로 생성한다 (Allow vpc:ListVpcs on *)"
+    vars:
+      name: "pol-{{run_id}}"
+    expect:
+      url: "#/iam/policy/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "정책 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000
