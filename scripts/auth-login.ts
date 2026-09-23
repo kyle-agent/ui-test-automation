@@ -2,7 +2,7 @@
  * 사람이 브라우저에서 직접 로그인(비밀번호·MFA·캡차)하고, 완료되면 Playwright storageState 를 저장한다.
  * 이 스크립트는 자격 증명을 읽지도, 입력하지도 않는다. 콘솔 대시보드가 뜨는 것만 기다린다.
  *
- *   npm run auth:login -- [--session root|iam] [--channel msedge|chrome] [--timeout 15] [--keep-open] [--cdp-port 9222]
+ *   npm run auth:login -- [--session root|iam] [--channel msedge|chrome] [--timeout 15] [--keep-open] [--cdp-port 9222] [--keepalive 5]
  *   (--channel 을 생략하면 .env 의 PW_CHANNEL 을, 그것도 없으면 Playwright 가 설치한 Chromium 을 쓴다)
  *
  * --keep-open 이면 브라우저를 닫지 않고 --remote-debugging-port 를 열어 둔다. 테스트와 스크립트는 .env 의
@@ -38,6 +38,9 @@ async function main(): Promise<void> {
 
   const cdpPort = typeof flags['cdp-port'] === 'string' ? Number(flags['cdp-port']) : 9222;
   const keepOpen = !!flags['keep-open'];
+  // 콘솔·SSO 세션은 약 30분 유휴 뒤 만료된다(2026-09-22~23 관찰: 테스트가 도는 동안엔 안 끊기고, 35~60분 비면 끊김).
+  // --keep-open 이면 대시보드 탭을 이 간격(분)으로 새로 고쳐 유휴를 막는다. 0 이면 끔.
+  const keepAliveMinutes = typeof flags.keepalive === 'string' ? Number(flags.keepalive) : 5;
   // 영구 프로필 = 브라우저의 기본 컨텍스트. CDP 로 붙는 쪽이 여는 새 탭이 같은 쿠키를 공유하려면 반드시 기본 컨텍스트여야 한다.
   // (browser.newContext() 로 만든 컨텍스트는 시크릿 창처럼 분리돼 있어 CDP 클라이언트의 새 탭에 쿠키가 없다.)
   const userDataDir = path.join(RECORDINGS_DIR, `profile-${kind}`);
@@ -89,10 +92,51 @@ async function main(): Promise<void> {
         `다른 터미널에서 실행: .env 에 PW_CDP_URL=http://127.0.0.1:${cdpPort} 를 넣은 뒤 npm run auth:check → npm run menu:snapshot → npm run test:smoke`,
       );
       console.log('이 창을 닫으면 콘솔 세션이 무효화되고 SSO 도 로그아웃됩니다.');
-      await new Promise(() => undefined);
+      await keepAlive(context, dashboard, keepAliveMinutes);
     }
   } finally {
     await context.close().catch(() => undefined);
+  }
+}
+
+/**
+ * 세션 keep-alive: 대시보드 탭을 주기적으로 새로 고친다. 테스트는 자기 탭을 따로 열므로 충돌하지 않는다.
+ * 새로 고친 뒤 제목이 "… | Console" 이 아니면(SSO 로 튕김) 만료로 보고 경고만 남긴다 — 재로그인은 사람이 한다.
+ */
+async function keepAlive(context: BrowserContext, initial: Page, minutes: number): Promise<void> {
+  if (!(minutes > 0)) {
+    await new Promise(() => undefined);
+    return;
+  }
+  console.log(`keep-alive: ${minutes}분마다 대시보드 탭을 새로 고칩니다 (--keepalive 0 으로 끔).`);
+  let page = initial;
+  for (;;) {
+    await new Promise((r) => setTimeout(r, minutes * 60_000));
+    if (page.isClosed()) {
+      page =
+        context.pages().find((p) => p.url().includes(consoleHost()) && !p.isClosed()) ??
+        (await context.newPage());
+    }
+    const stamp = new Date().toLocaleTimeString();
+    try {
+      if (!page.url().includes(consoleHost()))
+        await page.goto(`${CONSOLE_URL}${CONSOLE_BASE_PATH}`, { waitUntil: 'domcontentloaded' });
+      else await page.reload({ waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(3_000);
+      const title = await page.title();
+      const alive = /\| Console$/.test(title) && page.url().includes(consoleHost());
+      console.log(
+        `[${stamp}] keep-alive: ${alive ? 'OK' : '세션 만료로 보임'} — ${title.slice(0, 60)} (${page.url().slice(0, 80)})`,
+      );
+      if (!alive)
+        console.log(
+          '  로그인 브라우저에서 다시 로그인하세요. 로그인되면 다음 주기부터 다시 OK 로 표시됩니다.',
+        );
+    } catch (err) {
+      console.log(
+        `[${stamp}] keep-alive 실패: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`,
+      );
+    }
   }
 }
 
