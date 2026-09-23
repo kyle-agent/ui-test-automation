@@ -13,6 +13,7 @@ export const ROUTES = {
   pip: '#/vpc/public-ip/list',
   igw: '#/vpc/internet-gateway/list',
   volume: '#/virtualserver/block-storage/list',
+  pdns: '#/dns/private-dns/list',
   port: '#/vpc/port/list',
   subnet: '#/vpc/subnet/list',
   vpc: '#/vpc/vpc/list',
@@ -28,7 +29,7 @@ export const ROUTES = {
 export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
-const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr|rg|grp|lc|port)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -71,6 +72,7 @@ const ORDER: Kind[] = [
   'pip',
   'igw',
   'volume',
+  'pdns',
   'port',
   'subnet',
   'vpc',
@@ -143,6 +145,20 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    case 'pdns':
+      // Private DNS: 목록에 삭제 버튼이 없고 상세의 "서비스 해지" 가 Creating 동안 비활성 → Active 를 기다린 뒤 상세에서 해지
+      await waitForRow(page, route, item.name, {
+        status: /Active/i,
+        timeoutMs: 300_000,
+        intervalMs: 15_000,
+        log,
+      });
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
       return;
     case 'port':
       // 행 선택 → 상단 "삭제" (VPC Port; 서버에 붙어 있으면 실패하므로 서버 정리 뒤에 온다)

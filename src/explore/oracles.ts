@@ -56,8 +56,23 @@ export async function checkPage(page: Page, beforeText: string): Promise<Finding
   if (m) findings.push({ severity: 'anomaly', kind: 'error-text', detail: excerpt(flat, m.index ?? 0) });
   const r = added.match(REJECTED_TEXT);
   if (r) findings.push({ severity: 'info', kind: 'server-rejected', detail: excerpt(added, r.index ?? 0) });
+  // 폼이 실제로 거부한 것(오류 스타일이 붙은 입력란·메시지)은 힌트 문구("3~20자로 입력하세요" 는 항상 보인다)와 구분해 validation-error 로 올린다.
+  const errorStyled = await page
+    .locator(
+      '.scp-form-group-error:visible, .scp-textfield-error:visible, .scp-error-text:visible, [class*="is-error"]:visible, [class*="has-error"]:visible, [aria-invalid="true"]:visible',
+    )
+    .allInnerTexts()
+    .catch(() => [] as string[]);
+  const styled = errorStyled.map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  if (styled.length)
+    findings.push({
+      severity: 'info',
+      kind: 'validation-error',
+      detail: styled.slice(0, 3).join(' | ').slice(0, 200),
+    });
   const v = added.match(VALIDATION_TEXT);
-  if (v) findings.push({ severity: 'info', kind: 'validation-text', detail: excerpt(added, v.index ?? 0) });
+  if (v && !styled.length)
+    findings.push({ severity: 'info', kind: 'validation-text', detail: excerpt(added, v.index ?? 0) });
   return findings;
 }
 
