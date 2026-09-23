@@ -42,18 +42,18 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-23 18:08 · 실행 기록 11건 · 마지막 실행 2026-09-23 18:05 compute.launch-configuration</span>
+  <span class="muted">생성 2026-09-23 18:57 · 실행 기록 12건 · 마지막 실행 2026-09-23 18:47 networking.vpc-port</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
 <section>
   <h2>요약</h2>
   <div class="cards">
-    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">7 <span class="s">/ 8 (스위트 10)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">73% <span class="s">8/11</span></div><div class="s">실패 분류: unclassified 3</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">16% <span class="s">13/80 리소스</span></div><div class="s">L3+ 7 · 탐색 3회</div></div>
+    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">8 <span class="s">/ 9 (스위트 11)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
+    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">75% <span class="s">9/12</span></div><div class="s">실패 분류: unclassified 3</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">18% <span class="s">14/80 리소스</span></div><div class="s">L3+ 8 · 탐색 14회</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 8 실패 3"><div class="stack"><span class="fail" style="height:27.27272727272727%"></span><span class="pass" style="height:72.72727272727273%"></span></div><div class="lbl">09-23</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 9 실패 3"><div class="stack"><span class="fail" style="height:25%"></span><span class="pass" style="height:75%"></span></div><div class="lbl">09-23</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
 </section>
 
@@ -125,16 +125,32 @@
         <td class="num">1분 25초</td>
         <td class="dots"><span class="dot fail" title="2026-09-23 18:02 FAIL(unclassified) 51초"></span><span class="dot pass" title="2026-09-23 18:05 PASS 1분 25초"></span> <span class="muted">1/2</span></td>
         <td class="num">1분 25초</td>
+      </tr>
+<tr>
+        <td class="mono">networking.vpc-port</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-23 18:47</td>
+        <td class="num">9분 25초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 18:47 PASS 9분 25초"></span> <span class="muted">1/1</span></td>
+        <td class="num">9분 25초</td>
       </tr></tbody></table>
 </section>
 
 <section>
-  <h2>실행 기록 <small>최신 11건</small></h2>
+  <h2>실행 기록 <small>최신 12건</small></h2>
   <div class="filters">보기:
     <button data-st="all" class="on">전체</button><button data-st="fail">실패</button><button data-st="env">환경</button><button data-st="pass">통과</button>
   </div>
   <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-09-23 18:47</td>
+        <td class="mono">networking.vpc-port</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">9분 25초</td>
+        <td class="mono small">0923-1847-1b2b</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-09-23 18:05</td>
         <td class="mono">compute.launch-configuration</td>
         <td><span class="badge pass">PASS</span></td>
@@ -230,8 +246,8 @@
   
     <div class="cards">
       <div class="card"><div class="k">리소스(모집단)</div><div class="v">80</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">13 <span class="s">/ 80 · 16%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:84%" title="L1 진입 67"></span><span class="seg l2" style="width:8%" title="L2 CRUD 6"></span><span class="seg l3" style="width:3%" title="L3 동작 2"></span><span class="seg l4" style="width:6%" title="L4 통합 5"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">7 <span class="s">/ 80 · 9%</span></div><div class="s">L0 없음 0 · L1 진입 67 · L2 CRUD 6 · L3 동작 2 · L4 통합 5</div></div>
+      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">14 <span class="s">/ 80 · 18%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:83%" title="L1 진입 66"></span><span class="seg l2" style="width:8%" title="L2 CRUD 6"></span><span class="seg l3" style="width:3%" title="L3 동작 2"></span><span class="seg l4" style="width:8%" title="L4 통합 6"></span></div></div>
+      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">8 <span class="s">/ 80 · 10%</span></div><div class="s">L0 없음 0 · L1 진입 66 · L2 CRUD 6 · L3 동작 2 · L4 통합 6</div></div>
     </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -280,9 +296,9 @@
 <tr>
         <td>Networking</td>
         <td class="num">30</td>
-        <td class="num"></td><td class="num">24</td><td class="num">1</td><td class="num">1</td><td class="num">4</td>
-        <td class="num">20%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:80%" title="L1 진입 24"></span><span class="seg l2" style="width:3%" title="L2 CRUD 1"></span><span class="seg l3" style="width:3%" title="L3 동작 1"></span><span class="seg l4" style="width:13%" title="L4 통합 4"></span></div></td>
+        <td class="num"></td><td class="num">23</td><td class="num">1</td><td class="num">1</td><td class="num">5</td>
+        <td class="num">23%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:77%" title="L1 진입 23"></span><span class="seg l2" style="width:3%" title="L2 CRUD 1"></span><span class="seg l3" style="width:3%" title="L3 동작 1"></span><span class="seg l4" style="width:17%" title="L4 통합 5"></span></div></td>
       </tr>
 <tr>
         <td>Security</td>
@@ -321,6 +337,15 @@
         <td class="mono small">compute.vm-stack-net</td>
         <td>2026-09-23</td>
         <td class="note"></td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Networking">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">port</td>
+        <td>VPC</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.vpc<br>networking.vpc-port</td>
+        <td>2026-09-23</td>
+        <td class="note">VPC → Subnet 위에서 자동 할당 IP 로 생성(상태 Down, 서버 미연결) → 행 선택·상단 삭제. 무과금</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
@@ -801,15 +826,6 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
-        <td class="mono">port</td>
-        <td>VPC</td>
-        <td>Networking</td>
-        <td class="mono small">smoke.vpc</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Networking">
-        <td><span class="lv l1">L1</span></td>
         <td class="mono">private-dns</td>
         <td>DNS</td>
         <td>Networking</td>
@@ -1029,8 +1045,30 @@
 
 <section>
   <h2>탐색(Level 5, Jev) <small>recordings/explore</small></h2>
-  <p class="muted">탐색 3회 · 이상 0건 · 정보 8건 · 누적 비용 $0.0039 (Level 5, 커버리지 분모에 넣지 않음)</p>
+  <p class="muted">탐색 14회 · 이상 0건 · 정보 30건 · 누적 비용 $0.0195 (Level 5, 커버리지 분모에 넣지 않음)</p>
     <table><thead><tr><th>시각</th><th>이름</th><th>라우트</th><th class="num">결정/동작</th><th class="num">이상</th><th class="num">정보</th><th class="num">비용</th><th>종료 사유</th><th>보고서</th></tr></thead><tbody><tr>
+        <td>2026-09-23 09:48</td>
+        <td>vpc-list</td>
+        <td class="mono small">#/vpc/vpc/list</td>
+        <td class="num">20/19</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0022</td>
+        <td>결정 예산 소진</td>
+        <td class="mono small">recordings/explore/vpc-list-202609230948/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:26</td>
+        <td>vpc-list</td>
+        <td class="mono small">#/vpc/vpc/list</td>
+        <td class="num">0/0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0000</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/vpc-list-202609230926/report.md</td>
+      </tr>
+<tr>
         <td>2026-09-23 07:54</td>
         <td>vpc-form</td>
         <td class="mono small">#/vpc/vpc/list</td>
@@ -1062,6 +1100,105 @@
         <td class="num">$0.0000</td>
         <td>Jev 호출 실패: 모델 연결 실패 (UNSPECIFIED: CA certificate key too weak; 경로: 환경 변수 프록시 (http://70.10.15.10:8080)); 동작을 실행하지 않았습니다. 인증서 오류면 docs/windows-node-proxy.md 의 NODE_OPTIONS/NODE_USE_SYSTEM_CA, 연결/DNS 오류면 .env 에 HTTPS_PROXY=http://프록시:포트 를 넣으세요.</td>
         <td class="mono small">recordings/explore/vpc-form-202609230749/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:41</td>
+        <td>vm-form</td>
+        <td class="mono small">#/virtualserver/virtualserver/list</td>
+        <td class="num">27/27</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0035</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/vm-form-202609230936/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:20</td>
+        <td>vm-form</td>
+        <td class="mono small">#/virtualserver/virtualserver/list</td>
+        <td class="num">0/0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0000</td>
+        <td>Jev 호출 실패: 모델 응답이 유효하지 않습니다; 동작을 실행하지 않았습니다.</td>
+        <td class="mono small">recordings/explore/vm-form-202609230916/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:34</td>
+        <td>subnet-form</td>
+        <td class="mono small">#/vpc/subnet/list</td>
+        <td class="num">15/14</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0016</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/subnet-form-202609230934/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:14</td>
+        <td>subnet-form</td>
+        <td class="mono small">#/vpc/subnet/list</td>
+        <td class="num">3/1</td>
+        <td class="num">0</td>
+        <td class="num">1</td>
+        <td class="num">$0.0003</td>
+        <td>Jev 가 두 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/subnet-form-202609230914/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:50</td>
+        <td>sgrp-form</td>
+        <td class="mono small">#/virtualserver/server-group/list</td>
+        <td class="num">17/16</td>
+        <td class="num">0</td>
+        <td class="num">1</td>
+        <td class="num">$0.0020</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/sgrp-form-202609230950/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:27</td>
+        <td>sgrp-form</td>
+        <td class="mono small">#/virtualserver/server-group/list</td>
+        <td class="num">0/0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0000</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/sgrp-form-202609230927/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:52</td>
+        <td>sg-form</td>
+        <td class="mono small">#/securitygroup/securitygroup/list</td>
+        <td class="num">20/20</td>
+        <td class="num">0</td>
+        <td class="num">5</td>
+        <td class="num">$0.0022</td>
+        <td>결정 예산 소진</td>
+        <td class="mono small">recordings/explore/sg-form-202609230952/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:55</td>
+        <td>rg-form</td>
+        <td class="mono small">#/resourcegroups/resource-group/list</td>
+        <td class="num">15/15</td>
+        <td class="num">0</td>
+        <td class="num">2</td>
+        <td class="num">$0.0021</td>
+        <td>5회 연속 화면 변화 없음</td>
+        <td class="mono small">recordings/explore/rg-form-202609230955/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-23 09:53</td>
+        <td>addr-form</td>
+        <td class="mono small">#/securitygroup/addressgroup/list</td>
+        <td class="num">16/15</td>
+        <td class="num">0</td>
+        <td class="num">4</td>
+        <td class="num">$0.0017</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/addr-form-202609230953/report.md</td>
       </tr></tbody></table>
 </section>
 

@@ -1,22 +1,5 @@
 [
   {
-    "name": "subnet-form",
-    "args": [
-      "--route",
-      "#/vpc/subnet/list",
-      "--open",
-      "Subnet 생성",
-      "--prereq",
-      "vpc",
-      "--budget",
-      "30",
-      "--cost",
-      "0.05",
-      "--minutes",
-      "10"
-    ]
-  },
-  {
     "name": "sg-form",
     "args": [
       "--route",
@@ -44,6 +27,34 @@
       "0.03",
       "--minutes",
       "6"
+    ]
+  },
+  {
+    "name": "rg-form",
+    "args": [
+      "--route",
+      "#/resourcegroups/resource-group/list",
+      "--open",
+      "Resource Group 생성",
+      "--budget",
+      "20",
+      "--cost",
+      "0.03",
+      "--minutes",
+      "6"
+    ]
+  },
+  {
+    "name": "vm-list",
+    "args": [
+      "--route",
+      "#/virtualserver/virtualserver/list",
+      "--budget",
+      "15",
+      "--cost",
+      "0.03",
+      "--minutes",
+      "5"
     ]
   }
 ]

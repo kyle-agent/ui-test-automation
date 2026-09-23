@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-23 18:08, 실행 기록 11건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-23 18:57, 실행 기록 12건.
 
 ## 1. spec 별 최근 상태
 
@@ -16,6 +16,7 @@
 | management.resource-group | 2026-09-23 18:00 | PASS | 52초 | P | 52초 |
 | iam.user-group | 2026-09-23 18:01 | PASS | 53초 | P | 53초 |
 | compute.launch-configuration | 2026-09-23 18:05 | PASS | 1분 25초 | FP | 1분 25초 |
+| networking.vpc-port | 2026-09-23 18:47 | PASS | 9분 25초 | P | 9분 25초 |
 
 실행 기록은 `npm run test:stacks` 가 spec 하나를 마칠 때마다 `reports/runs/<YYYYMMDD-HHMM>-<spec id>.json` 으로 남긴다. 결과의 FAIL(class) 는 실패 분류(unclassified/environment/product/test), FAIL(known: KI-xxx) 는 알려진 이슈에 매칭된 실패.
 
@@ -39,7 +40,7 @@ level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 
 
 - 서비스 89 · 화면 276 (Service Home 83, 그 외 193) · 스모크 진입 282
 - 목록 화면 100, 그중 리소스 키 있음 80 = 장부 리소스 80개
-- level ≥ 2 (CRUD 이상): **13/80** (16%) · level ≥ 3 (동작 이상): **7/80** (9%)
+- level ≥ 2 (CRUD 이상): **14/80** (18%) · level ≥ 3 (동작 이상): **8/80** (10%)
 
 | 카테고리 | 리소스 | L1 | L2 | L3 | L4 |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -49,7 +50,7 @@ level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 
 | Database | 6 | 6 | 0 | 0 | 0 |
 | Financial Management | 1 | 1 | 0 | 0 | 0 |
 | Management | 8 | 6 | 2 | 0 | 0 |
-| Networking | 30 | 24 | 1 | 1 | 4 |
+| Networking | 30 | 23 | 1 | 1 | 5 |
 | Security | 7 | 7 | 0 | 0 | 0 |
 | Storage | 8 | 7 | 1 | 0 | 0 |
-| **합계** | **80** | **67** | **6** | **2** | **5** |
+| **합계** | **80** | **66** | **6** | **2** | **6** |

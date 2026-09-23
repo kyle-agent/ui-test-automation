@@ -1,0 +1,56 @@
+id: networking.vpc-port
+title: VPC → Subnet → Port 생성 후 역순 삭제
+service: VPC
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브, VPC·Subnet 이 있는 상태): Port 목록 #/vpc/port/list, 버튼 "Port 생성" / 상단 "삭제"(행 선택 후).
+# 폼: "VPC명"(드롭다운), "Subnet명"(드롭다운, 항목 텍스트 "sub-… (10.250.0.0/24)"), "Port명"(영문·숫자·- 로 3~20자), "IP 할당 방식"(자동 할당 기본),
+# "설명"(50자), Security Group 사용(체크). VPC·Subnet·Port명을 채우면 "생성" 이 활성화된다. 서버에 붙이지 않은 Port 는 무과금.
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}} 를 {{vpc_cidr}} 로 생성한다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      vpc_cidr: "10.250.0.0/20"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+
+  - goal: "Subnet {{subnet}} 을 {{subnet_cidr}} 로 생성하고 Active 를 기다린다"
+    vars:
+      subnet: "sub-{{run_id}}"
+      subnet_cidr: "10.250.0.0/24"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "Port {{name}} 을 {{subnet}} 에 자동 할당 IP 로 생성한다"
+    vars:
+      name: "port-{{run_id}}"
+    expect:
+      url: "#/vpc/port/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "Port {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 180000
+  - goal: "Subnet {{subnet}} 을 삭제한다"
+    expect:
+      not_text: ["{{subnet}}"]
+      timeout: 1200000
+  - goal: "VPC {{vpc}} 를 해지한다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 180000

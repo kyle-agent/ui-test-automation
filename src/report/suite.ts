@@ -13,4 +13,5 @@ export const SUITE_ORDER: readonly string[] = [
   'management.resource-group',
   'iam.user-group',
   'compute.launch-configuration',
+  'networking.vpc-port', // VPC → Subnet → Port (≈10분)
 ];
