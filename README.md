@@ -147,7 +147,9 @@ npm run stacks:cleanup                     # 실패로 남은 리소스를 의�
 
 ```bash
 npm run coverage             # service-map/coverage.yaml 을 서비스 맵과 맞춰 검증하고 level 별 수치·카테고리 표 출력 (--md 로 Markdown)
-npm run results              # reports/runs/*.json → reports/RESULTS.md (spec 별 최근 상태, 최근 실패, 알려진 이슈, 커버리지)
+npm run results              # reports/runs/*.json → reports/RESULTS.md + reports/dashboard.html (spec 별 최근 상태, 실행 기록, 알려진 이슈, 커버리지, 탐색)
+npm run dashboard            # 위와 같고 만든 뒤 reports/dashboard.html 을 기본 브라우저로 연다
+npx tsx scripts/run-record-import.ts --spec <id> --json <playwright json> --rm   # 런처 없이 직접 돌린 결과(JSON 리포터)를 실행 기록으로 변환
 ```
 
 - **`service-map/coverage.yaml`**: 모집단은 `screens.txt` 의 "리소스 키가 붙은 목록 화면"(`… | /x/y/list (key)`, 80개)이고 한 줄이 리소스 하나다.
@@ -160,6 +162,9 @@ npm run results              # reports/runs/*.json → reports/RESULTS.md (spec 
   알려진 이슈에 맞으면 그 항목의 kind 와 `known_issue`). stdout 은 넣지 않는다.
 - **`reports/RESULTS.md`**: `npm run results` 가 만드는 생성 파일. spec 별 마지막 실행·결과·소요·최근 5회(`PPFPP`)·통과 평균, 최근 실패, 적용된 알려진 이슈, 커버리지 요약.
   기록이 없으면 "기록 없음". 스위트를 돌린 뒤 `npm run results` 로 다시 만든다.
+- **`reports/dashboard.html`**: 같은 명령이 함께 만드는 브라우저용 대시보드(`src/report/dashboard.ts`, 외부 요청 없는 HTML 한 파일). 요약 카드(녹색 spec 수·통과율·L2+ 비율), 날짜별 통과/실패 막대,
+  spec 별 최근 10회 점, 실행 기록(실패/환경/통과 필터, 실패 단계·오류·첨부 경로), 카테고리별 level 막대와 리소스별 level 표(level 필터), Jev 탐색 목록(이상·정보·비용), 알려진 이슈.
+  `npm run dashboard` 로 열거나 파일을 더블클릭한다. 커밋 대상(결과 공유용).
 - **`data/known-issues.yaml`**: 알려진 이슈(id `KI-000` 형식, `spec` 또는 `*`, 오류 메시지 정규식 `match`, `kind` product|test|environment, `since`, `note`, 선택 `expires`·`enabled`).
   매칭된 실패는 숨기지 않고 `FAIL(known: KI-xxx)` 로 표시한다. 지금은 형식을 보여 주는 비활성 예시(`KI-000`)만 있다.
 
@@ -179,6 +184,9 @@ MSYS_NO_PATHCONV=1 npm run explore -- --route '#/vpc/vpc/list' --open '서비스
 - 파일럿(2026-09-23, VPC 생성 폼): 결정 11회·20회, 비용 $0.0014·$0.0025, 이상 0, 검증 문구 2·6건, 생성 확정·취소·화면 이동 모달 처리.
 - 옵션: `--prereq vpc[,subnet]` 은 탐색 전에 선행 리소스를 만들고(Subnet 폼은 VPC 가 있어야 드롭다운이 채워진다) 끝나면 run_id 이름의 리소스를 자동 정리한다(`--no-cleanup` 으로 끔).
   드롭다운을 열면 아직 고르지 않은 항목을 코드가 이어서 고른다(보고서의 입력 열에 `→ 항목`).
+- 여러 건을 직렬로: `npx tsx scripts/explore-batch.ts --plan plans/explore-default.json` (항목마다 explore 인자; 한 건이 실패해도 계속). 기본 plan 은 Subnet 폼(선행 VPC)·VM 폼(선행 VPC+Subnet)·VPC 목록·Server Group 폼.
+  오래 걸리므로 Windows 에선 PowerShell `Start-Process cmd -ArgumentList '/c', 'cd /d C:\jev\scp-console-tests && set NODE_OPTIONS=… && npx tsx scripts/explore-batch.ts --plan … > log 2>&1'` 처럼 분리해 띄운다.
+  결과는 `npm run results` 가 대시보드 "탐색" 절에 모은다.
 
 **발견 → 단언 승격 절차** (탐색이 커버리지로 환류되는 경로)
 

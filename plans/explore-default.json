@@ -1,0 +1,55 @@
+[
+  {
+    "name": "subnet-form",
+    "args": [
+      "--route",
+      "#/vpc/subnet/list",
+      "--open",
+      "Subnet 생성",
+      "--prereq",
+      "vpc",
+      "--budget",
+      "30",
+      "--cost",
+      "0.05",
+      "--minutes",
+      "10"
+    ]
+  },
+  {
+    "name": "vm-form",
+    "args": [
+      "--route",
+      "#/virtualserver/virtualserver/list",
+      "--open",
+      "서비스 생성",
+      "--prereq",
+      "vpc,subnet",
+      "--budget",
+      "35",
+      "--cost",
+      "0.06",
+      "--minutes",
+      "14"
+    ]
+  },
+  {
+    "name": "vpc-list",
+    "args": ["--route", "#/vpc/vpc/list", "--budget", "20", "--cost", "0.03", "--minutes", "6"]
+  },
+  {
+    "name": "sgrp-form",
+    "args": [
+      "--route",
+      "#/virtualserver/server-group/list",
+      "--open",
+      "Server Group 생성",
+      "--budget",
+      "20",
+      "--cost",
+      "0.03",
+      "--minutes",
+      "6"
+    ]
+  }
+]

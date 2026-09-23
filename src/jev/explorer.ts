@@ -154,11 +154,21 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
     if (Date.now() - started > timeCap) return stop('시간 예산 소진');
     if (report.totals.cost > costCap) return stop('비용 예산 소진');
     await settleConsole(page, { appearGraceMs: 500 });
-    // 허용 라우트를 벗어났으면 되돌린다
-    if (!page.url().includes(`#${prefix}`)) {
+    // 허용 라우트를 벗어났으면 되돌린다. --open 으로 연 폼이면 폼 화면(homeUrl) 자체를 벗어난 것도 이탈로 본다
+    // (예: Subnet 폼에서 왼쪽 메뉴 "VPC" 를 눌러 VPC 목록으로 간 경우 — 폼으로 돌아와야 탐색이 이어진다).
+    const drifted = opened
+      ? page.url().split('?')[0] !== homeUrl.split('?')[0]
+      : !page.url().includes(`#${prefix}`);
+    if (drifted) {
       log(`  라우트 이탈 (${page.url().slice(-60)}) → 되돌림`);
       await page.goto(homeUrl, { waitUntil: 'domcontentloaded' }).catch(() => undefined);
       await settleConsole(page, { appearGraceMs: 800 });
+      if (opened && page.url().split('?')[0] !== homeUrl.split('?')[0]) {
+        // 폼 URL 로 직접 못 들어가는 콘솔이면 목록에서 다시 연다
+        await gotoRoute(page, route);
+        await page.getByRole('button', { name: opened, exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+      }
     }
     let state: PageState;
     try {

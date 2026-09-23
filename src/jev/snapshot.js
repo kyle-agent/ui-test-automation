@@ -27,6 +27,10 @@
   const everything = deepAll(document);
   const deepQuery = (sel) => everything.filter((e) => e.matches(sel));
   const safe = (e) => !['password', 'file', 'hidden'].includes(e.type);
+  // 화면 골격(상단 바·왼쪽 메뉴·빵부스러기)은 탐색 대상이 아니다: 눌러 봐야 다른 화면으로 나갈 뿐이다 (SCP 콘솔: .scp-breadcrumb, .scp-con-header 의 링크).
+  const CHROME =
+    'header,nav,aside,[role="navigation"],[role="banner"],.scp-breadcrumb,.scp-con-header-breadcrumb,[class*="lnb"],[class*="gnb"],[class*="sidebar"],[class*="side-nav"]';
+  const chrome = (e) => !!e.closest(CHROME);
   const visible = (e) =>
     !e.closest('[aria-hidden="true"],[inert]') &&
     e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
@@ -199,6 +203,7 @@
   let occluded = 0;
   for (const e of deepQuery(selector)) {
     if (!safe(e) || !visible(e) || e.matches(':disabled') || e.closest('[aria-disabled="true"]')) continue;
+    if (chrome(e)) continue;
     const r = e.getBoundingClientRect(),
       rname = role(e);
     if (!rname || !inViewport(r)) continue;
@@ -254,6 +259,7 @@
     if (pointerCount >= 120) break;
     if (!e.matches('div,span,li,td,p,label,i,img,svg')) continue;
     if (!visible(e) || e.closest('[aria-disabled="true"],[inert]') || !pointerLike(e)) continue;
+    if (chrome(e)) continue;
     const r = e.getBoundingClientRect();
     if (!inViewport(r)) continue;
     if (!reachable(e, r)) {
