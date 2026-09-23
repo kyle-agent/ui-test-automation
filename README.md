@@ -118,6 +118,28 @@ npm run record -- scenarios/networking/vpc-create-delete.yaml --base-url "file:/
 CONSOLE_URL="file:///$PWD/tests/fixtures/fake-vpc.html?mode=iframe" CONSOLE_BASE_PATH= RUN_DESTRUCTIVE=1 npx playwright test --project=regression
 ```
 
+### 5. 회귀 스택 스위트 한 번에 돌리기 (실제 콘솔, 과금 리소스 생성·삭제)
+
+```bash
+npm run stacks:check                       # 남은 테스트 리소스와 VPC 개수(계정 한도 5) 점검. 변경 없음
+npm run test:stacks                        # 아래 순서로 spec 을 하나씩 직렬 실행 (약 45분). 별도 터미널에서
+npm run test:stacks -- --only vm-volume    # 일부만 (콤마 구분). --from vm-stack 은 그 spec 부터
+npm run stacks:cleanup                     # 실패로 남은 리소스를 의존관계 역순으로 정리 (이름 규칙에 맞는 것만)
+```
+
+| 순서 | spec | 만드는 것 | 소요(실측) |
+| --- | --- | --- | --- |
+| 1 | `networking.vpc.create-delete` | VPC | 약 20초 |
+| 2 | `compute.vm-stack` | VPC → Subnet → 서버 (Keypair 는 공유 `qa-shared-keypair` 재사용) | 약 12분 |
+| 3 | `compute.vm-volume` | 2 + 볼륨 생성·연결·분리·삭제 | 약 16분 |
+| 4 | `compute.vm-stack-net` | 2 + Security Group·Internet Gateway·Public IP 연결 | 약 15분 |
+
+- **직렬이어야 하는 이유**: 계정당 VPC 5개 한도, 로그인 브라우저 하나를 공유(탭 순서), 한 spec 이 만든 리소스를 그 spec 의 afterEach 가 지운다. `PW_CDP_URL` 이 있으면 워커는 이미 1이지만
+  Playwright 는 파일 순서를 보장하지 않으므로 런처(`scripts/run-stacks.ts`)가 spec 을 한 개씩 순서대로 띄운다. 하나가 실패해도 다음 spec 은 새 run_id 로 독립 실행된다.
+- 각 spec 은 실패해도 afterEach 에서 역순 정리를 끝까지 시도하고, 못 지운 것을 "정리 중 실패" 로 보고한다. 그때는 `npm run stacks:check` → `npm run stacks:cleanup`.
+- 시간이 오래 걸리는 대기: Subnet Active 최대 15분(IGW 가 붙은 VPC 는 5분 이상), 서버를 담았던 Subnet 삭제 약 6분, 볼륨 연결·분리 각 약 30초.
+- 콘솔 세션은 몇 시간~하루 뒤 만료된다(SSO 재로그인 필요). 브라우저 크래시는 `connectLiveBrowser` 가 자동 재기동하지만 세션 만료는 사람이 로그인해야 한다.
+
 ### 세션 없이 되는 것 (클라우드/CI)
 
 ```bash
