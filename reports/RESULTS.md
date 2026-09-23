@@ -1,21 +1,31 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-23 17:00, 실행 기록 1건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-23 18:08, 실행 기록 11건.
 
 ## 1. spec 별 최근 상태
 
 | spec | 마지막 실행 | 결과 | 소요 | 최근 5회 | 통과 평균 |
 | --- | --- | --- | ---: | --- | ---: |
-| networking.vpc.create-delete | 2026-09-23 17:00 | PASS | 41초 | P | 41초 |
-| compute.vm-stack | 기록 없음 | - | - | - | - |
-| compute.vm-volume | 기록 없음 | - | - | - | - |
-| compute.vm-stack-net | 기록 없음 | - | - | - | - |
+| networking.vpc.create-delete | 2026-09-23 17:09 | PASS | 42초 | PP | 42초 |
+| compute.vm-stack | 2026-09-23 17:09 | PASS | 13분 2초 | P | 13분 2초 |
+| compute.vm-volume | 2026-09-23 17:22 | PASS | 15분 27초 | P | 15분 27초 |
+| compute.vm-stack-net | 2026-09-23 17:38 | FAIL(unclassified) | 16분 29초 | F | - |
+| compute.server-group | 기록 없음 | - | - | - | - |
+| security.address-group | 기록 없음 | - | - | - | - |
+| storage.object-storage-bucket | 2026-09-23 17:40 | PASS | 1분 9초 | FP | 1분 9초 |
+| management.resource-group | 2026-09-23 18:00 | PASS | 52초 | P | 52초 |
+| iam.user-group | 2026-09-23 18:01 | PASS | 53초 | P | 53초 |
+| compute.launch-configuration | 2026-09-23 18:05 | PASS | 1분 25초 | FP | 1분 25초 |
 
 실행 기록은 `npm run test:stacks` 가 spec 하나를 마칠 때마다 `reports/runs/<YYYYMMDD-HHMM>-<spec id>.json` 으로 남긴다. 결과의 FAIL(class) 는 실패 분류(unclassified/environment/product/test), FAIL(known: KI-xxx) 는 알려진 이슈에 매칭된 실패.
 
 ## 2. 최근 실패 (최대 10건)
 
-최근 실패 없음
+| 실행 | spec | class | 오류 | 첨부 |
+| --- | --- | --- | --- | --- |
+| 2026-09-23 18:02 | compute.launch-configuration | unclassified | TimeoutError: locator.click: Timeout 15000ms exceeded. | `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-8.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-4.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-3.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-2.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-1.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-5.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-6.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-7.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/screenshot-simple-crud.ts.png`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/error-context.md`, `test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/trace.zip` |
+| 2026-09-23 17:38 | compute.vm-stack-net | unclassified | Error: 정리 중 실패 (남은 리소스를 확인하세요): | `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/screenshot-compute.vm-stack-net.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-2.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-4.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-3.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-1.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-6.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-5.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/test-failed-7.png`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/error-context.md`, `test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/trace.zip` |
+| 2026-09-23 17:37 | storage.object-storage-bucket | unclassified | TimeoutError: locator.click: Timeout 15000ms exceeded. | `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/screenshot-simple-crud.ts.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-6.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-2.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-4.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-1.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-3.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-7.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/test-failed-5.png`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/error-context.md`, `test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/trace.zip` |
 
 ## 3. 알려진 이슈
 
@@ -29,17 +39,17 @@ level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 
 
 - 서비스 89 · 화면 276 (Service Home 83, 그 외 193) · 스모크 진입 282
 - 목록 화면 100, 그중 리소스 키 있음 80 = 장부 리소스 80개
-- level ≥ 2 (CRUD 이상): **7/80** (9%) · level ≥ 3 (동작 이상): **7/80** (9%)
+- level ≥ 2 (CRUD 이상): **13/80** (16%) · level ≥ 3 (동작 이상): **7/80** (9%)
 
 | 카테고리 | 리소스 | L1 | L2 | L3 | L4 |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | AI-ML | 3 | 3 | 0 | 0 | 0 |
-| Compute | 14 | 12 | 0 | 1 | 1 |
+| Compute | 14 | 10 | 2 | 1 | 1 |
 | Data Analytics | 3 | 3 | 0 | 0 | 0 |
 | Database | 6 | 6 | 0 | 0 | 0 |
 | Financial Management | 1 | 1 | 0 | 0 | 0 |
-| Management | 8 | 8 | 0 | 0 | 0 |
-| Networking | 30 | 25 | 0 | 1 | 4 |
+| Management | 8 | 6 | 2 | 0 | 0 |
+| Networking | 30 | 24 | 1 | 1 | 4 |
 | Security | 7 | 7 | 0 | 0 | 0 |
-| Storage | 8 | 8 | 0 | 0 | 0 |
-| **합계** | **80** | **73** | **0** | **2** | **5** |
+| Storage | 8 | 7 | 1 | 0 | 0 |
+| **합계** | **80** | **67** | **6** | **2** | **5** |

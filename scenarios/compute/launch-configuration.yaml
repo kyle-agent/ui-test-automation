@@ -1,0 +1,32 @@
+id: compute.launch-configuration
+title: Launch Configuration 생성 후 삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-23 프로브): 목록 #/virtualserver/launch-configuration/list, 버튼 "Launch Configuration 생성" / 상단 "삭제"(행 선택 후).
+# 폼: 이미지(기본 표준 Alma 9.6 선택됨), "Launch Configuration명"(영문·숫자·-_ 63자), "서비스 유형"(Standard-1 …) → "서버 타입", Block Storage 기본 OS(SSD_Provisioned 기본),
+# "Keypair명"(qa-shared-keypair). 선행 리소스: 공유 Keypair 만. 서버를 만들지 않으므로 무과금.
+steps:
+  - goal: "Launch Configuration 목록으로 이동한다"
+    goto: "#/virtualserver/launch-configuration/list"
+    expect:
+      url: "#/virtualserver/launch-configuration/list"
+
+  - goal: "Launch Configuration {{name}} 을 생성한다 (Standard-1, 첫 서버 타입, qa-shared-keypair)"
+    vars:
+      name: "lc-{{run_id}}"
+    expect:
+      url: "#/virtualserver/launch-configuration/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "Launch Configuration {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

@@ -36,7 +36,8 @@
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run format:check && npm run test:unit",
     "record": "tsx scripts/record.ts",
-    "jev:ping": "tsx scripts/jev-ping.ts"
+    "jev:ping": "tsx scripts/jev-ping.ts",
+    "dashboard": "tsx scripts/results.ts --open"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

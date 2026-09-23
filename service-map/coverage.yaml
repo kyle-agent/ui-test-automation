@@ -241,10 +241,10 @@ resources:
     service: "IAM"
     category: "Management"
     route: /iam/group/list
-    level: 1
-    specs: [smoke.iam]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.iam, iam.user-group]
+    last_pass: "2026-09-23"
+    note: "사용자 그룹 생성(이름·설명만) → 목록 확인 → 삭제. Global 화면, 무과금"
   - key: saml-provider
     service: "IAM"
     category: "Management"
@@ -401,10 +401,10 @@ resources:
     service: "Resource Groups"
     category: "Management"
     route: /resourcegroups/resource-group/list
-    level: 1
-    specs: [smoke.resource-groups]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.resource-groups, management.resource-group]
+    last_pass: "2026-09-23"
+    note: "생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금"
   - key: lastmile
     service: "SASE"
     category: "Networking"
@@ -513,10 +513,10 @@ resources:
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/launch-configuration/list
-    level: 1
-    specs: [smoke.virtual-server]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.virtual-server, compute.launch-configuration]
+    last_pass: "2026-09-23"
+    note: "Standard-1/s1v1m2, 기본 OS 디스크 SSD(SSD_Provisioned 는 IOPS·Throughput 필수), 공유 Keypair. 서버를 만들지 않아 무과금"
   - key: server-group
     service: "Virtual Server"
     category: "Compute"

@@ -10,4 +10,7 @@ export const SUITE_ORDER: readonly string[] = [
   'compute.server-group', // ≈1분. Server Group 생성·삭제 (선행 리소스 없음)
   'security.address-group', // ≈1분. Address Group 생성·삭제 (선행 리소스 없음)
   'storage.object-storage-bucket', // 전제: 계정에 Object Storage 인증키 1개 (2026-09-23 생성)
+  'management.resource-group',
+  'iam.user-group',
+  'compute.launch-configuration',
 ];

@@ -211,8 +211,19 @@ export async function waitForRow(
   for (;;) {
     if (!page.url().includes(`#${route.replace(/^#/, '')}`)) await gotoRoute(page, route);
     const r = row(page, name);
-    const count = await r.count();
-    const text = count ? (await r.first().innerText()).replace(/\s+/g, ' ').trim() : '';
+    let count = await r.count();
+    // 행이 읽는 사이에 사라질 수 있다(반납·삭제 직후 목록 갱신) → 짧게 기다리고, 못 읽으면 "행 없음" 으로 다시 센다.
+    const text = count
+      ? (
+          await r
+            .first()
+            .innerText({ timeout: 5_000 })
+            .catch(() => '')
+        )
+          .replace(/\s+/g, ' ')
+          .trim()
+      : '';
+    if (count && !text) count = await r.count();
     const ok = opts.gone ? count === 0 : opts.status ? opts.status.test(text) : count > 0;
     if (ok) return;
     const elapsed = Math.round((Date.now() - start) / 1000);

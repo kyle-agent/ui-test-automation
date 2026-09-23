@@ -3,7 +3,9 @@
  *   npm run results
  * 내용: spec 별 최근 상태 표(마지막 실행·PASS/FAIL·소요·최근 5회·통과 평균), 최근 실패, 적용된 알려진 이슈,
  * 커버리지 요약(scripts/coverage.ts --md 와 같음). 콘솔·브라우저 없이 돈다. 기록이 없으면 spec 마다 "기록 없음" 으로 채운다.
+ * 같은 입력으로 reports/dashboard.html (브라우저용, 자체 완결 HTML) 도 만든다. --open 이면 만든 뒤 기본 브라우저로 연다.
  */
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -14,12 +16,14 @@ import {
   summarizeCoverage,
   validateCoverage,
 } from '../src/report/coverage';
+import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
 import { loadKnownIssues } from '../src/report/known-issues';
 import { failuresTable, fmtTime, knownIssuesSection, resultsTable } from '../src/report/results';
 import { readRunRecords, RUNS_DIR } from '../src/report/run-record';
 import { SUITE_ORDER } from '../src/report/suite';
 
 const RESULTS_MD = path.resolve(process.cwd(), 'reports', 'RESULTS.md');
+const DASHBOARD_HTML = path.resolve(process.cwd(), 'reports', 'dashboard.html');
 
 function main(): void {
   const records = readRunRecords();
@@ -67,9 +71,33 @@ function main(): void {
   out.push('');
   fs.mkdirSync(path.dirname(RESULTS_MD), { recursive: true });
   fs.writeFileSync(RESULTS_MD, out.join('\n'));
+  const explores = readExploreSummaries();
+  fs.writeFileSync(
+    DASHBOARD_HTML,
+    renderDashboardHtml({
+      generated: fmtTime(new Date().toISOString()),
+      records,
+      suiteOrder: SUITE_ORDER,
+      coverage: errors.length ? null : summarizeCoverage(ledger, map),
+      coverageErrors: errors,
+      entries: ledger.resources,
+      issues,
+      explores,
+    }),
+  );
   console.log(
     `${path.relative(process.cwd(), RESULTS_MD)} 갱신: 실행 기록 ${records.length}건 (${path.relative(process.cwd(), RUNS_DIR)}), 커버리지 ${errors.length ? '검증 실패' : 'OK'}`,
   );
+  console.log(`${path.relative(process.cwd(), DASHBOARD_HTML)} 갱신: 탐색 보고서 ${explores.length}건`);
+  if (process.argv.includes('--open')) {
+    const cmd =
+      process.platform === 'win32'
+        ? ['cmd', ['/c', 'start', '', DASHBOARD_HTML]]
+        : process.platform === 'darwin'
+          ? ['open', [DASHBOARD_HTML]]
+          : ['xdg-open', [DASHBOARD_HTML]];
+    spawn(cmd[0] as string, cmd[1] as string[], { detached: true, stdio: 'ignore' }).unref();
+  }
   if (errors.length) process.exitCode = 1;
 }
 

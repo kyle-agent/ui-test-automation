@@ -19,12 +19,15 @@ export const ROUTES = {
   sgrp: '#/virtualserver/server-group/list',
   bkt: '#/objectstorage/objectstorage/list',
   addr: '#/securitygroup/addressgroup/list',
+  rg: '#/resourcegroups/resource-group/list',
+  grp: '#/iam/group/list',
+  lc: '#/virtualserver/launch-configuration/list',
 } as const;
 
 export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
-const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+const TEST_NAME = /^(vm|sub|vpc|vol|sg|sgrp|bkt|addr|rg|grp|lc)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -62,7 +65,21 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
   return { leftovers, vpcTotal };
 }
 
-const ORDER: Kind[] = ['vm', 'pip', 'igw', 'volume', 'subnet', 'vpc', 'sg', 'sgrp', 'bkt', 'addr'];
+const ORDER: Kind[] = [
+  'vm',
+  'pip',
+  'igw',
+  'volume',
+  'subnet',
+  'vpc',
+  'sg',
+  'sgrp',
+  'bkt',
+  'addr',
+  'rg',
+  'grp',
+  'lc',
+];
 
 /** 남은 리소스를 의존관계 역순으로 지운다. 실패한 항목은 모아서 돌려준다. */
 export async function cleanupLeftovers(
@@ -138,7 +155,10 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       return;
     case 'sgrp':
     case 'addr':
-      // 행 선택 → 상단 "삭제" (Server Group, Address Group)
+    case 'rg':
+    case 'grp':
+    case 'lc':
+      // 행 선택 → 상단 "삭제" (Server Group, Address Group, Resource Group, IAM 사용자 그룹, Launch Configuration)
       await selectRow(page, item.name);
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제/, '확인', { agree: true });

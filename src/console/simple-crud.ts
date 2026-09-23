@@ -40,6 +40,8 @@ export interface SimpleCrudConfig {
   deleteButton?: string;
   deleteConfirmText?: RegExp;
   tags?: string[];
+  /** 폼을 채운 뒤 '생성' 을 누르기 전 추가 동작 (예: key/value 태그 입력 후 '태그 추가') */
+  beforeSubmit?: (page: Page, vars: Record<string, string>) => Promise<void>;
   /** 생성 후 삭제 전 추가 검증·동작 (예: 상세 화면 확인) */
   afterCreate?: (page: Page, vars: Record<string, string>) => Promise<void>;
   /** 환경 전제가 안 갖춰져 실행할 수 없을 때(예: Object Storage 는 인증키 필요) 사유와 함께 건너뛴다 */
@@ -86,7 +88,10 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
             await selectRow(page, vars.name!);
             await topButton(page, deleteButton).click();
           }
-          await confirmModal(page, config.deleteConfirmText ?? /삭제|해지/, '확인', { agree: true, resourceName: vars.name });
+          await confirmModal(page, config.deleteConfirmText ?? /삭제|해지/, '확인', {
+            agree: true,
+            resourceName: vars.name,
+          });
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
           await waitForRow(page, config.route, vars.name!, {
             gone: true,
@@ -117,6 +122,7 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
             await fillField(page, f.label, fill(f.value, vars), { selector: f.selector });
           for (const d of config.dropdowns ?? []) await pickOption(page, d.label, d.option);
           for (const c of config.checkboxes ?? []) await setCheckbox(page, c.label, c.checked);
+          if (config.beforeSubmit) await config.beforeSubmit(page, vars);
           await submitForm(page, '생성');
           await confirmModal(page, config.confirmText ?? /생성|신청|예약/, '확인', { agree: true });
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);

@@ -1,0 +1,46 @@
+{
+  "spec": "compute.launch-configuration",
+  "started": "2026-09-23T09:05:22.912Z",
+  "ended": "2026-09-23T09:06:47.433Z",
+  "seconds": 85,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.launch-configuration",
+    "run_id": "0923-1805-3ba9",
+    "title": "Launch Configuration 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Launch Configuration 생성 후 삭제",
+      "status": "passed",
+      "seconds": 57.7,
+      "annotations": {
+        "scenario": "compute.launch-configuration",
+        "run_id": "0923-1805-3ba9",
+        "title": "Launch Configuration 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Launch Configuration 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] lc-0923-1805-3ba9 생성",
+          "status": "pass",
+          "seconds": 27.4
+        }
+      ]
+    }
+  ]
+}

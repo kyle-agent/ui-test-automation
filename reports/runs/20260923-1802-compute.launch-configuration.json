@@ -1,0 +1,74 @@
+{
+  "spec": "compute.launch-configuration",
+  "started": "2026-09-23T09:02:02.895Z",
+  "ended": "2026-09-23T09:02:53.888Z",
+  "seconds": 51,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.launch-configuration",
+    "run_id": "0923-1802-b5f3",
+    "title": "Launch Configuration 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Launch Configuration 생성 후 삭제",
+      "status": "failed",
+      "seconds": 32.5,
+      "annotations": {
+        "scenario": "compute.launch-configuration",
+        "run_id": "0923-1802-b5f3",
+        "title": "Launch Configuration 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Launch Configuration 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.3
+        },
+        {
+          "title": "steps[1] lc-0923-1802-b5f3 생성",
+          "status": "fail",
+          "seconds": 22.7
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-8.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/error-context.md",
+        "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-8.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/error-context.md",
+    "test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/trace.zip"
+  ]
+}
