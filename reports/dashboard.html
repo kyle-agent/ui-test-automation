@@ -42,7 +42,7 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 07:51 · 실행 기록 35건 · 마지막 실행 2026-09-28 07:35 compute.vm-stack-net</span>
+  <span class="muted">생성 2026-09-28 08:52 · 실행 기록 35건 · 마지막 실행 2026-09-28 07:35 compute.vm-stack-net</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
@@ -51,7 +51,7 @@
   <div class="cards">
     <div class="card"><div class="k">현재 녹색 spec</div><div class="v">15 <span class="s">/ 15 (스위트 16)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
     <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">80% <span class="s">28/35</span></div><div class="s">실패 분류: unclassified 7</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">23% <span class="s">18/80 리소스</span></div><div class="s">L3+ 11 · 탐색 20회</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">23% <span class="s">18/80 리소스</span></div><div class="s">L3+ 11 · 탐색 26회</div></div>
   </div>
   <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 1 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:2.941176470588235%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
@@ -1276,8 +1276,19 @@
 
 <section>
   <h2>탐색(Level 5, Jev) <small>recordings/explore</small></h2>
-  <p class="muted">탐색 20회 · 이상 0건 · 정보 48건 · 누적 비용 $0.0298 (Level 5, 커버리지 분모에 넣지 않음)</p>
+  <p class="muted">탐색 26회 · 이상 0건 · 정보 76건 · 누적 비용 $0.0407 (Level 5, 커버리지 분모에 넣지 않음)</p>
     <table><thead><tr><th>시각</th><th>이름</th><th>라우트</th><th class="num">결정/동작</th><th class="num">이상</th><th class="num">정보</th><th class="num">비용</th><th>종료 사유</th><th>보고서</th></tr></thead><tbody><tr>
+        <td>2026-09-27 23:37</td>
+        <td>vpc-list</td>
+        <td class="mono small">#/vpc/vpc/list</td>
+        <td class="num">14/14</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0016</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/vpc-list-202609272337/report.md</td>
+      </tr>
+<tr>
         <td>2026-09-23 09:48</td>
         <td>vpc-list</td>
         <td class="mono small">#/vpc/vpc/list</td>
@@ -1298,6 +1309,28 @@
         <td class="num">$0.0000</td>
         <td>시도할 컨트롤이 더 없음</td>
         <td class="mono small">recordings/explore/vpc-list-202609230926/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-27 23:50</td>
+        <td>vpc-form</td>
+        <td class="mono small">#/vpc/vpc/list</td>
+        <td class="num">21/20</td>
+        <td class="num">0</td>
+        <td class="num">19</td>
+        <td class="num">$0.0022</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/vpc-form-202609272350/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-27 23:44</td>
+        <td>vpc-form</td>
+        <td class="mono small">#/vpc/vpc/list</td>
+        <td class="num">7/6</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0008</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/vpc-form-202609272344/report.md</td>
       </tr>
 <tr>
         <td>2026-09-23 07:54</td>
@@ -1355,6 +1388,17 @@
         <td class="mono small">recordings/explore/vm-list-202609230957/report.md</td>
       </tr>
 <tr>
+        <td>2026-09-27 23:29</td>
+        <td>vm-form</td>
+        <td class="mono small">#/virtualserver/virtualserver/list</td>
+        <td class="num">28/28</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0036</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/vm-form-202609272325/report.md</td>
+      </tr>
+<tr>
         <td>2026-09-23 09:41</td>
         <td>vm-form</td>
         <td class="mono small">#/virtualserver/virtualserver/list</td>
@@ -1388,6 +1432,17 @@
         <td class="mono small">recordings/explore/subnet-list-202609231113/report.md</td>
       </tr>
 <tr>
+        <td>2026-09-27 23:22</td>
+        <td>subnet-form</td>
+        <td class="mono small">#/vpc/subnet/list</td>
+        <td class="num">7/5</td>
+        <td class="num">0</td>
+        <td class="num">2</td>
+        <td class="num">$0.0007</td>
+        <td>Jev 가 두 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/subnet-form-202609272322/report.md</td>
+      </tr>
+<tr>
         <td>2026-09-23 09:34</td>
         <td>subnet-form</td>
         <td class="mono small">#/vpc/subnet/list</td>
@@ -1408,6 +1463,17 @@
         <td class="num">$0.0003</td>
         <td>Jev 가 두 번 연속 BLOCKED</td>
         <td class="mono small">recordings/explore/subnet-form-202609230914/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-27 23:39</td>
+        <td>sgrp-form</td>
+        <td class="mono small">#/virtualserver/server-group/list</td>
+        <td class="num">17/16</td>
+        <td class="num">0</td>
+        <td class="num">1</td>
+        <td class="num">$0.0020</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/sgrp-form-202609272339/report.md</td>
       </tr>
 <tr>
         <td>2026-09-23 09:50</td>
