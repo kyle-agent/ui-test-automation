@@ -144,6 +144,7 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
   let staleStreak = 0;
   let lastState: PageState | null = null;
   let inModal = false;
+  const seenErrors = new Set<string>(); // 이미 보고한 검증 오류 ("값 → 문구")
 
   const stop = (reason: string) => {
     report.stop_reason = reason;
@@ -306,7 +307,17 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
       }
     }
 
-    const findings = [...collectors.drain(), ...(await checkPage(page, beforeText))];
+    // 같은 검증 오류가 다음 단계에도 그대로 남아 있으면(입력란을 고치기 전까지) 다시 세지 않는다 — 새로 나타난 항목만 보고한다.
+    const raw = [...collectors.drain(), ...(await checkPage(page, beforeText))];
+    const findings = raw.filter((f) => {
+      if (f.kind !== 'validation-error') return true;
+      const parts = f.detail.split(' | ');
+      const fresh = parts.filter((p) => !seenErrors.has(p));
+      for (const p of parts) seenErrors.add(p);
+      if (!fresh.length) return false;
+      f.detail = fresh.join(' | ');
+      return true;
+    });
     const modal = visibleModal(page);
     const modalText = (await modal.isVisible().catch(() => false))
       ? (await modal.innerText()).replace(/\s+/g, ' ').slice(0, 300)
