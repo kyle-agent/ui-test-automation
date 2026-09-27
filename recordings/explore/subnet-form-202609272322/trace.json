@@ -1,0 +1,134 @@
+{
+  "name": "subnet-form",
+  "route": "#/vpc/subnet/list",
+  "run_id": "0928-0822-e691",
+  "started_at": "2026-09-27T23:22:54.423Z",
+  "ended_at": "2026-09-27T23:23:41.551Z",
+  "stop_reason": "Jev 가 두 번 연속 BLOCKED",
+  "steps": [
+    {
+      "n": 1,
+      "operation": "CLICK",
+      "label": "선택하세요.",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.86,
+      "confidence": 0.89,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "title_after": "Subnet 생성 | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": "vpc-0928-0822-e691 AZ: kr-west1-b",
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "검색어를 입력하세요. 신규 생성 vpc-0928-0822-e691 AZ: kr-west1-b"
+        }
+      ],
+      "screenshot": "screenshots\\01.jpg",
+      "cost": 0.000113946
+    },
+    {
+      "n": 2,
+      "operation": "CLICK",
+      "label": "Open Subnet명",
+      "role": "textbox",
+      "text": null,
+      "why": null,
+      "probability": 0.53,
+      "confidence": 0.42,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "title_after": "Subnet 생성 | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\02.jpg",
+      "cost": 0.00012054
+    },
+    {
+      "n": 3,
+      "operation": "CLICK",
+      "label": "서비스 정보",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.75,
+      "confidence": 0.55,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "title_after": "Subnet 생성 | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\03.jpg",
+      "cost": 0.000110166
+    },
+    {
+      "n": 4,
+      "operation": "CLICK",
+      "label": "취소",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 1,
+      "confidence": 0.55,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/list",
+      "title_after": "Subnet 목록 | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "validation-text",
+          "detail": "총 0 20개씩 보기 삭제 정확한 검색어를 입력하세요. 상세 검색 Subnet ID 생성 일시 상태 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요."
+        }
+      ],
+      "screenshot": "screenshots\\04.jpg",
+      "cost": 0.00010458
+    },
+    {
+      "n": 5,
+      "operation": "TYPE_TEXT",
+      "label": "Subnet명",
+      "role": "textbox",
+      "text": "sub-0928-0822-e691",
+      "why": "유효 이름 (3~20자)",
+      "probability": 1,
+      "confidence": 0.77,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/subnet/request",
+      "title_after": "Subnet 생성 | VPC | kr-west1 | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\05.jpg",
+      "cost": 0.000079548
+    }
+  ],
+  "totals": {
+    "decisions": 7,
+    "actions": 5,
+    "cost": 0.0006984599999999999,
+    "anomalies": 0,
+    "infos": 2
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\""
+  ],
+  "names_used": [
+    "sub-0928-0822-e691"
+  ]
+}

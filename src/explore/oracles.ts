@@ -57,11 +57,23 @@ export async function checkPage(page: Page, beforeText: string): Promise<Finding
   const r = added.match(REJECTED_TEXT);
   if (r) findings.push({ severity: 'info', kind: 'server-rejected', detail: excerpt(added, r.index ?? 0) });
   // 폼이 실제로 거부한 것(오류 스타일이 붙은 입력란·메시지)은 힌트 문구("3~20자로 입력하세요" 는 항상 보인다)와 구분해 validation-error 로 올린다.
+  // 실측(2026-09-28, VPC 폼): 거부된 입력란은 감싸는 div 가 `.scp-textfield.scp-error.scp-dirty` 가 되고 폼 그룹 안에 "입력 조건에 맞지 않습니다." 같은 문구가 붙는다.
   const errorStyled = await page
     .locator(
-      '.scp-form-group-error:visible, .scp-textfield-error:visible, .scp-error-text:visible, [class*="is-error"]:visible, [class*="has-error"]:visible, [aria-invalid="true"]:visible',
+      '.scp-error:visible, .scp-form-group-error:visible, [class*="is-error"]:visible, [class*="has-error"]:visible, [aria-invalid="true"]:visible',
     )
-    .allInnerTexts()
+    .evaluateAll((els) =>
+      els.map((el) => {
+        const group = el.closest('.scp-form-group') ?? el.parentElement ?? el;
+        const input = el.querySelector('input,textarea') as HTMLInputElement | null;
+        const msg = (group.textContent ?? '')
+          .split('\n')
+          .map((s) => s.trim())
+          .filter((s) => /않습니다|없습니다|입력하세요|올바르지|초과|이미/.test(s))
+          .join(' ');
+        return `${input?.value ? `"${input.value.slice(0, 30)}" → ` : ''}${msg || (el.textContent ?? '').trim()}`;
+      }),
+    )
     .catch(() => [] as string[]);
   const styled = errorStyled.map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
   if (styled.length)

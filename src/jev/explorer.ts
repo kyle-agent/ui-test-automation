@@ -222,18 +222,27 @@ export async function exploreScreen(opts: ExploreOptions): Promise<ExploreReport
     }
     report.totals.decisions++;
     report.totals.cost += Number((decision.usage as { cost?: number }).cost ?? 0);
-    const action = candidates.find((a) => a.id === decision.choice) ?? null;
+    let action = candidates.find((a) => a.id === decision.choice) ?? null;
     const prob = decision.probabilities[decision.choice] ?? null;
     log(
       `  #${n + 1} Jev: ${decision.operation}${action ? ` [${action.id}] ${action.role ?? action.kind} "${action.label}"` : ''} (p=${prob === null ? '-' : prob.toFixed(2)}, conf=${decision.confidence.toFixed(2)})`,
     );
     if (decision.operation === 'DONE') return stop('Jev 가 DONE');
     if (decision.operation === 'BLOCKED' || !action) {
-      if (++blocked >= 2) return stop('Jev 가 두 번 연속 BLOCKED');
-      await page.waitForTimeout(1_000);
-      continue;
-    }
-    blocked = 0;
+      // Jev 가 고르지 못해도 아직 안 눌러 본 컨트롤이 남아 있으면 코드가 순서대로 고른다 (두 번 연속이면). 후보가 없을 때만 멈춘다.
+      if (++blocked >= 2) {
+        const fallback = candidates.find((a) => a.kind !== 'scroll' && a.kind !== 'wait') ?? null;
+        if (!fallback) return stop('Jev 가 두 번 연속 BLOCKED (남은 후보 없음)');
+        log(
+          `     Jev BLOCKED ${blocked}회 → 코드가 고름: [${fallback.id}] ${fallback.role ?? fallback.kind} "${fallback.label}"`,
+        );
+        action = fallback;
+        if (blocked >= 6) return stop('Jev 가 여섯 번 연속 BLOCKED');
+      } else {
+        await page.waitForTimeout(1_000);
+        continue;
+      }
+    } else blocked = 0;
 
     // 입력값: 라벨 아래 힌트를 읽어 변형 순서대로
     let text: string | null = null;
