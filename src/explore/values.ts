@@ -26,7 +26,7 @@ export function resourceKind(route: string): string {
   return KIND_BY_ROUTE.find(([re]) => re.test(route))?.[1] ?? 'xp';
 }
 
-export function variationsFor(label: string, hint: string, runId: string, kind: string): Variation[] {
+function variationsRaw(label: string, hint: string, runId: string, kind: string): Variation[] {
   const base = `${kind}-${runId}`;
   const h = hint.replace(/\s+/g, ' ');
   const range = h.match(/(\d+)\s*~\s*(\d+)\s*자/);
@@ -93,4 +93,13 @@ export function variationsFor(label: string, hint: string, runId: string, kind: 
     { value: `한글${fit(base).slice(0, max - 2)}`, why: '한글', expectAccept: false },
     { value: '', why: '빈 값', expectAccept: false },
   ];
+}
+
+/**
+ * 입력 변형 순서: 거부를 기대하는 값(경계·금지 문자·빈 값)을 먼저, 유효한 값을 마지막에. 유효값을 먼저 넣으면 Jev 가 곧바로 생성 을 눌러
+ * 폼을 떠나 버려(2026-09-28 VPC 폼: 6동작 만에 DONE) 검증 규칙을 한 번도 건드리지 못한다. 마지막에 유효값이 들어가므로 제출 흐름은 그대로다.
+ */
+export function variationsFor(label: string, hint: string, runId: string, kind: string): Variation[] {
+  const all = variationsRaw(label, hint, runId, kind);
+  return [...all.filter((v) => !v.expectAccept), ...all.filter((v) => v.expectAccept)];
 }
