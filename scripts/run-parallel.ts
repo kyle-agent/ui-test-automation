@@ -102,7 +102,8 @@ async function main(): Promise<void> {
       results.push(await runOne(spec, env));
       await next();
     };
-    for (let i = 0; i < Math.min(max, queue.length); i++) running.push(next());
+    const workers = Math.min(max, queue.length); // queue 가 줄어들기 전에 개수를 고정한다 (아니면 절반만 뜬다)
+    for (let i = 0; i < workers; i++) running.push(next());
     await Promise.all(running);
   } finally {
     if (shared && !keepShared) {
