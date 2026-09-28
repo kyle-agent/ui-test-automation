@@ -71,6 +71,7 @@ test.describe('시나리오 로더', () => {
     expect(vars).toEqual({
       run_id: '0921-1305-ab12',
       run_id_compact: '09211305ab12',
+      run_id_alpha: 'ajcbbdafabbc',
       name: 'qa-vm-0921-1305-ab12',
     });
     expect(resolveVars(sc.teardown[0]!.goal, vars)).toBe('qa-vm-0921-1305-ab12 삭제');

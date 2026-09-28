@@ -43,8 +43,8 @@ const TEST_NAME =
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
 const TEST_HZ = /^hz-\d{4}-\d{4}-[0-9a-f]{4}\.[a-z.]+$/;
-/** PostgreSQL 클러스터명은 pgc<run_id 숫자·hex> (영문·숫자만 허용) */
-const TEST_PG = /^pgcd{8}[0-9a-f]{4}$/;
+/** PostgreSQL 클러스터명은 pgc<run_id_alpha> (영문만 허용) */
+const TEST_PG = /^pgc[a-z]{12}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {

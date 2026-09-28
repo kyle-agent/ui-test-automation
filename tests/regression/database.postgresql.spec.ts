@@ -145,6 +145,8 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await fillField(page, '서버명 prefix', vars.prefix!);
       await fillField(page, '클러스터명', vars.name!);
       await uncheck(page, '이중화 구성');
+      // Block Storage 'DATA' 용량은 기본 0GB 라 필수 입력 (요약에 '추가(DATA) SSD | 0GB', 생성 비활성 — 2026-09-28 프로브)
+      await fillField(page, 'DATA', '16');
       await pickOption(page, 'VPC명', new RegExp(vars.vpc!));
       await page.waitForTimeout(800);
       await pickOption(page, 'Subnet명', new RegExp(vars.subnet!));
