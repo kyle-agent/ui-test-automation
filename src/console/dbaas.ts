@@ -37,6 +37,8 @@ export interface DbaasConfig {
   dropdowns?: { label: string; option: string | RegExp }[];
   /** 끌 체크박스 라벨 (기본: 이중화 구성, 백업, Audit Log 설정, ServiceWatch 로그 수집, 유지 관리 기간) */
   uncheck?: string[];
+  /** 폼 맨 위 이미지 종류 드롭다운에서 고를 항목 (예: Search Engine 의 OpenSearch). 기본은 첫 값 유지 */
+  imageOption?: RegExp;
   /** 켤 체크박스 라벨 (예: EPAS 'License' 확인) */
   check?: string[];
   /** 비밀번호 입력란 수 (기본 2: 비밀번호 + 확인) */
@@ -166,6 +168,18 @@ export function defineDbaasSpec(config: DbaasConfig): void {
           await openCreateForm(page, config.route, config.createButton ?? '서비스 생성');
           await page.getByText(config.readyLabel).first().waitFor({ timeout: 60_000 });
           await page.waitForTimeout(1_500);
+          if (config.imageOption) {
+            // 이미지 종류: 폼 맨 위 첫 드롭다운 (라벨 없음; 헤더의 리전 드롭다운은 뺀다)
+            const dd = page
+              .locator('.scp-dropdown:visible')
+              .filter({ hasNotText: /한국 서부/ })
+              .first();
+            await dd.click();
+            const menu = page.locator('.scp-menu:visible').last();
+            await menu.waitFor({ timeout: 5_000 });
+            await menu.locator('.scp-menu-item').filter({ hasText: config.imageOption }).first().click();
+            await page.waitForTimeout(1_000);
+          }
           for (const f of config.fields)
             await fillField(page, f.label, fillVars(f.value, vars), { selector: f.selector });
           for (const label of config.uncheck ?? ['이중화 구성']) await uncheck(page, label);

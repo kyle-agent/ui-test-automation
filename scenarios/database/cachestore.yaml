@@ -1,0 +1,44 @@
+id: database.cachestore
+title: VPC → Subnet → CacheStore(Redis) 단일 서버 생성 후 역순 해지
+service: CacheStore(DBaaS)
+category: Database
+tags: [regression, destructive, crud, stack, heavy]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-28 프로브): Redis OSS Sentinel 7.2 기본. 필드: 서버명 prefix·클러스터명(영문만)·DATA GB·고가용성(끔)·VPC/Subnet·백업(끔)·Redis Port·Redis 비밀번호 2회·ServiceWatch(끔). Database명/사용자명 없음.
+# 목록엔 해지 버튼이 없고 상세 "서비스 해지". 시간 과금 → 생성 확인 즉시 해지. 공유 VPC(SHARED_VPC/SHARED_SUBNET) 채택 가능.
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}} 와 Subnet {{subnet}} 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "CacheStore(Redis) 클러스터 {{name}} (서버 prefix {{prefix}}) 을 단일 서버로 생성하고 Active 를 기다린다"
+    vars:
+      name: "rdc{{run_id_alpha}}"
+      prefix: "r{{run_id_compact}}"
+    expect:
+      url: "#/cachestore/cachestore/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 1800000
+  - goal: "Subnet, VPC 를 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000
