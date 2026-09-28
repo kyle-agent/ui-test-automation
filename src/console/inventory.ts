@@ -9,6 +9,8 @@ import { settleConsole } from './overlays';
 import { confirmModal, row, selectRow, terminateServer, topButton, waitForRow } from './ui';
 
 export const ROUTES = {
+  ske: '#/ske/cluster',
+  pg: '#/postgresql/postgresql/list',
   asg: '#/virtualserver/auto-scaling-group/list',
   vm: '#/virtualserver/virtualserver/list',
   pip: '#/vpc/public-ip/list',
@@ -36,11 +38,13 @@ export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
 const TEST_NAME =
-  /^(asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+  /^(ske|asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
 const TEST_HZ = /^hz-\d{4}-\d{4}-[0-9a-f]{4}\.[a-z.]+$/;
+/** PostgreSQL 클러스터명은 pgc<run_id 숫자·hex> (영문·숫자만 허용) */
+const TEST_PG = /^pgcd{8}[0-9a-f]{4}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -72,15 +76,17 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
         continue;
       }
       const name = words.find((w) =>
-        kind === 'nat'
-          ? /^sub-d{4}-d{4}-[0-9a-f]{4}$/.test(w)
-          : kind === 'igw'
-            ? TEST_IGW.test(w)
-            : kind === 'fs'
-              ? TEST_FS.test(w)
-              : kind === 'hz'
-                ? TEST_HZ.test(w)
-                : TEST_NAME.test(w),
+        kind === 'pg'
+          ? TEST_PG.test(w)
+          : kind === 'nat'
+            ? /^sub-d{4}-d{4}-[0-9a-f]{4}$/.test(w)
+            : kind === 'igw'
+              ? TEST_IGW.test(w)
+              : kind === 'fs'
+                ? TEST_FS.test(w)
+                : kind === 'hz'
+                  ? TEST_HZ.test(w)
+                  : TEST_NAME.test(w),
       );
       if (name) leftovers.push({ kind, name, rowText });
     }
@@ -89,6 +95,8 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
 }
 
 const ORDER: Kind[] = [
+  'ske',
+  'pg',
   'asg',
   'vm',
   'nat',
@@ -139,6 +147,33 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
   await gotoRoute(page, route);
   if ((await row(page, item.name).count()) === 0) return;
   switch (item.kind) {
+    case 'ske':
+      // Kubernetes Engine 클러스터: 행 선택 → 상단 "서비스 해지". 생성 중이면 Active 까지 기다린다
+      await waitForRow(page, route, item.name, {
+        status: /Active|Running/i,
+        timeoutMs: 1_800_000,
+        intervalMs: 30_000,
+        log,
+      });
+      await selectRow(page, item.name);
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+      return;
+    case 'pg':
+      // PostgreSQL(DBaaS): 목록엔 해지가 없고 상세의 "서비스 해지"
+      await waitForRow(page, route, item.name, {
+        status: /Active|Running/i,
+        timeoutMs: 1_800_000,
+        intervalMs: 30_000,
+        log,
+      });
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+      return;
     case 'asg':
       // Auto-Scaling Group: 목록에 삭제가 없으면 상세의 삭제/서비스 해지
       if (

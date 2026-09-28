@@ -1,0 +1,46 @@
+id: container.ske-cluster
+title: VPC → Subnet → SG → Kubernetes Engine 클러스터 생성 후 역순 해지
+service: Kubernetes Engine
+category: Container
+tags: [regression, destructive, crud, stack, heavy]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-28 프로브): 클러스터 목록 #/ske/cluster, 버튼 "서비스 생성" / 상단 "서비스 해지"(행 선택 후). 폼(#/ske/cluster/request):
+# "클러스터명"(소문자·숫자·- 3~30자), 제어 영역: Kubernetes 버전(기본 최신), 퍼블릭 엔드포인트·ServiceWatch·Deletion Protection 체크(기본값 유지),
+# 네트워크 설정: "VPC명 정보"·"기본 Subnet 정보" 드롭다운, "추가 Subnet 정보"·"Security Group 정보" 는 "선택" 모달, StorageClass/NFS 선택 사항, "요금 확인" → "생성".
+# 노드 풀 없이 제어 영역만 만든다(시간 과금 → 생성 확인 즉시 해지). 생성·해지 각각 10~20분.
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}}, Subnet {{subnet}}, Security Group {{sg}} 를 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+      sg: "sg-{{run_id}}"
+    expect:
+      url: "#/securitygroup/securitygroup/list"
+      text: ["{{sg}}"]
+
+  - goal: "클러스터 {{name}} 을 기본 버전·기본 Subnet·SG {{sg}} 로 생성하고 Active 를 기다린다"
+    vars:
+      name: "ske-{{run_id}}"
+    expect:
+      url: "#/ske/cluster"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 1800000
+  - goal: "SG, Subnet, VPC 를 역순으로 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000

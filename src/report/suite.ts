@@ -20,5 +20,7 @@ export const SUITE_ORDER: readonly string[] = [
   'security.security-group-rule', // ≈3분. SG 생성 → 규칙 추가·삭제 → 해지 (L3)
   'networking.nat-gateway', // ≈12분. VPC → Subnet → Public IP → NAT → 역순 (시간 과금, 즉시 삭제)
   'compute.auto-scaling-group', // ≈15분. VPC → Subnet → SG → LC → ASG(0대) → 역순. 무과금
-  'networking.vpc-peering', // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지
+  'networking.vpc-peering',
+  'container.ske-cluster', // ≈40분. VPC → Subnet → SG → SKE 클러스터(노드 없음) → 역순. 시간 과금
+  'database.postgresql', // ≈40분. VPC → Subnet → PostgreSQL 단일 서버 → 역순. 시간 과금 // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지
 ];
