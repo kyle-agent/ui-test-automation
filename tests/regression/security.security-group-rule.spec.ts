@@ -103,11 +103,12 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       const tcpBox = page.locator('.scp-select:visible').filter({ hasText: /^TCP$/ }).first();
       if (!(await isChecked(tcpBox))) await tcpBox.click();
       await page.waitForTimeout(500);
-      // 포트 입력란은 라벨 연결이 없고 placeholder "1~65,535 사이의 값을 입력하세요." (below() 는 헤더 검색창을 잡았다 — 2026-09-28 프로브)
-      const port = page.getByPlaceholder(/1~65,535/).first();
+      // 포트 입력란은 라벨·placeholder 가 없다("1~65,535 …" 는 힌트 텍스트). 보이는 텍스트 입력란 순서: 헤더 검색창 → 대상 주소 → 포트 (2026-09-28 프로브)
+      const port = page.locator('input[type=text]:visible').nth(2);
       await port.fill('22');
       await port.press('Tab');
-      await page.getByRole('button', { name: '추가', exact: true }).first().click(); // 값을 넣으면 활성화된다
+      await expect(port, '포트 입력값이 남아 있어야 합니다').toHaveValue('22');
+      await page.getByRole('button', { name: '추가', exact: true }).first().click({ force: true }); // 값을 넣으면 활성화된다
       await page.waitForTimeout(500);
       log(
         `  유형 절: ${(await page.locator('body').innerText()).replace(/\s+/g, ' ').match(/유형.{0,300}/)?.[0]}`,

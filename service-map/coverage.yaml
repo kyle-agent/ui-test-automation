@@ -481,10 +481,10 @@ resources:
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/auto-scaling-group/list
-    level: 1
-    specs: [smoke.virtual-server]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.virtual-server, compute.auto-scaling-group]
+    last_pass: "2026-09-28"
+    note: "VPC·Subnet·SG·LC 위에서 Min 0/Desired 0/Max 1 로 생성(In Service, 서버 없음 → 무과금) → 상세 Auto-Scaling Group 삭제"
   - key: volume@virtual-server
     service: "Virtual Server"
     category: "Compute"
@@ -513,9 +513,9 @@ resources:
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/launch-configuration/list
-    level: 2
-    specs: [smoke.virtual-server, compute.launch-configuration]
-    last_pass: "2026-09-23"
+    level: 4
+    specs: [smoke.virtual-server, compute.launch-configuration, compute.auto-scaling-group]
+    last_pass: "2026-09-28"
     note: "Standard-1/s1v1m2, 기본 OS 디스크 SSD(SSD_Provisioned 는 IOPS·Throughput 필수), 공유 Keypair. 서버를 만들지 않아 무과금"
   - key: server-group
     service: "Virtual Server"
@@ -531,8 +531,8 @@ resources:
     route: /virtualserver/virtualserver/list
     level: 4
     specs: [compute.vm-stack, compute.vm-volume, compute.vm-stack-net]
-    last_pass: 2026-09-23
-    note: ""
+    last_pass: "2026-09-28"
+    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28)"
   - key: internet-gateway
     service: "VPC"
     category: "Networking"

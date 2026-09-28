@@ -1,0 +1,69 @@
+{
+  "spec": "security.security-group-rule",
+  "started": "2026-09-28T01:16:35.127Z",
+  "ended": "2026-09-28T01:18:24.300Z",
+  "seconds": 109,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.security-group-rule",
+    "run_id": "0928-1016-19bb",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Security Group 생성 → 규칙 추가·삭제 → 해지",
+      "status": "failed",
+      "seconds": 79.8,
+      "annotations": {
+        "scenario": "security.security-group-rule",
+        "run_id": "0928-1016-19bb",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Security Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.1
+        },
+        {
+          "title": "steps[1] Security Group sg-0928-1016-19bb 생성",
+          "status": "pass",
+          "seconds": 30.6
+        },
+        {
+          "title": "steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)",
+          "status": "fail",
+          "seconds": 27
+        }
+      ],
+      "error": "TimeoutError: locator.fill: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-3.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-2.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/error-context.md",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.fill: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-3.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-2.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/error-context.md",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip"
+  ]
+}
