@@ -18,9 +18,17 @@ const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /** 라벨 텍스트 바로 아래의 가장 가까운 컨트롤. 라벨이 정확히 일치하는 요소가 없으면("VPC명 *" 처럼 붙어 있으면) 부분 일치로 넓힌다. */
 export async function below(page: Page, label: string, selector = 'input', nth = 0): Promise<Locator> {
-  const strict = page.locator(`${selector}:visible:below(:text-is(${q(label)}))`);
+  // `:below` 는 뷰포트 기준 사각형을 비교한다. 라벨이 화면 위로 스크롤돼 나가면 고정 헤더의 검색창이 "라벨 아래" 로 잡힌다
+  // (2026-09-28 DBaaS 폼 "DATA"·SG 규칙 "포트" 가 헤더 검색창에 채워짐) → 라벨을 먼저 뷰포트로 끌어오고, 헤더 안 요소는 뺀다.
+  await page
+    .locator(`:text-is(${q(label)})`)
+    .first()
+    .scrollIntoViewIfNeeded({ timeout: 2_000 })
+    .catch(() => undefined);
+  const notHeader = `:not(header ${selector.split(',')[0]!.trim()})`;
+  const strict = page.locator(`${selector}:visible:below(:text-is(${q(label)}))${notHeader}`);
   if ((await strict.count()) > nth) return strict.nth(nth);
-  return page.locator(`${selector}:visible:below(:text(${q(label)}))`).nth(nth);
+  return page.locator(`${selector}:visible:below(:text(${q(label)}))${notHeader}`).nth(nth);
 }
 
 export async function fillField(

@@ -9,7 +9,7 @@ defineDbaasSpec({
   fields: [
     { label: '서버명 prefix', value: '{{prefix}}' },
     { label: '클러스터명', value: '{{name}}' },
-    { label: 'DATA', value: '16' },
+    { label: 'DATA', value: '100' }, // MySQL 은 100 미만을 100 으로 강제(numberfield min), 나머지도 100 이면 안전
     { label: 'Database명', value: 'qadb' },
     { label: 'Database 사용자명', value: 'qauser' },
     { label: 'Database Port번호', value: '3306' },

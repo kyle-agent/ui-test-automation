@@ -27,5 +27,4 @@ export const SUITE_ORDER: readonly string[] = [
   'database.mariadb', // ≈25분
   'database.epas', // ≈25분. License 확인 체크
   'database.cachestore', // ≈20분. Redis Sentinel 단일, 고가용성 끔
-  'database.searchengine', // ≈25분. OpenSearch Node 1 // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지
 ];
