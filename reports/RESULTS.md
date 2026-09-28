@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-28 15:08, 실행 기록 55건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-28 15:17, 실행 기록 55건.
 
 ## 1. spec 별 최근 상태
 
@@ -55,18 +55,22 @@
 level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 체인. 갱신 규칙은 README "회귀 스택 스위트" 절.
 
 - 서비스 89 · 화면 276 (Service Home 83, 그 외 193) · 스모크 진입 282
-- 목록 화면 100, 그중 리소스 키 있음 80 = 장부 리소스 80개
-- level ≥ 2 (CRUD 이상): **21/80** (26%) · level ≥ 3 (동작 이상): **16/80** (20%)
+- 목록 화면 100, 그중 리소스 키 있음 112 = 장부 리소스 112개
+- level ≥ 2 (CRUD 이상): **22/112** (20%) · level ≥ 3 (동작 이상): **17/112** (15%)
 
 | 카테고리 | 리소스 | L1 | L2 | L3 | L4 |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | AI-ML | 3 | 3 | 0 | 0 | 0 |
-| Compute | 14 | 9 | 1 | 1 | 3 |
+| Application Service | 4 | 4 | 0 | 0 | 0 |
+| Compute | 15 | 10 | 1 | 1 | 3 |
+| Container | 3 | 2 | 0 | 0 | 1 |
 | Data Analytics | 3 | 3 | 0 | 0 | 0 |
 | Database | 6 | 5 | 0 | 0 | 1 |
+| DevOps Tools | 1 | 1 | 0 | 0 | 0 |
 | Financial Management | 1 | 1 | 0 | 0 | 0 |
-| Management | 8 | 6 | 2 | 0 | 0 |
-| Networking | 30 | 19 | 0 | 2 | 9 |
+| Hybrid Cloud | 3 | 3 | 0 | 0 | 0 |
+| Management | 14 | 12 | 2 | 0 | 0 |
+| Networking | 44 | 33 | 0 | 2 | 9 |
 | Security | 7 | 7 | 0 | 0 | 0 |
 | Storage | 8 | 6 | 2 | 0 | 0 |
-| **합계** | **80** | **59** | **5** | **3** | **13** |
+| **합계** | **112** | **90** | **5** | **3** | **14** |

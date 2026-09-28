@@ -14,7 +14,7 @@ Samsung Cloud Platform v2 Enterprise 콘솔(https://console.e.samsungsdscloud.co
 service-map/            서비스·화면 트리 (메뉴 API 스냅샷). screens.json 이 기준, screens.txt 는 사람용
   snapshots/<date>.json 날짜별 정규화 스냅샷 (커밋) → npm run menu:diff 로 변경 감지
   titles.json           라우트별로 확인된 document.title. 있으면 정확히 일치해야 한다
-  coverage.yaml         커버리지 장부: 리소스 키가 있는 목록 화면(80개)별 level 0~4 · spec · last_pass (npm run coverage 로 검증)
+  coverage.yaml         커버리지 장부: 리소스 키가 있는 화면(112개)별 level 0~4 · spec · last_pass (npm run coverage 로 검증)
 data/known-issues.yaml  알려진 이슈 (실패 분류에 쓰는 오류 메시지 정규식)
 reports/                runs/<시각>-<spec id>.json 실행 기록(런처가 남김, 커밋) · RESULTS.md 결과 정리(npm run results 생성물)
 scenarios/              사람이 읽는 시나리오 YAML (goal + 결정적 expect)
@@ -152,7 +152,7 @@ npm run dashboard            # 위와 같고 만든 뒤 reports/dashboard.html �
 npx tsx scripts/run-record-import.ts --spec <id> --json <playwright json> --rm   # 런처 없이 직접 돌린 결과(JSON 리포터)를 실행 기록으로 변환
 ```
 
-- **`service-map/coverage.yaml`**: 모집단은 `screens.txt` 의 "리소스 키가 붙은 목록 화면"(`… | /x/y/list (key)`, 80개)이고 한 줄이 리소스 하나다.
+- **`service-map/coverage.yaml`**: 모집단은 `screens.txt` 의 "리소스 키가 붙은 화면 전부"(`… | /x/y/... (key)`, 112개 — 2026-09-28 까지는 `/list` 로 끝나는 80개만)이고 한 줄이 리소스 하나다.
   `level` 은 0 없음 · 1 진입(스모크가 화면에 들어간다) · 2 CRUD(생성·확인·삭제, teardown 포함) · 3 동작(연결/분리·시작/중지·크기 변경 같은 상태 변화) ·
   4 통합(다른 리소스와 의존관계를 맺는 스택 안에서 통과). `specs` 는 `tests/regression/<id>.spec.ts` 또는 시나리오 id, `last_pass` 는 그 level 로 마지막 통과한 날짜.
   같은 resource_type 이 여러 서비스에 있으면(volume·image·keypair·user·group·bucket) key 가 `keypair@virtual-server` 처럼 서비스 slug 를 달고 있다.

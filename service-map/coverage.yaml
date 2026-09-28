@@ -253,7 +253,7 @@ resources:
     specs: [smoke.iam]
     last_pass: null
     note: ""
-  - key: policy
+  - key: policy@iam
     service: "IAM"
     category: "Management"
     route: /iam/policy/list
@@ -549,7 +549,7 @@ resources:
     specs: [smoke.vpc, networking.nat-gateway]
     last_pass: "2026-09-28"
     note: "VPC(IGW 필수) → Subnet → Public IP(구분 NAT Gateway) → NAT(Multi-AZ 끔, 이름 자동 NAT_GW_<subnet>) → 삭제 → IGW·IP·Subnet·VPC. 시간 과금이라 즉시 삭제"
-  - key: port
+  - key: port@vpc
     service: "VPC"
     category: "Networking"
     route: /vpc/port/list
@@ -645,3 +645,259 @@ resources:
     specs: [smoke.vpn]
     last_pass: null
     note: ""
+  - key: api
+    service: "API Gateway"
+    category: "Application Service"
+    route: /apigateway/api
+    level: 1
+    specs: [smoke.api-gateway]
+    last_pass: null
+    note: ""
+  - key: connection
+    service: "Cloud Fabric Connect"
+    category: "Networking"
+    route: /cfc/connection
+    level: 1
+    specs: [smoke.cloud-fabric-connect]
+    last_pass: null
+    note: ""
+  - key: fabric
+    service: "Cloud Fabric Connect"
+    category: "Networking"
+    route: /cfc/fabric
+    level: 1
+    specs: [smoke.cloud-fabric-connect]
+    last_pass: null
+    note: ""
+  - key: policy@cloud-fabric-connect
+    service: "Cloud Fabric Connect"
+    category: "Networking"
+    route: /cfc/policy
+    level: 1
+    specs: [smoke.cloud-fabric-connect]
+    last_pass: null
+    note: ""
+  - key: port@cloud-fabric-connect
+    service: "Cloud Fabric Connect"
+    category: "Networking"
+    route: /cfc/port
+    level: 1
+    specs: [smoke.cloud-fabric-connect]
+    last_pass: null
+    note: ""
+  - key: vcable
+    service: "Cloud LAN-Data Center"
+    category: "Networking"
+    route: /clandc/cable
+    level: 1
+    specs: [smoke.cloud-lan-data-center]
+    last_pass: null
+    note: ""
+  - key: vdevice
+    service: "Cloud LAN-Data Center"
+    category: "Networking"
+    route: /clandc/device
+    level: 1
+    specs: [smoke.cloud-lan-data-center]
+    last_pass: null
+    note: ""
+  - key: interface
+    service: "Cloud LAN-Data Center"
+    category: "Networking"
+    route: /clandc/interface
+    level: 1
+    specs: [smoke.cloud-lan-data-center]
+    last_pass: null
+    note: ""
+  - key: cloud-lan-network
+    service: "Cloud LAN-Data Center"
+    category: "Networking"
+    route: /clandc/network
+    level: 1
+    specs: [smoke.cloud-lan-data-center]
+    last_pass: null
+    note: ""
+  - key: cssdlan-network
+    service: "Cloud Secured SD-LAN"
+    category: "Networking"
+    route: /cssdlan/cssdlan-network
+    level: 1
+    specs: [smoke.cloud-secured-sd-lan]
+    last_pass: null
+    note: ""
+  - key: attachment
+    service: "Cloud WAN"
+    category: "Networking"
+    route: /cwan/attachment
+    level: 1
+    specs: [smoke.cloud-wan]
+    last_pass: null
+    note: ""
+  - key: network
+    service: "Cloud WAN"
+    category: "Networking"
+    route: /cwan/network
+    level: 1
+    specs: [smoke.cloud-wan]
+    last_pass: null
+    note: ""
+  - key: segment
+    service: "Cloud WAN"
+    category: "Networking"
+    route: /cwan/segment
+    level: 1
+    specs: [smoke.cloud-wan]
+    last_pass: null
+    note: ""
+  - key: cloudwan-sitevpn
+    service: "Cloud WAN"
+    category: "Networking"
+    route: /cwan/sitevpn
+    level: 1
+    specs: [smoke.cloud-wan]
+    last_pass: null
+    note: ""
+  - key: connected
+    service: "Dedicated Cloud"
+    category: "Hybrid Cloud"
+    route: /dedicatedcloud/dedicated-cloud
+    level: 1
+    specs: [smoke.dedicated-cloud]
+    last_pass: null
+    note: ""
+  - key: devops-service
+    service: "DevOps Service"
+    category: "DevOps Tools"
+    route: /devopsservice/devops-service
+    level: 1
+    specs: [smoke.devops-service]
+    last_pass: null
+    note: ""
+  - key: role
+    service: "IAM"
+    category: "Management"
+    route: /iam/role
+    level: 1
+    specs: [smoke.iam]
+    last_pass: null
+    note: ""
+  - key: account
+    service: "ID Center"
+    category: "Management"
+    route: /idcenter/account/organization-list
+    level: 1
+    specs: [smoke.id-center]
+    last_pass: null
+    note: ""
+  - key: trail
+    service: "Logging&Audit"
+    category: "Management"
+    route: /loggingaudit/trail
+    level: 1
+    specs: [smoke.logging-audit]
+    last_pass: null
+    note: ""
+  - key: phone
+    service: "Message Hub"
+    category: "Application Service"
+    route: /messagehub/phone
+    level: 1
+    specs: [smoke.message-hub]
+    last_pass: null
+    note: ""
+  - key: push-application
+    service: "Message Hub"
+    category: "Application Service"
+    route: /messagehub/push-application
+    level: 1
+    specs: [smoke.message-hub]
+    last_pass: null
+    note: ""
+  - key: receiver-group
+    service: "Notification Manager"
+    category: "Management"
+    route: /notification/group
+    level: 1
+    specs: [smoke.notification-manager]
+    last_pass: null
+    note: ""
+  - key: oracle-services
+    service: "Oracle Services"
+    category: "Hybrid Cloud"
+    route: /oracleservices/oracle-services
+    level: 1
+    specs: [smoke.oracle-services]
+    last_pass: null
+    note: ""
+  - key: service-control-policy
+    service: "Organization"
+    category: "Management"
+    route: /organization/control-policy
+    level: 1
+    specs: [smoke.organization]
+    last_pass: null
+    note: ""
+  - key: ou
+    service: "Organization"
+    category: "Management"
+    route: /organization/structure
+    level: 1
+    specs: [smoke.organization]
+    last_pass: null
+    note: ""
+  - key: private-zone
+    service: "Private Zone"
+    category: "Hybrid Cloud"
+    route: /privatezone/private-zone
+    level: 1
+    specs: [smoke.private-zone]
+    last_pass: null
+    note: ""
+  - key: queue
+    service: "Queue Service"
+    category: "Application Service"
+    route: /queueservice/queueservices
+    level: 1
+    specs: [smoke.queue-service]
+    last_pass: null
+    note: ""
+  - key: sase
+    service: "SASE"
+    category: "Networking"
+    route: /sase/sase
+    level: 1
+    specs: [smoke.sase]
+    last_pass: null
+    note: ""
+  - key: cloud-function
+    service: "Cloud Functions"
+    category: "Compute"
+    route: /scf/cloudfunctions
+    level: 1
+    specs: [smoke.cloud-functions]
+    last_pass: null
+    note: ""
+  - key: container-registry
+    service: "Container Registry"
+    category: "Container"
+    route: /scr/registry
+    level: 1
+    specs: [smoke.container-registry]
+    last_pass: null
+    note: ""
+  - key: repository
+    service: "Container Registry"
+    category: "Container"
+    route: /scr/repository
+    level: 1
+    specs: [smoke.container-registry]
+    last_pass: null
+    note: ""
+  - key: cluster
+    service: "Kubernetes Engine"
+    category: "Container"
+    route: /ske/cluster
+    level: 4
+    specs: [smoke.kubernetes-engine, container.ske-cluster]
+    last_pass: "2026-09-28"
+    note: "VPC·Subnet·SG 위에 제어 영역만(노드 풀 없음) 생성: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지"

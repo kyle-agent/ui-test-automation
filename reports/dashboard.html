@@ -42,7 +42,7 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 15:08 · 실행 기록 55건 · 마지막 실행 2026-09-28 14:41 database.postgresql</span>
+  <span class="muted">생성 2026-09-28 15:17 · 실행 기록 55건 · 마지막 실행 2026-09-28 14:41 database.postgresql</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
@@ -51,7 +51,7 @@
   <div class="cards">
     <div class="card"><div class="k">현재 녹색 spec</div><div class="v">20 <span class="s">/ 20 (스위트 20)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
     <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">64% <span class="s">35/55</span></div><div class="s">실패 분류: unclassified 20</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">26% <span class="s">21/80 리소스</span></div><div class="s">L3+ 16 · 탐색 26회</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">20% <span class="s">22/112 리소스</span></div><div class="s">L3+ 17 · 탐색 26회</div></div>
   </div>
   <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 8 실패 13"><div class="stack"><span class="fail" style="height:38.23529411764706%"></span><span class="pass" style="height:23.52941176470588%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
@@ -555,9 +555,9 @@
   <div class="legend"><span><i class="l0"></i>L0 없음</span><span><i class="l1"></i>L1 진입</span><span><i class="l2"></i>L2 CRUD</span><span><i class="l3"></i>L3 동작</span><span><i class="l4"></i>L4 통합</span></div>
   
     <div class="cards">
-      <div class="card"><div class="k">리소스(모집단)</div><div class="v">80</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">21 <span class="s">/ 80 · 26%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:74%" title="L1 진입 59"></span><span class="seg l2" style="width:6%" title="L2 CRUD 5"></span><span class="seg l3" style="width:4%" title="L3 동작 3"></span><span class="seg l4" style="width:16%" title="L4 통합 13"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">16 <span class="s">/ 80 · 20%</span></div><div class="s">L0 없음 0 · L1 진입 59 · L2 CRUD 5 · L3 동작 3 · L4 통합 13</div></div>
+      <div class="card"><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
+      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">22 <span class="s">/ 112 · 20%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:80%" title="L1 진입 90"></span><span class="seg l2" style="width:4%" title="L2 CRUD 5"></span><span class="seg l3" style="width:3%" title="L3 동작 3"></span><span class="seg l4" style="width:13%" title="L4 통합 14"></span></div></div>
+      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">17 <span class="s">/ 112 · 15%</span></div><div class="s">L0 없음 0 · L1 진입 90 · L2 CRUD 5 · L3 동작 3 · L4 통합 14</div></div>
     </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -569,11 +569,25 @@
         <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 3"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
       </tr>
 <tr>
+        <td>Application Service</td>
+        <td class="num">4</td>
+        <td class="num"></td><td class="num">4</td><td class="num"></td><td class="num"></td><td class="num"></td>
+        <td class="num">0%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 4"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+      </tr>
+<tr>
         <td>Compute</td>
-        <td class="num">14</td>
-        <td class="num"></td><td class="num">9</td><td class="num">1</td><td class="num">1</td><td class="num">3</td>
-        <td class="num">36%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:64%" title="L1 진입 9"></span><span class="seg l2" style="width:7%" title="L2 CRUD 1"></span><span class="seg l3" style="width:7%" title="L3 동작 1"></span><span class="seg l4" style="width:21%" title="L4 통합 3"></span></div></td>
+        <td class="num">15</td>
+        <td class="num"></td><td class="num">10</td><td class="num">1</td><td class="num">1</td><td class="num">3</td>
+        <td class="num">33%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:67%" title="L1 진입 10"></span><span class="seg l2" style="width:7%" title="L2 CRUD 1"></span><span class="seg l3" style="width:7%" title="L3 동작 1"></span><span class="seg l4" style="width:20%" title="L4 통합 3"></span></div></td>
+      </tr>
+<tr>
+        <td>Container</td>
+        <td class="num">3</td>
+        <td class="num"></td><td class="num">2</td><td class="num"></td><td class="num"></td><td class="num">1</td>
+        <td class="num">33%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:67%" title="L1 진입 2"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:33%" title="L4 통합 1"></span></div></td>
       </tr>
 <tr>
         <td>Data Analytics</td>
@@ -590,6 +604,13 @@
         <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:83%" title="L1 진입 5"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:17%" title="L4 통합 1"></span></div></td>
       </tr>
 <tr>
+        <td>DevOps Tools</td>
+        <td class="num">1</td>
+        <td class="num"></td><td class="num">1</td><td class="num"></td><td class="num"></td><td class="num"></td>
+        <td class="num">0%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 1"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+      </tr>
+<tr>
         <td>Financial Management</td>
         <td class="num">1</td>
         <td class="num"></td><td class="num">1</td><td class="num"></td><td class="num"></td><td class="num"></td>
@@ -597,18 +618,25 @@
         <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 1"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
       </tr>
 <tr>
+        <td>Hybrid Cloud</td>
+        <td class="num">3</td>
+        <td class="num"></td><td class="num">3</td><td class="num"></td><td class="num"></td><td class="num"></td>
+        <td class="num">0%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 3"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+      </tr>
+<tr>
         <td>Management</td>
-        <td class="num">8</td>
-        <td class="num"></td><td class="num">6</td><td class="num">2</td><td class="num"></td><td class="num"></td>
-        <td class="num">25%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:75%" title="L1 진입 6"></span><span class="seg l2" style="width:25%" title="L2 CRUD 2"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+        <td class="num">14</td>
+        <td class="num"></td><td class="num">12</td><td class="num">2</td><td class="num"></td><td class="num"></td>
+        <td class="num">14%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:86%" title="L1 진입 12"></span><span class="seg l2" style="width:14%" title="L2 CRUD 2"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
       </tr>
 <tr>
         <td>Networking</td>
-        <td class="num">30</td>
-        <td class="num"></td><td class="num">19</td><td class="num"></td><td class="num">2</td><td class="num">9</td>
-        <td class="num">37%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:63%" title="L1 진입 19"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:7%" title="L3 동작 2"></span><span class="seg l4" style="width:30%" title="L4 통합 9"></span></div></td>
+        <td class="num">44</td>
+        <td class="num"></td><td class="num">33</td><td class="num"></td><td class="num">2</td><td class="num">9</td>
+        <td class="num">25%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:75%" title="L1 진입 33"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:5%" title="L3 동작 2"></span><span class="seg l4" style="width:20%" title="L4 통합 9"></span></div></td>
       </tr>
 <tr>
         <td>Security</td>
@@ -626,7 +654,7 @@
       </tr></tbody>
     </table>
     <details>
-      <summary>리소스별 level (80)</summary>
+      <summary>리소스별 level (112)</summary>
       <div class="filters">level:
         <button data-lv="all" class="on">전체</button><button data-lv="0">L0 없음</button><button data-lv="1">L1 진입</button><button data-lv="2">L2 CRUD</button><button data-lv="3">L3 동작</button><button data-lv="4">L4 통합</button>
       </div>
@@ -656,6 +684,15 @@
         <td class="mono small">compute.vm-stack<br>compute.vm-volume<br>compute.vm-stack-net</td>
         <td>2026-09-28</td>
         <td class="note">상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28)</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Container">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">cluster</td>
+        <td>Kubernetes Engine</td>
+        <td>Container</td>
+        <td class="mono small">smoke.kubernetes-engine<br>container.ske-cluster</td>
+        <td>2026-09-28</td>
+        <td class="note">VPC·Subnet·SG 위에 제어 영역만(노드 풀 없음) 생성: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Database">
         <td><span class="lv l4">L4</span></td>
@@ -695,7 +732,7 @@
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
-        <td class="mono">port</td>
+        <td class="mono">port@vpc</td>
         <td>VPC</td>
         <td>Networking</td>
         <td class="mono small">smoke.vpc<br>networking.vpc-port</td>
@@ -846,12 +883,57 @@
         <td></td>
         <td class="note"></td>
       </tr>
+<tr class="res" data-level="1" data-cat="Application Service">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">api</td>
+        <td>API Gateway</td>
+        <td>Application Service</td>
+        <td class="mono small">smoke.api-gateway</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Application Service">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">phone</td>
+        <td>Message Hub</td>
+        <td>Application Service</td>
+        <td class="mono small">smoke.message-hub</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Application Service">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">push-application</td>
+        <td>Message Hub</td>
+        <td>Application Service</td>
+        <td class="mono small">smoke.message-hub</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Application Service">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">queue</td>
+        <td>Queue Service</td>
+        <td>Application Service</td>
+        <td class="mono small">smoke.queue-service</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
 <tr class="res" data-level="1" data-cat="Compute">
         <td><span class="lv l1">L1</span></td>
         <td class="mono">baremetal</td>
         <td>Bare Metal Server</td>
         <td>Compute</td>
         <td class="mono small">smoke.bare-metal-server</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Compute">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">cloud-function</td>
+        <td>Cloud Functions</td>
+        <td>Compute</td>
+        <td class="mono small">smoke.cloud-functions</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -927,6 +1009,24 @@
         <td></td>
         <td class="note"></td>
       </tr>
+<tr class="res" data-level="1" data-cat="Container">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">container-registry</td>
+        <td>Container Registry</td>
+        <td>Container</td>
+        <td class="mono small">smoke.container-registry</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Container">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">repository</td>
+        <td>Container Registry</td>
+        <td>Container</td>
+        <td class="mono small">smoke.container-registry</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
 <tr class="res" data-level="1" data-cat="Data Analytics">
         <td><span class="lv l1">L1</span></td>
         <td class="mono">event-streams</td>
@@ -999,12 +1099,57 @@
         <td></td>
         <td class="note"></td>
       </tr>
+<tr class="res" data-level="1" data-cat="DevOps Tools">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">devops-service</td>
+        <td>DevOps Service</td>
+        <td>DevOps Tools</td>
+        <td class="mono small">smoke.devops-service</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
 <tr class="res" data-level="1" data-cat="Financial Management">
         <td><span class="lv l1">L1</span></td>
         <td class="mono">planned-compute</td>
         <td>Planned Compute</td>
         <td>Financial Management</td>
         <td class="mono small">smoke.planned-compute</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Hybrid Cloud">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">connected</td>
+        <td>Dedicated Cloud</td>
+        <td>Hybrid Cloud</td>
+        <td class="mono small">smoke.dedicated-cloud</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Hybrid Cloud">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">oracle-services</td>
+        <td>Oracle Services</td>
+        <td>Hybrid Cloud</td>
+        <td class="mono small">smoke.oracle-services</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Hybrid Cloud">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">private-zone</td>
+        <td>Private Zone</td>
+        <td>Hybrid Cloud</td>
+        <td class="mono small">smoke.private-zone</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">account</td>
+        <td>ID Center</td>
+        <td>Management</td>
+        <td class="mono small">smoke.id-center</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1019,6 +1164,15 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Management">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">ou</td>
+        <td>Organization</td>
+        <td>Management</td>
+        <td class="mono small">smoke.organization</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">permission-set</td>
         <td>ID Center</td>
         <td>Management</td>
@@ -1028,7 +1182,25 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Management">
         <td><span class="lv l1">L1</span></td>
-        <td class="mono">policy</td>
+        <td class="mono">policy@iam</td>
+        <td>IAM</td>
+        <td>Management</td>
+        <td class="mono small">smoke.iam</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">receiver-group</td>
+        <td>Notification Manager</td>
+        <td>Management</td>
+        <td class="mono small">smoke.notification-manager</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">role</td>
         <td>IAM</td>
         <td>Management</td>
         <td class="mono small">smoke.iam</td>
@@ -1041,6 +1213,24 @@
         <td>IAM</td>
         <td>Management</td>
         <td class="mono small">smoke.iam</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">service-control-policy</td>
+        <td>Organization</td>
+        <td>Management</td>
+        <td class="mono small">smoke.organization</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Management">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">trail</td>
+        <td>Logging&amp;Audit</td>
+        <td>Management</td>
+        <td class="mono small">smoke.logging-audit</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1064,6 +1254,15 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">attachment</td>
+        <td>Cloud WAN</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-wan</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">cdn</td>
         <td>Global CDN</td>
         <td>Networking</td>
@@ -1082,6 +1281,15 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">cloud-lan-network</td>
+        <td>Cloud LAN-Data Center</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-lan-data-center</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">cloud-lastmile</td>
         <td>Cloud Last Mile</td>
         <td>Networking</td>
@@ -1091,10 +1299,46 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">cloudwan-sitevpn</td>
+        <td>Cloud WAN</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-wan</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">connection</td>
+        <td>Cloud Fabric Connect</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-fabric-connect</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">cssdlan-network</td>
+        <td>Cloud Secured SD-LAN</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-secured-sd-lan</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">direct-connect</td>
         <td>Direct Connect</td>
         <td>Networking</td>
         <td class="mono small">smoke.direct-connect</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">fabric</td>
+        <td>Cloud Fabric Connect</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-fabric-connect</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1122,6 +1366,15 @@
         <td>GSLB</td>
         <td>Networking</td>
         <td class="mono small">smoke.gslb</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">interface</td>
+        <td>Cloud LAN-Data Center</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-lan-data-center</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1163,6 +1416,33 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">network</td>
+        <td>Cloud WAN</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-wan</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">policy@cloud-fabric-connect</td>
+        <td>Cloud Fabric Connect</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-fabric-connect</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">port@cloud-fabric-connect</td>
+        <td>Cloud Fabric Connect</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-fabric-connect</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">private-nat</td>
         <td>VPC</td>
         <td>Networking</td>
@@ -1199,10 +1479,46 @@
       </tr>
 <tr class="res" data-level="1" data-cat="Networking">
         <td><span class="lv l1">L1</span></td>
+        <td class="mono">sase</td>
+        <td>SASE</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.sase</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">segment</td>
+        <td>Cloud WAN</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-wan</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
         <td class="mono">transit-gateway</td>
         <td>VPC</td>
         <td>Networking</td>
         <td class="mono small">smoke.vpc</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">vcable</td>
+        <td>Cloud LAN-Data Center</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-lan-data-center</td>
+        <td></td>
+        <td class="note"></td>
+      </tr>
+<tr class="res" data-level="1" data-cat="Networking">
+        <td><span class="lv l1">L1</span></td>
+        <td class="mono">vdevice</td>
+        <td>Cloud LAN-Data Center</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.cloud-lan-data-center</td>
         <td></td>
         <td class="note"></td>
       </tr>

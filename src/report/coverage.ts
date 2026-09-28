@@ -108,11 +108,12 @@ export function isListRoute(route: string): boolean {
   return /\/list$/.test(route);
 }
 
-/** 서비스 맵에서 리소스 키가 붙은 목록 화면을 모아 장부 키를 매긴다 (route 순 정렬). */
+/** 서비스 맵에서 리소스 키가 붙은 화면을 모두 모아 장부 키를 매긴다 (route 순 정렬).
+ *  2026-09-28 까지는 `/list` 로 끝나는 화면만 셌으나(80개) SKE 클러스터(`/ske/cluster`)처럼 키가 있어도 `/list` 가 아닌 화면 32개가 빠져 키 있는 화면 전부(112개)로 넓혔다. */
 export function keyedListScreens(map: ScreenMap): KeyedListScreen[] {
   const rows = map.services.flatMap((s) =>
     s.screens
-      .filter((sc) => isListRoute(sc.route) && sc.resource_type)
+      .filter((sc) => sc.resource_type)
       .map((sc) => ({
         resource_type: sc.resource_type!,
         service: s.name,
@@ -142,7 +143,7 @@ export function mapTotals(map: ScreenMap): MapTotals {
     non_home_screens: all.length - home,
     smoke_entries: map.services.length + (all.length - home),
     list_screens: list.length,
-    keyed_list_screens: list.filter((sc) => sc.resource_type).length,
+    keyed_list_screens: all.filter((sc) => sc.resource_type).length, // 키 있는 화면 전부 (목록 여부 무관)
   };
 }
 
