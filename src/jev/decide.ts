@@ -2,7 +2,9 @@
  * Jev(TypeSafe 결정 모델) 호출부. 저장소에서 LLM 을 부르는 곳은 이 파일뿐이다.
  *
  * browser-use/jev-ultrafast 의 model.py(MIT) 를 TypeScript 로 옮기고:
- *  - 기본 엔드포인트를 OpenRouter decisions API 로, 키는 TYPESAFE_API_KEY → OPENROUTER_API_KEY 순으로 쓴다.
+ *  - 기본 엔드포인트는 TypeSafe 공식 API(POST https://api.typesafe.ai/v1/systemone, 2026-09-29 전환). OpenRouter decisions API 는
+ *    TYPESAFE_API_URL 로 지정했을 때만 쓴다. 키는 엔드포인트에 맞는 것만 보낸다(TypeSafe 키를 OpenRouter 로, 또는 그 반대로 보내지 않는다).
+ *  - 계약(docs.typesafe.ai/api): 요청 { state, model, questions }, 응답 { model, answers, usage: { input_tokens, output_tokens } }.
  *  - criteria/instructions 는 항상 문자열로 보낸다 (OpenRouter 가 구조체를 거부한다).
  * 모델 출력은 관측된 요소 인덱스와 동작 이름으로만 해석한다. 셀렉터·좌표·코드는 절대 모델에서 받지 않는다.
  */
@@ -10,8 +12,20 @@ import { spawnSync } from 'node:child_process';
 import { EnvHttpProxyAgent, ProxyAgent, fetch as undiciFetch, type Dispatcher } from 'undici';
 import { NEXT_ACTION, TARGET, TEXT_VALUE } from './questions';
 
-export const DEFAULT_DECISIONS_URL = 'https://openrouter.ai/api/alpha/decisions';
-export const DEFAULT_MODEL = 'typesafe/jev-1.13';
+export const DEFAULT_DECISIONS_URL = 'https://api.typesafe.ai/v1/systemone';
+/** 회귀 재현성을 위해 별칭(jev-latest) 대신 버전을 고정한다. 새 버전은 TYPESAFE_MODEL 로 올려 보고 바꾼다. */
+export const DEFAULT_MODEL = 'jev-1.13.0';
+export const OPENROUTER_DECISIONS_URL = 'https://openrouter.ai/api/alpha/decisions';
+/** TypeSafe 가격: 입력 토큰당 과금, 출력 무료 (docs.typesafe.ai/models, Jev 1.13: $0.042 / Mtok) */
+export const TYPESAFE_USD_PER_INPUT_TOKEN = 0.042 / 1_000_000;
+
+export function decisionsUrl(): string {
+  return process.env.TYPESAFE_API_URL || DEFAULT_DECISIONS_URL;
+}
+
+export function isOpenRouter(url = decisionsUrl()): boolean {
+  return /openrouter.ai/i.test(url);
+}
 
 export type ActionKind = 'click' | 'fill' | 'select' | 'scroll' | 'wait';
 
@@ -75,13 +89,23 @@ export interface Decision {
 
 type Raw = Record<string, unknown>;
 
-export function decisionKey(): string {
-  const key = process.env.TYPESAFE_API_KEY || process.env.OPENROUTER_API_KEY;
+/** 엔드포인트에 맞는 키만 고른다: TypeSafe → TYPESAFE_API_KEY, OpenRouter → OPENROUTER_API_KEY. */
+export function decisionKey(url = decisionsUrl()): string {
+  const name = isOpenRouter(url) ? 'OPENROUTER_API_KEY' : 'TYPESAFE_API_KEY';
+  const key = process.env[name];
   if (!key)
-    throw new Error(
-      'TYPESAFE_API_KEY 또는 OPENROUTER_API_KEY 가 필요합니다 (기록/치유 단계에서만). .env 에 넣으세요.',
-    );
+    throw new Error(`${name} 가 필요합니다 (엔드포인트 ${url}; 기록/탐색 단계에서만). .env 에 넣으세요.`);
   return key;
+}
+
+/** 응답 usage 에 달러 비용이 없으면(TypeSafe 는 토큰만 준다) 입력 토큰으로 계산해 cost 를 채운다. 탐색·레코더의 비용 예산이 이 값을 쓴다. */
+export function normalizeUsage(usage: Raw | undefined): Raw {
+  const u: Raw = { ...(usage ?? {}) };
+  if (typeof u.cost !== 'number') {
+    const input = Number(u.input_tokens ?? u.prompt_tokens ?? 0);
+    u.cost = input * TYPESAFE_USD_PER_INPUT_TOKEN;
+  }
+  return u;
 }
 
 // ---------------------------------------------------------------------------
@@ -307,7 +331,7 @@ export function buildRequest(state: PageState, goal: string, history: HistoryEnt
     };
   }
   const body: Raw = {
-    model: process.env.TYPESAFE_MODEL || DEFAULT_MODEL,
+    model: process.env.TYPESAFE_MODEL || (isOpenRouter() ? 'typesafe/jev-1.13' : DEFAULT_MODEL),
     state: {
       page: { url: state.url, title: state.title, text: state.text },
       elements,
@@ -351,15 +375,15 @@ export function interpret(result: Raw, built: BuiltRequest): Omit<Decision, 'lat
     targetProbabilities: targetAnswer?.probabilities ?? {},
     rawAnswers: result.answers,
     model: typeof result.model === 'string' ? result.model : undefined,
-    usage: (result.usage as Raw | undefined) ?? {},
+    usage: normalizeUsage(result.usage as Raw | undefined),
   };
 }
 
 export async function choose(state: PageState, goal: string, history: HistoryEntry[]): Promise<Decision> {
   const built = buildRequest(state, goal, history);
   const started = performance.now();
-  const url = process.env.TYPESAFE_API_URL || DEFAULT_DECISIONS_URL;
-  const result = await postJson(url, decisionKey(), built.body);
+  const url = decisionsUrl();
+  const result = await postJson(url, decisionKey(url), built.body);
   return {
     ...interpret(result, built),
     latencyMs: Math.round(performance.now() - started),

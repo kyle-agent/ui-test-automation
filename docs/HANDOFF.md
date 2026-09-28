@@ -337,3 +337,12 @@
 - **SKE 탐색(별도 에이전트, Jev)**: 9회 83결정 이상 0, $0.011, 실제 클러스터 4회. 사실·후보는 `docs/service-facts/container-ske.md`. **결함 후보**: 워크로드·서비스 및 인그레스·스토리지·구성·권한
   라우트 직접 진입 시 홈으로 리다이렉트(TypeError+404). 에이전트는 사용량 한도로 3번째 사이클 중 멈췄고 남은 클러스터는 없다.
 - 커버리지 **L2+ 26/112(23%), L3+ 21/112(19%)**.
+
+### 9.13 Jev 호출을 OpenRouter → TypeSafe 공식 API 로 전환 (2026-09-29)
+
+- 기본 엔드포인트 `POST https://api.typesafe.ai/v1/systemone`, 모델 `jev-1.13.0`(별칭 `jev-latest` 대신 버전 고정 — 재현성), 키 `TYPESAFE_API_KEY`(`src/jev/decide.ts`).
+  요청·응답 계약은 docs.typesafe.ai/api 와 같아 질문 형식은 그대로다(choice → `choice`/`probabilities`/`confidence`).
+- 키는 엔드포인트에 맞는 것만 보낸다: TypeSafe URL → `TYPESAFE_API_KEY`, OpenRouter URL → `OPENROUTER_API_KEY`. 예전처럼 OpenRouter 키가 TypeSafe 로 새어 가지 않는다.
+- 비용: TypeSafe 응답은 `usage: { input_tokens, output_tokens }` 만 준다 → `normalizeUsage` 가 입력 토큰 × $0.042/Mtok 로 `cost` 를 채워 탐색·레코더 비용 예산이 계속 동작한다.
+- 사내 프록시(70.10.15.10:8080)는 api.typesafe.ai 를 통과시킨다(키 없이 호출 → TypeSafe 403 "Must supply an API key", 틀린 키 → 401). 키를 넣은 뒤 `npm run jev:ping` 으로 확인.
+- 되돌리기: `.env` 에 `TYPESAFE_API_URL=https://openrouter.ai/api/alpha/decisions`, `TYPESAFE_MODEL=typesafe/jev-1.13`, `OPENROUTER_API_KEY`. TYPE_TEXT 소형 텍스트 모델은 여전히 OpenRouter(`TEXT_MODEL_*`).

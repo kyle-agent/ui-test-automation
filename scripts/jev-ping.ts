@@ -1,5 +1,6 @@
 /**
- * Jev(OpenRouter decisions) 연결 진단. 작은 가짜 화면 상태로 결정 한 번을 요청한다 (약 $0.00003).
+ * Jev 연결 진단 (기본: TypeSafe 공식 API POST https://api.typesafe.ai/v1/systemone). 작은 가짜 화면 상태로 결정 한 번을 요청한다 (입력 수백 토큰, 약 $0.00003).
+ * 엔드포인트는 TYPESAFE_API_URL, 모델은 TYPESAFE_MODEL 로 바꿀 수 있다. OpenRouter URL 을 주면 OPENROUTER_API_KEY 를 쓴다.
  *
  *   npm run jev:ping                 # 자동: HTTPS_PROXY 환경 변수 → npm proxy 설정 → 직접 연결
  *   npm run jev:ping -- --no-proxy   # 프록시를 무시하고 직접 연결
@@ -8,9 +9,10 @@
  */
 import '../src/console/env';
 import {
-  DEFAULT_DECISIONS_URL,
   DEFAULT_MODEL,
   choose,
+  decisionsUrl,
+  isOpenRouter,
   proxyDispatcher,
   setProxyMode,
   type PageState,
@@ -41,13 +43,13 @@ const state: PageState = {
 };
 
 async function main(): Promise<void> {
-  const keySource = process.env.TYPESAFE_API_KEY
-    ? 'TYPESAFE_API_KEY'
-    : process.env.OPENROUTER_API_KEY
-      ? 'OPENROUTER_API_KEY'
-      : '(없음)';
-  console.log(`엔드포인트: ${process.env.TYPESAFE_API_URL || DEFAULT_DECISIONS_URL}`);
-  console.log(`모델: ${process.env.TYPESAFE_MODEL || DEFAULT_MODEL}, 키: ${keySource}`);
+  const url = decisionsUrl();
+  const keyName = isOpenRouter(url) ? 'OPENROUTER_API_KEY' : 'TYPESAFE_API_KEY';
+  const keySource = process.env[keyName] ? `${keyName} (설정됨)` : `${keyName} (없음)`;
+  console.log(`엔드포인트: ${url} (${isOpenRouter(url) ? 'OpenRouter' : 'TypeSafe'})`);
+  console.log(
+    `모델: ${process.env.TYPESAFE_MODEL || (isOpenRouter(url) ? 'typesafe/jev-1.13' : DEFAULT_MODEL)}, 키: ${keySource}`,
+  );
   console.log(`경로: ${proxyDispatcher().source}`);
   console.log(
     `TLS 설정: NODE_OPTIONS=${process.env.NODE_OPTIONS ?? '(없음)'}, NODE_USE_SYSTEM_CA=${process.env.NODE_USE_SYSTEM_CA ?? '(없음)'}, NODE_EXTRA_CA_CERTS=${process.env.NODE_EXTRA_CA_CERTS ?? '(없음)'}`,
@@ -58,7 +60,10 @@ async function main(): Promise<void> {
   console.log(
     `\n성공 (${Date.now() - started}ms): ${d.operation}${chosen ? ` → [${chosen.id}] ${chosen.label}` : ''} p=${(d.probabilities[d.choice] ?? 0).toFixed(2)} conf=${d.confidence.toFixed(2)}`,
   );
-  console.log(`모델 응답: ${d.model}, 비용 $${Number((d.usage as { cost?: number }).cost ?? 0).toFixed(6)}`);
+  const u = d.usage as { cost?: number; input_tokens?: number; output_tokens?: number };
+  console.log(
+    `모델 응답: ${d.model}, 입력 ${u.input_tokens ?? '-'} 토큰 / 출력 ${u.output_tokens ?? '-'} 토큰, 비용 ${Number(u.cost ?? 0).toFixed(6)}`,
+  );
   if (chosen?.id !== 'e2')
     console.log('주의: 기대한 "VPC 생성" 이 아닌 다른 요소를 골랐습니다. 연결은 정상입니다.');
 }
