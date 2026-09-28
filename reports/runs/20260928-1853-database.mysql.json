@@ -1,0 +1,51 @@
+{
+  "spec": "database.mysql",
+  "started": "2026-09-28T09:53:00.713Z",
+  "ended": "2026-09-28T10:09:14.194Z",
+  "seconds": 973,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.mysql",
+    "run_id": "0928-1853-0f52",
+    "title": "MySQL(DBaaS) 목록 | MySQL(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → MySQL(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 943.2,
+      "annotations": {
+        "scenario": "database.mysql",
+        "run_id": "0928-1853-0f52",
+        "title": "MySQL(DBaaS) 목록 | MySQL(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.3
+        },
+        {
+          "title": "steps[2] mycajcibifdaffc 생성",
+          "status": "pass",
+          "seconds": 622.6
+        }
+      ]
+    }
+  ]
+}

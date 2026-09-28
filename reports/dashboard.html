@@ -42,18 +42,18 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 15:42 · 실행 기록 57건 · 마지막 실행 2026-09-28 15:13 database.postgresql</span>
+  <span class="muted">생성 2026-09-28 19:15 · 실행 기록 71건 · 마지막 실행 2026-09-28 18:53 database.cachestore</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
 <section>
   <h2>요약</h2>
   <div class="cards">
-    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">20 <span class="s">/ 20 (스위트 20)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">65% <span class="s">37/57</span></div><div class="s">실패 분류: unclassified 20</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">20% <span class="s">22/112 리소스</span></div><div class="s">L3+ 17 · 탐색 26회</div></div>
+    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">24 <span class="s">/ 25 (스위트 24)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
+    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">59% <span class="s">42/71</span></div><div class="s">실패 분류: unclassified 29</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">23% <span class="s">26/112 리소스</span></div><div class="s">L3+ 21 · 탐색 35회</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 10 실패 13"><div class="stack"><span class="fail" style="height:38.23529411764706%"></span><span class="pass" style="height:29.411764705882355%"></span></div><div class="lbl">09-28</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:18.91891891891892%"></span><span class="pass" style="height:72.97297297297297%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 15 실패 22"><div class="stack"><span class="fail" style="height:59.45945945945946%"></span><span class="pass" style="height:40.54054054054054%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
 </section>
 
@@ -215,10 +215,50 @@
 <tr>
         <td class="mono">database.postgresql</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-28 15:13</td>
-        <td class="num">26분 30초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 26분 30초"></span> <span class="muted">2/3</span></td>
-        <td class="num">25분 9초</td>
+        <td>2026-09-28 16:12</td>
+        <td class="num">16분 42초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 26분 30초"></span><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 22초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 42초"></span> <span class="muted">3/5</span></td>
+        <td class="num">22분 20초</td>
+      </tr>
+<tr>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 18:53</td>
+        <td class="num">16분 13초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 17초"></span><span class="dot fail" title="2026-09-28 16:12 FAIL(unclassified) 3분 13초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 35초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 16분 13초"></span> <span class="muted">1/4</span></td>
+        <td class="num">16분 13초</td>
+      </tr>
+<tr>
+        <td class="mono">database.mariadb</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 16:12</td>
+        <td class="num">15분 43초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 15분 43초"></span> <span class="muted">1/2</span></td>
+        <td class="num">15분 43초</td>
+      </tr>
+<tr>
+        <td class="mono">database.epas</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 16:12</td>
+        <td class="num">16분 12초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 12초"></span> <span class="muted">1/2</span></td>
+        <td class="num">16분 12초</td>
+      </tr>
+<tr>
+        <td class="mono">database.cachestore</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 18:53</td>
+        <td class="num">15분 21초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 16:03 FAIL(unclassified) 1분 31초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 34초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 15분 21초"></span> <span class="muted">1/3</span></td>
+        <td class="num">15분 21초</td>
+      </tr>
+<tr>
+        <td class="mono">database.searchengine</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td>2026-09-28 16:04</td>
+        <td class="num">1분 20초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 16:04 FAIL(unclassified) 1분 20초"></span> <span class="muted">0/1</span></td>
+        <td class="num">-</td>
       </tr></tbody></table>
 </section>
 
@@ -229,6 +269,118 @@
   </div>
   <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-09-28 18:53</td>
+        <td class="mono">database.cachestore</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">15분 21초</td>
+        <td class="mono small">0928-1853-f0a8</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 18:53</td>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">16분 13초</td>
+        <td class="mono small">0928-1853-0f52</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 16:34</td>
+        <td class="mono">database.cachestore</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 34초</td>
+        <td class="mono small">0928-1635-75c6</td>
+        <td class="err">[steps[2] rdcajcibgdfhfcg 생성] TimeoutError: locator.waitFor: Timeout 10000ms exceeded. <span class="muted mono small">test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-21.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 16:34</td>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 35초</td>
+        <td class="mono small">0928-1635-576c</td>
+        <td class="err">[steps[2] mycajcibgdffhgc 생성] TimeoutError: locator.waitFor: Timeout 10000ms exceeded. <span class="muted mono small">test-results/artifacts/database.mysql-VPC-→-Subne-58be9-ySQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-6.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 16:12</td>
+        <td class="mono">database.epas</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">16분 12초</td>
+        <td class="mono small">0928-1613-8fa8</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 16:12</td>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">3분 13초</td>
+        <td class="mono small">0928-1613-2b78</td>
+        <td class="err">[steps[2] mycajcibgbdcbhi 생성] Error: &quot;DATA&quot; 입력값이 남아 있어야 합니다 <span class="muted mono small">test-results/artifacts/database.mysql-VPC-→-Subne-58be9-ySQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 16:12</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">16분 42초</td>
+        <td class="mono small">0928-1613-c120</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 16:12</td>
+        <td class="mono">database.mariadb</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">15분 43초</td>
+        <td class="mono small">0928-1613-315d</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 16:04</td>
+        <td class="mono">database.searchengine</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 20초</td>
+        <td class="mono small">0928-1605-8bb1</td>
+        <td class="err">[steps[2] secajcibgafibbb 생성] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/database.searchengine-VPC--2425c-OpenSearch-단일-서버-생성-후-역순-해지-regression/test-failed-8.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 16:03</td>
+        <td class="mono">database.cachestore</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 31초</td>
+        <td class="mono small">0928-1603-96db</td>
+        <td class="err">[steps[2] rdcajcibgadjgdb 생성] TimeoutError: locator.waitFor: Timeout 10000ms exceeded. <span class="muted mono small">test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-6.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 15:58</td>
+        <td class="mono">database.epas</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 13초</td>
+        <td class="mono small">0928-1559-e798</td>
+        <td class="err">[steps[2] epcajcibffjehji 생성] Error: &quot;Database명&quot; 입력값이 남아 있어야 합니다 <span class="muted mono small">test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-6.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 15:58</td>
+        <td class="mono">database.mariadb</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 13초</td>
+        <td class="mono small">0928-1559-b02f</td>
+        <td class="err">[steps[2] macajcibffjbacf 생성] Error: &quot;Database명&quot; 입력값이 남아 있어야 합니다 <span class="muted mono small">test-results/artifacts/database.mariadb-VPC-→-Sub-2999c-iaDB-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 15:57</td>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 17초</td>
+        <td class="mono small">0928-1557-8be6</td>
+        <td class="err">[steps[2] mycajcibffhibeg 생성] Error: &quot;Database명&quot; 입력값이 남아 있어야 합니다 <span class="muted mono small">test-results/artifacts/database.mysql-VPC-→-Subne-58be9-ySQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-4.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 15:57</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 22초</td>
+        <td class="mono small">0928-1557-cf4c</td>
+        <td class="err">[steps[2] pgcajcibffhcfec 생성] Error: &quot;DATA&quot; 입력값이 남아 있어야 합니다 <span class="muted mono small">test-results/artifacts/database.postgresql-VPC-→--d0e4e-eSQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-6.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-09-28 15:13</td>
         <td class="mono">database.postgresql</td>
         <td><span class="badge pass">PASS</span></td>
@@ -435,118 +587,6 @@
         <td class="num">5분 59초</td>
         <td class="mono small">0923-2209-87b6</td>
         <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 22:07</td>
-        <td class="mono">storage.file-storage</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 55초</td>
-        <td class="mono small">0923-2207-068a</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 22:00</td>
-        <td class="mono">networking.private-dns</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">6분 51초</td>
-        <td class="mono small">0923-2200-7d07</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:49</td>
-        <td class="mono">networking.vpc-port</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">11분 11초</td>
-        <td class="mono small">0923-2149-5982</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:47</td>
-        <td class="mono">compute.launch-configuration</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 29초</td>
-        <td class="mono small">0923-2148-cf40</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:46</td>
-        <td class="mono">iam.user-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">58초</td>
-        <td class="mono small">0923-2147-63d6</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:45</td>
-        <td class="mono">management.resource-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">57초</td>
-        <td class="mono small">0923-2146-e2a8</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:44</td>
-        <td class="mono">storage.object-storage-bucket</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 20초</td>
-        <td class="mono small">0923-2144-8eab</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:43</td>
-        <td class="mono">security.address-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 23초</td>
-        <td class="mono small">0923-2143-a6a1</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 21:41</td>
-        <td class="mono">compute.server-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 22초</td>
-        <td class="mono small">0923-2142-e116</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 20:38</td>
-        <td class="mono">compute.vm-stack-net</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">63분 31초</td>
-        <td class="mono small">0923-2038-71f4</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/screenshot-compute.vm-stack-net.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 20:21</td>
-        <td class="mono">compute.vm-volume</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">16분 21초</td>
-        <td class="mono small">0923-2022-7e13</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 20:05</td>
-        <td class="mono">compute.vm-stack</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">16분 17초</td>
-        <td class="mono small">0923-2005-2054</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/screenshot-compute.vm-stack.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 20:04</td>
-        <td class="mono">networking.vpc.create-delete</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">42초</td>
-        <td class="mono small">0923-2005-09df</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 19:54</td>
-        <td class="mono">networking.dns-hosted-zone</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">6분 54초</td>
-        <td class="mono small">0923-1954-17d8</td>
-        <td class="err"></td>
       </tr></tbody></table>
 </section>
 
@@ -556,8 +596,8 @@
   
     <div class="cards">
       <div class="card"><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">22 <span class="s">/ 112 · 20%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:80%" title="L1 진입 90"></span><span class="seg l2" style="width:4%" title="L2 CRUD 5"></span><span class="seg l3" style="width:3%" title="L3 동작 3"></span><span class="seg l4" style="width:13%" title="L4 통합 14"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">17 <span class="s">/ 112 · 15%</span></div><div class="s">L0 없음 0 · L1 진입 90 · L2 CRUD 5 · L3 동작 3 · L4 통합 14</div></div>
+      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">26 <span class="s">/ 112 · 23%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:77%" title="L1 진입 86"></span><span class="seg l2" style="width:4%" title="L2 CRUD 5"></span><span class="seg l3" style="width:3%" title="L3 동작 3"></span><span class="seg l4" style="width:16%" title="L4 통합 18"></span></div></div>
+      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">21 <span class="s">/ 112 · 19%</span></div><div class="s">L0 없음 0 · L1 진입 86 · L2 CRUD 5 · L3 동작 3 · L4 통합 18</div></div>
     </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -599,9 +639,9 @@
 <tr>
         <td>Database</td>
         <td class="num">6</td>
-        <td class="num"></td><td class="num">5</td><td class="num"></td><td class="num"></td><td class="num">1</td>
-        <td class="num">17%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:83%" title="L1 진입 5"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:17%" title="L4 통합 1"></span></div></td>
+        <td class="num"></td><td class="num">1</td><td class="num"></td><td class="num"></td><td class="num">5</td>
+        <td class="num">83%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:17%" title="L1 진입 1"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:83%" title="L4 통합 5"></span></div></td>
       </tr>
 <tr>
         <td>DevOps Tools</td>
@@ -693,6 +733,42 @@
         <td class="mono small">smoke.kubernetes-engine<br>container.ske-cluster</td>
         <td>2026-09-28</td>
         <td class="note">VPC·Subnet·SG 위에 제어 영역만(노드 풀 없음) 생성: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Database">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">cache-store</td>
+        <td>CacheStore(DBaaS)</td>
+        <td>Database</td>
+        <td class="mono small">smoke.cachestore-dbaas<br>database.cachestore</td>
+        <td>2026-09-28</td>
+        <td class="note">Redis Sentinel 단일(고가용성 끔), DATA 64GB 이상·8GB 배수, Redis Port/비밀번호. 공유 VPC 병렬 PASS 15.4분</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Database">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">epas</td>
+        <td>EPAS(DBaaS)</td>
+        <td>Database</td>
+        <td class="mono small">smoke.epas-dbaas<br>database.epas</td>
+        <td>2026-09-28</td>
+        <td class="note">PostgreSQL 과 같은 폼 + License(BYOL) 확인 체크. 공유 VPC 위에서 병렬 PASS 16.2분</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Database">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">mariadb</td>
+        <td>MariaDB(DBaaS)</td>
+        <td>Database</td>
+        <td class="mono small">smoke.mariadb-dbaas<br>database.mariadb</td>
+        <td>2026-09-28</td>
+        <td class="note">PostgreSQL 과 같은 폼(db1v1m2). 공유 VPC 위에서 병렬 PASS 15.7분</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Database">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">mysql</td>
+        <td>MySQL(DBaaS)</td>
+        <td>Database</td>
+        <td class="mono small">smoke.mysql-dbaas<br>database.mysql</td>
+        <td>2026-09-28</td>
+        <td class="note">PostgreSQL 과 같은 폼. DATA 8GB 배수. 공유 VPC 병렬 PASS 16.2분</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Database">
         <td><span class="lv l4">L4</span></td>
@@ -1051,42 +1127,6 @@
         <td>Vertica(DBaaS)</td>
         <td>Data Analytics</td>
         <td class="mono small">smoke.vertica-dbaas</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Database">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">cache-store</td>
-        <td>CacheStore(DBaaS)</td>
-        <td>Database</td>
-        <td class="mono small">smoke.cachestore-dbaas</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Database">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">epas</td>
-        <td>EPAS(DBaaS)</td>
-        <td>Database</td>
-        <td class="mono small">smoke.epas-dbaas</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Database">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">mariadb</td>
-        <td>MariaDB(DBaaS)</td>
-        <td>Database</td>
-        <td class="mono small">smoke.mariadb-dbaas</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Database">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">mysql</td>
-        <td>MySQL(DBaaS)</td>
-        <td>Database</td>
-        <td class="mono small">smoke.mysql-dbaas</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1671,7 +1711,7 @@
 
 <section>
   <h2>탐색(Level 5, Jev) <small>recordings/explore</small></h2>
-  <p class="muted">탐색 26회 · 이상 0건 · 정보 76건 · 누적 비용 $0.0407 (Level 5, 커버리지 분모에 넣지 않음)</p>
+  <p class="muted">탐색 35회 · 이상 0건 · 정보 113건 · 누적 비용 $0.0521 (Level 5, 커버리지 분모에 넣지 않음)</p>
     <table><thead><tr><th>시각</th><th>이름</th><th>라우트</th><th class="num">결정/동작</th><th class="num">이상</th><th class="num">정보</th><th class="num">비용</th><th>종료 사유</th><th>보고서</th></tr></thead><tbody><tr>
         <td>2026-09-27 23:37</td>
         <td>vpc-list</td>
@@ -1858,6 +1898,105 @@
         <td class="num">$0.0003</td>
         <td>Jev 가 두 번 연속 BLOCKED</td>
         <td class="mono small">recordings/explore/subnet-form-202609230914/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:09</td>
+        <td>ske-workload</td>
+        <td class="mono small">#/ske/workload</td>
+        <td class="num">6/4</td>
+        <td class="num">0</td>
+        <td class="num">6</td>
+        <td class="num">$0.0010</td>
+        <td>Jev 가 여섯 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/ske-workload-202609280709/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:14</td>
+        <td>ske-storage</td>
+        <td class="mono small">#/ske/storage</td>
+        <td class="num">6/4</td>
+        <td class="num">0</td>
+        <td class="num">6</td>
+        <td class="num">$0.0010</td>
+        <td>Jev 가 여섯 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/ske-storage-202609280714/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:04</td>
+        <td>ske-node</td>
+        <td class="mono small">#/ske/node</td>
+        <td class="num">6/5</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0005</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/ske-node-202609280704/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:11</td>
+        <td>ske-network</td>
+        <td class="mono small">#/ske/network</td>
+        <td class="num">7/5</td>
+        <td class="num">0</td>
+        <td class="num">8</td>
+        <td class="num">$0.0012</td>
+        <td>Jev 가 여섯 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/ske-network-202609280711/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:07</td>
+        <td>ske-namespace</td>
+        <td class="mono small">#/ske/namespace</td>
+        <td class="num">5/4</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">$0.0005</td>
+        <td>Jev 가 DONE</td>
+        <td class="mono small">recordings/explore/ske-namespace-202609280707/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:17</td>
+        <td>ske-configuration</td>
+        <td class="mono small">#/ske/configuration</td>
+        <td class="num">6/4</td>
+        <td class="num">0</td>
+        <td class="num">6</td>
+        <td class="num">$0.0010</td>
+        <td>Jev 가 여섯 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/ske-configuration-202609280717/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:01</td>
+        <td>ske-cluster-list</td>
+        <td class="mono small">#/ske/cluster</td>
+        <td class="num">15/15</td>
+        <td class="num">0</td>
+        <td class="num">2</td>
+        <td class="num">$0.0019</td>
+        <td>결정 예산 소진</td>
+        <td class="mono small">recordings/explore/ske-cluster-list-202609280701/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 06:51</td>
+        <td>ske-cluster-form</td>
+        <td class="mono small">#/ske/cluster</td>
+        <td class="num">26/26</td>
+        <td class="num">0</td>
+        <td class="num">3</td>
+        <td class="num">$0.0033</td>
+        <td>시도할 컨트롤이 더 없음</td>
+        <td class="mono small">recordings/explore/ske-cluster-form-202609280647/report.md</td>
+      </tr>
+<tr>
+        <td>2026-09-28 07:19</td>
+        <td>ske-authorization</td>
+        <td class="mono small">#/ske/authorization</td>
+        <td class="num">6/4</td>
+        <td class="num">0</td>
+        <td class="num">6</td>
+        <td class="num">$0.0010</td>
+        <td>Jev 가 여섯 번 연속 BLOCKED</td>
+        <td class="mono small">recordings/explore/ske-authorization-202609280719/report.md</td>
       </tr>
 <tr>
         <td>2026-09-27 23:39</td>

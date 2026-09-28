@@ -325,3 +325,15 @@
 - **동시 실행 확인(15:13~15:40)**: SKE 클러스터와 PostgreSQL 을 같은 로그인 브라우저의 별도 탭(별도 `run-stacks --only` 프로세스)에서 동시에 돌려 둘 다 PASS(17.5분·26.5분). 잔여 0.
   리소스 이름이 run_id 로 분리되고 VPC 한도(5)만 지키면 무거운 스택끼리 병렬이 된다. 단, `stacks:cleanup --yes` 는 실행 중엔 금지(9.9 참고).
 - 장부 모집단을 **키 있는 화면 전부(112)** 로 넓혔다(사용자 결정, `keyedListScreens` 에서 `/list` 조건 제거). L2+ 22/112(20%), L3+ 17/112(15%), L4 14. `policy`→`policy@iam`, `port`→`port@vpc`.
+
+### 9.12 공유 VPC 병렬 실행 · DBaaS 5종 · SKE 탐색 (2026-09-28 저녁)
+
+- **`scripts/run-parallel.ts --specs a,b,c --max N`**: api-test-automation 의 shared-infra 방식. 런처가 VPC+Subnet 을 한 번 만들고 `SHARED_VPC`/`SHARED_SUBNET` 으로 넘기면
+  spec(`src/console/shared.ts` `ensureNetwork`)은 자기 네트워크를 만들지도 지우지도 않는다. 끝나면 런처가 Subnet → VPC 를 지운다. 한 브라우저의 탭을 나눠 쓴다.
+- **DBaaS 팩토리 `src/console/dbaas.ts`** + spec 5종 모두 공유 VPC 위 병렬 PASS: PostgreSQL·MariaDB·EPAS(16:12 배치, 각 ≈16분 동시), MySQL·CacheStore(18:52 배치, 각 ≈16분 동시). 전부 L4.
+  폼 사실: 클러스터명 영문만, **DATA 디스크는 8GB 배수(100 거부)·CacheStore 는 64GB 이상** → 128GB 로 통일. EPAS 는 License(BYOL) 확인 체크. 네트워크 절이 비동기로 늦게 채워지며 폼을 다시 그려
+  먼저 채운 값이 사라진다 → VPC/Subnet 을 먼저 고르고 가라앉힌 뒤 입력. 보류: Search Engine(Elasticsearch BYOL 키만), SQL Server(BYOL 입력 3개), Vertica(노드 3개 필수).
+- **`below()` 버그 수정**: `:below` 는 뷰포트 좌표라 라벨이 스크롤로 사라지면 고정 헤더 검색창을 잡았다(SG 규칙 포트·DBaaS DATA 오류의 진짜 원인). 라벨을 먼저 스크롤하고 헤더 요소를 뺀다.
+- **SKE 탐색(별도 에이전트, Jev)**: 9회 83결정 이상 0, $0.011, 실제 클러스터 4회. 사실·후보는 `docs/service-facts/container-ske.md`. **결함 후보**: 워크로드·서비스 및 인그레스·스토리지·구성·권한
+  라우트 직접 진입 시 홈으로 리다이렉트(TypeError+404). 에이전트는 사용량 한도로 3번째 사이클 중 멈췄고 남은 클러스터는 없다.
+- 커버리지 **L2+ 26/112(23%), L3+ 21/112(19%)**.

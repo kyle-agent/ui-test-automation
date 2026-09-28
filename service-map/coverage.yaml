@@ -81,10 +81,10 @@ resources:
     service: "CacheStore(DBaaS)"
     category: "Database"
     route: /cachestore/cachestore/list
-    level: 1
-    specs: [smoke.cachestore-dbaas]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.cachestore-dbaas, database.cachestore]
+    last_pass: "2026-09-28"
+    note: "Redis Sentinel 단일(고가용성 끔), DATA 64GB 이상·8GB 배수, Redis Port/비밀번호. 공유 VPC 병렬 PASS 15.4분"
   - key: cdn
     service: "Global CDN"
     category: "Networking"
@@ -361,10 +361,10 @@ resources:
     service: "MySQL(DBaaS)"
     category: "Database"
     route: /mysql/mysql/list
-    level: 1
-    specs: [smoke.mysql-dbaas]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.mysql-dbaas, database.mysql]
+    last_pass: "2026-09-28"
+    note: "PostgreSQL 과 같은 폼. DATA 8GB 배수. 공유 VPC 병렬 PASS 16.2분"
   - key: bucket@object-storage
     service: "Object Storage"
     category: "Storage"
