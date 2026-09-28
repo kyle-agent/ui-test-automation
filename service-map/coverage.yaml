@@ -450,9 +450,9 @@ resources:
     category: "Networking"
     route: /securitygroup/securitygroup/list
     level: 4
-    specs: [compute.vm-stack-net]
-    last_pass: 2026-09-23
-    note: ""
+    specs: [compute.vm-stack-net, security.security-group-rule]
+    last_pass: "2026-09-28"
+    note: "규칙 추가(Inbound·CIDR·TCP 22)·삭제 동작 (security.security-group-rule, 2026-09-28)"
   - key: singleid
     service: "SingleID"
     category: "Security"
