@@ -545,10 +545,10 @@ resources:
     service: "VPC"
     category: "Networking"
     route: /vpc/nat-gateway/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.vpc, networking.nat-gateway]
+    last_pass: "2026-09-28"
+    note: "VPC(IGW 필수) → Subnet → Public IP(구분 NAT Gateway) → NAT(Multi-AZ 끔, 이름 자동 NAT_GW_<subnet>) → 삭제 → IGW·IP·Subnet·VPC. 시간 과금이라 즉시 삭제"
   - key: port
     service: "VPC"
     category: "Networking"

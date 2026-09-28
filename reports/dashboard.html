@@ -42,18 +42,18 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 08:52 · 실행 기록 35건 · 마지막 실행 2026-09-28 07:35 compute.vm-stack-net</span>
+  <span class="muted">생성 2026-09-28 10:47 · 실행 기록 52건 · 마지막 실행 2026-09-28 10:43 security.address-group</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
 <section>
   <h2>요약</h2>
   <div class="cards">
-    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">15 <span class="s">/ 15 (스위트 16)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">80% <span class="s">28/35</span></div><div class="s">실패 분류: unclassified 7</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">23% <span class="s">18/80 리소스</span></div><div class="s">L3+ 11 · 탐색 26회</div></div>
+    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">18 <span class="s">/ 18 (스위트 18)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
+    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">63% <span class="s">33/52</span></div><div class="s">실패 분류: unclassified 19</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">25% <span class="s">20/80 리소스</span></div><div class="s">L3+ 15 · 탐색 26회</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 1 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:2.941176470588235%"></span></div><div class="lbl">09-28</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 6 실패 12"><div class="stack"><span class="fail" style="height:35.294117647058826%"></span><span class="pass" style="height:17.647058823529413%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
 </section>
 
@@ -71,10 +71,10 @@
 <tr>
         <td class="mono">compute.vm-stack</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-23 22:31</td>
-        <td class="num">12분 20초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 17:09 PASS 13분 2초"></span><span class="dot fail" title="2026-09-23 20:05 FAIL(unclassified) 16분 17초"></span><span class="dot pass" title="2026-09-23 22:31 PASS 12분 20초"></span> <span class="muted">2/3</span></td>
-        <td class="num">12분 41초</td>
+        <td>2026-09-28 10:00</td>
+        <td class="num">14분 36초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 17:09 PASS 13분 2초"></span><span class="dot fail" title="2026-09-23 20:05 FAIL(unclassified) 16분 17초"></span><span class="dot pass" title="2026-09-23 22:31 PASS 12분 20초"></span><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 12분 57초"></span><span class="dot pass" title="2026-09-28 10:00 PASS 14분 36초"></span> <span class="muted">3/5</span></td>
+        <td class="num">13분 19초</td>
       </tr>
 <tr>
         <td class="mono">compute.vm-volume</td>
@@ -103,10 +103,10 @@
 <tr>
         <td class="mono">security.address-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-23 21:43</td>
-        <td class="num">1분 23초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 21:43 PASS 1분 23초"></span> <span class="muted">1/1</span></td>
-        <td class="num">1분 23초</td>
+        <td>2026-09-28 10:43</td>
+        <td class="num">1분 16초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 21:43 PASS 1분 23초"></span><span class="dot fail" title="2026-09-28 10:38 FAIL(unclassified) 2분 2초"></span><span class="dot pass" title="2026-09-28 10:43 PASS 1분 16초"></span> <span class="muted">2/3</span></td>
+        <td class="num">1분 20초</td>
       </tr>
 <tr>
         <td class="mono">storage.object-storage-bucket</td>
@@ -132,7 +132,6 @@
         <td class="dots"><span class="dot pass" title="2026-09-23 18:01 PASS 53초"></span><span class="dot pass" title="2026-09-23 21:46 PASS 58초"></span> <span class="muted">2/2</span></td>
         <td class="num">56초</td>
       </tr>
-<tr><td class="mono">iam.policy</td><td colspan="5" class="muted">기록 없음</td></tr>
 <tr>
         <td class="mono">compute.launch-configuration</td>
         <td><span class="badge pass">PASS</span></td>
@@ -174,6 +173,30 @@
         <td class="num">6분 27초</td>
       </tr>
 <tr>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 10:26</td>
+        <td class="num">1분 41초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:35 FAIL(unclassified) 1분 51초"></span><span class="dot fail" title="2026-09-28 09:42 FAIL(unclassified) 2분 18초"></span><span class="dot fail" title="2026-09-28 09:56 FAIL(unclassified) 1분 51초"></span><span class="dot fail" title="2026-09-28 10:00 FAIL(unclassified) 2분 0초"></span><span class="dot fail" title="2026-09-28 10:08 FAIL(unclassified) 2분 36초"></span><span class="dot fail" title="2026-09-28 10:16 FAIL(unclassified) 1분 49초"></span><span class="dot pass" title="2026-09-28 10:26 PASS 1분 41초"></span> <span class="muted">1/7</span></td>
+        <td class="num">1분 41초</td>
+      </tr>
+<tr>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 10:34</td>
+        <td class="num">11분 27초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:35 FAIL(unclassified) 10분 10초"></span><span class="dot fail" title="2026-09-28 09:48 FAIL(unclassified) 12분 43초"></span><span class="dot fail" title="2026-09-28 10:02 FAIL(unclassified) 14분 16초"></span><span class="dot pass" title="2026-09-28 10:34 PASS 11분 27초"></span> <span class="muted">1/4</span></td>
+        <td class="num">11분 27초</td>
+      </tr>
+<tr>
+        <td class="mono">compute.auto-scaling-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 10:03</td>
+        <td class="num">14분 51초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 17분 7초"></span><span class="dot pass" title="2026-09-28 10:03 PASS 14분 51초"></span> <span class="muted">1/2</span></td>
+        <td class="num">14분 51초</td>
+      </tr>
+<tr>
         <td class="mono">networking.vpc-peering</td>
         <td><span class="badge pass">PASS</span></td>
         <td>2026-09-23 22:15</td>
@@ -184,12 +207,148 @@
 </section>
 
 <section>
-  <h2>실행 기록 <small>최신 35건</small></h2>
+  <h2>실행 기록 <small>최신 40건</small></h2>
   <div class="filters">보기:
     <button data-st="all" class="on">전체</button><button data-st="fail">실패</button><button data-st="env">환경</button><button data-st="pass">통과</button>
   </div>
   <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-09-28 10:43</td>
+        <td class="mono">security.address-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 16초</td>
+        <td class="mono small">0928-1043-e651</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 10:38</td>
+        <td class="mono">security.address-group</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">2분 2초</td>
+        <td class="mono small">0928-1038-fb44</td>
+        <td class="err">[steps[1] addr-0928-1038-fb44 생성] Error: 추가한 대상 주소가 표에 보여야 합니다 <span class="muted mono small">test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-4.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 10:34</td>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">11분 27초</td>
+        <td class="mono small">0928-1034-bb05</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 10:26</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 41초</td>
+        <td class="mono small">0928-1026-a77a</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 10:16</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 49초</td>
+        <td class="mono small">0928-1016-19bb</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] TimeoutError: locator.fill: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-3.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 10:08</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">2분 36초</td>
+        <td class="mono small">0928-1009-5c04</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] Error: 추가한 규칙이 규칙 탭에 보여야 합니다 <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 10:03</td>
+        <td class="mono">compute.auto-scaling-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">14분 51초</td>
+        <td class="mono small">0928-1003-09cf</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 10:02</td>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">14분 16초</td>
+        <td class="mono small">0928-1003-2977</td>
+        <td class="err">[steps[3] NAT Gateway 생성] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 10:00</td>
+        <td class="mono">compute.vm-stack</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">14분 36초</td>
+        <td class="mono small">0928-1001-b5af</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 10:00</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">2분 0초</td>
+        <td class="mono small">0928-1000-2750</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] TimeoutError: locator.waitFor: Timeout 5000ms exceeded. <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:56</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 51초</td>
+        <td class="mono small">0928-0956-e7c7</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-5.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:48</td>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">12분 43초</td>
+        <td class="mono small">0928-0948-bd81</td>
+        <td class="err">[steps[3] NAT Gateway 생성] Error: &quot;Public IP&quot; 드롭다운에 /123\.41\.34\.242/ 항목이 없습니다. 보이는 항목: [&quot;vpc-0928-0945-bad5 AZ: kr-west1-b&quot;,&quot;vpc-0928-0945-d3ea AZ: kr-west1-b&quot;,&quot;vpc-0928-0948-bd81 AZ: kr-west1-b&quot;] <span class="muted mono small">test-results/artifacts/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:45</td>
+        <td class="mono">compute.vm-stack</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">12분 57초</td>
+        <td class="mono small">0928-0945-d3ea</td>
+        <td class="err">[steps[5] 서버 vm-0928-0945-d3ea 정지 → 시작] Error: 상세에 /^(정지|중지|Stop)$/i 버튼이 없습니다. 보이는 버튼: [&quot;시작(dis)&quot;,&quot;중지&quot;,&quot;재시작&quot;,&quot;Image 생성&quot;,&quot;콘솔 로그&quot;,&quot;Dump 생성&quot;,&quot;서비스 해지&quot;,&quot;신규 네트워크 포트로 추가&quot;,&quot;기존 네트워크 포트로 추가&quot;,&quot;신규 네트워크 포트로 추가&quot;,&quot;기존 네트워크 포트로 추가&quot;,&quot;Dele <span class="muted mono small">test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-6.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:45</td>
+        <td class="mono">compute.auto-scaling-group</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">17분 7초</td>
+        <td class="mono small">0928-0945-bad5</td>
+        <td class="err">[steps[2] Auto-Scaling Group asg-0928-0945-bad5 생성] Error: &quot;VPC명&quot; 드롭다운에 /^vpc-0928-0945-bad5\b/ 항목이 없습니다. 보이는 항목: [&quot;vpc-0928-0945-bad5 AZ: kr-west1-b&quot;,&quot;vpc-0928-0945-d3ea AZ: kr-west1-b&quot;,&quot;vpc-0928-0948-bd81 AZ: kr-west1- <span class="muted mono small">test-results/artifacts/compute.auto-scaling-group-79505-Scaling-Group-0대-생성-후-역순-삭제-regression/test-failed-5.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:42</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">2분 18초</td>
+        <td class="mono small">0928-0942-06c9</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] Error: 추가한 규칙이 규칙 탭에 보여야 합니다 <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-4.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:35</td>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">10분 10초</td>
+        <td class="mono small">0928-0935-4d1b</td>
+        <td class="err">[steps[3] NAT Gateway 생성] Error: &quot;VPC명&quot; 드롭다운에 /^vpc-0928-0935-4d1b\b/ 항목이 없습니다. 보이는 항목: [&quot;vpc-0928-0935-4d1b AZ: kr-west1-b&quot;] <span class="muted mono small">test-results/artifacts/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-3.png</span></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 09:35</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">1분 51초</td>
+        <td class="mono small">0928-0935-5296</td>
+        <td class="err">[steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-09-28 07:35</td>
         <td class="mono">compute.vm-stack-net</td>
         <td><span class="badge pass">PASS</span></td>
@@ -372,102 +531,6 @@
         <td class="num">6분 37초</td>
         <td class="mono small">0923-1910-ec9a</td>
         <td class="err">[steps[1] pdns-0923-1910-ec9a 생성] Error: pdns-0923-1910-ec9a 상태 /Active/i 대기 180초 초과. 마지막: pdns-0923-1910-ec9a kr-west1 Creating <span class="muted mono small">test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-3.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 18:47</td>
-        <td class="mono">networking.vpc-port</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">9분 25초</td>
-        <td class="mono small">0923-1847-1b2b</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 18:05</td>
-        <td class="mono">compute.launch-configuration</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 25초</td>
-        <td class="mono small">0923-1805-3ba9</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 18:02</td>
-        <td class="mono">compute.launch-configuration</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">51초</td>
-        <td class="mono small">0923-1802-b5f3</td>
-        <td class="err">[steps[1] lc-0923-1802-b5f3 생성] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/compute.launch-configurati-9eebd-aunch-Configuration-생성-후-삭제-regression/test-failed-8.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 18:01</td>
-        <td class="mono">iam.user-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">53초</td>
-        <td class="mono small">0923-1801-0ec2</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 18:00</td>
-        <td class="mono">management.resource-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">52초</td>
-        <td class="mono small">0923-1800-baf8</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 17:40</td>
-        <td class="mono">storage.object-storage-bucket</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 9초</td>
-        <td class="mono small">0923-1740-4527</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 17:38</td>
-        <td class="mono">compute.vm-stack-net</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">16분 29초</td>
-        <td class="mono small">0923-1738-196a</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/compute.vm-stack-net-SG·IG-c43a4-irtual-Server-스택-생성-후-역순-삭제-regression/screenshot-compute.vm-stack-net.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 17:37</td>
-        <td class="mono">storage.object-storage-bucket</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">1분 6초</td>
-        <td class="mono small">0923-1737-374b</td>
-        <td class="err">TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/storage.object-storage-buc-1741a-지-Object-Storage-버킷-생성-후-해지-regression/screenshot-simple-crud.ts.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 17:22</td>
-        <td class="mono">compute.vm-volume</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">15분 27초</td>
-        <td class="mono small">0923-1723-923d</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 17:09</td>
-        <td class="mono">compute.vm-stack</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">13분 2초</td>
-        <td class="mono small">0923-1710-a2d1</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 17:09</td>
-        <td class="mono">networking.vpc.create-delete</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">42초</td>
-        <td class="mono small">0923-1709-d0c8</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 17:00</td>
-        <td class="mono">networking.vpc.create-delete</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">41초</td>
-        <td class="mono small">0923-1700-3d79</td>
-        <td class="err"></td>
       </tr></tbody></table>
 </section>
 
@@ -477,8 +540,8 @@
   
     <div class="cards">
       <div class="card"><div class="k">리소스(모집단)</div><div class="v">80</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">18 <span class="s">/ 80 · 23%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:78%" title="L1 진입 62"></span><span class="seg l2" style="width:9%" title="L2 CRUD 7"></span><span class="seg l3" style="width:3%" title="L3 동작 2"></span><span class="seg l4" style="width:11%" title="L4 통합 9"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">11 <span class="s">/ 80 · 14%</span></div><div class="s">L0 없음 0 · L1 진입 62 · L2 CRUD 7 · L3 동작 2 · L4 통합 9</div></div>
+      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">20 <span class="s">/ 80 · 25%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:75%" title="L1 진입 60"></span><span class="seg l2" style="width:6%" title="L2 CRUD 5"></span><span class="seg l3" style="width:4%" title="L3 동작 3"></span><span class="seg l4" style="width:15%" title="L4 통합 12"></span></div></div>
+      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">15 <span class="s">/ 80 · 19%</span></div><div class="s">L0 없음 0 · L1 진입 60 · L2 CRUD 5 · L3 동작 3 · L4 통합 12</div></div>
     </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -492,9 +555,9 @@
 <tr>
         <td>Compute</td>
         <td class="num">14</td>
-        <td class="num"></td><td class="num">10</td><td class="num">2</td><td class="num">1</td><td class="num">1</td>
-        <td class="num">29%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:71%" title="L1 진입 10"></span><span class="seg l2" style="width:14%" title="L2 CRUD 2"></span><span class="seg l3" style="width:7%" title="L3 동작 1"></span><span class="seg l4" style="width:7%" title="L4 통합 1"></span></div></td>
+        <td class="num"></td><td class="num">9</td><td class="num">1</td><td class="num">1</td><td class="num">3</td>
+        <td class="num">36%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:64%" title="L1 진입 9"></span><span class="seg l2" style="width:7%" title="L2 CRUD 1"></span><span class="seg l3" style="width:7%" title="L3 동작 1"></span><span class="seg l4" style="width:21%" title="L4 통합 3"></span></div></td>
       </tr>
 <tr>
         <td>Data Analytics</td>
@@ -527,9 +590,9 @@
 <tr>
         <td>Networking</td>
         <td class="num">30</td>
-        <td class="num"></td><td class="num">20</td><td class="num">1</td><td class="num">1</td><td class="num">8</td>
-        <td class="num">33%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:67%" title="L1 진입 20"></span><span class="seg l2" style="width:3%" title="L2 CRUD 1"></span><span class="seg l3" style="width:3%" title="L3 동작 1"></span><span class="seg l4" style="width:27%" title="L4 통합 8"></span></div></td>
+        <td class="num"></td><td class="num">19</td><td class="num"></td><td class="num">2</td><td class="num">9</td>
+        <td class="num">37%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:63%" title="L1 진입 19"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:7%" title="L3 동작 2"></span><span class="seg l4" style="width:30%" title="L4 통합 9"></span></div></td>
       </tr>
 <tr>
         <td>Security</td>
@@ -553,12 +616,30 @@
       </div>
       <table id="res"><thead><tr><th>level</th><th>key</th><th>서비스</th><th>카테고리</th><th>specs</th><th>last_pass</th><th>note</th></tr></thead><tbody><tr class="res" data-level="4" data-cat="Compute">
         <td><span class="lv l4">L4</span></td>
+        <td class="mono">auto-scaling-group</td>
+        <td>Virtual Server</td>
+        <td>Compute</td>
+        <td class="mono small">smoke.virtual-server<br>compute.auto-scaling-group</td>
+        <td>2026-09-28</td>
+        <td class="note">VPC·Subnet·SG·LC 위에서 Min 0/Desired 0/Max 1 로 생성(In Service, 서버 없음 → 무과금) → 상세 Auto-Scaling Group 삭제</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Compute">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">launch-configuration</td>
+        <td>Virtual Server</td>
+        <td>Compute</td>
+        <td class="mono small">smoke.virtual-server<br>compute.launch-configuration<br>compute.auto-scaling-group</td>
+        <td>2026-09-28</td>
+        <td class="note">Standard-1/s1v1m2, 기본 OS 디스크 SSD(SSD_Provisioned 는 IOPS·Throughput 필수), 공유 Keypair. 서버를 만들지 않아 무과금</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Compute">
+        <td><span class="lv l4">L4</span></td>
         <td class="mono">virtual-server</td>
         <td>Virtual Server</td>
         <td>Compute</td>
         <td class="mono small">compute.vm-stack<br>compute.vm-volume<br>compute.vm-stack-net</td>
-        <td>2026-09-23</td>
-        <td class="note"></td>
+        <td>2026-09-28</td>
+        <td class="note">상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28)</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
@@ -577,6 +658,15 @@
         <td class="mono small">compute.vm-stack-net</td>
         <td>2026-09-23</td>
         <td class="note"></td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Networking">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">nat-gateway</td>
+        <td>VPC</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.vpc<br>networking.nat-gateway</td>
+        <td>2026-09-28</td>
+        <td class="note">VPC(IGW 필수) → Subnet → Public IP(구분 NAT Gateway) → NAT(Multi-AZ 끔, 이름 자동 NAT_GW_&lt;subnet&gt;) → 삭제 → IGW·IP·Subnet·VPC. 시간 과금이라 즉시 삭제</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
@@ -601,9 +691,9 @@
         <td class="mono">security-group</td>
         <td>Security Group</td>
         <td>Networking</td>
-        <td class="mono small">compute.vm-stack-net</td>
-        <td>2026-09-23</td>
-        <td class="note"></td>
+        <td class="mono small">compute.vm-stack-net<br>security.security-group-rule</td>
+        <td>2026-09-28</td>
+        <td class="note">규칙 추가(Inbound·CIDR·TCP 22)·삭제 동작 (security.security-group-rule, 2026-09-28)</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
@@ -643,21 +733,21 @@
       </tr>
 <tr class="res" data-level="3" data-cat="Networking">
         <td><span class="lv l3">L3</span></td>
+        <td class="mono">address-group</td>
+        <td>Security Group</td>
+        <td>Networking</td>
+        <td class="mono small">smoke.security-group<br>security.address-group</td>
+        <td>2026-09-28</td>
+        <td class="note">생성(대상 주소 CIDR) → 목록 → 삭제. 선행 리소스 없음 · 상세 대상 주소 탭에서 CIDR 추가(모달) 동작 (2026-09-28)</td>
+      </tr>
+<tr class="res" data-level="3" data-cat="Networking">
+        <td><span class="lv l3">L3</span></td>
         <td class="mono">publicip</td>
         <td>VPC</td>
         <td>Networking</td>
         <td class="mono small">compute.vm-stack-net</td>
         <td>2026-09-23</td>
         <td class="note">서버에 NAT 로 연결/해제</td>
-      </tr>
-<tr class="res" data-level="2" data-cat="Compute">
-        <td><span class="lv l2">L2</span></td>
-        <td class="mono">launch-configuration</td>
-        <td>Virtual Server</td>
-        <td>Compute</td>
-        <td class="mono small">smoke.virtual-server<br>compute.launch-configuration</td>
-        <td>2026-09-23</td>
-        <td class="note">Standard-1/s1v1m2, 기본 OS 디스크 SSD(SSD_Provisioned 는 IOPS·Throughput 필수), 공유 Keypair. 서버를 만들지 않아 무과금</td>
       </tr>
 <tr class="res" data-level="2" data-cat="Compute">
         <td><span class="lv l2">L2</span></td>
@@ -685,15 +775,6 @@
         <td class="mono small">smoke.resource-groups<br>management.resource-group</td>
         <td>2026-09-23</td>
         <td class="note">생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금</td>
-      </tr>
-<tr class="res" data-level="2" data-cat="Networking">
-        <td><span class="lv l2">L2</span></td>
-        <td class="mono">address-group</td>
-        <td>Security Group</td>
-        <td>Networking</td>
-        <td class="mono small">smoke.security-group<br>security.address-group</td>
-        <td>2026-09-23</td>
-        <td class="note">생성(대상 주소 CIDR) → 목록 → 삭제. 선행 리소스 없음</td>
       </tr>
 <tr class="res" data-level="2" data-cat="Storage">
         <td><span class="lv l2">L2</span></td>
@@ -737,15 +818,6 @@
         <td>Simple AI Training</td>
         <td>AI-ML</td>
         <td class="mono small">smoke.simple-ai-training</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Compute">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">auto-scaling-group</td>
-        <td>Virtual Server</td>
-        <td>Compute</td>
-        <td class="mono small">smoke.virtual-server</td>
         <td></td>
         <td class="note"></td>
       </tr>
@@ -1070,15 +1142,6 @@
         <td>Load Balancer</td>
         <td>Networking</td>
         <td class="mono small">smoke.load-balancer</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Networking">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">nat-gateway</td>
-        <td>VPC</td>
-        <td>Networking</td>
-        <td class="mono small">smoke.vpc</td>
         <td></td>
         <td class="note"></td>
       </tr>

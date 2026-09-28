@@ -296,3 +296,18 @@
   **콘솔 사실: VPC·서버·(Peering 직후) 해지 요청이 가끔 무시된다. 요청 후 상태 변화를 확인하고 재시도하는 것이 규칙.** 22:29 에 vm-stack·vm-stack-net 만 다시 돌려 확인 중.
 - IAM 정책은 보류: 마법사 2단계의 JSON 모드 편집기(ACE)에 값을 넣어도(타이핑·붙여넣기·API) "다음" 이 활성화되지 않고, 기본 모드는 서비스 선택 뒤 액션 그룹(Create/Delete/List…)을 펼쳐 개별 액션을 골라야 한다. spec·기록은 지웠다.
 - 탐색 4차(선행 없는 폼 5건)까지 합쳐 오늘 탐색 20회, 이상 0. 대시보드 "탐색" 절에 모두 보인다.
+
+### 9.10 스택 확장 2차 — ASG · NAT · 동작(L3) (2026-09-28 오전)
+
+- 새 spec(모두 통과): `compute.auto-scaling-group`(VPC → Subnet → SG → LC → ASG Min0/Desired0/Max1 "In Service" → 상세 "Auto-Scaling Group 삭제" → 역순, 14.6분, 무과금),
+  `networking.nat-gateway`(VPC → **IGW 필수** → Subnet → Public IP **구분 "NAT Gateway"** → NAT(Multi-AZ 끔, 이름 자동 `NAT_GW_<subnet>`) → 삭제 → IGW → IP 반납 → Subnet → VPC, 11.3분, 시간 과금),
+  `security.security-group-rule`(SG → 상세 규칙 탭 → "규칙 추가" 화면: 프로토콜 TCP 체크 → 포트 22 → "추가" → Inbound → "완료" → "규칙을 추가하시겠습니까?" → 행 삭제 → SG 해지, 1.7분).
+  동작 step 추가: `compute.vm-stack` 상세 "중지"(Powering Off → Stopped) → "시작"(Powering On → Active), `security.address-group` 상세 "대상 주소 (n)" 탭 → "대상 주소 추가" 모달.
+- **커버리지 L2+ 19/80(24%), L3+ 14/80(18%)** — auto-scaling-group·launch-configuration·nat-gateway L4, address-group L3, security-group·virtual-server 에 동작 기록.
+- 콘솔 사실(새로): NAT 폼은 IGW 없는 VPC 를 고를 수 없고("Internet Gateway가 연결되어 있지 않은 VPC는 선택이 불가합니다"), Internet Gateway 구분으로 예약한 IP 는 NAT 폼 목록에 안 나온다.
+  SG 규칙 화면의 포트 입력란은 라벨·placeholder 가 없어(힌트만) 보이는 텍스트 입력란 순서(검색창 → 대상 주소 → 포트)로 잡는다. "ALL" 유형은 경고 모달. ASG 목록엔 삭제가 없고 상세 버튼만.
+  Address Group 상세엔 "수정" 이 없고 대상 주소 탭의 "대상 주소 추가" 모달만 있다(행 삭제 없음).
+- 도구 교훈: `hasText: /^라벨$/` 로 버튼을 잡으면 안 맞는 경우가 있다(안쪽 공백·아이콘) → `getByRole('button', { name })`. 드롭다운 항목도 `^` 앵커 금지(항목 텍스트 앞뒤 공백).
+  하단 고정 버튼("완료"·"다음")과 일부 모달 "확인" 은 활성인데도 Playwright "stable" 판정이 안 나 15초 타임아웃 → `submitForm`/`confirmModal` 이 10초 뒤 강제 클릭으로 넘어간다.
+- 탐색: 오라클이 `.scp-error` 래퍼를 잡아 거부값 → 문구를 보고하고(VPC 폼 19건 확인), 거부 기대값을 먼저 내고, 같은 오류는 한 번만 센다. BLOCKED 두 번이면 코드가 다음 후보를 고른다.
+- 보류 그대로: IAM 정책(액션 선택 UI), LB(Service Subnet), Secrets Manager·KMS(과금·지연 삭제).

@@ -1,0 +1,56 @@
+{
+  "spec": "networking.nat-gateway",
+  "started": "2026-09-28T01:34:08.698Z",
+  "ended": "2026-09-28T01:45:35.385Z",
+  "seconds": 687,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.nat-gateway",
+    "run_id": "0928-1034-bb05",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Public IP → NAT Gateway 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 661.1,
+      "annotations": {
+        "scenario": "networking.nat-gateway",
+        "run_id": "0928-1034-bb05",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] VPC vpc-0928-1034-bb05 · Subnet sub-0928-1034-bb05 생성",
+          "status": "pass",
+          "seconds": 291.4
+        },
+        {
+          "title": "steps[2] Public IP 예약",
+          "status": "pass",
+          "seconds": 19.2
+        },
+        {
+          "title": "steps[3] NAT Gateway 생성",
+          "status": "pass",
+          "seconds": 32.5
+        }
+      ]
+    }
+  ]
+}

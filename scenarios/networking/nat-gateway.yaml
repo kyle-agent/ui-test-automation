@@ -12,7 +12,7 @@ precondition:
 # 콘솔(2026-09-28 프로브): NAT 목록 #/vpc/nat-gateway/list, 버튼 "NAT Gateway 생성" / 상단 "삭제"(행 선택 후). 폼(#/vpc/nat-gateway/request):
 # "VPC명"(드롭다운, 항목 "vpc-… AZ: kr-west1-b"), "Subnet명"(VPC 고른 뒤 채워짐), "NAT Gateway명"(자동), "Multi-AZ 사용 여부"(체크, 기본 켜짐 → 끈다: IP 2개 필요),
 # "Public IP"(사전 예약된 Public IP 드롭다운), "설명", "요금 확인" 버튼(월 ₩35,040 → 시간 과금이라 만들자마자 지운다).
-# Public IP 는 vm-stack-net 과 같은 흐름으로 예약(구분 Internet Gateway, AZ kr-west1-b)하고 NAT 삭제 뒤 반납.
+# VPC 에 Internet Gateway 가 붙어 있어야 NAT 폼에서 VPC 를 고를 수 있고, Public IP 는 구분 "NAT Gateway" 로 예약해야 목록에 나온다(2026-09-28 프로브). NAT 삭제 → IGW 삭제 → IP 반납 → Subnet → VPC.
 steps:
   - goal: "VPC 목록으로 이동한다"
     goto: "#/vpc/vpc/list"

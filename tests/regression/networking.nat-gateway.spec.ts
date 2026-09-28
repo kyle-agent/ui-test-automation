@@ -14,6 +14,7 @@ import {
   pickOption,
   row,
   selectRow,
+  setCheckbox,
   submitForm,
   terminateVpc,
   topButton,
@@ -93,6 +94,18 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         await expectStep(page, resolveExpectation(scenario.teardown[0]!.expect, vars), ctx(0));
       });
     });
+    await attempt('IGW 삭제', async () => {
+      await gotoRoute(page, ROUTES.igw);
+      if ((await row(page, vars.vpc!).count()) === 0) return;
+      await row(page, vars.vpc!).getByRole('button', { name: '삭제', exact: true }).click();
+      await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true });
+      await waitForRow(page, ROUTES.igw, vars.vpc!, {
+        gone: true,
+        timeoutMs: 600_000,
+        intervalMs: 15_000,
+        log,
+      });
+    });
     await attempt('Public IP 반납', async () => {
       if (!publicIp) return;
       await gotoRoute(page, ROUTES.pip);
@@ -154,6 +167,21 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await submitForm(page, '생성');
       await confirmModal(page, /생성하시겠습니까/);
       await waitForRow(page, ROUTES.vpc, vars.vpc!, { status: /Active/, timeoutMs: 180_000, log });
+      // NAT 폼: "Internet Gateway가 연결되어 있지 않은 VPC는 선택이 불가합니다" (2026-09-28 프로브) → IGW 를 먼저 붙인다 (vm-stack-net 과 같은 흐름)
+      await openCreateForm(page, ROUTES.igw, 'Internet Gateway 생성');
+      await pickOption(page, 'VPC명', vars.vpc!);
+      await pickOption(page, '구분', 'Internet Gateway');
+      await setCheckbox(page, 'Firewall 사용', false);
+      await setCheckbox(page, 'Firewall 로그 저장 여부', false);
+      await submitForm(page, '생성');
+      await confirmModal(page, /선택하지 않았습니다/, '확인', { agree: true });
+      await confirmModal(page, /생성하시겠습니까/);
+      await waitForRow(page, ROUTES.igw, vars.vpc!, {
+        status: /Active/,
+        timeoutMs: 300_000,
+        intervalMs: 10_000,
+        log,
+      });
       await openCreateForm(page, ROUTES.subnet, 'Subnet 생성');
       await pickOption(page, 'VPC명', vars.vpc!);
       await pickOption(page, 'Subnet 유형', 'Public');
@@ -175,7 +203,12 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     await test.step('steps[2] Public IP 예약', async () => {
       const before = new Set(await publicIps(page));
       await openCreateForm(page, ROUTES.pip, 'Public IP 예약');
-      await pickOption(page, '구분', 'Internet Gateway');
+      // NAT 용 IP 는 구분을 "NAT Gateway" 로 예약해야 NAT 폼의 Public IP 목록에 나온다(Internet Gateway 로 예약하면 "데이터가 없습니다" — 2026-09-28 프로브)
+      try {
+        await pickOption(page, '구분', /NAT/);
+      } catch {
+        await pickOption(page, '구분', 'Internet Gateway');
+      }
       await pickOption(page, 'Availability Zone', 'kr-west1-b');
       await submitForm(page, '생성');
       await confirmModal(page, /예약하시겠습니까/);
