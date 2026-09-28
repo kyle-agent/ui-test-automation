@@ -311,3 +311,14 @@
   하단 고정 버튼("완료"·"다음")과 일부 모달 "확인" 은 활성인데도 Playwright "stable" 판정이 안 나 15초 타임아웃 → `submitForm`/`confirmModal` 이 10초 뒤 강제 클릭으로 넘어간다.
 - 탐색: 오라클이 `.scp-error` 래퍼를 잡아 거부값 → 문구를 보고하고(VPC 폼 19건 확인), 거부 기대값을 먼저 내고, 같은 오류는 한 번만 센다. BLOCKED 두 번이면 코드가 다음 후보를 고른다.
 - 보류 그대로: IAM 정책(액션 선택 UI), LB(Service Subnet), Secrets Manager·KMS(과금·지연 삭제).
+
+### 9.11 무거운 서비스 — Kubernetes Engine · PostgreSQL(DBaaS) (2026-09-28 오후)
+
+- `container.ske-cluster`(VPC → Subnet → SG → 클러스터, 노드 풀 없음): **PASS 22.6분**. Running 까지 ≈7분, 해지 ≈12분. 목록 "서비스 해지"(행 선택).
+  폼 사실: "생성" 은 StorageClass 설정의 **"NFS 볼륨 — 사용" 체크(기본 켜짐, 볼륨 미선택)를 꺼야** 활성. Security Group 은 두 번째 "선택" 모달(검색 → 행 체크 → 확인). 제어 영역만이라 월 ₩62,780 예상(시간 과금).
+- `database.postgresql`(VPC → Subnet → 단일 서버 db1v2m4): 1차 실패 → 프로브로 원인 둘 확인 → **2차 PASS 23.8분**. Running ≈8분, 해지는 상세 "서비스 해지"(목록엔 없음).
+  폼 사실: **클러스터명은 영문만**(숫자 있으면 문구 없는 `.scp-error`), **Block Storage DATA 용량이 기본 0GB 라 필수**(요약 "추가(DATA) SSD | 0GB"). 폼이 절 단위로 늦게 그려져 "Database 사용자명" 이 보일 때까지(최대 60초) 기다린 뒤 채운다.
+  비밀번호는 `Qa!<run_id_compact>x9` 로 실행 중 만들고 기록하지 않는다(`run_id_alpha` = 숫자를 a~j 로 바꾼 run_id 를 `scenarioVars` 에 추가). 월 ₩152,570 예상(시간 과금).
+- 커버리지 **L2+ 21/80(26%), L3+ 16/80(20%)** — postgresql L4. **SKE 클러스터는 장부 모집단 밖**: `/ske/cluster` 는 `/list` 로 끝나지 않아 `keyedListScreens` 가 뺀다. 같은 이유로 빠진 키 있는 화면이 32개
+  (Container Registry `/scr/registry`, Cloud Functions `/scf/cloudfunctions`, IAM 역할 `/iam/role`, Queue, Cloud WAN/LAN, Oracle Services, Trail …). 모집단을 "키 있는 화면 전부(112)" 로 넓힐지는 사용자 결정 사항 — 넓히면 분모가 80 → 112.
+- 정리 스크립트 종류 추가: `ske`(Active 대기 → 목록 해지), `pg`(Active 대기 → 상세 해지). 스위트 21개 spec, 전체 약 3시간 40분 — 무거운 둘은 `@heavy` 태그.
