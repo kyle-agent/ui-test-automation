@@ -22,5 +22,8 @@ export const SUITE_ORDER: readonly string[] = [
   'compute.auto-scaling-group', // ≈15분. VPC → Subnet → SG → LC → ASG(0대) → 역순. 무과금
   'networking.vpc-peering',
   'container.ske-cluster', // ≈40분. VPC → Subnet → SG → SKE 클러스터(노드 없음) → 역순. 시간 과금
-  'database.postgresql', // ≈40분. VPC → Subnet → PostgreSQL 단일 서버 → 역순. 시간 과금 // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지
+  'database.postgresql', // ≈25분. VPC → Subnet → PostgreSQL 단일 서버 → 역순. 시간 과금 (공유 VPC 병렬 가능: scripts/run-parallel.ts)
+  'database.mysql', // ≈25분. 위와 같은 구조
+  'database.mariadb', // ≈25분
+  'database.epas', // ≈25분. License 확인 체크 // ≈5분. VPC 2개 → Peering(동일 Account) → 상세에서 삭제 → VPC 해지
 ];

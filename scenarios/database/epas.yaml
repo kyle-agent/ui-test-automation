@@ -1,0 +1,44 @@
+id: database.epas
+title: VPC → Subnet → EPAS(DBaaS) 단일 서버 생성 후 역순 해지
+service: EPAS(DBaaS)
+category: Database
+tags: [regression, destructive, crud, stack, heavy]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-28 프로브): PostgreSQL 폼과 같은 구조(서버명 prefix·클러스터명(영문만)·DATA GB·VPC/Subnet 공통 설정·Database명/사용자/비밀번호/포트·백업 등). 이미지 기본 EPAS 17.
+# 목록엔 해지 버튼이 없고 상세 "서비스 해지". 시간 과금 → 생성 확인 즉시 해지. 공유 VPC(SHARED_VPC/SHARED_SUBNET) 채택 가능.
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}} 와 Subnet {{subnet}} 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "EPAS(DBaaS) 클러스터 {{name}} (서버 prefix {{prefix}}) 을 단일 서버로 생성하고 Active 를 기다린다"
+    vars:
+      name: "epc{{run_id_alpha}}"
+      prefix: "e{{run_id_compact}}"
+    expect:
+      url: "#/epas/epas/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 1800000
+  - goal: "Subnet, VPC 를 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000
