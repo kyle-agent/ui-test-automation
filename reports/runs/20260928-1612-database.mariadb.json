@@ -1,0 +1,51 @@
+{
+  "spec": "database.mariadb",
+  "started": "2026-09-28T07:12:35.225Z",
+  "ended": "2026-09-28T07:28:18.625Z",
+  "seconds": 943,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.mariadb",
+    "run_id": "0928-1613-315d",
+    "title": "MariaDB(DBaaS) 목록 | MariaDB(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 43.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → MariaDB(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 867.8,
+      "annotations": {
+        "scenario": "database.mariadb",
+        "run_id": "0928-1613-315d",
+        "title": "MariaDB(DBaaS) 목록 | MariaDB(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 40.8
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 4
+        },
+        {
+          "title": "steps[2] macajcibgbddbfd 생성",
+          "status": "pass",
+          "seconds": 562.3
+        }
+      ]
+    }
+  ]
+}

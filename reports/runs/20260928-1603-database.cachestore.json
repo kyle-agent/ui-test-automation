@@ -1,0 +1,75 @@
+{
+  "spec": "database.cachestore",
+  "started": "2026-09-28T07:03:23.759Z",
+  "ended": "2026-09-28T07:04:54.992Z",
+  "seconds": 91,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "database.cachestore",
+    "run_id": "0928-1603-96db",
+    "title": "Subnet 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → CacheStore(Redis) 단일 서버 생성 후 역순 해지",
+      "status": "failed",
+      "seconds": 51.9,
+      "annotations": {
+        "scenario": "database.cachestore",
+        "run_id": "0928-1603-96db",
+        "title": "Subnet 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 2.4
+        },
+        {
+          "title": "steps[2] rdcajcibgadjgdb 생성",
+          "status": "fail",
+          "seconds": 40.9
+        }
+      ],
+      "error": "TimeoutError: locator.waitFor: Timeout 10000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-6.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-4.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-2.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-1.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-3.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-5.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/error-context.md",
+        "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.waitFor: Timeout 10000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-6.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-4.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-2.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-1.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-3.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/test-failed-5.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/error-context.md",
+    "test-results/artifacts/database.cachestore-VPC-→--c2905-tore-Redis-단일-서버-생성-후-역순-해지-regression/trace.zip"
+  ]
+}

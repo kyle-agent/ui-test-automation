@@ -161,10 +161,10 @@ resources:
     service: "EPAS(DBaaS)"
     category: "Database"
     route: /epas/epas/list
-    level: 1
-    specs: [smoke.epas-dbaas]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.epas-dbaas, database.epas]
+    last_pass: "2026-09-28"
+    note: "PostgreSQL 과 같은 폼 + License(BYOL) 확인 체크. 공유 VPC 위에서 병렬 PASS 16.2분"
   - key: event-streams
     service: "Event Streams"
     category: "Data Analytics"
@@ -337,10 +337,10 @@ resources:
     service: "MariaDB(DBaaS)"
     category: "Database"
     route: /mariadb/mariadb/list
-    level: 1
-    specs: [smoke.mariadb-dbaas]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.mariadb-dbaas, database.mariadb]
+    last_pass: "2026-09-28"
+    note: "PostgreSQL 과 같은 폼(db1v1m2). 공유 VPC 위에서 병렬 PASS 15.7분"
   - key: cluster-fabric
     service: "Multi-node GPU Cluster"
     category: "Compute"

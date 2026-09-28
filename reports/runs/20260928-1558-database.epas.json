@@ -1,0 +1,75 @@
+{
+  "spec": "database.epas",
+  "started": "2026-09-28T06:58:42.923Z",
+  "ended": "2026-09-28T06:59:55.832Z",
+  "seconds": 73,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "database.epas",
+    "run_id": "0928-1559-e798",
+    "title": "Subnet 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → EPAS(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "failed",
+      "seconds": 36.7,
+      "annotations": {
+        "scenario": "database.epas",
+        "run_id": "0928-1559-e798",
+        "title": "Subnet 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.5
+        },
+        {
+          "title": "steps[2] epcajcibffjehji 생성",
+          "status": "fail",
+          "seconds": 24.2
+        }
+      ],
+      "error": "Error: \"Database명\" 입력값이 남아 있어야 합니다",
+      "attachments": [
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-6.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-5.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-1.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-3.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-4.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-2.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/error-context.md",
+        "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: \"Database명\" 입력값이 남아 있어야 합니다",
+  "attachments": [
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-6.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-5.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-1.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-3.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-4.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-2.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/error-context.md",
+    "test-results/artifacts/database.epas-VPC-→-Subnet-0aefd-EPAS-DBaaS-단일-서버-생성-후-역순-해지-regression/trace.zip"
+  ]
+}
