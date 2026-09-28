@@ -1,0 +1,66 @@
+{
+  "spec": "security.address-group",
+  "started": "2026-09-28T01:38:19.040Z",
+  "ended": "2026-09-28T01:40:20.824Z",
+  "seconds": 122,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.address-group",
+    "run_id": "0928-1038-fb44",
+    "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Address Group 생성 후 삭제",
+      "status": "failed",
+      "seconds": 93.1,
+      "annotations": {
+        "scenario": "security.address-group",
+        "run_id": "0928-1038-fb44",
+        "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Address Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.3
+        },
+        {
+          "title": "steps[1] addr-0928-1038-fb44 생성",
+          "status": "fail",
+          "seconds": 68.4
+        }
+      ],
+      "error": "Error: 추가한 대상 주소가 표에 보여야 합니다",
+      "attachments": [
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/error-context.md",
+        "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 추가한 대상 주소가 표에 보여야 합니다",
+  "attachments": [
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/error-context.md",
+    "test-results/artifacts/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/trace.zip"
+  ]
+}
