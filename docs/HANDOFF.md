@@ -303,7 +303,7 @@
   `networking.nat-gateway`(VPC → **IGW 필수** → Subnet → Public IP **구분 "NAT Gateway"** → NAT(Multi-AZ 끔, 이름 자동 `NAT_GW_<subnet>`) → 삭제 → IGW → IP 반납 → Subnet → VPC, 11.3분, 시간 과금),
   `security.security-group-rule`(SG → 상세 규칙 탭 → "규칙 추가" 화면: 프로토콜 TCP 체크 → 포트 22 → "추가" → Inbound → "완료" → "규칙을 추가하시겠습니까?" → 행 삭제 → SG 해지, 1.7분).
   동작 step 추가: `compute.vm-stack` 상세 "중지"(Powering Off → Stopped) → "시작"(Powering On → Active), `security.address-group` 상세 "대상 주소 (n)" 탭 → "대상 주소 추가" 모달.
-- **커버리지 L2+ 19/80(24%), L3+ 14/80(18%)** — auto-scaling-group·launch-configuration·nat-gateway L4, address-group L3, security-group·virtual-server 에 동작 기록.
+- **커버리지 L2+ 20/80(25%), L3+ 15/80(19%)** — auto-scaling-group·launch-configuration·nat-gateway L4, address-group L3, security-group·virtual-server 에 동작 기록.
 - 콘솔 사실(새로): NAT 폼은 IGW 없는 VPC 를 고를 수 없고("Internet Gateway가 연결되어 있지 않은 VPC는 선택이 불가합니다"), Internet Gateway 구분으로 예약한 IP 는 NAT 폼 목록에 안 나온다.
   SG 규칙 화면의 포트 입력란은 라벨·placeholder 가 없어(힌트만) 보이는 텍스트 입력란 순서(검색창 → 대상 주소 → 포트)로 잡는다. "ALL" 유형은 경고 모달. ASG 목록엔 삭제가 없고 상세 버튼만.
   Address Group 상세엔 "수정" 이 없고 대상 주소 탭의 "대상 주소 추가" 모달만 있다(행 삭제 없음).
