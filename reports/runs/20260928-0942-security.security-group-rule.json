@@ -1,0 +1,71 @@
+{
+  "spec": "security.security-group-rule",
+  "started": "2026-09-28T00:42:39.189Z",
+  "ended": "2026-09-28T00:44:57.409Z",
+  "seconds": 138,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.security-group-rule",
+    "run_id": "0928-0942-06c9",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 9.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Security Group 생성 → 규칙 추가·삭제 → 해지",
+      "status": "failed",
+      "seconds": 107.2,
+      "annotations": {
+        "scenario": "security.security-group-rule",
+        "run_id": "0928-0942-06c9",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Security Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] Security Group sg-0928-0942-06c9 생성",
+          "status": "pass",
+          "seconds": 29.8
+        },
+        {
+          "title": "steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)",
+          "status": "fail",
+          "seconds": 59.9
+        }
+      ],
+      "error": "Error: 추가한 규칙이 규칙 탭에 보여야 합니다",
+      "attachments": [
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-4.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-2.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-3.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/error-context.md",
+        "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 추가한 규칙이 규칙 탭에 보여야 합니다",
+  "attachments": [
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-4.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-1.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-2.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/test-failed-3.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/error-context.md",
+    "test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip"
+  ]
+}

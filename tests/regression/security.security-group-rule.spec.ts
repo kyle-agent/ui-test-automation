@@ -98,13 +98,20 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await page.waitForTimeout(800);
       // 대상 입력 방법은 기본 CIDR. "대상 주소" 라벨 아래 입력란.
       await fillField(page, '대상 주소', vars.cidr!);
-      // 유형은 기본 "목적지 포트/Type 선택": TCP 목적지 포트에 22 를 넣고 그 아래 "추가" 로 목록에 올린다 ("ALL" 은 경고 모달을 띄운다).
-      const tcpPort = await below(page, 'TCP', 'input');
-      await tcpPort.fill('22');
-      await tcpPort.press('Tab');
-      // TCP 절의 "추가" (UDP·ICMP 에도 같은 버튼이 있다) — 라벨 아래 첫 버튼
-      await (await below(page, 'TCP', 'button')).click();
+      // 유형은 기본 "목적지 포트/Type 선택". 프로토콜 TCP 체크박스를 켜면 그 아래 "목적지 포트" 입력란과 "추가" 버튼이 나타난다(2026-09-28 프로브).
+      // "ALL" 을 고르면 경고 모달이 뜨므로 쓰지 않는다.
+      const tcpBox = page.locator('.scp-select:visible').filter({ hasText: /^TCP$/ }).first();
+      if (!(await isChecked(tcpBox))) await tcpBox.click();
       await page.waitForTimeout(500);
+      // 포트 입력란은 라벨 연결이 없고 placeholder "1~65,535 사이의 값을 입력하세요." (below() 는 헤더 검색창을 잡았다 — 2026-09-28 프로브)
+      const port = page.getByPlaceholder(/1~65,535/).first();
+      await port.fill('22');
+      await port.press('Tab');
+      await page.getByRole('button', { name: '추가', exact: true }).first().click(); // 값을 넣으면 활성화된다
+      await page.waitForTimeout(500);
+      log(
+        `  유형 절: ${(await page.locator('body').innerText()).replace(/\s+/g, ' ').match(/유형.{0,300}/)?.[0]}`,
+      );
       const inbound = page
         .locator('.scp-select:visible')
         .filter({ hasText: /^Inbound 규칙$/ })

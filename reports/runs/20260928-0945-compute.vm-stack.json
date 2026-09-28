@@ -1,0 +1,92 @@
+{
+  "spec": "compute.vm-stack",
+  "started": "2026-09-28T00:45:15.817Z",
+  "ended": "2026-09-28T00:58:12.361Z",
+  "seconds": 777,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.vm-stack",
+    "run_id": "0928-0945-d3ea",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Virtual Server 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 696.6,
+      "annotations": {
+        "scenario": "compute.vm-stack",
+        "run_id": "0928-0945-d3ea",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 목록으로 이동",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] Keypair qa-shared-keypair 준비 (있으면 재사용, 없으면 생성)",
+          "status": "pass",
+          "seconds": 1
+        },
+        {
+          "title": "steps[2] VPC vpc-0928-0945-d3ea 생성",
+          "status": "pass",
+          "seconds": 26.7
+        },
+        {
+          "title": "steps[3] Subnet sub-0928-0945-d3ea 생성",
+          "status": "pass",
+          "seconds": 220.3
+        },
+        {
+          "title": "steps[4] Virtual Server vm-0928-0945-d3ea 생성",
+          "status": "pass",
+          "seconds": 116.7
+        },
+        {
+          "title": "steps[5] 서버 vm-0928-0945-d3ea 정지 → 시작",
+          "status": "fail",
+          "seconds": 11.9
+        }
+      ],
+      "error": "Error: 상세에 /^(정지|중지|Stop)$/i 버튼이 없습니다. 보이는 버튼: [\"시작(dis)\",\"중지\",\"재시작\",\"Image 생성\",\"콘솔 로그\",\"Dump 생성\",\"서비스 해지\",\"신규 네트워크 포트로 추가\",\"기존 네트워크 포트로 추가\",\"신규 네트워크 포트로 추가\",\"기존 네트워크 포트로 추가\",\"Delete on termination 수정(dis)\",\"추가\"]",
+      "attachments": [
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/screenshot-compute.vm-stack.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 상세에 /^(정지|중지|Stop)$/i 버튼이 없습니다. 보이는 버튼: [\"시작(dis)\",\"중지\",\"재시작\",\"Image 생성\",\"콘솔 로그\",\"Dump 생성\",\"서비스 해지\",\"신규 네트워크 포트로 추가\",\"기존 네트워크 포트로 추가\",\"신규 네트워크 포트로 추가\",\"기존 네트워크 포트로 추가\",\"Delete on termination 수정(dis)\",\"추가\"]",
+  "attachments": [
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/screenshot-compute.vm-stack.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/compute.vm-stack-VPC-→-Sub-a6f0c-→-Virtual-Server-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

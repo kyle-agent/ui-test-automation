@@ -202,7 +202,13 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         .filter({ hasText: /^사용$/ })
         .first();
       if ((await multiAz.count()) && (await isChecked(multiAz))) await multiAz.click(); // Multi-AZ 끔 (IP 2개 필요)
-      await pickOption(page, 'Public IP', new RegExp(publicIp!.replace(/\./g, '\\.')));
+      // "NAT Gateway용 IP" 절: 앞 드롭다운은 종류("Public IP"), 뒤 드롭다운이 예약된 IP 목록("선택하세요."). 라벨 "Public IP" 가 종류 값과 겹쳐
+      // below() 가 엉뚱한 드롭다운을 잡으므로(2026-09-28 run 2) 남은 "선택하세요." 드롭다운을 직접 연다.
+      const ipDropdown = page.locator('.scp-dropdown:visible').filter({ hasText: '선택하세요.' }).last();
+      await ipDropdown.click();
+      const ipMenu = page.locator('.scp-menu:visible').last();
+      await ipMenu.waitFor({ timeout: 5_000 });
+      await ipMenu.locator('.scp-menu-item').filter({ hasText: publicIp! }).first().click();
       await fillField(page, '설명', `scp-console-tests ${vars.run_id}`, { selector: 'textarea' });
       const fee = page.getByRole('button', { name: '요금 확인', exact: true }).first();
       if (await fee.count()) await fee.click();
