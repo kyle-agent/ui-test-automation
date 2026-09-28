@@ -393,10 +393,10 @@ resources:
     service: "PostgreSQL(DBaaS)"
     category: "Database"
     route: /postgresql/postgresql/list
-    level: 1
-    specs: [smoke.postgresql-dbaas]
-    last_pass: null
-    note: ""
+    level: 4
+    specs: [smoke.postgresql-dbaas, database.postgresql]
+    last_pass: "2026-09-28"
+    note: "VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, 백업·Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지"
   - key: resource-group
     service: "Resource Groups"
     category: "Management"

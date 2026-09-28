@@ -42,18 +42,18 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 10:47 · 실행 기록 52건 · 마지막 실행 2026-09-28 10:43 security.address-group</span>
+  <span class="muted">생성 2026-09-28 15:08 · 실행 기록 55건 · 마지막 실행 2026-09-28 14:41 database.postgresql</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
 <section>
   <h2>요약</h2>
   <div class="cards">
-    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">18 <span class="s">/ 18 (스위트 18)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">63% <span class="s">33/52</span></div><div class="s">실패 분류: unclassified 19</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">25% <span class="s">20/80 리소스</span></div><div class="s">L3+ 15 · 탐색 26회</div></div>
+    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">20 <span class="s">/ 20 (스위트 20)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
+    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">64% <span class="s">35/55</span></div><div class="s">실패 분류: unclassified 20</div></div>
+    <div class="card"><div class="k">커버리지 L2+</div><div class="v">26% <span class="s">21/80 리소스</span></div><div class="s">L3+ 16 · 탐색 26회</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 6 실패 12"><div class="stack"><span class="fail" style="height:35.294117647058826%"></span><span class="pass" style="height:17.647058823529413%"></span></div><div class="lbl">09-28</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 8 실패 13"><div class="stack"><span class="fail" style="height:38.23529411764706%"></span><span class="pass" style="height:23.52941176470588%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
 </section>
 
@@ -203,6 +203,22 @@
         <td class="num">11분 53초</td>
         <td class="dots"><span class="dot fail" title="2026-09-23 19:31 FAIL(unclassified) 13분 14초"></span><span class="dot pass" title="2026-09-23 19:49 PASS 11분 36초"></span><span class="dot pass" title="2026-09-23 22:15 PASS 11분 53초"></span> <span class="muted">2/3</span></td>
         <td class="num">11분 45초</td>
+      </tr>
+<tr>
+        <td class="mono">container.ske-cluster</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 14:04</td>
+        <td class="num">22분 37초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-28 14:04 PASS 22분 37초"></span> <span class="muted">1/1</span></td>
+        <td class="num">22분 37초</td>
+      </tr>
+<tr>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td>2026-09-28 14:41</td>
+        <td class="num">23분 48초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span> <span class="muted">1/2</span></td>
+        <td class="num">23분 48초</td>
       </tr></tbody></table>
 </section>
 
@@ -213,6 +229,30 @@
   </div>
   <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-09-28 14:41</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">23분 48초</td>
+        <td class="mono small">0928-1442-f2db</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run fail" data-status="fail">
+        <td>2026-09-28 14:04</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td class="num">19분 48초</td>
+        <td class="mono small">0928-1405-23ce</td>
+        <td class="err">[steps[2] PostgreSQL pgc0928140523ce 생성] TimeoutError: locator.waitFor: Timeout 10000ms exceeded. <span class="muted mono small">test-results/artifacts/database.postgresql-VPC-→--d0e4e-eSQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-2.png</span></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 14:04</td>
+        <td class="mono">container.ske-cluster</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">22분 37초</td>
+        <td class="mono small">0928-1405-db14</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-09-28 10:43</td>
         <td class="mono">security.address-group</td>
         <td><span class="badge pass">PASS</span></td>
@@ -507,30 +547,6 @@
         <td class="num">1분 18초</td>
         <td class="mono small">0923-1937-d4c1</td>
         <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 19:31</td>
-        <td class="mono">networking.vpc-peering</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">13분 14초</td>
-        <td class="mono small">0923-1932-323d</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/networking.vpc-peering-VPC-c6ab1-2개-→-VPC-Peering-생성-후-역순-삭제-regression/screenshot-networking.vpc-peering.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 19:30</td>
-        <td class="mono">networking.private-dns</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">6분 31초</td>
-        <td class="mono small">0923-1930-ea78</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-23 19:10</td>
-        <td class="mono">networking.private-dns</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">6분 37초</td>
-        <td class="mono small">0923-1910-ec9a</td>
-        <td class="err">[steps[1] pdns-0923-1910-ec9a 생성] Error: pdns-0923-1910-ec9a 상태 /Active/i 대기 180초 초과. 마지막: pdns-0923-1910-ec9a kr-west1 Creating <span class="muted mono small">test-results/artifacts/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/test-failed-3.png</span></td>
       </tr></tbody></table>
 </section>
 
@@ -540,8 +556,8 @@
   
     <div class="cards">
       <div class="card"><div class="k">리소스(모집단)</div><div class="v">80</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">20 <span class="s">/ 80 · 25%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:75%" title="L1 진입 60"></span><span class="seg l2" style="width:6%" title="L2 CRUD 5"></span><span class="seg l3" style="width:4%" title="L3 동작 3"></span><span class="seg l4" style="width:15%" title="L4 통합 12"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">15 <span class="s">/ 80 · 19%</span></div><div class="s">L0 없음 0 · L1 진입 60 · L2 CRUD 5 · L3 동작 3 · L4 통합 12</div></div>
+      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">21 <span class="s">/ 80 · 26%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:74%" title="L1 진입 59"></span><span class="seg l2" style="width:6%" title="L2 CRUD 5"></span><span class="seg l3" style="width:4%" title="L3 동작 3"></span><span class="seg l4" style="width:16%" title="L4 통합 13"></span></div></div>
+      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">16 <span class="s">/ 80 · 20%</span></div><div class="s">L0 없음 0 · L1 진입 59 · L2 CRUD 5 · L3 동작 3 · L4 통합 13</div></div>
     </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -569,9 +585,9 @@
 <tr>
         <td>Database</td>
         <td class="num">6</td>
-        <td class="num"></td><td class="num">6</td><td class="num"></td><td class="num"></td><td class="num"></td>
-        <td class="num">0%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:100%" title="L1 진입 6"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+        <td class="num"></td><td class="num">5</td><td class="num"></td><td class="num"></td><td class="num">1</td>
+        <td class="num">17%</td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:83%" title="L1 진입 5"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:17%" title="L4 통합 1"></span></div></td>
       </tr>
 <tr>
         <td>Financial Management</td>
@@ -640,6 +656,15 @@
         <td class="mono small">compute.vm-stack<br>compute.vm-volume<br>compute.vm-stack-net</td>
         <td>2026-09-28</td>
         <td class="note">상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28)</td>
+      </tr>
+<tr class="res" data-level="4" data-cat="Database">
+        <td><span class="lv l4">L4</span></td>
+        <td class="mono">postgresql</td>
+        <td>PostgreSQL(DBaaS)</td>
+        <td>Database</td>
+        <td class="mono small">smoke.postgresql-dbaas<br>database.postgresql</td>
+        <td>2026-09-28</td>
+        <td class="note">VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, 백업·Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지</td>
       </tr>
 <tr class="res" data-level="4" data-cat="Networking">
         <td><span class="lv l4">L4</span></td>
@@ -962,15 +987,6 @@
         <td>MySQL(DBaaS)</td>
         <td>Database</td>
         <td class="mono small">smoke.mysql-dbaas</td>
-        <td></td>
-        <td class="note"></td>
-      </tr>
-<tr class="res" data-level="1" data-cat="Database">
-        <td><span class="lv l1">L1</span></td>
-        <td class="mono">postgresql</td>
-        <td>PostgreSQL(DBaaS)</td>
-        <td>Database</td>
-        <td class="mono small">smoke.postgresql-dbaas</td>
         <td></td>
         <td class="note"></td>
       </tr>
