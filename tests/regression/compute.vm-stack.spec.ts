@@ -2,6 +2,7 @@
 // 콘솔 화면 사실은 src/console/ui.ts 머리말과 docs/HANDOFF.md 9절 참조.
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { settleConsole } from '../../src/console/overlays';
 import {
   confirmModal,
   dismissModalIfAny,
@@ -199,6 +200,53 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         log,
       });
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), stepCtx(4));
+    });
+
+    await test.step(`steps[5] 서버 ${vars.vm} 정지 → 시작`, async () => {
+      // 목록에는 행 버튼이 없다 → 이름 링크로 상세에 들어가 상단 버튼을 쓴다. 라벨은 실측 로그로 확인한다.
+      const openDetail = async () => {
+        await gotoRoute(page, ROUTES.vm);
+        await row(page, vars.vm!).getByText(vars.vm!, { exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+      };
+      const buttons = () =>
+        page.evaluate(() =>
+          [...document.querySelectorAll('button')]
+            .filter((b) => b.checkVisibility() && !b.closest('header'))
+            .map(
+              (b) =>
+                b.innerText.trim().replace(/\s+/g, ' ') +
+                (b.getAttribute('aria-disabled') === 'true' ? '(dis)' : ''),
+            )
+            .filter(Boolean),
+        );
+      const press = async (re: RegExp) => {
+        // hasText 의 ^…$ 는 버튼 안 공백·아이콘 때문에 빗나간다 → 접근성 이름(공백 정규화)으로 잡는다
+        const b = page.getByRole('button', { name: re }).first();
+        if (!(await b.count()))
+          throw new Error(`상세에 ${re} 버튼이 없습니다. 보이는 버튼: ${JSON.stringify(await buttons())}`);
+        await b.click();
+        await confirmModal(page, /하시겠습니까/, '확인', { agree: true });
+        for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      };
+      await openDetail();
+      log(`  서버 상세 버튼: ${JSON.stringify(await buttons())}`);
+      await press(/^(정지|중지|Stop)$/i);
+      await waitForRow(page, ROUTES.vm, vars.vm!, {
+        status: /Stopped|Shutoff|정지/i,
+        timeoutMs: 300_000,
+        intervalMs: 15_000,
+        log,
+      });
+      await openDetail();
+      await press(/^(시작|Start)$/i);
+      await waitForRow(page, ROUTES.vm, vars.vm!, {
+        status: /Running|Active/i,
+        timeoutMs: 300_000,
+        intervalMs: 15_000,
+        log,
+      });
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), stepCtx(5));
     });
   });
 });

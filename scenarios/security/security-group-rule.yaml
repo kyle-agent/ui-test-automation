@@ -1,0 +1,42 @@
+id: security.security-group-rule
+title: Security Group 생성 → 규칙 추가·삭제 → 해지
+service: Security Group
+category: Security
+tags: [regression, destructive, crud, action]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-28 프로브): SG 생성은 "서비스 생성" → "로그 저장 여부" 끄기 → "진행하시겠습니까?" → "생성하시겠습니까?" 두 모달. 상세(#/securitygroup/securitygroup/detail/info)의
+# "규칙 (n)" 탭 → "규칙 추가" 는 별도 화면(…/detail/rule/request): 대상 입력 방법(CIDR/Address Group/Security Group 버튼, 기본 CIDR), "대상 주소" 입력,
+# 유형(목적지 포트/Type 선택 · Internet Protocol · ALL 버튼), 프로토콜(TCP/UDP/ICMP 체크), 방향(Inbound 규칙/Outbound 규칙 체크), 설명 → "완료".
+# 규칙 목록 열: 방향 · 규칙 ID · 대상 주소 · 원격 SG명 · 원격 SG ID · 서비스 · 설명. 삭제는 상세의 "서비스 해지"(목록엔 없음). 무과금.
+steps:
+  - goal: "Security Group 목록으로 이동한다"
+    goto: "#/securitygroup/securitygroup/list"
+    expect:
+      url: "#/securitygroup/securitygroup/list"
+
+  - goal: "Security Group {{name}} 을 로그 저장 없이 생성한다"
+    vars:
+      name: "sg-{{run_id}}"
+      cidr: "10.250.0.0/24"
+    expect:
+      text: ["{{name}}"]
+
+  - goal: "규칙 탭에서 Inbound · CIDR {{cidr}} · ALL 규칙을 추가한다"
+    expect:
+      text: ["{{cidr}}"]
+
+  - goal: "추가한 규칙을 삭제한다"
+    expect:
+      not_text: ["{{cidr}}"]
+      timeout: 120000
+
+teardown:
+  - goal: "상세의 서비스 해지로 Security Group {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

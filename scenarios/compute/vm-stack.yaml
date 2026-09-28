@@ -58,6 +58,12 @@ steps:
       not_text: ["오류가 발생", "실패"]
       timeout: 600000
 
+  # 2026-09-28 추가(L3 동작): 목록에는 정지/시작 버튼이 없고 상세 화면 상단에 있다(실측 라벨은 실행 로그 "서버 상세 버튼" 참고).
+  - goal: "서버 {{vm}} 을 상세 화면에서 정지하고 Stopped 가 된 뒤 다시 시작해 Active 로 돌아오는지 확인한다"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+
 teardown:
   - goal: "서버 {{vm}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:

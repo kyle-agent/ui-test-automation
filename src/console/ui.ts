@@ -139,7 +139,13 @@ export async function confirmModal(
       await input.press('Tab');
     }
   }
-  await modal.getByRole('button', { name: button, exact: true }).click();
+  // 모달 버튼도 드물게 "stable" 판정이 안 나 클릭이 오래 매달린다(2026-09-28 SG 규칙 ALL 경고 모달) → 10초 뒤 강제 클릭
+  const ok = modal.getByRole('button', { name: button, exact: true });
+  try {
+    await ok.click({ timeout: 10_000 });
+  } catch {
+    await ok.click({ force: true });
+  }
   await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined);
 }
 
@@ -164,11 +170,17 @@ export async function openCreateForm(page: Page, route: string, button: string):
 
 /** 폼 하단의 주 버튼(예: "생성")을 누른다. 폼이 유효해질 때까지 aria-disabled 이므로 Playwright 가 활성화를 기다린다. */
 export async function submitForm(page: Page, button: string = '생성'): Promise<void> {
-  await page
+  const btn = page
     .locator('button:visible:not(tr button)')
     .filter({ hasText: new RegExp(`^${escapeRe(button)}$`) })
-    .last()
-    .click();
+    .last();
+  // 실측(2026-09-28, SG 규칙 추가 "완료" · IAM 정책 "다음"): 활성(aria-disabled=false)인데도 "stable" 판정이 안 나 클릭이 15초 타임아웃되는
+  // 하단 버튼이 있다(고정 푸터 애니메이션으로 보임) → 10초 안에 안 되면 강제 클릭.
+  try {
+    await btn.click({ timeout: 10_000 });
+  } catch {
+    await btn.click({ force: true });
+  }
 }
 
 export function row(page: Page, name: string): Locator {

@@ -9,8 +9,10 @@ import { settleConsole } from './overlays';
 import { confirmModal, row, selectRow, terminateServer, topButton, waitForRow } from './ui';
 
 export const ROUTES = {
+  asg: '#/virtualserver/auto-scaling-group/list',
   vm: '#/virtualserver/virtualserver/list',
   pip: '#/vpc/public-ip/list',
+  nat: '#/vpc/nat-gateway/list',
   igw: '#/vpc/internet-gateway/list',
   volume: '#/virtualserver/block-storage/list',
   hz: '#/dns/hosted-zone/list',
@@ -34,7 +36,7 @@ export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
 const TEST_NAME =
-  /^(vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+  /^(asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
@@ -70,13 +72,15 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
         continue;
       }
       const name = words.find((w) =>
-        kind === 'igw'
-          ? TEST_IGW.test(w)
-          : kind === 'fs'
-            ? TEST_FS.test(w)
-            : kind === 'hz'
-              ? TEST_HZ.test(w)
-              : TEST_NAME.test(w),
+        kind === 'nat'
+          ? /^sub-d{4}-d{4}-[0-9a-f]{4}$/.test(w)
+          : kind === 'igw'
+            ? TEST_IGW.test(w)
+            : kind === 'fs'
+              ? TEST_FS.test(w)
+              : kind === 'hz'
+                ? TEST_HZ.test(w)
+                : TEST_NAME.test(w),
       );
       if (name) leftovers.push({ kind, name, rowText });
     }
@@ -85,7 +89,9 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
 }
 
 const ORDER: Kind[] = [
+  'asg',
   'vm',
+  'nat',
   'pip',
   'igw',
   'volume',
@@ -133,8 +139,44 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
   await gotoRoute(page, route);
   if ((await row(page, item.name).count()) === 0) return;
   switch (item.kind) {
+    case 'asg':
+      // Auto-Scaling Group: 목록에 삭제가 없으면 상세의 삭제/서비스 해지
+      if (
+        await row(page, item.name)
+          .getByRole('button', { name: /삭제|해지/ })
+          .count()
+      )
+        await row(page, item.name)
+          .getByRole('button', { name: /삭제|해지/ })
+          .first()
+          .click();
+      else {
+        await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+        await page
+          .locator('button:visible')
+          .filter({ hasText: /삭제|서비스 해지/ })
+          .first()
+          .click();
+      }
+      await confirmModal(page, /삭제|해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+      return;
     case 'vm':
       await terminateServer(page, route, item.name, log);
+      return;
+    case 'nat':
+      // NAT Gateway: 행 선택 → 상단 "삭제" (이름은 콘솔이 자동으로 지어 Subnet명으로 찾는다)
+      await waitForRow(page, route, item.name, {
+        status: /Active/i,
+        timeoutMs: 600_000,
+        intervalMs: 15_000,
+        log,
+      });
+      await selectRow(page, item.name);
+      await topButton(page, '삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
       return;
     case 'pip':
       await waitForRow(page, route, item.name, {

@@ -1,0 +1,52 @@
+id: networking.nat-gateway
+title: VPC → Subnet → Public IP → NAT Gateway 생성 후 역순 삭제
+service: VPC
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-28 프로브): NAT 목록 #/vpc/nat-gateway/list, 버튼 "NAT Gateway 생성" / 상단 "삭제"(행 선택 후). 폼(#/vpc/nat-gateway/request):
+# "VPC명"(드롭다운, 항목 "vpc-… AZ: kr-west1-b"), "Subnet명"(VPC 고른 뒤 채워짐), "NAT Gateway명"(자동), "Multi-AZ 사용 여부"(체크, 기본 켜짐 → 끈다: IP 2개 필요),
+# "Public IP"(사전 예약된 Public IP 드롭다운), "설명", "요금 확인" 버튼(월 ₩35,040 → 시간 과금이라 만들자마자 지운다).
+# Public IP 는 vm-stack-net 과 같은 흐름으로 예약(구분 Internet Gateway, AZ kr-west1-b)하고 NAT 삭제 뒤 반납.
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}} 와 Subnet {{subnet}} 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "Public IP 를 예약한다 (Internet Gateway, kr-west1-b)"
+    expect:
+      url: "#/vpc/public-ip/list"
+
+  - goal: "NAT Gateway 를 {{subnet}} 에 예약한 Public IP 로 생성하고 Active 를 기다린다 (Multi-AZ 끔)"
+    vars:
+      name: "nat-{{run_id}}"
+    expect:
+      url: "#/vpc/nat-gateway/list"
+      text: ["{{subnet}}"]
+
+teardown:
+  - goal: "NAT Gateway 를 삭제한다"
+    expect:
+      not_text: ["{{subnet}}"]
+      timeout: 600000
+  - goal: "Public IP 를 반납한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+  - goal: "Subnet {{subnet}} 과 VPC {{vpc}} 를 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000
