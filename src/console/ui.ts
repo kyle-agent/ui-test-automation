@@ -32,6 +32,13 @@ export async function fillField(
   const field = await below(page, label, opts.selector ?? 'input', opts.nth ?? 0);
   await field.fill(value);
   await field.press('Tab');
+  // 절 단위로 늦게 그려지는 폼(DBaaS)은 채운 직후 재렌더로 값이 사라질 수 있다 → 한 번 더 채운다 (2026-09-28 MySQL "Database명")
+  if ((await field.inputValue().catch(() => '')) !== value) {
+    await page.waitForTimeout(1_000);
+    const again = await below(page, label, opts.selector ?? 'input', opts.nth ?? 0);
+    await again.fill(value);
+    await again.press('Tab');
+  }
   await expect(field, `"${label}" 입력값이 남아 있어야 합니다`).toHaveValue(value);
 }
 

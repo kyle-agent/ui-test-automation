@@ -180,12 +180,16 @@ export function defineDbaasSpec(config: DbaasConfig): void {
             await menu.locator('.scp-menu-item').filter({ hasText: config.imageOption }).first().click();
             await page.waitForTimeout(1_000);
           }
-          for (const f of config.fields)
-            await fillField(page, f.label, fillVars(f.value, vars), { selector: f.selector });
-          for (const label of config.uncheck ?? ['이중화 구성']) await uncheck(page, label);
+          // 네트워크 절(VPC 목록)이 비동기로 늦게 채워지며 폼 전체가 다시 그려져 먼저 채운 값이 사라진다(병렬 실행 때 두드러짐, 2026-09-28)
+          // → VPC/Subnet 을 먼저 고르고(목록이 찰 때까지 pickOption 이 기다린다) 잠시 가라앉힌 뒤 입력란을 채운다.
           await pickOption(page, 'VPC명', new RegExp(n.vpc));
           await page.waitForTimeout(800);
           await pickOption(page, 'Subnet명', new RegExp(n.subnet));
+          await settleConsole(page, { appearGraceMs: 800 });
+          await page.waitForTimeout(1_500);
+          for (const f of config.fields)
+            await fillField(page, f.label, fillVars(f.value, vars), { selector: f.selector });
+          for (const label of config.uncheck ?? ['이중화 구성']) await uncheck(page, label);
           for (const d of config.dropdowns ?? []) await pickOption(page, d.label, d.option);
           const password = `Qa!${vars.run_id_compact}x9`; // 8~30자, 영문·숫자·특수문자. 기록 금지
           const pw = page.locator('input[type=password]:visible');
