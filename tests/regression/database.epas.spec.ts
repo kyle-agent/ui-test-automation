@@ -9,7 +9,7 @@ defineDbaasSpec({
   fields: [
     { label: '서버명 prefix', value: '{{prefix}}' },
     { label: '클러스터명', value: '{{name}}' },
-    { label: 'DATA', value: '100' }, // MySQL 은 100 미만을 100 으로 강제(numberfield min), 나머지도 100 이면 안전
+    { label: 'DATA', value: '128' }, // DATA 는 8GB 배수(100 거부), CacheStore 는 64GB 이상 (2026-09-28 실측)
     { label: 'Database명', value: 'qadb' },
     { label: 'Database 사용자명', value: 'qauser' },
     { label: 'Database Port번호', value: '5432' },
