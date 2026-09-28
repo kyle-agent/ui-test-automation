@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-28 15:17, 실행 기록 55건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-09-28 15:42, 실행 기록 57건.
 
 ## 1. spec 별 최근 상태
 
@@ -24,8 +24,8 @@
 | networking.nat-gateway | 2026-09-28 10:34 | PASS | 11분 27초 | FFFP | 11분 27초 |
 | compute.auto-scaling-group | 2026-09-28 10:03 | PASS | 14분 51초 | FP | 14분 51초 |
 | networking.vpc-peering | 2026-09-23 22:15 | PASS | 11분 53초 | FPP | 11분 45초 |
-| container.ske-cluster | 2026-09-28 14:04 | PASS | 22분 37초 | P | 22분 37초 |
-| database.postgresql | 2026-09-28 14:41 | PASS | 23분 48초 | FP | 23분 48초 |
+| container.ske-cluster | 2026-09-28 15:13 | PASS | 17분 30초 | PP | 20분 4초 |
+| database.postgresql | 2026-09-28 15:13 | PASS | 26분 30초 | FPP | 25분 9초 |
 
 실행 기록은 `npm run test:stacks` 가 spec 하나를 마칠 때마다 `reports/runs/<YYYYMMDD-HHMM>-<spec id>.json` 으로 남긴다. 결과의 FAIL(class) 는 실패 분류(unclassified/environment/product/test), FAIL(known: KI-xxx) 는 알려진 이슈에 매칭된 실패.
 

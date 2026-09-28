@@ -322,3 +322,6 @@
 - 커버리지 **L2+ 21/80(26%), L3+ 16/80(20%)** — postgresql L4. **SKE 클러스터는 장부 모집단 밖**: `/ske/cluster` 는 `/list` 로 끝나지 않아 `keyedListScreens` 가 뺀다. 같은 이유로 빠진 키 있는 화면이 32개
   (Container Registry `/scr/registry`, Cloud Functions `/scf/cloudfunctions`, IAM 역할 `/iam/role`, Queue, Cloud WAN/LAN, Oracle Services, Trail …). 모집단을 "키 있는 화면 전부(112)" 로 넓힐지는 사용자 결정 사항 — 넓히면 분모가 80 → 112.
 - 정리 스크립트 종류 추가: `ske`(Active 대기 → 목록 해지), `pg`(Active 대기 → 상세 해지). 스위트 21개 spec, 전체 약 3시간 40분 — 무거운 둘은 `@heavy` 태그.
+- **동시 실행 확인(15:13~15:40)**: SKE 클러스터와 PostgreSQL 을 같은 로그인 브라우저의 별도 탭(별도 `run-stacks --only` 프로세스)에서 동시에 돌려 둘 다 PASS(17.5분·26.5분). 잔여 0.
+  리소스 이름이 run_id 로 분리되고 VPC 한도(5)만 지키면 무거운 스택끼리 병렬이 된다. 단, `stacks:cleanup --yes` 는 실행 중엔 금지(9.9 참고).
+- 장부 모집단을 **키 있는 화면 전부(112)** 로 넓혔다(사용자 결정, `keyedListScreens` 에서 `/list` 조건 제거). L2+ 22/112(20%), L3+ 17/112(15%), L4 14. `policy`→`policy@iam`, `port`→`port@vpc`.

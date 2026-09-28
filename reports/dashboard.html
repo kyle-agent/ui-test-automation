@@ -42,7 +42,7 @@
 <body>
 <header>
   <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-09-28 15:17 · 실행 기록 55건 · 마지막 실행 2026-09-28 14:41 database.postgresql</span>
+  <span class="muted">생성 2026-09-28 15:42 · 실행 기록 57건 · 마지막 실행 2026-09-28 15:13 database.postgresql</span>
   <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
 </header>
 <main>
@@ -50,10 +50,10 @@
   <h2>요약</h2>
   <div class="cards">
     <div class="card"><div class="k">현재 녹색 spec</div><div class="v">20 <span class="s">/ 20 (스위트 20)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">64% <span class="s">35/55</span></div><div class="s">실패 분류: unclassified 20</div></div>
+    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">65% <span class="s">37/57</span></div><div class="s">실패 분류: unclassified 20</div></div>
     <div class="card"><div class="k">커버리지 L2+</div><div class="v">20% <span class="s">22/112 리소스</span></div><div class="s">L3+ 17 · 탐색 26회</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 8 실패 13"><div class="stack"><span class="fail" style="height:38.23529411764706%"></span><span class="pass" style="height:23.52941176470588%"></span></div><div class="lbl">09-28</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:20.588235294117645%"></span><span class="pass" style="height:79.41176470588235%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 10 실패 13"><div class="stack"><span class="fail" style="height:38.23529411764706%"></span><span class="pass" style="height:29.411764705882355%"></span></div><div class="lbl">09-28</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
 </section>
 
@@ -207,18 +207,18 @@
 <tr>
         <td class="mono">container.ske-cluster</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-28 14:04</td>
-        <td class="num">22분 37초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-28 14:04 PASS 22분 37초"></span> <span class="muted">1/1</span></td>
-        <td class="num">22분 37초</td>
+        <td>2026-09-28 15:13</td>
+        <td class="num">17분 30초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-28 14:04 PASS 22분 37초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 17분 30초"></span> <span class="muted">2/2</span></td>
+        <td class="num">20분 4초</td>
       </tr>
 <tr>
         <td class="mono">database.postgresql</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-28 14:41</td>
-        <td class="num">23분 48초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span> <span class="muted">1/2</span></td>
-        <td class="num">23분 48초</td>
+        <td>2026-09-28 15:13</td>
+        <td class="num">26분 30초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 26분 30초"></span> <span class="muted">2/3</span></td>
+        <td class="num">25분 9초</td>
       </tr></tbody></table>
 </section>
 
@@ -229,6 +229,22 @@
   </div>
   <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-09-28 15:13</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">26분 30초</td>
+        <td class="mono small">0928-1513-ba04</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-09-28 15:13</td>
+        <td class="mono">container.ske-cluster</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">17분 30초</td>
+        <td class="mono small">0928-1513-4bcc</td>
+        <td class="err"></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-09-28 14:41</td>
         <td class="mono">database.postgresql</td>
         <td><span class="badge pass">PASS</span></td>
@@ -530,22 +546,6 @@
         <td><span class="badge pass">PASS</span></td>
         <td class="num">6분 54초</td>
         <td class="mono small">0923-1954-17d8</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 19:49</td>
-        <td class="mono">networking.vpc-peering</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">11분 36초</td>
-        <td class="mono small">0923-1949-a7dd</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-23 19:37</td>
-        <td class="mono">storage.file-storage</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">1분 18초</td>
-        <td class="mono small">0923-1937-d4c1</td>
         <td class="err"></td>
       </tr></tbody></table>
 </section>
