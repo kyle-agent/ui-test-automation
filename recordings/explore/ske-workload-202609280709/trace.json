@@ -1,0 +1,150 @@
+{
+  "name": "ske-workload",
+  "route": "#/ske/workload",
+  "run_id": "0928-1609-581f",
+  "started_at": "2026-09-28T07:09:32.814Z",
+  "ended_at": "2026-09-28T07:10:10.940Z",
+  "stop_reason": "Jev 가 여섯 번 연속 BLOCKED",
+  "steps": [
+    {
+      "n": 2,
+      "operation": "BLOCKED",
+      "label": "My Info.",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.61,
+      "confidence": 0.42,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/iam/my-info/detail/basic",
+      "title_after": "My Info. | Root 사용자 | Identity and Access Management(IAM) | Global | Console",
+      "page_changed": true,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "TypeError: Cannot read properties of undefined (reading 'length')\n    at immediate (https://console.kr-west1.e.samsungsdscloud.com/console/bundles/scp-kubernetes-user-console/main.90183ad278ec4c82aefe"
+        },
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "TypeError: Cannot read properties of undefined (reading 'map')\n    at h (https://console.kr-west1.e.samsungsdscloud.com/console/bundles/scp-kubernetes-user-console/main.90183ad278ec4c82aefe.js:1:17881"
+        },
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+        },
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "AxiosError: Request failed with status code 404\n    at tr (https://console.kr-west1.e.samsungsdscloud.com/console/js/vendors.c6bc6f52eca6e8ba3783.js:2:8022082)\n    at XMLHttpRequest.M (https://console"
+        }
+      ],
+      "screenshot": "screenshots\\02.jpg",
+      "cost": 0.000172494
+    },
+    {
+      "n": 3,
+      "operation": "BLOCKED",
+      "label": "알림 목록",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.67,
+      "confidence": 0.5,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "title_after": "Console Home | kr-west1 | Console",
+      "page_changed": false,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+        },
+        {
+          "severity": "info",
+          "kind": "console-error",
+          "detail": "AxiosError: Request failed with status code 404\n    at tr (https://console.kr-west1.e.samsungsdscloud.com/console/js/vendors.c6bc6f52eca6e8ba3783.js:2:8022082)\n    at XMLHttpRequest.M (https://console"
+        }
+      ],
+      "screenshot": "screenshots\\03.jpg",
+      "cost": 0.000170562
+    },
+    {
+      "n": 4,
+      "operation": "BLOCKED",
+      "label": "Quick Start Guide",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.63,
+      "confidence": 0.44,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "title_after": "Console Home | kr-west1 | Console",
+      "page_changed": false,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\04.jpg",
+      "cost": 0.00016863
+    },
+    {
+      "n": 5,
+      "operation": "BLOCKED",
+      "label": "Architecture Center",
+      "role": "button",
+      "text": null,
+      "why": null,
+      "probability": 0.62,
+      "confidence": 0.42,
+      "url_before": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "url_after": "https://console.kr-west1.e.samsungsdscloud.com/console/#/home/dashboard",
+      "title_after": "Console Home | kr-west1 | Console",
+      "page_changed": false,
+      "menu_pick": null,
+      "modal": null,
+      "findings": [],
+      "screenshot": "screenshots\\05.jpg",
+      "cost": 0.000166698
+    }
+  ],
+  "totals": {
+    "decisions": 6,
+    "actions": 4,
+    "cost": 0.001015686,
+    "anomalies": 0,
+    "infos": 6
+  },
+  "untried": [
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"button\"",
+    "button \"Documentation\"",
+    "button \"Marketplace\"",
+    "button \"IAM\"",
+    "button \"VPC\"",
+    "button \"Kubernetes Engine\"",
+    "button \"Virtual Server\"",
+    "button \"Resource Groups\"",
+    "button \"Security Group\"",
+    "button \"Feature Update\"",
+    "button \"전체\"",
+    "button \"공지 사항\"",
+    "button \"Simple AI Inference 서비스 모델 변경(신규) 안내 (2026.09.18) 2026-09-17\"",
+    "button \"Vertica(DBaaS) 상품 일부 버전 제공 종료 예정 안내 (2026.11.19) 2026-09-09\"",
+    "button \"인프라 유지보수 작업 안내 (2026.09.21 ~ 2026.10.30) 2026-09-04\"",
+    "button \"인프라 유지보수 작업 안내 (2026.09.29) 2026-09-02\"",
+    "button \"인프라 유지보수 작업 안내 (2026.09.28) 2026-09-02\"",
+    "button \"이용 및 청구 내역\"",
+    "button \"예산 현황\""
+  ],
+  "names_used": []
+}

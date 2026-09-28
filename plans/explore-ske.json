@@ -1,0 +1,27 @@
+[
+  {
+    "name": "ske-cluster-form",
+    "args": [
+      "--route",
+      "#/ske/cluster",
+      "--open",
+      "서비스 생성",
+      "--prereq",
+      "vpc,subnet",
+      "--budget",
+      "30",
+      "--cost",
+      "0.05",
+      "--minutes",
+      "12"
+    ]
+  },
+  { "name": "ske-cluster-list", "args": ["--route", "#/ske/cluster", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-node", "args": ["--route", "#/ske/node", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-namespace", "args": ["--route", "#/ske/namespace", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-workload", "args": ["--route", "#/ske/workload", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-network", "args": ["--route", "#/ske/network", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-storage", "args": ["--route", "#/ske/storage", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-configuration", "args": ["--route", "#/ske/configuration", "--budget", "15", "--cost", "0.03", "--minutes", "5"] },
+  { "name": "ske-authorization", "args": ["--route", "#/ske/authorization", "--budget", "15", "--cost", "0.03", "--minutes", "5"] }
+]
