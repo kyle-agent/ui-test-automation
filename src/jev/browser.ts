@@ -282,9 +282,35 @@ export async function act(
   const offset = (await frameOffset(frame, page)) ?? { x: 0, y: 0 };
   await page.mouse.click(point.x + offset.x, point.y + offset.y);
   if (action.kind === 'fill') {
+    const want = text ?? '';
     await page.keyboard.press('ControlOrMeta+a');
-    await page.keyboard.insertText(text ?? '');
+    await page.keyboard.insertText(want);
+    // scp 입력란은 프로그램식 입력이 가끔 반영되지 않는다(이전 값 유지; 2026-09-29 VPC명 재현). 그러면 탐색 보고서에
+    // "유효값인데 오류" 같은 잘못된 경보가 생긴다 → 포커스된 칸의 값을 읽어 다르면 지우고 키보드로 한 글자씩 다시 친다.
+    // maxlength 로 잘린 값은 정상으로 본다. 자동완성 콤보박스는 입력 중 값이 바뀌므로 확인하지 않는다.
+    if (action.role !== 'combobox' && !(await fillApplied(frame, want))) {
+      await page.keyboard.press('ControlOrMeta+a');
+      await page.keyboard.press('Delete');
+      await page.keyboard.type(want, { delay: 20 });
+    }
+    // 콘솔은 칸을 벗어날 때(blur) 검증한다. 벗어나지 않으면 직전 값의 오류 표시가 남아 판정이 틀린다
+    // (2026-09-29: 빈 값 뒤 유효 VPC명에 "입력 조건에 맞지 않습니다" 가 남은 것처럼 기록됨) → 사람처럼 Tab 으로 넘어간다.
+    if (action.role !== 'combobox') await page.keyboard.press('Tab');
   }
+}
+
+/** 포커스된 입력란의 값이 기대값(maxlength 로 잘린 것 포함)과 같으면 true. 입력란이 아니면 확인할 수 없으므로 true. */
+async function fillApplied(frame: Parameters<typeof evaluateIn>[0], want: string): Promise<boolean> {
+  const got = await evaluateIn<{ value: string; max: number } | null>(
+    frame,
+    `(() => { const e = document.activeElement;
+      if (!e || !('value' in e)) return null;
+      const max = Number(e.getAttribute('maxlength') || 0);
+      return { value: String(e.value), max }; })()`,
+  ).catch(() => null);
+  if (!got) return true;
+  const expected = got.max > 0 ? want.slice(0, got.max) : want;
+  return got.value === expected;
 }
 
 /** 입력 후 화면이 반응할 시간을 준다. 콤보박스 입력이면 제안 목록이 뜰 때까지 최대 200ms, 그 외 두 프레임 또는 50ms. */
