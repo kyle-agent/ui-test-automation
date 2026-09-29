@@ -363,7 +363,7 @@
 
 - `scripts/run-suite.ts`: SUITE_ORDER 전부를 한 로그인 브라우저의 탭 여러 개로 동시에 돌린다. spec 별 VPC 수·예상 시간은 `src/report/suite-plan.ts`
   (통과 실행 중앙값, 없는 spec 은 VPC 0·3분으로 본다 — 새 spec 이 VPC 를 만들면 여기에 적을 것).
-- 규칙: VPC 여유 = 5 − 시작 시점 VPC 수 − (공유 VPC 가 살아 있는 동안 1). 오래 걸리는 spec 부터, 탭 ≤ `--max`(기본 8). 공유 VPC+Subnet 은 시작하자마자
+- 규칙: VPC 여유 = 5 − 시작 시점 VPC 수 − (공유 VPC 가 살아 있는 동안 1). 오래 걸리는 spec 부터, 탭 ≤ `--max`(기본 5). 공유 VPC+Subnet 은 시작하자마자
   뒤에서 만들고(DBaaS 5종이 채택), DBaaS 가 다 끝나면 지워 VPC 한 칸을 돌려준다. 각 spec 은 `run-stacks.ts --only <id> --no-preflight` 로 떠서 reports/runs 기록이 같다.
 - 로그: `reports/suite/suite-<stamp>.log`(커밋 안 함). 직렬 예상 224분.
 - **첫 실측(2026-09-29 오후) — 아직 통과 못 함.** 드러난 문제와 조치:

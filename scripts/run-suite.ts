@@ -8,7 +8,7 @@
  * 스케줄 규칙 (api-test-automation 의 shared-infra + VPC 세마포어와 같은 생각):
  *  - 계정 VPC 한도 5 에서 실행 전에 이미 있는 VPC 수를 빼고, 공유 VPC 가 살아 있는 동안 1 을 더 뺀 만큼만 VPC 를 쓰는 spec 을 동시에 띄운다
  *    (spec 별 VPC 수는 src/report/suite-plan.ts). 공유 VPC 채택 spec(DBaaS)은 VPC 를 쓰지 않는다.
- *  - 오래 걸리는 spec 부터 띄운다. 한 로그인 브라우저의 탭을 최대 --max 개(기본 8)까지 나눠 쓴다.
+ *  - 오래 걸리는 spec 부터 띄운다. 한 로그인 브라우저의 탭을 최대 --max 개(기본 5)까지 나눠 쓴다.
  *  - 공유 VPC+Subnet 은 다른 spec 을 띄우기 전에 먼저 만든다(부하 중엔 Subnet 폼이 느려 실패했다, 한 번 재시도). 공유 spec 이 다 끝나면 지운다.
  * 각 spec 은 `scripts/run-stacks.ts --only <id> --no-preflight` 로 떠서 reports/runs/ 에 기록을 남긴다. 실행 중엔 stacks:cleanup --yes 금지.
  */
@@ -26,7 +26,7 @@ import { parseArgs } from '../src/service-map/io';
 const VPC_CAP = 5;
 const { flags } = parseArgs(process.argv.slice(2));
 const only = typeof flags.only === 'string' ? flags.only.split(',').map((s) => s.trim()).filter(Boolean) : null;
-const maxTabs = typeof flags.max === 'string' ? Number(flags.max) : 8;
+const maxTabs = typeof flags.max === 'string' ? Number(flags.max) : 5;
 const dryRun = flags['dry-run'] === true;
 const staggerMs = (typeof flags.stagger === 'string' ? Number(flags.stagger) : 20) * 1000;
 
