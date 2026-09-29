@@ -279,9 +279,29 @@ export async function waitForRow(
     if (Date.now() - start > timeout)
       throw new Error(`${name} ${want} 대기 ${timeout / 1000}초 초과. 마지막: ${text || '(행 없음)'}`);
     await page.waitForTimeout(interval);
-    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
-    await settleConsole(page, { appearGraceMs: 800 });
+    await refreshList(page);
   }
+}
+
+/**
+ * 목록만 새로 고친다: 목록 제목 오른쪽 위의 작은 새로고침 아이콘(`i.i-refresh`)을 누르면 목록 API 만 다시 부른다
+ * (실측 2026-09-29, VPC 목록: GET /console/api/vpc/v1/vpcs 1회, 페이지 이동·재로딩 없음). 아이콘이 없는 화면은 페이지를 다시 읽는다.
+ * 토스트는 지워지지 않으므로 본문 not_text 검사 전에는 여전히 page.reload 를 쓴다.
+ */
+export async function refreshList(page: Page): Promise<void> {
+  const icon = page.locator('i.i-refresh:visible').first();
+  if (await icon.count()) {
+    const clicked = await icon
+      .click({ timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (clicked) {
+      await settleConsole(page, { appearGraceMs: 800 });
+      return;
+    }
+  }
+  await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+  await settleConsole(page, { appearGraceMs: 800 });
 }
 
 /**

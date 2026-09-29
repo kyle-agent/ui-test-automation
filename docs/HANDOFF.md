@@ -375,3 +375,6 @@
   5. 탭 9개 + trace 상태에서 13:50 경 CDP 브라우저의 컨텍스트가 통째로 사라짐(Edge 프로세스는 살아 있음) → 진행 중 spec 전부 정리 없이 실패.
      동시 탭은 5~6 이하로 시작해 올려 볼 것. 남은 리소스 13개(PostgreSQL 1 Running, VPC 5/5) 는 `npm run stacks:cleanup` 로 정리 필요.
 - 결과 요약(2차): PASS queue · cloud-function · server-group · object-storage-bucket · file-storage · security-group-rule / 나머지는 위 원인으로 실패·중단.
+- (사용자 안내 2026-09-29) 목록 대기 중 새로 고침은 페이지 전체를 다시 읽지 않고 목록 제목 오른쪽 위 작은 아이콘(`i.i-refresh`)을 누른다 → `refreshList()` (ui.ts).
+  목록 API 만 다시 부르고 페이지 이동이 없다(실측). 아이콘이 없으면 page.reload 로 대신한다. 삭제 뒤 토스트를 지우는 1회 reload 는 그대로 둔다(not_text 검사).
+  확인: queue · vpc create-delete PASS. 남은 테스트 리소스 0 (VPC 0/5).
