@@ -346,3 +346,12 @@
 - 비용: TypeSafe 응답은 `usage: { input_tokens, output_tokens }` 만 준다 → `normalizeUsage` 가 입력 토큰 × $0.042/Mtok 로 `cost` 를 채워 탐색·레코더 비용 예산이 계속 동작한다.
 - 사내 프록시(70.10.15.10:8080)는 api.typesafe.ai 를 통과시킨다(키 없이 호출 → TypeSafe 403 "Must supply an API key", 틀린 키 → 401). 키를 넣은 뒤 `npm run jev:ping` 으로 확인.
 - 되돌리기: `.env` 에 `TYPESAFE_API_URL=https://openrouter.ai/api/alpha/decisions`, `TYPESAFE_MODEL=typesafe/jev-1.13`, `OPENROUTER_API_KEY`. TYPE_TEXT 소형 텍스트 모델은 여전히 OpenRouter(`TEXT_MODEL_*`).
+
+### 9.14 "유효값인데 오류" 재현 → 제품 결함 아님, 입력 헬퍼 보강 (2026-09-29)
+
+- 탐색에서 두 번 본 현상(잘못된 VPC명 뒤 유효값을 넣어도 "입력 조건에 맞지 않습니다" 가 남음)을 재현했다. 값이 실제로 들어갔는지 확인하며 넣으면
+  2자·21자·특수문자·한글·빈 값 → 유효값 5가지 × 3회 = 15/15 모두 오류가 사라지고 "생성" 이 활성화된다. **콘솔 결함 아님.**
+- 진짜 원인: 프로그램식 `fill()` 이 scp 입력란에 가끔 반영되지 않는다(이전 값 유지, 다시 fill 해도 그대로). 실제 키보드 타이핑은 매번 반영.
+  → `fillField` 가 fill 두 번 뒤에도 값이 다르면 전체 선택 → 지우기 → 키보드 입력으로 넘어간다. 탐색기(`src/jev/browser.ts` act)의 입력은 아직 fill 만 쓴다(같은 보강 후보).
+- `below()`: 콘솔 상단 전역 검색창은 `<header>` 태그 밖에 있어 기존 헤더 제외가 효과가 없었다 → placeholder("서비스명, 마켓플레이스…")로도 거른다. 선택자 끝 `:not()` 제거.
+- 참고: VPC명 21자는 maxlength 20 으로 잘려 들어가 오류 없이 유효값이 된다(거부가 아니라 절단).

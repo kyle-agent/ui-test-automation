@@ -1,0 +1,46 @@
+{
+  "spec": "security.address-group",
+  "started": "2026-09-29T00:13:19.331Z",
+  "ended": "2026-09-29T00:15:01.282Z",
+  "seconds": 102,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.address-group",
+    "run_id": "0929-0913-b7df",
+    "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Address Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 78.5,
+      "annotations": {
+        "scenario": "security.address-group",
+        "run_id": "0929-0913-b7df",
+        "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Address Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] addr-0929-0913-b7df 생성",
+          "status": "pass",
+          "seconds": 47.3
+        }
+      ]
+    }
+  ]
+}

@@ -18,17 +18,29 @@ const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /** 라벨 텍스트 바로 아래의 가장 가까운 컨트롤. 라벨이 정확히 일치하는 요소가 없으면("VPC명 *" 처럼 붙어 있으면) 부분 일치로 넓힌다. */
 export async function below(page: Page, label: string, selector = 'input', nth = 0): Promise<Locator> {
-  // `:below` 는 뷰포트 기준 사각형을 비교한다. 라벨이 화면 위로 스크롤돼 나가면 고정 헤더의 검색창이 "라벨 아래" 로 잡힌다
-  // (2026-09-28 DBaaS 폼 "DATA"·SG 규칙 "포트" 가 헤더 검색창에 채워짐) → 라벨을 먼저 뷰포트로 끌어오고, 헤더 안 요소는 뺀다.
-  await page
-    .locator(`:text-is(${q(label)})`)
-    .first()
-    .scrollIntoViewIfNeeded({ timeout: 2_000 })
-    .catch(() => undefined);
-  const notHeader = `:not(header ${selector.split(',')[0]!.trim()})`;
-  const strict = page.locator(`${selector}:visible:below(:text-is(${q(label)}))${notHeader}`);
-  if ((await strict.count()) > nth) return strict.nth(nth);
-  return page.locator(`${selector}:visible:below(:text(${q(label)}))${notHeader}`).nth(nth);
+  // `:below` 는 뷰포트 기준 사각형을 비교하고 결과를 라벨과의 거리순으로 정렬한다.
+  //  - 라벨이 스크롤로 화면 위에 있으면 고정 헤더의 검색창도 "라벨 아래" 로 잡힌다(2026-09-28 DBaaS "DATA") → 헤더 안 요소는 건너뛴다.
+  //  - 라벨을 억지로 스크롤하면 안 된다: 오른쪽 요약 패널(고정 위치)에도 같은 라벨("VPC명")이 있어, 스크롤 뒤엔 그 글자가
+  //    다음 칸(IP 대역) 바로 위에 와서 엉뚱한 칸이 잡혔다(2026-09-29 재현). 선택자 끝 `:not(...)` 도 쓰지 않는다.
+  for (const anchor of [`:text-is(${q(label)})`, `:text(${q(label)})`]) {
+    const all = page.locator(`${selector}:visible:below(${anchor})`);
+    const count = await all.count();
+    let seen = 0;
+    for (let i = 0; i < count; i++) {
+      const el = all.nth(i);
+      // 콘솔 상단 전역 검색창은 <header> 태그 밖에 있다 → placeholder 로도 거른다 (2026-09-29 확인)
+      const inChrome = await el
+        .evaluate(
+          (e) =>
+            !!e.closest('header') ||
+            ((e as HTMLInputElement).placeholder ?? '').includes('서비스명, 마켓플레이스'),
+        )
+        .catch(() => false);
+      if (inChrome) continue;
+      if (seen++ === nth) return el;
+    }
+  }
+  return page.locator(`${selector}:visible:below(:text(${q(label)}))`).nth(nth);
 }
 
 export async function fillField(
@@ -46,6 +58,15 @@ export async function fillField(
     const again = await below(page, label, opts.selector ?? 'input', opts.nth ?? 0);
     await again.fill(value);
     await again.press('Tab');
+  }
+  // scp 입력란은 프로그램식 fill 이 가끔 반영되지 않는다(이전 값 유지, 2026-09-29 VPC명 재현 3회 중 1회).
+  // 실제 키보드 입력은 매번 반영되므로 마지막 수단으로 전체 선택 → 지우기 → 타이핑한다.
+  if ((await field.inputValue().catch(() => '')) !== value) {
+    await field.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type(value, { delay: 20 });
+    await page.keyboard.press('Tab');
   }
   await expect(field, `"${label}" 입력값이 남아 있어야 합니다`).toHaveValue(value);
 }
