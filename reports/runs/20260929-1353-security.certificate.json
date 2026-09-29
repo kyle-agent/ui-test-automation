@@ -1,0 +1,46 @@
+{
+  "spec": "security.certificate",
+  "started": "2026-09-29T04:53:43.328Z",
+  "ended": "2026-09-29T04:54:54.168Z",
+  "seconds": 71,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.certificate",
+    "run_id": "0929-1354-8546",
+    "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "자체 발급 인증서 생성 후 해지",
+      "status": "passed",
+      "seconds": 49,
+      "annotations": {
+        "scenario": "security.certificate",
+        "run_id": "0929-1354-8546",
+        "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Certificate Manager 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] cert-0929-1354-8546 생성",
+          "status": "pass",
+          "seconds": 22.3
+        }
+      ]
+    }
+  ]
+}

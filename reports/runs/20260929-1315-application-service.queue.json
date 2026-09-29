@@ -1,0 +1,46 @@
+{
+  "spec": "application-service.queue",
+  "started": "2026-09-29T04:15:52.336Z",
+  "ended": "2026-09-29T04:16:50.205Z",
+  "seconds": 58,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "application-service.queue",
+    "run_id": "0929-1316-f469",
+    "title": "Queue 목록 | Queue Service | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Queue 생성 후 해지",
+      "status": "passed",
+      "seconds": 32.9,
+      "annotations": {
+        "scenario": "application-service.queue",
+        "run_id": "0929-1316-f469",
+        "title": "Queue 목록 | Queue Service | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Queue 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.3
+        },
+        {
+          "title": "steps[1] que-0929-1316-f469 생성",
+          "status": "pass",
+          "seconds": 21.1
+        }
+      ]
+    }
+  ]
+}

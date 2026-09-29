@@ -1,0 +1,46 @@
+{
+  "spec": "compute.server-group",
+  "started": "2026-09-29T04:42:24.035Z",
+  "ended": "2026-09-29T04:44:27.831Z",
+  "seconds": 124,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.server-group",
+    "run_id": "0929-1343-3c45",
+    "title": "Server Group 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 24.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Server Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 68.9,
+      "annotations": {
+        "scenario": "compute.server-group",
+        "run_id": "0929-1343-3c45",
+        "title": "Server Group 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Server Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.5
+        },
+        {
+          "title": "steps[1] sgrp-0929-1343-3c45 생성",
+          "status": "pass",
+          "seconds": 19
+        }
+      ]
+    }
+  ]
+}

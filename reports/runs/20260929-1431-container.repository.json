@@ -1,0 +1,51 @@
+{
+  "spec": "container.repository",
+  "started": "2026-09-29T05:31:20.270Z",
+  "ended": "2026-09-29T05:39:15.629Z",
+  "seconds": 475,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.repository",
+    "run_id": "0929-1431-7833",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Registry 위에 Repository 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 450,
+      "annotations": {
+        "scenario": "container.repository",
+        "run_id": "0929-1431-7833",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.2
+        },
+        {
+          "title": "steps[1] Registry cr092914317833 생성",
+          "status": "pass",
+          "seconds": 192.4
+        },
+        {
+          "title": "steps[2] Repository repo-0929-1431-7833 생성",
+          "status": "pass",
+          "seconds": 32.6
+        }
+      ]
+    }
+  ]
+}

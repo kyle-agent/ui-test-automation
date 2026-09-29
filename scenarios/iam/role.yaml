@@ -1,0 +1,33 @@
+id: iam.role
+title: IAM 역할 생성 후 삭제
+service: IAM
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): 목록 #/iam/role (Global), 버튼 "역할 생성" / 상단 "삭제"(행 선택 후). 기존 OrganizationAccountAccessRole 은 건드리지 않는다.
+# 폼 #/iam/role/create: "역할명"(영문·숫자·+=,.@-_ 64자 이내), 설명, 최대 세션 지속 시간(1시간), 수행 주체 연결(구분 "현재 Account" 를 고르면 Value 에 계정 ID 가 채워진다),
+# 정책 연결(선택 사항), 태그. "추가" 는 수행 주체 행을 하나 더 만든다: 빈 행이 남으면 생성이 비활성이라 누르지 않는다.
+# 정책 없이 현재 Account 만 수행 주체로 둔 역할이라 권한 영향이 없다. 무과금.
+steps:
+  - goal: "역할 목록으로 이동한다"
+    goto: "#/iam/role"
+    expect:
+      url: "#/iam/role"
+
+  - goal: "역할 {{name}} 을 수행 주체 현재 Account, 정책 없이 생성한다"
+    vars:
+      name: "role-{{run_id}}"
+    expect:
+      url: "#/iam/role"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "역할 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

@@ -32,19 +32,27 @@ export const ROUTES = {
   grp: '#/iam/group/list',
   pol: '#/iam/policy/list',
   lc: '#/virtualserver/launch-configuration/list',
+  fn: '#/scf/cloudfunctions',
+  que: '#/queueservice/queueservices',
+  ntg: '#/notification/group',
+  role: '#/iam/role',
+  cert: '#/certificate-manager/certificate-manager/list',
+  cr: '#/scr/registry',
 } as const;
 
 export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
 const TEST_NAME =
-  /^(ske|asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+  /^(ske|asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol|fn|que|ntg|role|cert)-\d{4}-\d{4}-[0-9a-f]{4}$/;
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}[a-z0-9]{0,6}$/;
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
 const TEST_HZ = /^hz-\d{4}-\d{4}-[0-9a-f]{4}\.[a-z.]+$/;
 /** PostgreSQL 클러스터명은 pgc<run_id_alpha> (영문만 허용) */
 const TEST_PG = /^pgc[a-z]{12}$/;
+/** Container Registry 명은 '-' 불가: cr<run_id_compact> */
+const TEST_CR = /^cr\d{8}[0-9a-f]{4}$/;
 const TEST_IGW = /^IGW_vpc-\d{4}-\d{4}-[0-9a-f]{4}$/;
 
 export interface Leftover {
@@ -86,7 +94,9 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
                 ? TEST_FS.test(w)
                 : kind === 'hz'
                   ? TEST_HZ.test(w)
-                  : TEST_NAME.test(w),
+                  : kind === 'cr'
+                    ? TEST_CR.test(w)
+                    : TEST_NAME.test(w),
       );
       if (name) leftovers.push({ kind, name, rowText });
     }
@@ -118,6 +128,12 @@ const ORDER: Kind[] = [
   'grp',
   'pol',
   'lc',
+  'fn',
+  'que',
+  'ntg',
+  'role',
+  'cert',
+  'cr',
 ];
 
 /** 남은 리소스를 의존관계 역순으로 지운다. 실패한 항목은 모아서 돌려준다. */
@@ -334,6 +350,32 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await topButton(page, '서비스 해지').click();
       await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name }); // 모달이 실제 버킷명 입력을 요구
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
+      return;
+    case 'fn':
+    case 'que':
+    case 'cert':
+      // 행 선택 → 상단 "서비스 해지" (Cloud Functions, Queue, Certificate Manager)
+      await selectRow(page, item.name);
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지|삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    case 'ntg':
+    case 'role':
+      // 행 선택 → 상단 "삭제" (알림 그룹, IAM 역할)
+      await selectRow(page, item.name);
+      await topButton(page, '삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
+      return;
+    case 'cr':
+      // Container Registry: 목록에 해지 버튼이 없다 → 상세 "서비스 해지". Terminating 이 수 분 간다
+      if (/Terminating/i.test(item.rowText)) return;
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지|삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 20_000, log });
       return;
     case 'sg':
       await row(page, item.name).getByText(item.name, { exact: true }).first().click();

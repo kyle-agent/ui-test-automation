@@ -38,6 +38,10 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'database.mariadb': { vpc: 0, shared: true, minutes: 16 },
   'database.epas': { vpc: 0, shared: true, minutes: 16 },
   'database.cachestore': { vpc: 0, shared: true, minutes: 15.5 },
+  // 2026-09-29 커버리지 확장(단독 통과 실측). 나머지(queue·notification-group·cloud-function·certificate)는 기본값 3분
+  'container.repository': { vpc: 0, minutes: 7 },
+  'container.container-registry': { vpc: 0, minutes: 6.5 },
+  'iam.role': { vpc: 0, minutes: 4.5 },
 };
 
 export function planFor(spec: string): SpecPlan {

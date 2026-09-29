@@ -1,0 +1,53 @@
+{
+  "spec": "compute.cloud-function",
+  "started": "2026-09-29T04:19:22.674Z",
+  "ended": "2026-09-29T04:21:50.509Z",
+  "seconds": 148,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "timedOut",
+      "seconds": 106,
+      "annotations": {},
+      "steps": [],
+      "error": "Test timeout of 90000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-6.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-4.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-2.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-5.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-7.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-3.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-1.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-9.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/error-context.md",
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/trace.zip"
+      ]
+    },
+    {
+      "title": "Cloud Function 생성 후 해지",
+      "status": "skipped",
+      "seconds": 0,
+      "annotations": {},
+      "steps": []
+    }
+  ],
+  "error": "Test timeout of 90000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-6.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-4.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-2.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-5.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-7.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-3.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-1.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/test-failed-9.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/error-context.md",
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/trace.zip"
+  ]
+}

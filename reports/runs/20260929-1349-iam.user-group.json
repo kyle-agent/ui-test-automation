@@ -1,0 +1,38 @@
+{
+  "spec": "iam.user-group",
+  "started": "2026-09-29T04:49:16.443Z",
+  "ended": "2026-09-29T04:50:56.042Z",
+  "seconds": 100,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 사용자 그룹 생성 후 삭제",
+      "status": "failed",
+      "seconds": 0,
+      "annotations": {},
+      "steps": [
+        {
+          "title": "steps[0] 사용자 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.1
+        },
+        {
+          "title": "steps[1] grp-0929-1349-71a1 생성",
+          "status": "pass",
+          "seconds": 38.3
+        }
+      ],
+      "error": "Error: worker process exited unexpectedly (code=1, signal=null)"
+    }
+  ],
+  "error": "Error: worker process exited unexpectedly (code=1, signal=null)"
+}

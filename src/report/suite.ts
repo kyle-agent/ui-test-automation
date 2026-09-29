@@ -27,4 +27,11 @@ export const SUITE_ORDER: readonly string[] = [
   'database.mariadb', // ≈25분
   'database.epas', // ≈25분. License 확인 체크
   'database.cachestore', // ≈20분. Redis Sentinel 단일, 고가용성 끔
+  'application-service.queue', // Queue(기본 유형) 생성·해지. 선행 리소스 없음
+  'management.notification-group', // 알림 그룹(수신자 없음) 생성·삭제. Global
+  'compute.cloud-function', // Function(새로 작성, Node.js) 생성·해지. 호출 과금
+  'container.container-registry', // Registry(프라이빗) 생성·상세 해지. 빈 채로 즉시 해지
+  'iam.role', // 역할(수행 주체 현재 Account, 정책 없음) 생성·삭제. Global
+  'security.certificate', // 자체 발급 인증서(한 달) 생성·해지. 무과금
+  'container.repository', // Registry → Repository → 역순. ≈8분
 ];

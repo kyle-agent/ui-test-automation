@@ -1,0 +1,33 @@
+{
+  "spec": "database.cachestore",
+  "started": "2026-09-29T04:34:32.597Z",
+  "ended": "2026-09-29T04:37:28.061Z",
+  "seconds": 175,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "failed",
+      "seconds": 59.1,
+      "annotations": {},
+      "steps": [],
+      "error": "Error: page.title: Target page, context or browser has been closed",
+      "attachments": [
+        "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png"
+      ]
+    },
+    {
+      "title": "VPC → Subnet → CacheStore(Redis) 단일 서버 생성 후 역순 해지",
+      "status": "skipped",
+      "seconds": 0,
+      "annotations": {},
+      "steps": []
+    }
+  ],
+  "error": "Error: page.title: Target page, context or browser has been closed",
+  "attachments": [
+    "test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png"
+  ]
+}

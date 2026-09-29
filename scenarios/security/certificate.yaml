@@ -1,0 +1,33 @@
+id: security.certificate
+title: 자체 발급 인증서 생성 후 해지
+service: Certificate Manager
+category: Security
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): 목록 #/certificate-manager/certificate-manager/list, 버튼 "서비스 생성" / 상단 "서비스 해지"(행 선택 후).
+# 폼: "인증서명"(영문·숫자·-_. 3~30자), 유형 "사용자 인증서"(PEM 붙여 넣기) | "자체 발급 인증서"(Self-Signed). 자체 발급을 고르면
+# Common Name(30자), Organization Unit(짧으면 "입력 조건에 맞지 않습니다": "QA" 는 거절, "QATeam" 은 통과), 시작일(오늘 기본), 만료일(달력에서 골라야 한다:
+# 입력란에 타이핑한 날짜는 "필수값입니다" 로 남는다), 만료 알림(끔). 키·인증서를 밖으로 내보내지 않으므로 보관할 비밀이 없다.
+steps:
+  - goal: "Certificate Manager 목록으로 이동한다"
+    goto: "#/certificate-manager/certificate-manager/list"
+    expect:
+      url: "#/certificate-manager/certificate-manager/list"
+
+  - goal: "자체 발급 인증서 {{name}} 을 한 달짜리로 생성한다"
+    vars:
+      name: "cert-{{run_id}}"
+    expect:
+      url: "#/certificate-manager/certificate-manager/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "인증서 {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

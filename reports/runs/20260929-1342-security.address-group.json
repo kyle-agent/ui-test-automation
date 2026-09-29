@@ -1,0 +1,68 @@
+{
+  "spec": "security.address-group",
+  "started": "2026-09-29T04:42:55.153Z",
+  "ended": "2026-09-29T04:49:14.615Z",
+  "seconds": 379,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.address-group",
+    "run_id": "0929-1345-bd2b",
+    "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 104.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Address Group 생성 후 삭제",
+      "status": "failed",
+      "seconds": 214.9,
+      "annotations": {
+        "scenario": "security.address-group",
+        "run_id": "0929-1345-bd2b",
+        "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Address Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 23.3
+        },
+        {
+          "title": "steps[1] addr-0929-1345-bd2b 생성",
+          "status": "fail",
+          "seconds": 90.6
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-10.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-9.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-8.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/screenshot-simple-crud.ts.png"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-10.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-9.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-8.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/screenshot-simple-crud.ts.png"
+  ]
+}

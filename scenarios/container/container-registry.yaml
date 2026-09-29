@@ -1,0 +1,32 @@
+id: container.container-registry
+title: Container Registry 생성 후 해지
+service: Container Registry
+category: Container
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): 목록 #/scr/registry, 버튼 "서비스 생성". 목록에 해지 버튼이 없어 상세에서 "서비스 해지".
+# 폼 #/scr/registry/request: "레지스트리명"(영문 소문자로 시작, 소문자·숫자 3~25자, '-' 불가), 엔드포인트 프라이빗(기본),
+# 프라이빗 엔드포인트 접근 제어(끔), 가시성 Public(끔), 태그. 선행 리소스 없음. 저장 용량 과금이라 비어 있는 채로 바로 해지.
+steps:
+  - goal: "Registry 목록으로 이동한다"
+    goto: "#/scr/registry"
+    expect:
+      url: "#/scr/registry"
+
+  - goal: "Registry {{name}} 을 프라이빗 엔드포인트로 생성한다"
+    vars:
+      name: "cr{{run_id_compact}}"
+    expect:
+      url: "#/scr/registry"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "Registry {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

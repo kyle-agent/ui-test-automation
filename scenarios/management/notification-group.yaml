@@ -1,0 +1,32 @@
+id: management.notification-group
+title: 알림 그룹 생성 후 삭제
+service: Notification Manager
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): 목록 #/notification/group (Global), 버튼 "알림 그룹 생성" / 상단 "삭제"(행 선택 후).
+# 폼 #/notification/group/create: "알림 그룹명"(한글·영문·숫자·+=,.@-_ 3~24자), 설명, 사용자 표, 외부 수신자(이메일) 입력란.
+# 실제 메일이 나가지 않도록 사용자·외부 수신자는 넣지 않는다. 선행 리소스 없음, 무과금.
+steps:
+  - goal: "알림 그룹 목록으로 이동한다"
+    goto: "#/notification/group"
+    expect:
+      url: "#/notification/group"
+
+  - goal: "알림 그룹 {{name}} 을 수신자 없이 생성한다"
+    vars:
+      name: "ntg-{{run_id}}"
+    expect:
+      url: "#/notification/group"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "알림 그룹 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000
