@@ -24,3 +24,4 @@ __pycache__/
 # 로컬 설정
 .env
 .env.local
+reports/suite/

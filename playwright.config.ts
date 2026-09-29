@@ -38,7 +38,8 @@ export default defineConfig({
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/report.json' }],
   ],
-  outputDir: 'test-results/artifacts',
+  // 병렬 스위트에서는 spec 마다 따로 둔다: Playwright 는 시작할 때 outputDir 을 비워서, 같은 폴더면 먼저 돌던 spec 의 trace 가 지워져 컨텍스트가 닫힌다
+  outputDir: process.env.PW_OUTPUT_DIR ?? 'test-results/artifacts',
   use: {
     baseURL: CONSOLE_URL,
     locale: 'ko-KR',
@@ -58,7 +59,8 @@ export default defineConfig({
       testDir: 'tests/auth',
       use: { ...devices['Desktop Chrome'], storageState: { cookies: [], origins: [] } },
     },
-    { name: 'session', testDir: 'tests/setup', testMatch: /session\.setup\.ts/ },
+    // 병렬 스위트(test:suite)에서 여러 탭이 동시에 콘솔을 열면 첫 로딩이 90초를 넘기기도 한다
+    { name: 'session', testDir: 'tests/setup', testMatch: /session\.setup\.ts/, timeout: 180_000 },
     {
       name: 'smoke',
       testDir: 'tests/smoke',

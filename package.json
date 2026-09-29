@@ -23,6 +23,7 @@
     "test:smoke": "playwright test --project=smoke",
     "test:regression": "playwright test --project=regression",
     "test:stacks": "tsx scripts/run-stacks.ts",
+    "test:suite": "tsx scripts/run-suite.ts",
     "stacks:check": "tsx scripts/stacks-cleanup.ts",
     "stacks:cleanup": "tsx scripts/stacks-cleanup.ts --yes",
     "explore": "tsx scripts/explore.ts",

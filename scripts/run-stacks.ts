@@ -99,7 +99,14 @@ function runOne(id: string, issues: readonly KnownIssue[]): RunRecord {
     {
       stdio: 'inherit',
       shell: true,
-      env: { ...process.env, RUN_DESTRUCTIVE: '1', PW_WORKERS: '1', PLAYWRIGHT_JSON_OUTPUT_FILE: jsonFile },
+      env: {
+        ...process.env,
+        RUN_DESTRUCTIVE: '1',
+        PW_WORKERS: '1',
+        PLAYWRIGHT_JSON_OUTPUT_FILE: jsonFile,
+        // 병렬 실행(test:suite) 때 서로의 산출물 폴더를 지우지 않도록 spec 별로 나눈다
+        PW_OUTPUT_DIR: path.join('test-results', 'artifacts', id),
+      },
     },
   );
   const ended = new Date();

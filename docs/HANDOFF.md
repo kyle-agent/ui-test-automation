@@ -358,3 +358,20 @@
 - (추가) 탐색기 입력도 보강(`src/jev/browser.ts` act): insertText 뒤 포커스된 칸의 값을 확인해 다르면 키보드로 다시 치고(maxlength 절단은 정상), **입력 후 Tab 으로 칸을 벗어난다**.
   콘솔은 blur 때 검증하므로, 벗어나지 않으면 직전 값의 오류 표시를 새 값의 판정으로 읽는다 — 이것이 "유효값인데 오류" 경보의 두 번째 원인이었다.
   보강 후 VPC 폼 탐색: 정보 9건 → 3건, 남은 3건("vp", /15, /29)은 모두 실제 거부. 자동완성 콤보박스는 확인·Tab 을 하지 않는다.
+
+### 9.15 병렬 스위트 실행기 `npm run test:suite` (2026-09-29)
+
+- `scripts/run-suite.ts`: SUITE_ORDER 전부를 한 로그인 브라우저의 탭 여러 개로 동시에 돌린다. spec 별 VPC 수·예상 시간은 `src/report/suite-plan.ts`
+  (통과 실행 중앙값, 없는 spec 은 VPC 0·3분으로 본다 — 새 spec 이 VPC 를 만들면 여기에 적을 것).
+- 규칙: VPC 여유 = 5 − 시작 시점 VPC 수 − (공유 VPC 가 살아 있는 동안 1). 오래 걸리는 spec 부터, 탭 ≤ `--max`(기본 8). 공유 VPC+Subnet 은 시작하자마자
+  뒤에서 만들고(DBaaS 5종이 채택), DBaaS 가 다 끝나면 지워 VPC 한 칸을 돌려준다. 각 spec 은 `run-stacks.ts --only <id> --no-preflight` 로 떠서 reports/runs 기록이 같다.
+- 로그: `reports/suite/suite-<stamp>.log`(커밋 안 함). 직렬 예상 224분.
+- **첫 실측(2026-09-29 오후) — 아직 통과 못 함.** 드러난 문제와 조치:
+  1. 부하 중 공유 네트워크 Subnet 폼 5초 대기 초과 → 공유 네트워크를 다른 spec 보다 먼저 만들고, 실패하면 정리 후 1회 재시도.
+  2. 실패 뒤 스케줄러가 이미 끝난 promise 로 경쟁해 빈 루프 → 힙 4GB 초과로 런처가 죽고 자식 spec 도 정리 없이 같이 죽음 → 루프 수정.
+  3. 9개가 동시에 세션 확인 → 콘솔 첫 로딩이 90초 초과 → session 프로젝트 timeout 180초 + 띄우는 간격 `--stagger`(기본 20초).
+  4. 모든 spec 이 `test-results/artifacts` 를 같이 써서 새 spec 이 시작할 때 폴더를 비워 먼저 돌던 spec 의 trace 가 지워짐(ENOENT, 컨텍스트 닫힘)
+     → run-stacks 가 `PW_OUTPUT_DIR=test-results/artifacts/<spec>` 로 나눈다.
+  5. 탭 9개 + trace 상태에서 13:50 경 CDP 브라우저의 컨텍스트가 통째로 사라짐(Edge 프로세스는 살아 있음) → 진행 중 spec 전부 정리 없이 실패.
+     동시 탭은 5~6 이하로 시작해 올려 볼 것. 남은 리소스 13개(PostgreSQL 1 Running, VPC 5/5) 는 `npm run stacks:cleanup` 로 정리 필요.
+- 결과 요약(2차): PASS queue · cloud-function · server-group · object-storage-bucket · file-storage · security-group-rule / 나머지는 위 원인으로 실패·중단.

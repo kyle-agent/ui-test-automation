@@ -127,6 +127,7 @@ CONSOLE_URL="file:///$PWD/tests/fixtures/fake-vpc.html?mode=iframe" CONSOLE_BASE
 npm run stacks:check                       # 남은 테스트 리소스와 VPC 개수(계정 한도 5) 점검. 변경 없음
 npm run test:stacks                        # 아래 순서로 spec 을 하나씩 직렬 실행 (약 45분). 별도 터미널에서
 npm run test:stacks -- --only vm-volume    # 일부만 (콤마 구분). --from vm-stack 은 그 spec 부터
+npm run test:suite                         # 전체를 병렬로 (VPC 여유·탭 수 안에서 오래 걸리는 것부터, DBaaS 는 공유 VPC). --max 9 --only a,b --dry-run
 npm run stacks:cleanup                     # 실패로 남은 리소스를 의존관계 역순으로 정리 (이름 규칙에 맞는 것만)
 ```
 
