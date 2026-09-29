@@ -1,0 +1,57 @@
+id: networking.vpn
+title: VPC → IGW → Public IP → VPN Gateway → VPN Tunnel 생성 후 역순 삭제
+service: VPN
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/vpn-*.md): VPN 목록 #/vpn/vpn/list "서비스 생성" → VPN Gateway명(영문·숫자만 3~20 → vpn<run_id_compact>), 연결 VPC명,
+# Public IP(예약된 IGW 구분 IP 목록), 설명(40자), "요금 확인"(월 ₩37,960). API 는 VPC 에 IGW 가 있어야 한다(internet-gateway-not-found) → IGW(Firewall 끔)를 먼저 붙인다.
+# "VPN을 생성하시겠습니까?" → Active ≈30초. Tunnel 목록 #/vpn/vpn-tunnel/list "VPN Tunnel 생성": Tunnel명(영문·숫자), VPN Gateway명 → VPC명·Public IP 자동,
+# Peer VPN GW IP(203.0.113.2, 문서용 주소), Remote Subnet(CIDR) 입력 + "추가", Pre-shared Key(password, 8~64자 — run_id 로 만들고 기록하지 않는다),
+# IKE 설정(IKE v1 기본, Encryption·Digest 드롭다운 + "추가", Diffie-Hellman 체크), IPSEC 설정(같은 구조, PFS 기본 켜짐), SA LifeTime 86400/43200, DPD 60 기본.
+# "SCP VPN 서비스는 Passive Mode(Responder)" — 상대 장비가 없어도 터널은 Active 로 만들어진다(연결 상태와 별개). Creating ≈1분.
+# 삭제: VPN·Tunnel 목록엔 삭제가 없고 상세 버튼만 — Tunnel 상세 "VPN Tunnel 삭제", VPN 상세 "서비스 해지"("해지하기 전에는 연결된 Tunnel을 삭제해 주세요").
+steps:
+  - goal: "VPN 목록으로 이동한다"
+    goto: "#/vpn/vpn/list"
+    expect:
+      url: "#/vpn/vpn/list"
+
+  - goal: "VPC {{vpc}} 와 Internet Gateway 를 만들고 Public IP 를 예약한다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+    expect:
+      url: "#/vpc/public-ip/list"
+
+  - goal: "VPN Gateway {{vpn}} 를 만들고 Active 를 기다린다"
+    vars:
+      vpn: "vpn{{run_id_compact}}"
+    expect:
+      url: "#/vpn/vpn/list"
+      text: ["{{vpn}}"]
+
+  - goal: "VPN Tunnel {{tunnel}} (Peer 203.0.113.2, Remote 20.0.0.0/24, aes256-sha256, DH 14) 를 만든다"
+    vars:
+      tunnel: "vpnt{{run_id_compact}}"
+    expect:
+      url: "#/vpn/vpn-tunnel/list"
+      text: ["{{tunnel}}", "203.0.113.2"]
+
+teardown:
+  - goal: "VPN Tunnel {{tunnel}} 을 삭제한다"
+    expect:
+      url: "#/vpn/vpn-tunnel/list"
+      not_text: ["{{tunnel}}"]
+  - goal: "VPN {{vpn}} 을 해지한다"
+    expect:
+      url: "#/vpn/vpn/list"
+      not_text: ["{{vpn}}"]
+  - goal: "Public IP 반납 · IGW 삭제 · VPC {{vpc}} 해지"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

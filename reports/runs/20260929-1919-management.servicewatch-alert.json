@@ -1,0 +1,46 @@
+{
+  "spec": "management.servicewatch-alert",
+  "started": "2026-09-29T10:19:54.627Z",
+  "ended": "2026-09-29T10:21:14.073Z",
+  "seconds": 79,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-alert",
+    "run_id": "0929-1920-c1af",
+    "title": "경보 정책 목록 | 경보 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 경보 정책 생성 후 삭제",
+      "status": "passed",
+      "seconds": 54.2,
+      "annotations": {
+        "scenario": "management.servicewatch-alert",
+        "run_id": "0929-1920-c1af",
+        "title": "경보 정책 목록 | 경보 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 경보 정책 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] swa-0929-1920-c1af 생성",
+          "status": "pass",
+          "seconds": 21.4
+        }
+      ]
+    }
+  ]
+}

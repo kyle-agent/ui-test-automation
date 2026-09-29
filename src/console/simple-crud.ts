@@ -52,6 +52,8 @@ export interface SimpleCrudConfig {
   afterCreate?: (page: Page, vars: Record<string, string>) => Promise<void>;
   /** 환경 전제가 안 갖춰져 실행할 수 없을 때(예: Object Storage 는 인증키 필요) 사유와 함께 건너뛴다 */
   skipReason?: string;
+  /** 폼 하단 주 버튼 문구 (기본 "생성"; Message Hub Domain·Email 추가 화면은 "완료") */
+  submitButton?: string;
 }
 
 const fill = (s: string, vars: Record<string, string>) =>
@@ -140,7 +142,7 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
           for (const d of config.dropdowns ?? []) await pickOption(page, d.label, d.option);
           for (const c of config.checkboxes ?? []) await setCheckbox(page, c.label, c.checked);
           if (config.beforeSubmit) await config.beforeSubmit(page, vars);
-          await submitForm(page, '생성');
+          await submitForm(page, config.submitButton ?? '생성');
           await confirmModal(page, config.confirmText ?? /생성|신청|예약/, '확인', { agree: true });
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
           await waitForRow(page, config.route, vars.name!, {

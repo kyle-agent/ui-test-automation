@@ -1,0 +1,34 @@
+id: storage.file-storage-snapshot
+title: File Storage 스냅샷 생성 후 삭제
+service: File Storage
+category: Storage
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/filestorage-snapshot.md): 볼륨 흐름은 storage.file-storage 와 같다(NFS/Single-AZ/HDD, 이름 뒤 "_<6자리>" 가 붙음).
+# 스냅샷: 볼륨 상세 상단 "스냅샷 생성" → "스냅샷을 즉시 생성 하시겠습니까?" → 확인 (이름 입력 없음, 자동 이름 "<볼륨명>__snapshot.YYYY-MM-DD_HHMMSS").
+#   상세 "스냅샷 목록" 탭 행: 스냅샷명 | 용량 | 생성 일시 | 상태(Available, 수 초). 삭제는 탭 행 선택 → 탭 위 "삭제" → "스냅샷을 삭제하시겠습니까?" → 수 초 뒤 행 사라짐.
+# API(storage__filestorage.json): POST /v1/snapshots {volume_id} → DELETE /v1/snapshots/{id}. 볼륨 용량 과금(짧게 유지).
+steps:
+  - goal: "File Storage 목록으로 이동한다"
+    goto: "#/filestorage/filestorage/list"
+    expect:
+      url: "#/filestorage/filestorage/list"
+
+  - goal: "File Storage 볼륨 {{name}} 을 NFS 로 생성하고, 상세에서 스냅샷을 만들어 Available 을 확인한 뒤 스냅샷을 삭제한다"
+    vars:
+      # 소문자·숫자·_ 3~21자. 정리 종류 fss (fss_ + run_id 숫자·hex 12자 = 16자, 콘솔이 "_xxxxxx" 를 붙인다)
+      name: "fss_{{run_id_compact}}"
+    expect:
+      url: "#/filestorage/filestorage/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "File Storage 볼륨 {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

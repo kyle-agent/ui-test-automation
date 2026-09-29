@@ -1,0 +1,37 @@
+id: compute.volume-snapshot
+title: Block Storage 볼륨 스냅샷 생성·복구·삭제
+service: Virtual Server
+category: Compute
+tags: [regression, destructive, crud, storage]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/virtualserver-block-storage-snapshot.md). 서버 없이 볼륨만으로 된다(VPC 불필요).
+#   볼륨: #/virtualserver/block-storage/list "Block Storage 생성" → 볼륨명 / 디스크 유형 SSD / 용량 1 Unit(8GB) / AZ kr-west1-b → Available(수 초).
+#   상세는 목록의 "볼륨 ID" 링크(볼륨명 셀은 링크가 아니다) → #/virtualserver/block-storage/detail/info?blockStorageId=…
+#   상단 "스냅샷 생성" 모달(스냅샷명·설명) → 확인 → "스냅샷을 생성하시겠습니까?" → 탭 "스냅샷 목록 (1)" 행 Available(수 초).
+#   상단 "스냅샷 복구"(최신 스냅샷으로 되돌림) → "스냅샷을 복구하시겠습니까?" → 볼륨 Reverting ≈70초 → Available (복구 중 임시 스냅샷이 하나 더 보였다가 사라짐).
+#   스냅샷 삭제: 탭 행 선택 → 탭 위 "삭제" → "스냅샷 1개를 삭제하시겠습니까?" → 수 초 뒤 행 사라짐. 볼륨 삭제: 목록 행 선택 → 상단 "삭제".
+# 이름: 정리 종류 snap — 볼륨 snap-<run_id>, 스냅샷 snap-<run_id>-s1. 볼륨·스냅샷 용량 과금(짧게).
+steps:
+  - goal: "Block Storage 목록으로 이동한다"
+    goto: "#/virtualserver/block-storage/list"
+    expect:
+      url: "#/virtualserver/block-storage/list"
+
+  - goal: "볼륨 {{name}}(SSD 8GB) 을 만들고, 상세에서 스냅샷 {{snapshot}} 을 생성·복구한 뒤 스냅샷을 삭제한다"
+    vars:
+      name: "snap-{{run_id}}"
+      snapshot: "snap-{{run_id}}-s1"
+    expect:
+      url: "#/virtualserver/block-storage/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "볼륨 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

@@ -1,0 +1,39 @@
+id: financial-management.budget
+title: 계정 예산 생성 → 금액 수정 → 삭제
+service: Cost Management
+category: Financial Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/costmanagement-budget.md): 목록 #/costmanagement/budget (Global, "예산 관리"), 버튼 "예산 생성" / 상단 "수정"(행 선택 후)
+# / 상단 "⋮"(i.i-card-handle) 메뉴 → "Cost Navigator 연결" · "Cost Navigator 연결 해제" · "삭제". 이름 링크·상세 화면 없음.
+# 폼 #/costmanagement/budget/create: "예산명"(20자 이내), 관리 유형(월별 기본), "예산 (￦)"(입력 뒤 1,000,000 처럼 쉼표 표시), 시작월(이번 달 기본),
+# 임계치 도달 알림(기본 끔 — 수신자 메일이 나가지 않게 그대로 둔다), 신규 생성 방지(기본 끔 — 켜면 VM 등 생성이 막히므로 절대 켜지 않는다).
+# API 제약: 계정당 예산 1개 → 다른 예산이 이미 있으면 이 시나리오는 건너뛴다. 수정 화면 #/costmanagement/budget/<id>/modify 는 "완료". 무과금.
+steps:
+  - goal: "예산 관리 목록으로 이동한다"
+    goto: "#/costmanagement/budget"
+    expect:
+      url: "#/costmanagement/budget"
+
+  - goal: "월 예산 {{name}} 을 1,000,000원, 알림·생성 방지 없이 만든다"
+    vars:
+      name: "bud-{{run_id}}"
+    expect:
+      url: "#/costmanagement/budget"
+      text: ["{{name}}", "1,000,000"]
+
+  - goal: "예산 {{name}} 금액을 2,000,000원으로 수정한다"
+    expect:
+      url: "#/costmanagement/budget"
+      text: ["{{name}}", "2,000,000"]
+
+teardown:
+  - goal: "예산 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

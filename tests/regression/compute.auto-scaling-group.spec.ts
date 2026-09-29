@@ -1,5 +1,6 @@
 // 직접 작성 (2026-09-28). 시나리오: scenarios/compute/auto-scaling-group.yaml. 콘솔 사실은 yaml 머리 주석.
-import type { Page } from '@playwright/test';
+// 2026-09-29 L3(에이전트 C): steps[3] 상세 정책·스케줄 추가 → Active → 삭제. 알림은 수신자 후보(Account 멤버)가 없어 제외.
+import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
@@ -34,6 +35,66 @@ const ctx = (step: number) => ({
   testInfo: test.info(),
 });
 const ASG = '#/virtualserver/auto-scaling-group/list';
+
+/** 상세의 정책/스케줄 탭: "추가" 모달을 채우고 확인 → "…추가하시겠습니까?" → 행 Active → 행 선택·삭제 → 개수 0 */
+async function addAndDeleteInTab(
+  page: Page,
+  tab: '정책' | '스케줄',
+  name: string,
+  fillModal: (modal: ReturnType<typeof visibleModal>) => Promise<void>,
+) {
+  await page
+    .getByText(new RegExp(`^${tab} \\(\\d+\\)$`))
+    .first()
+    .click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  await page.getByRole('button', { name: `${tab} 추가`, exact: true }).click();
+  const modal = visibleModal(page);
+  await modal.waitFor({ timeout: 10_000 });
+  await fillModal(modal);
+  const ok = modal.getByRole('button', { name: '확인', exact: true });
+  await expect(ok, `${tab} 추가 모달의 확인이 활성화되어야 합니다`).toBeEnabled({ timeout: 10_000 });
+  try {
+    await ok.click({ timeout: 10_000 });
+  } catch {
+    await ok.click({ force: true });
+  }
+  await confirmModal(page, new RegExp(`${tab}을 추가하시겠습니까`));
+  for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+  await settleConsole(page, { appearGraceMs: 800 });
+  const r = page.locator('tr.scp-body-row').filter({ hasText: name }).first();
+  await expect(r, `${tab} ${name} 행이 Active 여야 합니다`).toContainText('Active', { timeout: 60_000 });
+  log(`  ${tab} 행: ${(await r.innerText()).replace(/\s+/g, ' ')}`);
+  await r.locator('i.table-select').first().click();
+  await topButton(page, '삭제').click();
+  await confirmModal(page, new RegExp(`${tab} 1개를 삭제하시겠습니까`), '확인', { agree: true });
+  for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+  await expect(page.getByText(new RegExp(`^${tab} \\(0\\)$`)).first(), `${tab} 삭제 뒤 개수 0`).toBeVisible({
+    timeout: 60_000,
+  });
+}
+
+/** 모달 안 보이는 텍스트 입력란을 순서대로 키보드로 채운다 (프로그램식 fill 이 가끔 반영되지 않는다) */
+async function typeInputs(page: Page, modal: ReturnType<typeof visibleModal>, values: string[]) {
+  const inputs = modal.locator('input[type=text]:visible');
+  // 1차 실행(2026-09-29): 스케줄명 타이핑이 7자("sch-092")에서 끊겨 잘린 이름으로 생성됨 → fill 후 값 확인, 다르면 다시 타이핑, 마지막에 단언
+  for (let i = 0; i < values.length; i++) {
+    const input = inputs.nth(i);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt === 0) await input.fill(values[i]!);
+      else {
+        await input.click();
+        await page.keyboard.press('Control+A');
+        await page.keyboard.press('Delete');
+        await page.keyboard.type(values[i]!, { delay: 30 });
+      }
+      await input.press('Tab');
+      await page.waitForTimeout(300);
+      if ((await input.inputValue()) === values[i]) break;
+    }
+    await expect(input).toHaveValue(values[i]!);
+  }
+}
 
 const visibleButtons = (page: Page) =>
   page.evaluate(() =>
@@ -248,6 +309,22 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         `  ASG 행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`,
       );
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] 정책 ${vars.policy} · 스케줄 ${vars.schedule} 추가·삭제`, async () => {
+      await gotoRoute(page, ASG);
+      await row(page, vars.name!).getByText(vars.name!).first().click(); // 이름 셀 링크 (exact 는 안 맞는다)
+      await settleConsole(page, { appearGraceMs: 800 });
+      await expect(page).toHaveURL(/auto-scaling-group\/detail/, { timeout: 30_000 });
+      // 정책: Scale Out, 이름만 넣고 나머지는 기본값(Average CPU Usage >= 60% 5분, 1대 증가, 쿨다운 300초). 서버 0대라 발동하지 않는다
+      await addAndDeleteInTab(page, '정책', vars.policy!, async (modal) => {
+        await modal.getByRole('button', { name: 'Scale Out', exact: true }).click();
+        await typeInputs(page, modal, [vars.policy!]);
+      });
+      // 스케줄: 이름 + Min 0 / Desired 0 / Max 1 (수행돼도 변화 없음), 주기 기본 매일
+      await addAndDeleteInTab(page, '스케줄', vars.schedule!, async (modal) => {
+        await typeInputs(page, modal, [vars.schedule!, '0', '0', '1']);
+      });
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });
   });
 });

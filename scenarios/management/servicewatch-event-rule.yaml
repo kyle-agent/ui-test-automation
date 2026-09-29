@@ -1,0 +1,33 @@
+id: management.servicewatch-event-rule
+title: ServiceWatch 이벤트 규칙 생성 → 비활성화 → 삭제
+service: ServiceWatch
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/service-watch-event-rule.md): 목록 #/service-watch/event/rule, 버튼 "이벤트 규칙 생성" / 상단 "삭제"(행 선택 후).
+# 폼: "이벤트 규칙명"(영문·숫자만 3~60자 → swe<run_id_compact>), 이벤트 소스(서비스 70여 개) → 이벤트 유형(소스별, KMS: 전체/Key/Managed Key),
+# 적용 이벤트·자원(기본 "모든"). 알림 수신자·알림 그룹은 선택 사항이라 넣지 않는다(메일이 나가지 않게). 생성 즉시 Active.
+# 상세 상단 "활성화"/"비활성화" → "비활성화 하시겠습니까?" 확인 → 목록 상태 Inactive (L3). 무과금.
+steps:
+  - goal: "이벤트 규칙 목록으로 이동한다"
+    goto: "#/service-watch/event/rule"
+    expect:
+      url: "#/service-watch/event/rule"
+
+  - goal: "KMS Key 이벤트 규칙 {{name}} 을 수신자 없이 생성하고 비활성화한다"
+    vars:
+      name: "swe{{run_id_compact}}"
+    expect:
+      url: "#/service-watch/event/rule"
+      text: ["{{name}}", "Inactive"]
+
+teardown:
+  - goal: "이벤트 규칙 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

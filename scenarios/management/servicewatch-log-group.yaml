@@ -1,0 +1,34 @@
+id: management.servicewatch-log-group
+title: ServiceWatch 로그 그룹 생성 → 로그 스트림 생성·삭제 → 로그 그룹 삭제
+service: ServiceWatch
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/service-watch-log-group.md): 목록 #/service-watch/log/group, 버튼 "로그 그룹 생성" / 상단 "삭제"(행 선택 후).
+# 폼: "로그 그룹명"(영문·숫자·-_/#. 3~512자, '/scp' 로 시작 불가), 로그 보관 정책(기본 "만기 없음" → 1일). 생성 즉시 Active.
+# 상세(#/service-watch/log/group/<id>/info) "로그 스트림" 탭 → "로그 스트림 생성" 모달("로그 스트림명" 영문·숫자만 3~512자 → sws<run_id_compact>)
+# → 행 끝 "삭제" → 확인. 목록엔 Cloud Functions 가 자동으로 만든 /scp/scf/<함수명> 로그 그룹도 보인다(건드리지 않음). 무과금(데이터 0 bytes).
+steps:
+  - goal: "로그 그룹 목록으로 이동한다"
+    goto: "#/service-watch/log/group"
+    expect:
+      url: "#/service-watch/log/group"
+
+  - goal: "로그 그룹 {{name}} 을 1일 보관으로 생성하고 로그 스트림 {{stream}} 을 만들었다 지운다"
+    vars:
+      name: "swl-{{run_id}}"
+      stream: "sws{{run_id_compact}}"
+    expect:
+      url: "#/service-watch/log/group"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "로그 그룹 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

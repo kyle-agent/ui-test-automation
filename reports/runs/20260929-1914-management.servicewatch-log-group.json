@@ -1,0 +1,78 @@
+{
+  "spec": "management.servicewatch-log-group",
+  "started": "2026-09-29T10:14:21.485Z",
+  "ended": "2026-09-29T10:15:56.148Z",
+  "seconds": 95,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "management.servicewatch-log-group",
+    "run_id": "0929-1914-91aa",
+    "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 로그 그룹 생성 → 로그 스트림 생성·삭제 → 로그 그룹 삭제",
+      "status": "failed",
+      "seconds": 63.5,
+      "annotations": {
+        "scenario": "management.servicewatch-log-group",
+        "run_id": "0929-1914-91aa",
+        "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 로그 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] swl-0929-1914-91aa 생성",
+          "status": "fail",
+          "seconds": 31.9
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-10.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-9.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-8.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-10.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-9.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-8.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip"
+  ]
+}

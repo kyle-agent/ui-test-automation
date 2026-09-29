@@ -1,0 +1,55 @@
+id: networking.transit-gateway
+title: VPC → Transit Gateway 생성 → VPC 연결 추가 → 연결 해제 → 역순 삭제
+service: VPC
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): 목록 #/vpc/transit-gateway/list "Transit Gateway 생성" → 폼: Transit Gateway명(3~20, 영문·숫자·-), 설명, "요금 확인"(월 ₩50,370, 시간 과금).
+# "Transit Gateway를 생성하시겠습니까?" → Creating ≈1.5분 → Active. 상세 탭: 상세 정보 / 연결 VPC 관리 (n) / 규칙 (n) / 태그 / 작업 이력, 상단 "Transit Gateway 삭제", "Firewall 연결".
+# "연결 VPC 관리" 탭 "VPC 연결 추가" → 모달(연결 VPC명 드롭다운) → "확인" → "VPC 연결을 추가하시겠습니까?" → Creating ≈2분 → Active.
+# 해제: 행 선택 → 상단 "삭제" → "VPC 연결을 삭제하시겠습니까?" → Deleting ≈2분. TGW 삭제: 목록 행 선택 → "삭제" → Deleting ≈1분.
+# VPC 는 Subnet 없이 연결된다(API vpc-transit-gateway-children 과 같음).
+steps:
+  - goal: "Transit Gateway 목록으로 이동한다"
+    goto: "#/vpc/transit-gateway/list"
+    expect:
+      url: "#/vpc/transit-gateway/list"
+
+  - goal: "VPC {{vpc}} 를 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+
+  - goal: "Transit Gateway {{tgw}} 를 만들고 Active 를 기다린다"
+    vars:
+      tgw: "tgw-{{run_id}}"
+    expect:
+      url: "#/vpc/transit-gateway/list"
+      text: ["{{tgw}}"]
+
+  - goal: "연결 VPC 관리 탭에서 {{vpc}} 연결을 추가하고 Active 를 기다린다"
+    expect:
+      url: "#/vpc/transit-gateway/detail/vpc-connection"
+      text: ["{{vpc}}"]
+
+  - goal: "VPC 연결을 해제한다"
+    expect:
+      url: "#/vpc/transit-gateway/detail/vpc-connection"
+      not_text: ["{{vpc}}"]
+
+teardown:
+  - goal: "Transit Gateway {{tgw}} 를 삭제한다"
+    expect:
+      url: "#/vpc/transit-gateway/list"
+      not_text: ["{{tgw}}"]
+  - goal: "VPC {{vpc}} 를 해지한다"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

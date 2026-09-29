@@ -1,0 +1,34 @@
+id: management.servicewatch-alert
+title: ServiceWatch 경보 정책 생성 후 삭제
+service: ServiceWatch
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/service-watch-alert-policy.md): 목록 #/service-watch/alert/policy (메뉴 경보 > 경보 정책;
+# 메뉴 지도(screens)의 /service-watch/alert 는 홈으로 돌아간다), 버튼 "경보 정책 생성" / 행 끝 "삭제".
+# 폼: "경보 정책명"(영문·숫자·-_ 3~63자), "지표 선택" 모달(대시보드와 같은 지표 트리, 1개 선택 → 확인), 평가 범위 300초·통계 평균(기본),
+# 조건 연산자(>, >=, <, <=, ~) + 임계값(천 단위 쉼표로 표시되므로 999), 경보 단계(기본 Middle). 알림 수신자·그룹 없음(메일 없음).
+# 생성 뒤 목록: 정책 상태 Active, 경보 상태 Insufficient data. 무과금.
+steps:
+  - goal: "경보 정책 목록으로 이동한다"
+    goto: "#/service-watch/alert/policy"
+    expect:
+      url: "#/service-watch/alert/policy"
+
+  - goal: "경보 정책 {{name}} 을 첫 지표 > 999 조건, 수신자 없이 생성한다"
+    vars:
+      name: "swa-{{run_id}}"
+    expect:
+      url: "#/service-watch/alert/policy"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "경보 정책 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

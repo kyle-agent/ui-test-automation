@@ -1,0 +1,46 @@
+{
+  "spec": "application-service.messagehub-email",
+  "started": "2026-09-29T11:12:16.099Z",
+  "ended": "2026-09-29T11:13:44.586Z",
+  "seconds": 88,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "application-service.messagehub-email",
+    "run_id": "0929-2012-ca0a",
+    "title": "Email 목록 | Message Hub | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Message Hub 발신 Email 주소 등록 후 삭제 (인증 메일 없이)",
+      "status": "passed",
+      "seconds": 57.9,
+      "annotations": {
+        "scenario": "application-service.messagehub-email",
+        "run_id": "0929-2012-ca0a",
+        "title": "Email 목록 | Message Hub | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Email 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] Email mhe-0929-2012-ca0a@example.com 등록",
+          "status": "pass",
+          "seconds": 16.2
+        }
+      ]
+    }
+  ]
+}

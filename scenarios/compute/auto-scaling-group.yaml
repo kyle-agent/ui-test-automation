@@ -37,6 +37,19 @@ steps:
       url: "#/virtualserver/auto-scaling-group/list"
       text: ["{{name}}"]
 
+  # L3(2026-09-29, 에이전트 C 프로브 recordings/probe/virtualserver-auto-scaling-group-detail.md): 상세 탭 정책 (n) / 스케줄 (n) / 알림 (n).
+  #   정책 추가 모달: 구분 Scale Out/Scale In 버튼, 정책명(63자), 실행 조건 Average·CPU Usage·>=·60%·5분(기본), 실행 단위 "지정 대수만큼 서버 수 증감" 1, 쿨다운 300초
+  #     → "정책을 추가하시겠습니까?" → "정책 생성이 성공하였습니다." 행 상태 Active. 삭제: 행 선택 → 표 위 "삭제" → "정책 1개를 삭제하시겠습니까?"
+  #   스케줄 추가 모달: 스케줄명, 서버 수 Min/Desired/Max(체크 켜짐 + 입력 3칸), 주기(매일/매주/매달/한 번), 시작일·종료일(영구), 시간, 시간대
+  #     → "스케줄을 추가하시겠습니까?" → 행 Active. 0/0/1 이면 수행돼도 서버가 생기지 않는다. 삭제는 정책과 같다("스케줄 1개를 삭제하시겠습니까?").
+  #   알림 추가는 하지 않는다: 수신자는 "로그인 이력이 있는 사용자(이메일·휴대전화 등록)" 주소록에서만 고르며 이 계정은 Account 멤버 0명 → 추가 불가(실제 사람에게 메일이 가는 기능이기도 함).
+  - goal: "상세에서 Scale Out 정책 {{policy}} 와 스케줄 {{schedule}}(0/0/1) 을 추가해 Active 를 확인하고 둘 다 삭제한다"
+    vars:
+      policy: "pol-{{run_id}}"
+      schedule: "sch-{{run_id}}"
+    expect:
+      url: "#/virtualserver/auto-scaling-group/detail"
+
 teardown:
   - goal: "Auto-Scaling Group {{name}} 을 삭제한다"
     expect:

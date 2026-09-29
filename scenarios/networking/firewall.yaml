@@ -1,0 +1,50 @@
+id: networking.firewall
+title: VPC → Internet Gateway(Firewall 사용) → Firewall 규칙 추가 → 규칙 삭제 → 역순 삭제
+service: Firewall
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브): Firewall 은 단독 생성이 없다(API 도 POST /v1/firewalls 없음). IGW·LB·Direct Connect 를 만들면 "FW_<구분>_<이름>" 이 따라 생긴다.
+# IGW 폼 "Firewall 사용" 을 켜면 사용 상태(크기 Extra Small, 규칙 할당량 5개), 끄면 '미사용' 상태로 생긴다. 로그 저장은 로그 저장소가 없어 끈다 → 경고 모달.
+# Firewall 목록 #/firewall/firewall/list (생성 버튼 없음) → 이름 링크 → 상세 탭 "규칙 (n)" → "규칙 추가"(#/firewall/firewall/detail/rule/request):
+#   출발지 주소·목적지 주소는 textarea(라벨 연결 없음, 순서 0·1, 설명이 2), 유형 "목적지 포트/Type 선택" + 프로토콜 TCP 체크 → 목적지 포트(읽기 전용, 기본 22 "SSH") → "추가"(서비스),
+#   동작 Allow / 방향 Inbound 기본 → 아래 "추가"(규칙을 '추가된 규칙' 표로) → "완료" → "규칙을 추가하시겠습니까?".
+# 규칙 삭제는 "규칙 수정" 화면(#/firewall/firewall/detail/rule/edit): 행 선택 → "삭제"(변경 사항 "삭제 예정") → "완료" → "규칙을 수정하시겠습니까?" → 규칙 동기화 상태 Syncing → In Sync.
+# IGW 를 지우면 그 Firewall 도 사라진다.
+steps:
+  - goal: "Firewall 목록으로 이동한다"
+    goto: "#/firewall/firewall/list"
+    expect:
+      url: "#/firewall/firewall/list"
+
+  - goal: "VPC {{vpc}} 와 Firewall 을 사용하는 Internet Gateway 를 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+    expect:
+      url: "#/firewall/firewall/list"
+      text: ["FW_IGW_{{vpc}}"]
+
+  - goal: "Firewall 규칙(192.168.1.1 → 10.250.0.10, TCP 22, Allow, Inbound)을 추가한다"
+    expect:
+      url: "#/firewall/firewall/detail/rule"
+      text: ["192.168.1.1", "10.250.0.10"]
+
+  - goal: "규칙 수정 화면에서 그 규칙을 삭제한다"
+    expect:
+      url: "#/firewall/firewall/detail/rule"
+      not_text: ["192.168.1.1"]
+
+teardown:
+  - goal: "Internet Gateway 를 삭제한다 (Firewall 도 같이 사라진다)"
+    expect:
+      url: "#/vpc/internet-gateway/list"
+      not_text: ["IGW_{{vpc}}"]
+  - goal: "VPC {{vpc}} 를 해지한다"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

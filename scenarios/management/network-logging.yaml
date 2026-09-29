@@ -1,0 +1,46 @@
+id: management.network-logging
+title: Network Logging(Firewall) 로그 저장소 설정 → 해제 (Object Storage 버킷 체인)
+service: Network Logging
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/network-logging-firewall-logging-list.md): #/network-logging/firewall-logging/list (Firewall · Security Group · NAT 세 화면 같은 구조).
+# "로그 저장소" 는 이름 있는 자원이 아니라 화면 위 드롭다운(기본 "미사용" + 이 계정·리전의 Object Storage 버킷) + "적용" 이다.
+# 버킷 선택 → 적용 → "로그 저장소를 수정하시겠습니까?" 확인 → 옆에 "<버킷>/LOG/FW" 경로 표시. 해제: "미사용" → 적용 → "로그 저장소 사용을 해제하시겠습니까?" 확인.
+# 설정만으로는 버킷에 파일이 생기지 않아 해제 뒤 빈 버킷 해지가 된다. Security Group Logging 은 SG 폼의 "로그 저장 여부" 기본값에 영향을 주므로
+# 다른 spec 과 겹치지 않게 Firewall Logging(IGW·Direct Connect·LB Firewall 대상) 화면을 쓴다. 버킷 흐름은 storage.object-storage-bucket 과 같다(인증키 전제).
+steps:
+  - goal: "Firewall Logging 목록으로 이동한다"
+    goto: "#/network-logging/firewall-logging/list"
+    expect:
+      url: "#/network-logging/firewall-logging/list"
+
+  - goal: "로그 저장소용 버킷 {{bucket}} 을 만든다"
+    vars:
+      bucket: "bkt-{{run_id}}"
+    expect:
+      url: "#/objectstorage/objectstorage/list"
+      text: ["{{bucket}}"]
+
+  - goal: "Firewall 로그 저장소를 {{bucket}} 으로 설정한다"
+    expect:
+      url: "#/network-logging/firewall-logging/list"
+      text: ["{{bucket}}/LOG/FW"]
+
+  - goal: "Firewall 로그 저장소를 미사용으로 되돌린다"
+    expect:
+      not_text: ["{{bucket}}/LOG/FW"]
+
+teardown:
+  - goal: "Firewall 로그 저장소가 {{bucket}} 이면 미사용으로 되돌린다"
+    expect:
+      not_text: ["{{bucket}}/LOG/FW"]
+  - goal: "버킷 {{bucket}} 을 해지한다"
+    expect:
+      not_text: ["{{bucket}}"]
+      timeout: 120000

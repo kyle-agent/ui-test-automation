@@ -34,4 +34,19 @@ export const SUITE_ORDER: readonly string[] = [
   'iam.role', // 역할(수행 주체 현재 Account, 정책 없음) 생성·삭제. Global
   'security.certificate', // 자체 발급 인증서(한 달) 생성·해지. 무과금
   'container.repository', // Registry → Repository → 역순. ≈8분
+  'security.kms-key', // KMS 키(AES-256, 퍼블릭 IP 1개) 생성 → 즉시 해지. 선행 리소스 없음
+  'security.secrets-manager', // 시크릿 생성 → 해지 예약(7일) → 해지 취소 → 다시 예약(L3). 7일 뒤 삭제
+  'iam.policy', // 정책(기본 정책 불러오기) → 그룹 연결·해제(L3) → 그룹·정책 삭제. Global, 무과금
+  'storage.file-storage-snapshot', // ≈3분. NFS 볼륨 → 상세 스냅샷 생성·삭제(L3) → 해지. 용량 과금
+  'management.servicewatch-dashboard', // 사용자 대시보드(첫 지표 위젯 1개) 생성·삭제. 무과금
+  'management.servicewatch-log-group', // 로그 그룹 생성 → 로그 스트림 생성·삭제 → 그룹 삭제
+  'management.servicewatch-event-rule', // 이벤트 규칙(KMS Key, 수신자 없음) 생성 → 비활성화(L3) → 삭제
+  'management.servicewatch-alert', // 경보 정책(첫 지표 > 999, 수신자 없음) 생성·삭제
+  'compute.volume-snapshot', // ≈4분. 볼륨(서버 없이) → 스냅샷 생성·복구(L3)·삭제 → 볼륨 삭제. 용량 과금
+  'management.network-logging', // 버킷 → Firewall Logging 로그 저장소 적용 → 미사용 → 버킷 해지. 무과금
+  'networking.load-balancer', // VPC → Subnet → LB → 헬스 체크 → 서버 그룹 → Listener → 역순. 시간 과금 (본 단계 통과, 정리 중 SSO 만료 — 재확인 필요)
+  'financial-management.budget', // 계정 예산(알림·생성 방지 끔) 생성 → 금액 수정(L3) → 삭제. Global, 계정당 1개
+  'application-service.api-gateway', // API(Region, ≈4분 Creating) → 리소스·GET 메서드 → 스테이지 배포(L3) → 해지. ≈8분
+  'application-service.messagehub-domain', // 발신 도메인(example.com 하위) 등록·삭제. 인증 안 함
+  'application-service.messagehub-email', // 발신 Email(example.com) 등록 → 가려진 목록 검색·상세 확인 → 삭제. 인증 메일 안 보냄
 ];

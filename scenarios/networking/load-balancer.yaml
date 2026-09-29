@@ -1,0 +1,76 @@
+id: networking.load-balancer
+title: VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener 생성 후 역순 삭제
+service: Load Balancer
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/loadbalancer-*.md):
+# - LB 목록 #/loadbalancer/loadbalancer/list "서비스 생성" → 폼: Load Balancer명(3~63, 영문·숫자·-_), 서비스 구분 L4/L7, VPC명, Service Subnet명(일반 Subnet 이 그대로 나온다),
+#   Availability Zone 1(kr-west1-b), Service IP/Source NAT IP/헬스 체크 IP(자동 할당), Public NAT IP(사용 체크), Firewall 사용·Firewall 로그 저장(끄면 경고 모달), "요금 확인".
+#   생성 → "Firewall 및 Firewall 로깅 사용을 선택하지 않았습니다" → "Load Balancer를 생성하시겠습니까?" → Creating ≈1분 → Active. LB 마다 Firewall "FW_LB_<subnet>" 이 미사용으로 따라 생긴다.
+# - "Service Subnet" = LB 가 만들어진 Subnet. LB 헬스 체크·LB 서버 그룹은 LB 가 있는 Subnet 에만 만들 수 있다 → 순서는 LB → 헬스 체크 → 서버 그룹 (API 도 같은 순서 제약).
+# - 헬스 체크 폼: LB 헬스 체크명, VPC명, Service Subnet명, 헬스 체크 방식(TCP·멤버 포트 기본). 서버 그룹 폼: LB 서버 그룹명, VPC명, Service Subnet명, 부하 분산(Round Robin), 프로토콜 TCP, LB 헬스 체크.
+# - Listener 는 별도 메뉴가 없고 LB 상세 "연결된 자원" 탭의 "Listener 생성" (Listener명, 프로토콜 TCP, 서비스 포트, LB 서버 그룹, 세션 유지 시간 120 기본).
+# - 삭제: Listener 행 "삭제"(연결된 자원 탭) → 서버 그룹 행 "삭제" → 헬스 체크 행 "삭제" → LB 행 "서비스 해지". 확인 모달 "규모에 따라 수십 분 걸릴 수 있습니다" — 실제로는 각 1분 안팎.
+# - 서버 멤버는 등록하지 않는다(API 는 실제 VM object_id 가 필요, 여기서는 LB 구성 자원 CRUD 만).
+steps:
+  - goal: "Load Balancer 목록으로 이동한다"
+    goto: "#/loadbalancer/loadbalancer/list"
+    expect:
+      url: "#/loadbalancer/loadbalancer/list"
+
+  - goal: "VPC 와 Subnet 을 준비한다 (SHARED_VPC 가 있으면 채택)"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+
+  - goal: "Load Balancer {{lb}} (L4) 를 만들고 Active 를 기다린다"
+    vars:
+      lb: "lb-{{run_id}}"
+    expect:
+      url: "#/loadbalancer/loadbalancer/list"
+      text: ["{{lb}}"]
+
+  - goal: "LB 헬스 체크 {{hc}} (TCP) 를 만든다"
+    vars:
+      hc: "lbhc-{{run_id}}"
+    expect:
+      url: "#/loadbalancer/loadbalancer-health-check/list"
+      text: ["{{hc}}"]
+
+  - goal: "LB 서버 그룹 {{sg}} (TCP, Round Robin, 헬스 체크 {{hc}}) 을 만든다"
+    vars:
+      sg: "lbsg-{{run_id}}"
+    expect:
+      url: "#/loadbalancer/loadbalancer-server-group/list"
+      text: ["{{sg}}"]
+
+  - goal: "LB 상세 연결된 자원에서 Listener {{ls}} (TCP 80 → {{sg}}) 를 만든다"
+    vars:
+      ls: "lbls-{{run_id}}"
+    expect:
+      url: "#/loadbalancer/loadbalancer/detail/linked-resource"
+      text: ["{{ls}}"]
+
+teardown:
+  - goal: "Listener {{ls}} 를 삭제한다"
+    expect:
+      not_text: ["{{ls}}"]
+  - goal: "LB 서버 그룹 {{sg}} 와 LB 헬스 체크 {{hc}} 를 삭제한다"
+    expect:
+      url: "#/loadbalancer/loadbalancer-health-check/list"
+      not_text: ["{{hc}}"]
+  - goal: "Load Balancer {{lb}} 를 해지한다"
+    expect:
+      url: "#/loadbalancer/loadbalancer/list"
+      not_text: ["{{lb}}"]
+  - goal: "Subnet {{subnet}} 과 VPC {{vpc}} 를 지운다 (공유 네트워크면 건너뜀)"
+    expect:
+      url: "#/vpc/vpc/list"

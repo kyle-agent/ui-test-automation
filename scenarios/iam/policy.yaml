@@ -1,0 +1,55 @@
+id: iam.policy
+title: IAM 정책 생성 → 사용자 그룹에 연결·해제 → 삭제
+service: Identity and Access Management(IAM)
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/iam-policy-list.md): 목록 #/iam/policy/list (Global), 버튼 "정책 생성" / 상단 "삭제"(행 선택 후).
+# 마법사 3단계: 기본 정보("정책명" 3~128자, 설명) → "다음" → 권한 설정 → "다음" → 입력 정보 확인 → "생성".
+# 권한 설정은 JSON 모드(ACE)·기본 모드(서비스 → 액션 그룹 펼쳐 선택)가 까다로워(9.9) "정책 불러오기" 모달에서 기본 정책
+# BillingplanReadOnlyAccess(Billing Plan List·Read)를 골라 채운다 → 확인 → "기존 입력 대체" 알림 확인 → 로딩 수 초 → "다음" 활성.
+# 권한 설정의 "다음" 뒤 "JSON 모드로 변경하거나…" 안내 모달이 생성 과정 중 1회 뜬다(확인).
+# 연결 대상 그룹은 이 시나리오가 만든다(계정에 테스트 그룹이 없음): 그룹 상세 → "정책 (n)" 탭 → "정책 연결" 화면(#/iam/group/<id>/policies/update)
+# → 정책명 검색 → 행 선택 → "완료" → "정책을 연결하시겠습니까?" 확인. 해제: 탭에서 행 선택 → "연결 해제" → 확인. 읽기 전용 정책이라 권한 영향 없음. 무과금.
+steps:
+  - goal: "정책 목록으로 이동한다"
+    goto: "#/iam/policy/list"
+    expect:
+      url: "#/iam/policy/list"
+
+  - goal: "정책 {{name}} 을 BillingplanReadOnlyAccess 를 불러와 생성한다"
+    vars:
+      name: "pol-{{run_id}}"
+    expect:
+      url: "#/iam/policy/list"
+      text: ["{{name}}"]
+
+  - goal: "사용자 그룹 {{group}} 을 만든다"
+    vars:
+      group: "grp-{{run_id}}"
+    expect:
+      url: "#/iam/group/list"
+      text: ["{{group}}"]
+
+  - goal: "그룹 상세 정책 탭에서 정책 {{name}} 을 연결한다"
+    expect:
+      text: ["{{name}}"]
+
+  - goal: "정책 {{name}} 연결을 해제한다"
+    expect:
+      not_text: ["{{name}}"]
+
+teardown:
+  - goal: "사용자 그룹 {{group}} 을 삭제한다"
+    expect:
+      not_text: ["{{group}}"]
+      timeout: 120000
+  - goal: "정책 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

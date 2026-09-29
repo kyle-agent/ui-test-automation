@@ -42,6 +42,18 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'container.repository': { vpc: 0, minutes: 7 },
   'container.container-registry': { vpc: 0, minutes: 6.5 },
   'iam.role': { vpc: 0, minutes: 4.5 },
+  // 에이전트 B(네트워킹): 모두 자기 VPC 1개. load-balancer 는 본 단계 실측 11분, 나머지는 콘솔 프로브 시간으로 추정(아직 SUITE_ORDER 밖)
+  'networking.load-balancer': { vpc: 1, minutes: 12 },
+  'networking.firewall': { vpc: 1, minutes: 5 },
+  'networking.transit-gateway': { vpc: 1, minutes: 10 },
+  'networking.vpn': { vpc: 1, minutes: 8 },
+  'networking.vpc-endpoint': { vpc: 1, minutes: 9 },
+  'networking.direct-connect': { vpc: 1, minutes: 5 },
+  'application-service.api-gateway': { vpc: 0, minutes: 6 }, // 에이전트 A: API Creating ≈4분. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
+  // 에이전트 C (2026-09-29 단독 통과): Cronjob 실행 확인·스냅샷 L3
+  'compute.cloud-function': { vpc: 0, minutes: 4 },
+  'storage.file-storage-snapshot': { vpc: 0, minutes: 2.5 },
+  'compute.volume-snapshot': { vpc: 0, minutes: 5 },
 };
 
 export function planFor(spec: string): SpecPlan {

@@ -1,0 +1,48 @@
+id: data-analytics.event-streams
+title: VPC → Subnet → Event Streams(Kafka) Broker 1대 생성 후 역순 해지
+service: Event Streams
+category: Data Analytics
+tags: [regression, destructive, crud, stack, heavy]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브 recordings/probe/eventstreams-eventstreams-list.md): 목록 #/eventstreams/eventstreams/list (목록에 해지 없음 → 상세 "서비스 해지").
+# 폼(…/request): 이미지 Kafka 3.9.2, 서버명 prefix(소문자 시작 3~13자), 클러스터명(영문 3~20자), Broker Node 수(1,3~10; 기본 3 → 1),
+#   서버 타입 Standard(ess1) ess1v2m4(vCPU 2, 4G, 기본=최소), Block Storage 기본 OS SSD / DATA SSD GB, Zookeeper 별도 설치·AKHQ 체크(끔),
+#   네트워크 VPC명/Subnet명/IP 자동, IP 접근 제어(선택), 유지 관리 기간(끔), Zookeeper·Broker SASL 계정(소문자 2~20)·비밀번호·확인·Port(1200~65535),
+#   Parameter "Apache Kafka 3 PISA Default", 시간대, ServiceWatch 로그 수집(끔). 라이선스·외부 인증 없음. 시간 과금 → 즉시 해지.
+# 비밀번호는 dbaas 팩토리가 run_id 로 실행 중 만들고 기록하지 않는다. 정리 종류 es (클러스터명 es<run_id_alpha>).
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}} 와 Subnet {{subnet}} 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "Event Streams 클러스터 {{name}} (서버 prefix {{prefix}}) 을 Broker 1대 최소 사양으로 생성하고 Running 을 기다린다"
+    vars:
+      name: "es{{run_id_alpha}}"
+      prefix: "e{{run_id_compact}}"
+    expect:
+      url: "#/eventstreams/eventstreams/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 1800000
+  - goal: "Subnet, VPC 를 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000

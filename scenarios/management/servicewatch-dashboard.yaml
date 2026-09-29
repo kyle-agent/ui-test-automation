@@ -1,0 +1,33 @@
+id: management.servicewatch-dashboard
+title: ServiceWatch 사용자 대시보드 생성 후 삭제
+service: ServiceWatch
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/service-watch-dashboard.md): 목록 #/service-watch/dashboard(서비스 대시보드 15개 + 사용자 대시보드),
+# 버튼 "대시보드 생성" / 상단 "삭제"(행 선택 후, "확인을 위해 삭제를 입력"). 생성 화면 #/service-watch/dashboard/request:
+# 제목 옆 이름 입력란(기본 Dashboard_YYMMDD_HHMMSS, 40자) + 위젯이 1개 이상 있어야 "생성" 활성 → "개별 위젯 추가" 모달의 지표 트리에서
+# 첫 지표 1개 선택 → "완료". 지표는 계정에 지표를 남긴 자원(예: 지난 Object Storage 버킷)이 있어야 보인다. 무과금.
+steps:
+  - goal: "대시보드 목록으로 이동한다"
+    goto: "#/service-watch/dashboard"
+    expect:
+      url: "#/service-watch/dashboard"
+
+  - goal: "위젯 1개짜리 사용자 대시보드 {{name}} 을 생성한다"
+    vars:
+      name: "swd-{{run_id}}"
+    expect:
+      url: "#/service-watch/dashboard"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "대시보드 {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

@@ -1,0 +1,51 @@
+id: application-service.api-gateway
+title: API Gateway API 생성 → 리소스·메서드 추가 → 스테이지 배포 → 해지
+service: API Gateway
+category: Application Service
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/apigateway-api.md): 목록 #/apigateway/api, 버튼 "서비스 생성"(→ #/apigateway/api/request) / 행 끝 "서비스 해지"
+# ("확인을 위해 삭제를 입력"). 폼: "API명"(영문 소문자로 시작, 소문자·숫자·- 3~50자, - 로 끝 불가), 생성 방법(새로 생성), 엔드포인트 유형(Region | Private).
+# 생성 후 Creating → Active 약 3~4분. 리소스 화면 #/apigateway/resource: 제목 옆 API 드롭다운 + "조회"(API 가 하나면 자동 선택),
+# 왼쪽 트리("/"), "리소스 생성" 모달(리소스명 소문자·숫자·-{} 3~50자, 경로 "/") → "생성 후에는 수정이 불가능합니다" 확인.
+# 리소스 선택 → "메서드 생성" 모달: 메서드 유형(ANY·DELETE·GET…), 통합 유형 HTTP → 엔드포인트 URL(https://example.com) → 확인 → 확인.
+# "API 배포" 모달: 스테이지명 "New Stage" + 신규 스테이지명 → "배포" → 확인 → 스테이지 화면 #/apigateway/stage 에 Active 배포.
+# 해지는 스테이지·리소스를 따로 지우지 않아도 API 해지로 함께 사라진다(목록에서 바로 사라짐). 호출하지 않으므로 과금은 사실상 없음.
+steps:
+  - goal: "API 목록으로 이동한다"
+    goto: "#/apigateway/api"
+    expect:
+      url: "#/apigateway/api"
+
+  - goal: "Region API {{name}} 을 생성하고 Active 를 기다린다"
+    vars:
+      name: "apigw-{{run_id}}"
+    expect:
+      url: "#/apigateway/api"
+      text: ["{{name}}", "Active"]
+
+  - goal: "리소스 /items 를 만든다"
+    expect:
+      text: ["/items"]
+
+  - goal: "/items 에 GET(HTTP https://example.com) 메서드를 만든다"
+    expect:
+      text: ["https://example.com"]
+
+  - goal: "새 스테이지 {{stage}} 로 API 를 배포한다"
+    vars:
+      stage: "stg-{{run_id}}"
+    expect:
+      url: "#/apigateway/stage"
+      text: ["{{stage}}", "Active"]
+
+teardown:
+  - goal: "API {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 120000

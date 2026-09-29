@@ -1,0 +1,55 @@
+id: networking.direct-connect
+title: VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → 역순 삭제
+service: Direct Connect
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/directconnect-directconnect-list.md): 목록 #/directconnect/directconnect/list "서비스 생성" → Direct Connect명(3~20),
+# Uplink 사용(포트용량 1G 기본), VPC명(VPC 당 1개), 설명, Firewall 사용·로그 저장(끄면 경고 모달), "요금 확인"(월 ₩86,000, 시간 과금).
+# 물리 회선 신청이 아니다: 상세에 "회선 신청/해지 요청 바로가기" 가 따로 있고 외부 회선은 영업 담당자 신청 → 콘솔 자원만 만들고 바로 지운다(API 도 65회 생성·삭제 검증).
+# Creating ≈10초 → Active. 상세 탭 "규칙 (n)" → "규칙 추가" 모달: 목적지(VPC / 원격지) 드롭다운 + 목적지 IP → "확인" → "…규칙을 추가하시겠습니까?" → Active ≈1분.
+# 규칙 삭제: 행 선택 → 상단 "삭제". Direct Connect 해지: 목록 행 끝 "서비스 해지". Firewall "FW_<dc명>" 은 미사용으로 따라 생겼다가 같이 사라진다.
+steps:
+  - goal: "Direct Connect 목록으로 이동한다"
+    goto: "#/directconnect/directconnect/list"
+    expect:
+      url: "#/directconnect/directconnect/list"
+
+  - goal: "VPC {{vpc}} 를 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+    expect:
+      url: "#/vpc/vpc/list"
+      text: ["{{vpc}}"]
+
+  - goal: "Direct Connect {{name}} (1G, Firewall 끔) 를 만들고 Active 를 기다린다"
+    vars:
+      name: "dc-{{run_id}}"
+    expect:
+      url: "#/directconnect/directconnect/list"
+      text: ["{{name}}"]
+
+  - goal: "규칙 탭에서 원격지 11.11.11.0/24 규칙을 추가한다"
+    expect:
+      url: "#/directconnect/directconnect/detail/route"
+      text: ["11.11.11.0/24"]
+
+  - goal: "그 규칙을 삭제한다"
+    expect:
+      url: "#/directconnect/directconnect/detail/route"
+      not_text: ["11.11.11.0/24"]
+
+teardown:
+  - goal: "Direct Connect {{name}} 를 해지한다"
+    expect:
+      url: "#/directconnect/directconnect/list"
+      not_text: ["{{name}}"]
+  - goal: "VPC {{vpc}} 를 해지한다"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

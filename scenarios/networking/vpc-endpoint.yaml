@@ -1,0 +1,46 @@
+id: networking.vpc-endpoint
+title: VPC → VPC Endpoint 유형 Subnet → VPC Endpoint(Object Storage) 생성 후 역순 삭제
+service: VPC
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-29 프로브, recordings/probe/vpc-vpc-endpoint-list.md): VPC Endpoint 는 Subnet 유형 "VPC Endpoint" 인 전용 Subnet 이 있어야 폼의 Subnet명 목록에 나온다
+# (API 도 type=VPC_ENDPOINT subnet 필요). Subnet 폼 유형: Public / Private / Local / VPC Endpoint, 구분 Primary. Gateway IP 는 비워 둬도 된다.
+# Endpoint 폼 #/vpc/vpc-endpoint/request: VPC명, 대상 서비스 정보(Object Storage / File Storage / Container Registry / DNS) → 연결 자원(Object Storage 는
+# object-store.private… 1개), VPC Endpoint명(3~20), VPC Endpoint IP(Subnet명 + IP 입력), "요금 확인"(월 ₩10,950). "VPC Endpoint를 생성하시겠습니까?" → Active ≈1분.
+# 삭제: 행 끝 "삭제" → "VPC Endpoint를 삭제하시겠습니까?" → Endpoint Subnet 삭제 → VPC 해지.
+steps:
+  - goal: "VPC Endpoint 목록으로 이동한다"
+    goto: "#/vpc/vpc-endpoint/list"
+    expect:
+      url: "#/vpc/vpc-endpoint/list"
+
+  - goal: "VPC {{vpc}} 와 VPC Endpoint 유형 Subnet {{subnet}} (10.250.1.0/24) 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sube-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}", "VPC Endpoint"]
+
+  - goal: "VPC Endpoint {{name}} (Object Storage, 10.250.1.10) 를 만들고 Active 를 기다린다"
+    vars:
+      name: "vpce-{{run_id}}"
+    expect:
+      url: "#/vpc/vpc-endpoint/list"
+      text: ["{{name}}", "10.250.1.10"]
+
+teardown:
+  - goal: "VPC Endpoint {{name}} 를 삭제한다"
+    expect:
+      url: "#/vpc/vpc-endpoint/list"
+      not_text: ["{{name}}"]
+  - goal: "Subnet {{subnet}} 과 VPC {{vpc}} 를 지운다"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

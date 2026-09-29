@@ -1,0 +1,182 @@
+// 직접 작성 (2026-09-29). 시나리오: scenarios/networking/load-balancer.yaml. 콘솔 사실은 yaml 머리 주석.
+// VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener 생성 → 역순 삭제. SHARED_VPC 가 있으면 그 네트워크를 쓴다.
+import type { Page } from '@playwright/test';
+import { test } from '../../src/fixtures/test';
+import { expectStep, gotoRoute } from '../../src/console/expect';
+import { ROUTES } from '../../src/console/inventory';
+import { settleConsole } from '../../src/console/overlays';
+import { confirmUntil, pickLate } from '../../src/console/networking';
+import { deleteNetwork, ensureNetwork, type SharedNetwork } from '../../src/console/shared';
+import {
+  confirmModal,
+  fillField,
+  openCreateForm,
+  row,
+  setCheckbox,
+  submitForm,
+  waitForRow,
+} from '../../src/console/ui';
+import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
+
+const scenario = loadScenario('scenarios/networking/load-balancer.yaml');
+const CONSOLE_CHECKS = process.env.CONSOLE_BASE_PATH === undefined;
+const vars = scenarioVars(scenario);
+const log = (line: string) => console.log(line);
+const ctx = (step: number) => ({
+  consoleTitle: CONSOLE_CHECKS,
+  scenario: scenario.id,
+  step,
+  testInfo: test.info(),
+});
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** LB 상세 → "연결된 자원" 탭 (Listener 목록). 돌아올 route 를 돌려준다. */
+async function openLinkedResources(page: Page): Promise<string> {
+  await gotoRoute(page, ROUTES.lb);
+  await row(page, vars.lb!).getByText(vars.lb!, { exact: true }).first().click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  await page.getByText(/^연결된 자원/).first().click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  return '#' + page.url().split('#')[1]!;
+}
+
+test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@network'] }, () => {
+  test.describe.configure({ mode: 'serial', timeout: 60 * 60_000 });
+  let net: SharedNetwork | null = null;
+
+  test.afterEach('정리 (역순: Listener → 서버 그룹 → 헬스 체크 → LB → Subnet → VPC)', async ({ page }) => {
+    test
+      .info()
+      .annotations.push(
+        { type: 'scenario', description: scenario.id },
+        { type: 'phase', description: 'teardown' },
+      );
+    const errors: string[] = [];
+    const attempt = async (name: string, fn: () => Promise<void>) => {
+      try {
+        await fn();
+      } catch (err) {
+        errors.push(`${name}: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
+        log(`  정리 실패 ${name}: ${errors[errors.length - 1]}`);
+      }
+    };
+    await attempt('Listener 삭제', async () => {
+      await gotoRoute(page, ROUTES.lb);
+      if ((await row(page, vars.lb!).count()) === 0) return;
+      const route = await openLinkedResources(page);
+      if ((await row(page, vars.ls!).count()) === 0) return;
+      await test.step(`teardown[0] Listener ${vars.ls} 삭제`, async () => {
+        await waitForRow(page, route, vars.ls!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+        await row(page, vars.ls!).getByRole('button', { name: '삭제', exact: true }).click();
+        await confirmModal(page, /Listener를 삭제하시겠습니까/);
+        await waitForRow(page, route, vars.ls!, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+        await expectStep(page, resolveExpectation(scenario.teardown[0]!.expect, vars), ctx(0));
+      });
+    });
+    await attempt('서버 그룹·헬스 체크 삭제', async () => {
+      await test.step(`teardown[1] LB 서버 그룹 ${vars.sg} · LB 헬스 체크 ${vars.hc} 삭제`, async () => {
+        for (const [route, name, text] of [
+          [ROUTES.lbsg, vars.sg!, /LB 서버 그룹을 삭제하시겠습니까/],
+          [ROUTES.lbhc, vars.hc!, /LB 헬스 체크를 삭제하시겠습니까/],
+        ] as const) {
+          await gotoRoute(page, route);
+          if ((await row(page, name).count()) === 0) continue;
+          await waitForRow(page, route, name, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+          await row(page, name).getByRole('button', { name: '삭제', exact: true }).click();
+          await confirmModal(page, text);
+          await waitForRow(page, route, name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+        }
+        await expectStep(page, resolveExpectation(scenario.teardown[1]!.expect, vars), ctx(1));
+      });
+    });
+    await attempt('LB 해지', async () => {
+      await gotoRoute(page, ROUTES.lb);
+      if ((await row(page, vars.lb!).count()) === 0) return;
+      await test.step(`teardown[2] Load Balancer ${vars.lb} 해지`, async () => {
+        await waitForRow(page, ROUTES.lb, vars.lb!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+        await row(page, vars.lb!).getByRole('button', { name: '서비스 해지', exact: true }).click();
+        await confirmModal(page, /Load Balancer를 해지하시겠습니까/);
+        await waitForRow(page, ROUTES.lb, vars.lb!, { gone: true, timeoutMs: 900_000, intervalMs: 20_000, log });
+        await expectStep(page, resolveExpectation(scenario.teardown[2]!.expect, vars), ctx(2));
+      });
+    });
+    await attempt('Subnet·VPC 삭제', async () => {
+      if (net?.shared) return;
+      await test.step('teardown[3] Subnet · VPC 삭제', async () => {
+        await deleteNetwork(page, vars.vpc!, vars.subnet!, log);
+        await expectStep(page, resolveExpectation(scenario.teardown[3]!.expect, vars), ctx(3));
+      });
+    });
+    if (errors.length) throw new Error(`정리 중 실패 (남은 리소스를 확인하세요):\n${errors.join('\n')}`);
+  });
+
+  test(scenario.title, async ({ page }) => {
+    test
+      .info()
+      .annotations.push(
+        { type: 'scenario', description: scenario.id },
+        { type: 'run_id', description: vars.run_id! },
+      );
+    await test.step(`steps[0] ${scenario.steps[0]!.goal}`, async () => {
+      await gotoRoute(page, ROUTES.lb);
+      await expectStep(page, resolveExpectation(scenario.steps[0]!.expect, vars), ctx(0));
+    });
+    await test.step('steps[1] VPC · Subnet 준비', async () => {
+      net = await ensureNetwork(page, { vpc: vars.vpc!, subnet: vars.subnet! }, log);
+      await gotoRoute(page, ROUTES.subnet);
+      await expectStep(page, resolveExpectation(scenario.steps[1]!.expect, vars), ctx(1));
+    });
+    const vpcRe = () => new RegExp(escapeRe(net!.vpc));
+    const subnetRe = () => new RegExp(escapeRe(net!.subnet));
+    await test.step(`steps[2] Load Balancer ${vars.lb} 생성`, async () => {
+      await openCreateForm(page, ROUTES.lb, '서비스 생성');
+      await fillField(page, 'Load Balancer명', vars.lb!);
+      await pickLate(page, 'VPC명', vpcRe(), log); // 항목 "vpc-… AZ: kr-west1-b"
+      await pickLate(page, 'Service Subnet명', subnetRe(), log); // 항목 "sub-… (10.250.0.0/24) AZ: kr-west1-b"
+      await pickLate(page, 'Availability Zone 1', 'kr-west1-b', log);
+      await setCheckbox(page, 'Firewall 사용', false);
+      await setCheckbox(page, 'Firewall 로그 저장', false);
+      await fillField(page, '설명', `scp-console-tests ${vars.run_id}`, { selector: 'textarea' });
+      await submitForm(page, '생성');
+      await confirmUntil(page, /Load Balancer를 생성하시겠습니까/, log); // 앞에 Firewall 미사용 경고가 온다
+      await waitForRow(page, ROUTES.lb, vars.lb!, { status: /Active/, timeoutMs: 900_000, intervalMs: 20_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] LB 헬스 체크 ${vars.hc} 생성`, async () => {
+      await openCreateForm(page, ROUTES.lbhc, 'LB 헬스 체크 생성');
+      await fillField(page, 'LB 헬스 체크명', vars.hc!);
+      await pickLate(page, 'VPC명', vpcRe(), log);
+      await pickLate(page, 'Service Subnet명', subnetRe(), log); // LB 가 있는 Subnet 만 나온다
+      await submitForm(page, '생성');
+      await confirmModal(page, /LB 헬스 체크를 생성하시겠습니까/);
+      await waitForRow(page, ROUTES.lbhc, vars.hc!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step(`steps[4] LB 서버 그룹 ${vars.sg} 생성`, async () => {
+      await openCreateForm(page, ROUTES.lbsg, 'LB 서버 그룹 생성');
+      await fillField(page, 'LB 서버 그룹명', vars.sg!);
+      await pickLate(page, 'VPC명', vpcRe(), log);
+      await pickLate(page, 'Service Subnet명', subnetRe(), log);
+      await pickLate(page, 'LB 헬스 체크', vars.hc!, log); // 항목: 미사용 · 시스템 기본(HTTP_Default …) · 이 실행의 헬스 체크
+      await submitForm(page, '생성');
+      await confirmModal(page, /LB 서버 그룹을 생성하시겠습니까/);
+      await waitForRow(page, ROUTES.lbsg, vars.sg!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] Listener ${vars.ls} 생성 (TCP 80)`, async () => {
+      await openLinkedResources(page);
+      await page.getByRole('button', { name: 'Listener 생성', exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await fillField(page, 'Listener명', vars.ls!);
+      await fillField(page, '서비스 포트', '80');
+      await pickLate(page, 'LB 서버 그룹', vars.sg!, log);
+      await submitForm(page, '생성');
+      await confirmModal(page, /Listener를 생성하시겠습니까/);
+      await settleConsole(page, { appearGraceMs: 800 });
+      const route = '#' + page.url().split('#')[1]!; // 생성 뒤 연결된 자원 탭으로 돌아온다
+      await waitForRow(page, route, vars.ls!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      log(`  Listener 행: ${(await row(page, vars.ls!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+    });
+  });
+});
