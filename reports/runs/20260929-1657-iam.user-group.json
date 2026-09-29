@@ -1,0 +1,46 @@
+{
+  "spec": "iam.user-group",
+  "started": "2026-09-29T07:57:05.065Z",
+  "ended": "2026-09-29T07:58:05.764Z",
+  "seconds": 61,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.user-group",
+    "run_id": "0929-1657-a8d2",
+    "title": "사용자 그룹 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 사용자 그룹 생성 후 삭제",
+      "status": "passed",
+      "seconds": 31.5,
+      "annotations": {
+        "scenario": "iam.user-group",
+        "run_id": "0929-1657-a8d2",
+        "title": "사용자 그룹 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 사용자 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.1
+        },
+        {
+          "title": "steps[1] grp-0929-1657-a8d2 생성",
+          "status": "pass",
+          "seconds": 17.8
+        }
+      ]
+    }
+  ]
+}

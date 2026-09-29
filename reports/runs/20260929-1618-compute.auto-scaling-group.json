@@ -1,0 +1,51 @@
+{
+  "spec": "compute.auto-scaling-group",
+  "started": "2026-09-29T07:18:26.841Z",
+  "ended": "2026-09-29T07:32:47.399Z",
+  "seconds": 861,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.auto-scaling-group",
+    "run_id": "0929-1618-f5b2",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Launch Configuration → Auto-Scaling Group(0대) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 827.8,
+      "annotations": {
+        "scenario": "compute.auto-scaling-group",
+        "run_id": "0929-1618-f5b2",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.6
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG · LC 생성",
+          "status": "pass",
+          "seconds": 401.6
+        },
+        {
+          "title": "steps[2] Auto-Scaling Group asg-0929-1618-f5b2 생성",
+          "status": "pass",
+          "seconds": 41.2
+        }
+      ]
+    }
+  ]
+}

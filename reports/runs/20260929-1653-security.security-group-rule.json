@@ -1,0 +1,56 @@
+{
+  "spec": "security.security-group-rule",
+  "started": "2026-09-29T07:53:12.824Z",
+  "ended": "2026-09-29T07:55:26.611Z",
+  "seconds": 134,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.security-group-rule",
+    "run_id": "0929-1653-6da7",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Security Group 생성 → 규칙 추가·삭제 → 해지",
+      "status": "passed",
+      "seconds": 101.2,
+      "annotations": {
+        "scenario": "security.security-group-rule",
+        "run_id": "0929-1653-6da7",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Security Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7
+        },
+        {
+          "title": "steps[1] Security Group sg-0929-1653-6da7 생성",
+          "status": "pass",
+          "seconds": 29.1
+        },
+        {
+          "title": "steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)",
+          "status": "pass",
+          "seconds": 25.6
+        },
+        {
+          "title": "steps[3] 규칙 삭제",
+          "status": "pass",
+          "seconds": 18
+        }
+      ]
+    }
+  ]
+}

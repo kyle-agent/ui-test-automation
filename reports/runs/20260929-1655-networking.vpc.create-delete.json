@@ -1,0 +1,51 @@
+{
+  "spec": "networking.vpc.create-delete",
+  "started": "2026-09-29T07:55:53.100Z",
+  "ended": "2026-09-29T07:57:08.427Z",
+  "seconds": 75,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc.create-delete",
+    "run_id": "0929-1656-748e",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 16.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC 생성 후 삭제",
+      "status": "passed",
+      "seconds": 34.4,
+      "annotations": {
+        "scenario": "networking.vpc.create-delete",
+        "run_id": "0929-1656-748e",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록 화면으로 이동한다",
+          "status": "pass",
+          "seconds": 7.5
+        },
+        {
+          "title": "steps[1] 서비스 생성 버튼을 눌러 생성 화면을 연다",
+          "status": "pass",
+          "seconds": 0.7
+        },
+        {
+          "title": "steps[2] VPC명과 IP 대역을 입력하고 생성 → 확인",
+          "status": "pass",
+          "seconds": 15.9
+        }
+      ]
+    }
+  ]
+}

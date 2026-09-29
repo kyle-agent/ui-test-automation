@@ -1,0 +1,56 @@
+{
+  "spec": "networking.vpc-port",
+  "started": "2026-09-29T07:32:56.309Z",
+  "ended": "2026-09-29T07:44:49.911Z",
+  "seconds": 714,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-port",
+    "run_id": "0929-1633-a02b",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Port 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 682.3,
+      "annotations": {
+        "scenario": "networking.vpc-port",
+        "run_id": "0929-1633-a02b",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] VPC vpc-0929-1633-a02b 생성",
+          "status": "pass",
+          "seconds": 22.7
+        },
+        {
+          "title": "steps[2] Subnet sub-0929-1633-a02b 생성",
+          "status": "pass",
+          "seconds": 259.5
+        },
+        {
+          "title": "steps[3] Port port-0929-1633-a02b 생성",
+          "status": "pass",
+          "seconds": 22.4
+        }
+      ]
+    }
+  ]
+}

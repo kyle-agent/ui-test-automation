@@ -1,0 +1,76 @@
+{
+  "spec": "compute.vm-stack-net",
+  "started": "2026-09-29T07:18:46.220Z",
+  "ended": "2026-09-29T07:35:57.270Z",
+  "seconds": 1031,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-stack-net",
+    "run_id": "0929-1619-8919",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "SG·IGW·Public IP 를 포함한 VPC → Subnet → Virtual Server 스택 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 996,
+      "annotations": {
+        "scenario": "compute.vm-stack-net",
+        "run_id": "0929-1619-8919",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 확인",
+          "status": "pass",
+          "seconds": 6.4
+        },
+        {
+          "title": "steps[1] Security Group sg-0929-1619-8919 생성",
+          "status": "pass",
+          "seconds": 28.2
+        },
+        {
+          "title": "steps[2] VPC vpc-0929-1619-8919 생성",
+          "status": "pass",
+          "seconds": 22.3
+        },
+        {
+          "title": "steps[3] Internet Gateway 생성",
+          "status": "pass",
+          "seconds": 41.2
+        },
+        {
+          "title": "steps[4] Subnet sub-0929-1619-8919 생성",
+          "status": "pass",
+          "seconds": 276.2
+        },
+        {
+          "title": "steps[5] Public IP 예약",
+          "status": "pass",
+          "seconds": 23.2
+        },
+        {
+          "title": "steps[6] Virtual Server vm-0929-1619-8919 생성 (SG sg-0929-1619-8919)",
+          "status": "pass",
+          "seconds": 98.4
+        },
+        {
+          "title": "steps[7] 서버 vm-0929-1619-8919 에 Public IP 123.41.35.73 연결",
+          "status": "pass",
+          "seconds": 46.4
+        }
+      ]
+    }
+  ]
+}

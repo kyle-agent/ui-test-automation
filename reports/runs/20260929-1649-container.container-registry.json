@@ -1,0 +1,74 @@
+{
+  "spec": "container.container-registry",
+  "started": "2026-09-29T07:49:42.074Z",
+  "ended": "2026-09-29T08:01:26.417Z",
+  "seconds": 704,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "container.container-registry",
+    "run_id": "0929-1650-b80d",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Container Registry 생성 후 해지",
+      "status": "failed",
+      "seconds": 636.1,
+      "annotations": {
+        "scenario": "container.container-registry",
+        "run_id": "0929-1650-b80d",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.3
+        },
+        {
+          "title": "steps[1] cr09291650b80d 생성",
+          "status": "fail",
+          "seconds": 622.2
+        }
+      ],
+      "error": "Error: cr09291650b80d 상태 /Running|Active|Ready|Available/i 대기 600초 초과. 마지막: (행 없음)",
+      "attachments": [
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-8.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: cr09291650b80d 상태 /Running|Active|Ready|Available/i 대기 600초 초과. 마지막: (행 없음)",
+  "attachments": [
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-8.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip"
+  ]
+}

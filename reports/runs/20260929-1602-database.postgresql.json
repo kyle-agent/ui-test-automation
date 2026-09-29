@@ -1,0 +1,51 @@
+{
+  "spec": "database.postgresql",
+  "started": "2026-09-29T07:02:05.680Z",
+  "ended": "2026-09-29T07:17:34.797Z",
+  "seconds": 929,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.postgresql",
+    "run_id": "0929-1602-c47a",
+    "title": "PostgreSQL(DBaaS) 목록 | PostgreSQL(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PostgreSQL(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 898.9,
+      "annotations": {
+        "scenario": "database.postgresql",
+        "run_id": "0929-1602-c47a",
+        "title": "PostgreSQL(DBaaS) 목록 | PostgreSQL(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.5
+        },
+        {
+          "title": "steps[2] pgcajcjbgacceha 생성",
+          "status": "pass",
+          "seconds": 636.9
+        }
+      ]
+    }
+  ]
+}

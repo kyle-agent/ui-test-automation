@@ -256,6 +256,7 @@ export async function waitForRow(
   const interval = opts.intervalMs ?? 10_000;
   const start = Date.now();
   const want = opts.gone ? '소멸' : opts.status ? `상태 ${opts.status}` : '등장';
+  let refreshed = false;
   for (;;) {
     if (!page.url().includes(`#${route.replace(/^#/, '')}`)) await gotoRoute(page, route);
     const r = row(page, name);
@@ -273,13 +274,22 @@ export async function waitForRow(
       : '';
     if (count && !text) count = await r.count();
     const ok = opts.gone ? count === 0 : opts.status ? opts.status.test(text) : count > 0;
-    if (ok) return;
+    if (ok) {
+      // 목록 아이콘 새로 고침은 토스트("vm-…: 해지 요청…")를 지우지 않는다. 소멸 뒤엔 호출부가 보통 본문 not_text 를 검사하므로 한 번 다시 읽는다
+      // (2026-09-29 스위트 run 3: vm-stack 서버 해지 not_text 가 토스트에 걸림).
+      if (opts.gone && refreshed) {
+        await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+        await settleConsole(page, { appearGraceMs: 800 });
+      }
+      return;
+    }
     const elapsed = Math.round((Date.now() - start) / 1000);
     opts.log?.(`  [${elapsed}s] ${name} ${want} 대기… ${count ? text.slice(0, 100) : '(행 없음)'}`);
     if (Date.now() - start > timeout)
       throw new Error(`${name} ${want} 대기 ${timeout / 1000}초 초과. 마지막: ${text || '(행 없음)'}`);
     await page.waitForTimeout(interval);
     await refreshList(page);
+    refreshed = true;
   }
 }
 

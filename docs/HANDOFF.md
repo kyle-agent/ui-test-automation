@@ -378,3 +378,9 @@
 - (사용자 안내 2026-09-29) 목록 대기 중 새로 고침은 페이지 전체를 다시 읽지 않고 목록 제목 오른쪽 위 작은 아이콘(`i.i-refresh`)을 누른다 → `refreshList()` (ui.ts).
   목록 API 만 다시 부르고 페이지 이동이 없다(실측). 아이콘이 없으면 page.reload 로 대신한다. 삭제 뒤 토스트를 지우는 1회 reload 는 그대로 둔다(not_text 검사).
   확인: queue · vpc create-delete PASS. 남은 테스트 리소스 0 (VPC 0/5).
+- **3차 실측(2026-09-29 15:57~16:58, 탭 5): 31개 중 28 PASS, 벽시계 60분 (직렬 예상 254분).** 컨텍스트 소실·세션 확인 시간 초과는 없었다.
+  실패 3건과 재실행(탭 3, 13분): 3/3 PASS.
+  - vm-stack: 서버 해지 뒤 not_text 가 토스트에 걸림 — 목록 아이콘 새로 고침은 토스트를 지우지 않는다(내 변경의 회귀)
+    → `waitForRow` 가 소멸 대기 중 목록을 한 번이라도 새로 고쳤으면 끝날 때 page.reload 1회. 재실행 PASS.
+  - file-storage: 생성 확인 모달이 10초 안에 안 뜸, container-registry: 생성 후 600초 동안 목록에 행 없음 → 둘 다 단독 재실행 PASS(부하성 간헐 실패로 본다).
+- 쓰는 법: `npm run test:suite` (기본 탭 5) → 실패한 것만 `npm run test:suite -- --only a,b --max 3` → `npm run results`.
