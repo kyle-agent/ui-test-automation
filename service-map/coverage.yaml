@@ -899,5 +899,5 @@ resources:
     route: /ske/cluster
     level: 4
     specs: [smoke.kubernetes-engine, container.ske-cluster]
-    last_pass: "2026-09-28"
-    note: "VPC·Subnet·SG 위에 제어 영역만(노드 풀 없음) 생성: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지"
+    last_pass: "2026-09-30"
+    note: "VPC·Subnet·SG 위에 제어 영역 생성 + 노드 풀(s1v1m2 1대) 추가·Running·삭제(L3, SKE_NODEPOOL=0 이면 생략). 제어 영역: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지"

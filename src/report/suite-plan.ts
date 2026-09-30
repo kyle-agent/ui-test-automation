@@ -32,7 +32,7 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.nat-gateway': { vpc: 1, minutes: 11.5 },
   'compute.auto-scaling-group': { vpc: 1, minutes: 15 },
   'networking.vpc-peering': { vpc: 2, minutes: 12 },
-  'container.ske-cluster': { vpc: 1, minutes: 22.5 },
+  'container.ske-cluster': { vpc: 1, minutes: 30 }, // 노드 풀 단계 포함(2026-09-30)
   'database.postgresql': { vpc: 0, shared: true, minutes: 17 },
   'database.mysql': { vpc: 0, shared: true, minutes: 16 },
   'database.mariadb': { vpc: 0, shared: true, minutes: 16 },

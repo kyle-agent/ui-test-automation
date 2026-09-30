@@ -25,7 +25,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Compute | scf cloud-functions | compute.cloud-function | ✅ |
 | Compute | scf triggers cronjob · apigateway | compute.cloud-function (Cronjob 트리거 + 실행 로그 L3). API Gateway 트리거는 미포함 | ✅ |
 | Container | ske clusters | container.ske-cluster | ✅ |
-| Container | ske nodepools | 프로브·실생성 1회(폼 사실 확보), spec 미작성 — 세션 만료로 중단 | 🔧 |
+| Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3) | ✅ |
 | Container | scr container-registries · repositories | container.container-registry · container.repository | ✅ |
 | Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
 | Data Analytics | eventstreams clusters | data-analytics.event-streams (공유 VPC) | ✅ |
