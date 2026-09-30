@@ -62,6 +62,19 @@ export const ROUTES = {
   fss: '#/filestorage/filestorage/list',
   snap: '#/virtualserver/block-storage/list',
   es: '#/eventstreams/eventstreams/list',
+  // 에이전트 C 2차 (2026-09-30): VM 커스텀 Image, DBaaS 읽기 복제본(엔진별 목록)
+  img: '#/virtualserver/image/list',
+  rep: '#/postgresql/postgresql/list',
+  repmy: '#/mysql/mysql/list',
+  repma: '#/mariadb/mariadb/list',
+  repep: '#/epas/epas/list',
+  // 에이전트 A 2차 (2026-09-30): VPC 없는 네트워킹
+  cdn: '#/cdn/cdn/list',
+  gslb: '#/gslb/gslb/list',
+  // 에이전트 B 2차 (2026-09-30): PrivateLink Endpoint·Service, Private NAT
+  ple: '#/vpc/privatelink-endpoint/list',
+  pls: '#/vpc/privatelink-service/list',
+  pnat: '#/vpc/private-nat/list',
 } as const;
 
 export type Kind = keyof typeof ROUTES;
@@ -97,6 +110,19 @@ const TEST_EXTRA: Partial<Record<Kind, RegExp>> = {
   fss: /^fss_\d{8}[0-9a-f]{4}(_[a-z0-9]{6})?$/,
   snap: /^snap-\d{4}-\d{4}-[0-9a-f]{4}$/,
   es: /^es[a-j]{12}$/,
+  // 에이전트 C 2차: Image img-<run_id>, 읽기 복제본 rep<run_id_compact> (Replica 명은 소문자 시작 3~19자)
+  img: /^img-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  rep: /^rep\d{8}[0-9a-f]{4}$/,
+  repmy: /^rep\d{8}[0-9a-f]{4}$/,
+  repma: /^rep\d{8}[0-9a-f]{4}$/,
+  repep: /^rep\d{8}[0-9a-f]{4}$/,
+  // 에이전트 A 2차: CDN명 cdn<compact>(영문·숫자만), GSLB 도메인명 gslb<compact>(+ .gslb.e.samsungsdscloud.com)
+  cdn: /^cdn\d{8}[0-9a-f]{4}$/,
+  gslb: /^gslb\d{8}[0-9a-f]{4}(\.gslb\.e\.samsungsdscloud\.com)?$/,
+  // 에이전트 B 2차: ple-/pls-/pnat-<run_id>
+  ple: /^ple-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  pls: /^pls-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  pnat: /^pnat-\d{4}-\d{4}-[0-9a-f]{4}$/,
 };
 
 export interface Leftover {
@@ -158,9 +184,14 @@ export async function listLeftovers(page: Page): Promise<{ leftovers: Leftover[]
 
 const ORDER: Kind[] = [
   'ske',
+  'rep', // 에이전트 C 2차: 읽기 복제본은 Master 보다 먼저
+  'repmy',
+  'repma',
+  'repep',
   'pg',
   'es', // 에이전트 C: Event Streams (VPC·Subnet 보다 먼저)
   'asg',
+  'img', // 에이전트 C 2차: 서버에서 만든 Image (서버와 독립, 먼저 지워도 된다)
   'vm',
   'lbsg', // 붙은 Listener 를 먼저 지운 뒤 (에이전트 B)
   'lbhc',
@@ -168,6 +199,9 @@ const ORDER: Kind[] = [
   'vpnt',
   'vpn',
   'vpce',
+  'pnat', // 에이전트 B 2차: Private NAT 는 연결된 Direct Connect 보다 먼저
+  'ple', // 에이전트 B 2차: Endpoint 를 지워야 Service 가 지워진다
+  'pls',
   'dc',
   'tgw', // 연결 VPC 를 먼저 해제
   'nat',
@@ -208,6 +242,8 @@ const ORDER: Kind[] = [
   'apigw',
   'mhd',
   'mhe',
+  'cdn', // 에이전트 A 2차
+  'gslb',
 ];
 
 /** 남은 리소스를 의존관계 역순으로 지운다. 실패한 항목은 모아서 돌려준다. */
@@ -250,6 +286,19 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
       return;
+    case 'img':
+      // 에이전트 C 2차: Image 상세 "Image 삭제" → "Image명: … Image를 삭제하시겠습니까?" → 확인 (수 초)
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByRole('button', { name: 'Image 삭제', exact: true }).click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    case 'rep':
+    case 'repmy':
+    case 'repma':
+    case 'repep':
+    // 에이전트 C 2차: 읽기 복제본도 별도 클러스터 행이라 Master 와 같은 상세 "서비스 해지"(Database명 입력 모달) — 아래 pg 로 이어진다
     case 'pg':
       // PostgreSQL(DBaaS): 목록엔 해지가 없고 상세의 "서비스 해지"
       await waitForRow(page, route, item.name, {
@@ -362,14 +411,23 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await confirmModal(page, /해지/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 15_000, log });
       return;
-    case 'port':
+    case 'port': {
       // 행 선택 → 상단 "삭제" (VPC Port; 서버에 붙어 있으면 실패하므로 서버 정리 뒤에 온다)
+      // 에이전트 B 2차: 테스트 Subnet 의 Virtual IP 에 연결돼 있을 수 있다 → 그 Subnet 의 VIP 부터 반납
+      const sub = item.rowText.split(' ').find((w) => /^sub-\d{4}-\d{4}-[0-9a-f]{4}$/.test(w));
+      if (sub) {
+        await releaseSubnetVips(page, sub, log);
+        await gotoRoute(page, route);
+      }
       await selectRow(page, item.name);
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
       return;
+    }
     case 'subnet':
+      await releaseSubnetVips(page, item.name, log); // 에이전트 B 2차: VIP 가 남아 있으면 Subnet 삭제가 막힌다
+      await gotoRoute(page, route);
       await selectRow(page, item.name);
       await topButton(page, '삭제').click();
       await confirmModal(page, /삭제하시겠습니까/);
@@ -383,6 +441,11 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
         intervalMs: 15_000,
         log,
       });
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      // 에이전트 B 2차: 규칙이 남아 있으면 Peering 삭제가 조용히 무시된다(2026-09-30 실측) → 규칙부터 지우고 상세로 돌아온다
+      await clearDetailRules(page, log);
+      await gotoRoute(page, route);
       await row(page, item.name).getByText(item.name, { exact: true }).first().click();
       await settleConsole(page, { appearGraceMs: 800 });
       await topButton(page, 'VPC Peering 삭제').click();
@@ -499,6 +562,8 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await row(page, item.name).getByText(item.name, { exact: true }).first().click();
       await settleConsole(page, { appearGraceMs: 800 });
       if (item.kind === 'tgw') {
+        // 에이전트 B 2차: 규칙이 남아 있으면 VPC 연결 삭제가 조용히 무시된다(2026-09-30 실측) → 규칙부터 지운다
+        await clearDetailRules(page, log);
         // 연결된 VPC 를 먼저 해제 ("연결 VPC 관리" 탭 → 행 선택 → 삭제)
         await page
           .getByText(/^연결 VPC 관리/)
@@ -538,6 +603,19 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       // Direct Connect: 행 끝 "서비스 해지" (규칙은 같이 사라진다고 보지 않고 해지가 막히면 오류로 남긴다)
       await row(page, item.name).getByRole('button', { name: '서비스 해지', exact: true }).click();
       await confirmModal(page, /해지하시겠습니까/);
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+      return;
+    case 'pnat':
+    case 'ple':
+    case 'pls':
+      // 에이전트 B 2차: Private NAT · PrivateLink Endpoint · PrivateLink Service — 행 끝 "삭제" → "…를 삭제하시겠습니까?" (Deleting ≈1분).
+      // Endpoint 가 Requesting 이면(승인 대기) 그대로 지울 수 있다. Service 는 Endpoint 가 모두 사라진 뒤(ORDER).
+      if (/Creating|Deleting/i.test(item.rowText))
+        await waitForRow(page, route, item.name, { status: /Active|Requesting|Rejected|Error/i, timeoutMs: 600_000, intervalMs: 15_000, log }).catch(() => undefined);
+      await gotoRoute(page, route);
+      if ((await row(page, item.name).count()) === 0) return;
+      await row(page, item.name).getByRole('button', { name: '삭제', exact: true }).click();
+      await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
       return;
     // ── 관리·보안 (에이전트 A, 2026-09-29) ──
@@ -647,6 +725,16 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
       return;
     }
+    case 'cdn':
+      await deleteCdn(page, item.name, log);
+      return;
+    case 'gslb':
+      // 행 선택 → 상단 "서비스 해지" (에이전트 A 2차)
+      await selectRow(page, item.name);
+      await topButton(page, '서비스 해지').click();
+      await confirmModal(page, /해지|삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
     case 'es':
       // Event Streams: 목록에 해지가 없고 상세의 "서비스 해지" (에이전트 C, PostgreSQL 과 같은 절차)
       await waitForRow(page, route, item.name, {
@@ -686,6 +774,75 @@ async function deleteLbListeners(page: Page, lbName: string, log: (line: string)
 }
 
 /**
+ * 지금 열린 상세 화면(Transit Gateway · VPC Peering)의 "규칙 (n)" 탭 규칙을 모두 지운다 (에이전트 B 2차, 2026-09-30).
+ * 규칙이 남아 있으면 TGW VPC 연결 삭제·Peering 삭제가 확인 뒤에도 조용히 무시된다(실측). 행 선택 → 상단 "삭제" → "규칙을 삭제하시겠습니까?".
+ */
+async function clearDetailRules(page: Page, log: (line: string) => void): Promise<void> {
+  const rulesTab = page.getByText(/^규칙 \(\d+\)/).filter({ visible: true }).first();
+  if (!/\(0\)/.test(await rulesTab.innerText().catch(() => '(0)'))) {
+    await rulesTab.click();
+    await settleConsole(page, { appearGraceMs: 1_500 });
+    const rtab = '#' + page.url().split('#')[1]!;
+    for (let i = 0; i < 10; i++) {
+      await page.locator('tr.scp-body-row:visible').first().waitFor({ timeout: 15_000 }).catch(() => undefined);
+      const r = page.locator('tr.scp-body-row:visible').first();
+      if (!(await r.count())) break;
+      const text = (await r.innerText()).replace(/\s+/g, ' ').trim();
+      const dest = text.match(/\d+\.\d+\.\d+\.\d+\/\d+/)?.[0];
+      if (!dest) break;
+      if (!/Deleting/i.test(text)) {
+        await r.locator('i.table-select').first().click();
+        await topButton(page, '삭제').click();
+        await confirmModal(page, /규칙을 삭제하시겠습니까/);
+      }
+      await waitForRow(page, rtab, dest, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+    }
+  }
+}
+
+/**
+ * Subnet 의 Virtual IP 를 모두 반납한다 (에이전트 B 2차, 2026-09-30 프로브). VIP 는 목록 메뉴가 없고 Subnet 상세 "Virtual IP 관리 (n)" 탭에만 있다.
+ * VIP 마다: 상세(IP 링크) → Public NAT IP 가 있으면 해제 → 연결 Port "연결 해제" → 탭으로 돌아와 행 끝 "반납" → "Virtual IP를 반납하시겠습니까?".
+ * Subnet 이 없거나 VIP 가 0 이면 아무것도 하지 않는다.
+ */
+export async function releaseSubnetVips(page: Page, subnet: string, log: (line: string) => void): Promise<void> {
+  await gotoRoute(page, ROUTES.subnet);
+  if ((await row(page, subnet).count()) === 0) return;
+  await row(page, subnet).getByText(subnet, { exact: true }).first().click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  const tabLink = page.getByText(/^Virtual IP 관리 \(\d+\)/).first();
+  if (/\(0\)/.test(await tabLink.innerText().catch(() => '(0)'))) return;
+  await tabLink.click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  const tab = '#' + page.url().split('#')[1]!;
+  const { setPublicNatIp } = await import('./networking'); // networking.ts 가 이 파일을 import 한다(순환 회피)
+  for (let i = 0; i < 10; i++) {
+    const first = page.locator('tr.scp-body-row:visible').first();
+    if (!(await first.count())) return;
+    const ip = (await first.innerText()).replace(/\s+/g, ' ').trim().split(' ')[0]!;
+    log(`  Subnet ${subnet} 의 Virtual IP ${ip} 반납`);
+    await first.getByText(ip, { exact: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 1_000 });
+    const nat = (await page.locator('[formlabel="Public NAT IP"]').first().innerText().catch(() => '-')).trim();
+    if (nat !== '-' && !/Deleting/i.test(nat)) await setPublicNatIp(page, null, log);
+    for (let j = 0; j < 5; j++) {
+      const port = page.locator('tr.scp-body-row:visible').filter({ has: page.getByRole('button', { name: '연결 해제', exact: true }) }).first();
+      if (!(await port.count())) break;
+      await port.getByRole('button', { name: '연결 해제', exact: true }).click();
+      await confirmModal(page, /연결 Port를 해제하시겠습니까/);
+      await page.waitForTimeout(5_000);
+      await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+      await settleConsole(page, { appearGraceMs: 1_000 });
+    }
+    await gotoRoute(page, tab);
+    await waitForRow(page, tab, ip, { timeoutMs: 60_000, log });
+    await row(page, ip).getByRole('button', { name: '반납', exact: true }).click();
+    await confirmModal(page, /Virtual IP를 반납하시겠습니까/);
+    await waitForRow(page, tab, ip, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+  }
+}
+
+/**
  * IGW 에 딸린 방화벽(FW_<IGW명>)의 규칙을 모두 지운다. 규칙 탭 이름 "규칙 (n)" 이 0 이면 아무것도 하지 않는다.
  * 흐름은 networking.firewall spec 과 같다: 규칙 탭 → 규칙 수정 → 행 선택 → 삭제("삭제 예정") → 완료 → 확인.
  */
@@ -719,4 +876,54 @@ export async function clearIgwFirewallRules(page: Page, igwName: string, log: (l
     await page.waitForTimeout(10_000);
   }
   throw new Error(`${fwName} 규칙이 5분 안에 지워지지 않았습니다`);
+}
+
+/**
+ * Global CDN 해지 (에이전트 A, 2026-09-30 실측): 목록이 Active 여도 상세 "CDN 설정 버전 n Pending"(배포 중) 동안은
+ * 시작·중지·Purge·서비스 해지·수정 버튼이 모두 비활성이다. 배포가 끝날 때까지 상세를 다시 읽고,
+ * "서비스 해지" 가 활성이면 해지, 아니고 "중지" 가 활성이면 먼저 중지한다(API 자동화: 삭제는 STOPPED 뒤에만 성공).
+ */
+export async function deleteCdn(
+  page: Page,
+  name: string,
+  log: (line: string) => void = console.log,
+  timeoutMs = 3_600_000,
+): Promise<void> {
+  const route = ROUTES.cdn;
+  const start = Date.now();
+  const enabledButton = async (label: string) => {
+    const b = page
+      .locator('button:visible:not(tr button)')
+      .filter({ hasText: new RegExp(`^\\s*${label}\\s*$`) })
+      .first();
+    return (await b.count()) && (await b.getAttribute('aria-disabled')) !== 'true' ? b : null;
+  };
+  let stopped = false;
+  for (;;) {
+    await gotoRoute(page, route);
+    if ((await row(page, name).count()) === 0) return;
+    await row(page, name).getByText(name, { exact: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 1_500 });
+    await page.waitForTimeout(2_000);
+    const body = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ');
+    const state = `${body.match(/(Active|Stopped|Stopping|Starting|Creating|Deploying|Error|Deleting)/)?.[1] ?? '?'}, 설정 버전 ${body.match(/CDN 설정 버전 (\d+ \S+)/)?.[1] ?? '?'}`;
+    const del = await enabledButton('서비스 해지');
+    if (del) {
+      log(`  CDN ${name} 해지 (${state})`);
+      await del.click();
+      await confirmModal(page, /해지/, '확인', { agree: true, resourceName: name });
+      await waitForRow(page, route, name, { gone: true, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+      return;
+    }
+    const stop = stopped ? null : await enabledButton('중지');
+    if (stop) {
+      log(`  CDN ${name} 중지 (${state})`);
+      await stop.click();
+      await confirmModal(page, /중지/, '확인', { agree: true, resourceName: name });
+      stopped = true;
+    } else log(`  [${Math.round((Date.now() - start) / 1000)}s] CDN ${name} 버튼 비활성 대기… (${state})`);
+    if (Date.now() - start > timeoutMs)
+      throw new Error(`CDN ${name} 해지 가능 상태 대기 ${timeoutMs / 1000}초 초과 (${state})`);
+    await page.waitForTimeout(30_000);
+  }
 }

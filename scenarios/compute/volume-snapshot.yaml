@@ -15,6 +15,7 @@ precondition:
 #   상단 "스냅샷 생성" 모달(스냅샷명·설명) → 확인 → "스냅샷을 생성하시겠습니까?" → 탭 "스냅샷 목록 (1)" 행 Available(수 초).
 #   상단 "스냅샷 복구"(최신 스냅샷으로 되돌림) → "스냅샷을 복구하시겠습니까?" → 볼륨 Reverting ≈70초 → Available (복구 중 임시 스냅샷이 하나 더 보였다가 사라짐).
 #   스냅샷 삭제: 탭 행 선택 → 탭 위 "삭제" → "스냅샷 1개를 삭제하시겠습니까?" → 수 초 뒤 행 사라짐. 볼륨 삭제: 목록 행 선택 → 상단 "삭제".
+#   볼륨 이전(2026-09-30): 상세 "볼륨 이전" → 신청 확인 → "볼륨 이전 ID / 승인 Key" 모달(값은 읽지 않음. 모달 "확인" 을 누르면 몇 초 뒤 탭이 닫혀 누르지 않고 새로 고침) → Awaiting Transfer → "볼륨 이전 취소" → Available. 받기는 다른 Account 필요.
 # 이름: 정리 종류 snap — 볼륨 snap-<run_id>, 스냅샷 snap-<run_id>-s1. 볼륨·스냅샷 용량 과금(짧게).
 steps:
   - goal: "Block Storage 목록으로 이동한다"
@@ -22,7 +23,7 @@ steps:
     expect:
       url: "#/virtualserver/block-storage/list"
 
-  - goal: "볼륨 {{name}}(SSD 8GB) 을 만들고, 상세에서 스냅샷 {{snapshot}} 을 생성·복구한 뒤 스냅샷을 삭제한다"
+  - goal: "볼륨 {{name}}(SSD 8GB) 을 만들고, 상세에서 스냅샷 {{snapshot}} 을 생성·복구한 뒤 스냅샷을 삭제하고, 볼륨 이전을 신청했다가 취소한다"
     vars:
       name: "snap-{{run_id}}"
       snapshot: "snap-{{run_id}}-s1"

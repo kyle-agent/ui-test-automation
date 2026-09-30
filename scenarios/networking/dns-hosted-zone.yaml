@@ -34,6 +34,16 @@ steps:
       url: "#/dns/hosted-zone/list"
       text: ["{{zone}}"]
 
+  # L3 (2026-09-30, 에이전트 A): 상세 탭 "레코드 (2)"(기본 SOA·NS) → "레코드 추가" 모달: 유형(A 기본 · AAAA · SPF · CNAME · MX · TXT),
+  # 이름(+ .<zone> 접미), 값(입력 + "추가", 최대 8개), TTL(300~86400초) → 확인. 삭제는 레코드 행 선택 → 표 위 "삭제".
+  - goal: "Hosted Zone {{zone}} 에 A 레코드 www → 192.0.2.10 (TTL 300) 을 추가한다"
+    expect:
+      text: ["192.0.2.10"]
+
+  - goal: "A 레코드 www 를 삭제한다"
+    expect:
+      not_text: ["192.0.2.10"]
+
 teardown:
   - goal: "Hosted Zone {{zone}} 을 행의 삭제 버튼으로 지운다"
     expect:

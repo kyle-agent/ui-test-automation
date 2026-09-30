@@ -1,11 +1,20 @@
 // 직접 작성 (2026-09-29). 시나리오: scenarios/networking/load-balancer.yaml. 콘솔 사실은 yaml 머리 주석.
-// VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener 생성 → 역순 삭제. SHARED_VPC 가 있으면 그 네트워크를 쓴다.
+// VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener 생성 → Public NAT IP 연결·해제(2026-09-30 에이전트 B) → 역순 삭제.
+// SHARED_VPC 가 있으면 그 네트워크를 쓴다(그땐 IGW 가 필요한 Public NAT 단계는 건너뛴다).
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
-import { confirmUntil, pickLate } from '../../src/console/networking';
+import {
+  confirmUntil,
+  createIgw,
+  deleteIgw,
+  pickLate,
+  releasePublicIp,
+  reservePublicIp,
+  setPublicNatIp,
+} from '../../src/console/networking';
 import { deleteNetwork, ensureNetwork, type SharedNetwork } from '../../src/console/shared';
 import {
   confirmModal,
@@ -29,6 +38,15 @@ const ctx = (step: number) => ({
   testInfo: test.info(),
 });
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+let publicIp = ''; // steps[6] 에서 예약한 IP (teardown 반납용)
+
+/** LB 상세(상세 정보 탭)를 연다. */
+async function openLbDetail(page: Page): Promise<void> {
+  await gotoRoute(page, ROUTES.lb);
+  await row(page, vars.lb!).getByText(vars.lb!, { exact: true }).first().click();
+  await settleConsole(page, { appearGraceMs: 1_000 });
+}
 
 /** LB 상세 → "연결된 자원" 탭 (Listener 목록). 돌아올 route 를 돌려준다. */
 async function openLinkedResources(page: Page): Promise<string> {
@@ -89,6 +107,14 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         await expectStep(page, resolveExpectation(scenario.teardown[1]!.expect, vars), ctx(1));
       });
     });
+    await attempt('Public NAT IP 해제', async () => {
+      if (!publicIp) return;
+      await gotoRoute(page, ROUTES.lb);
+      if ((await row(page, vars.lb!).count()) === 0) return;
+      await openLbDetail(page); // 본 단계가 중간에 실패했을 때만 연결돼 있다
+      const nat = (await page.locator('[formlabel="Public NAT IP"]').first().innerText().catch(() => '-')).trim();
+      if (nat !== '-') await setPublicNatIp(page, null, log);
+    });
     await attempt('LB 해지', async () => {
       await gotoRoute(page, ROUTES.lb);
       if ((await row(page, vars.lb!).count()) === 0) return;
@@ -98,6 +124,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         await confirmModal(page, /Load Balancer를 해지하시겠습니까/);
         await waitForRow(page, ROUTES.lb, vars.lb!, { gone: true, timeoutMs: 900_000, intervalMs: 20_000, log });
         await expectStep(page, resolveExpectation(scenario.teardown[2]!.expect, vars), ctx(2));
+      });
+    });
+    await attempt('Public IP 반납 · IGW 삭제', async () => {
+      if (net?.shared) return;
+      await test.step(`teardown[4] Public IP ${publicIp || '(없음)'} 반납 · IGW_${vars.vpc} 삭제`, async () => {
+        if (publicIp) await releasePublicIp(page, publicIp, log);
+        await deleteIgw(page, vars.vpc!, log);
+        await gotoRoute(page, ROUTES.igw);
+        await expectStep(page, resolveExpectation(scenario.teardown[4]!.expect, vars), ctx(4));
       });
     });
     await attempt('Subnet·VPC 삭제', async () => {
@@ -177,6 +212,26 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await waitForRow(page, route, vars.ls!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
       log(`  Listener 행: ${(await row(page, vars.ls!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+    });
+    await test.step('steps[6] Internet Gateway · Public IP 준비', async () => {
+      if (net!.shared) {
+        log('  공유 네트워크 — IGW 를 만들지 않으려고 Public NAT 단계(6~8)를 건너뜀');
+        return;
+      }
+      await createIgw(page, net!.vpc, { log }); // Public NAT IP 드롭다운엔 IGW 가 있는 VPC 의 IGW 구분 IP 가 나온다
+      publicIp = await reservePublicIp(page, log);
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
+    await test.step(`steps[7] Public NAT IP ${publicIp || '(건너뜀)'} 연결`, async () => {
+      if (!publicIp) return;
+      await openLbDetail(page);
+      await setPublicNatIp(page, publicIp, log);
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
+    });
+    await test.step('steps[8] Public NAT IP 해제', async () => {
+      if (!publicIp) return;
+      await setPublicNatIp(page, null, log);
+      await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), ctx(8));
     });
   });
 });

@@ -77,6 +77,38 @@ async function deleteSnapshot(page: Page, name: string, snapshot: string) {
   await waitSnapshot(page, snapshot, '소멸', (t) => t === '');
 }
 
+/**
+ * 볼륨 이전(createvolumetransfer → deletevolumetransfer, 2026-09-30 에이전트 C 프로브):
+ * 상세 "볼륨 이전" → "볼륨 이전을 신청하시겠습니까? … 다른 Account에서 '볼륨 이전 받기' 완료 후 기존 Account에서 볼륨이 제거됩니다" → 확인
+ * → 모달 "볼륨 이전 ID / 승인 Key" (값은 비밀이라 읽지도 기록하지도 않는다. 모달 "확인" 은 탭을 닫히게 해 누르지 않는다) → 목록 상태 Awaiting Transfer.
+ * 상세 "볼륨 이전 취소" → "볼륨 이전을 취소하시겠습니까?" → 확인 → Available. 받기(accept)는 다른 Account 가 필요해 하지 않는다.
+ */
+async function volumeTransferRoundTrip(page: Page, name: string) {
+  await openVolumeDetail(page, name);
+  try {
+    await page.getByRole('button', { name: '볼륨 이전', exact: true }).click();
+    await confirmModal(page, /볼륨 이전을 신청하시겠습니까/);
+    // 승인 Key 모달: 내용은 읽지 않는다. 모달의 "확인" 을 누르면 몇 초 뒤 테스트 탭이 닫혔다(2026-09-30 2회 연속, "Target page … closed" —
+    // 키 파일 다운로드로 추정, Keypair .pem 과 같은 증상) → 누르지 않고 페이지를 다시 읽어 모달을 없앤다(프로브에서 안전 확인).
+    const keyModal = visibleModal(page).filter({ hasText: '승인 Key' });
+    await keyModal.waitFor({ timeout: 30_000 });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await settleConsole(page, { appearGraceMs: 800 });
+    await waitForRow(page, ROUTE, name, { status: /Awaiting Transfer/, timeoutMs: 120_000, intervalMs: 5_000, log });
+  } finally {
+    // 실패해도 이전 요청은 취소해 둔다 (Awaiting Transfer 볼륨은 스냅샷 생성·연결이 막힌다)
+    await gotoRoute(page, ROUTE);
+    if (/Awaiting Transfer/.test(await row(page, name).first().innerText().catch(() => ''))) {
+      await openVolumeDetail(page, name);
+      await page.getByRole('button', { name: '볼륨 이전 취소', exact: true }).click();
+      await confirmModal(page, /볼륨 이전을 취소하시겠습니까/);
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+    }
+  }
+  await waitForRow(page, ROUTE, name, { status: /Available/, timeoutMs: 180_000, intervalMs: 5_000, log });
+  log('  볼륨 이전 신청 → Awaiting Transfer → 이전 취소 → Available');
+}
+
 defineSimpleCrudSpec({
   scenario: 'scenarios/compute/volume-snapshot.yaml',
   route: ROUTE,
@@ -131,6 +163,7 @@ defineSimpleCrudSpec({
       // 3) 스냅샷 삭제 — 실패해도 볼륨 삭제 전에 스냅샷을 치운다
       await deleteSnapshot(page, name, snapshot);
     }
+    await volumeTransferRoundTrip(page, name);
     await gotoRoute(page, ROUTE);
   },
   deleteButton: '삭제',

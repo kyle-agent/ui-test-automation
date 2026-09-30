@@ -1,0 +1,61 @@
+{
+  "spec": "database.postgresql",
+  "started": "2026-09-30T08:53:20.499Z",
+  "ended": "2026-09-30T09:38:55.623Z",
+  "seconds": 2735,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.postgresql",
+    "run_id": "0930-1753-5a41",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PostgreSQL(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 2691.8,
+      "annotations": {
+        "scenario": "database.postgresql",
+        "run_id": "0930-1753-5a41",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 430
+        },
+        {
+          "title": "steps[2] pgcajdabhfdfaeb 생성",
+          "status": "pass",
+          "seconds": 613.4
+        },
+        {
+          "title": "steps[3] Replica rep093017535a41 추가 → Running",
+          "status": "pass",
+          "seconds": 658.2
+        },
+        {
+          "title": "steps[4] Replica rep093017535a41 해지",
+          "status": "pass",
+          "seconds": 332.7
+        }
+      ]
+    }
+  ]
+}

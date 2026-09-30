@@ -1,5 +1,6 @@
 // 직접 작성 (2026-09-21). 시나리오: scenarios/compute/vm-stack.yaml.
 // 콘솔 화면 사실은 src/console/ui.ts 머리말과 docs/HANDOFF.md 9절 참조.
+import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { settleConsole } from '../../src/console/overlays';
@@ -7,6 +8,8 @@ import {
   confirmModal,
   dismissModalIfAny,
   fillField,
+  fillStable,
+  visibleModal,
   openCreateForm,
   pickOption,
   row,
@@ -29,6 +32,7 @@ const ROUTES = {
   vpc: '#/vpc/vpc/list',
   subnet: '#/vpc/subnet/list',
   vm: '#/virtualserver/virtualserver/list',
+  image: '#/virtualserver/image/list',
 };
 
 const log = (line: string) => console.log(line);
@@ -43,7 +47,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
   /** steps[1] 에서 Keypair 가 이미 있었으면 true. 공유 Keypair 는 정리 때 지우지 않는다. */
   let keypairPreexisted = false;
 
-  test.afterEach('정리 (역순: 서버 → Subnet → VPC → Keypair)', async ({ page }) => {
+  test.afterEach('정리 (역순: Image → 서버 → Subnet → VPC → Keypair)', async ({ page }) => {
     test
       .info()
       .annotations.push(
@@ -58,6 +62,17 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         errors.push(`${name}: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
       }
     };
+
+    await attempt('Image 삭제', async () => {
+      // steps[6] 이 도중에 실패했을 때만 남는다 (정상이면 steps[6] 안에서 지운다)
+      await gotoRoute(page, ROUTES.image);
+      if ((await row(page, vars.image!).count()) === 0) return;
+      await test.step('teardown[4] Image 삭제', async () => {
+        await waitForRow(page, ROUTES.image, vars.image!, { status: /Active|Error/i, timeoutMs: 900_000, intervalMs: 15_000, log });
+        await deleteImage(page);
+        await expectStep(page, resolveExpectation(scenario.teardown[4]!.expect, vars), stepCtx(4));
+      });
+    });
 
     await attempt('서버 해지', async () => {
       await gotoRoute(page, ROUTES.vm);
@@ -248,5 +263,110 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       });
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), stepCtx(5));
     });
+
+    // 2026-09-30 추가 (에이전트 C, API createvirtualservercustomimage·updateimage·deleteimage / createserverinterface·deleteserverinterface / createvirtualserverdump)
+    await test.step(`steps[6] 서버 ${vars.vm} 로 커스텀 Image ${vars.image} 생성 → Visibility Shared → 삭제`, async () => {
+      await openServerDetail(page);
+      await page.getByRole('button', { name: 'Image 생성', exact: true }).click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      // 폼(#/virtualserver/virtualserver/custom-image-request)은 Image명 하나. "Active 상태의 서버로 만든 Image 는 파일 시스템 무결성을 보장할 수 없다" 안내만 있다
+      await fillField(page, 'Image명', vars.image!);
+      await submitForm(page, '완료');
+      await confirmModal(page, /Image를 생성하시겠습니까/);
+      // 실측: Queued → Active ≈1~3분 (Ubuntu 16GB, Image 크기 1.7GB)
+      await waitForRow(page, ROUTES.image, vars.image!, { status: /Active/, timeoutMs: 900_000, intervalMs: 15_000, log });
+      await openImageDetail(page);
+      // Visibility 수정(updateimage): 라벨 옆 연필 → 모달 Private/Shared → 확인 → "Visibility를 수정하시겠습니까?" → 확인.
+      // Shared 가 되어야 "다른 Account로 공유"(createimagemember) 가 활성화되지만, 공유 대상 Account 가 없어 멤버 추가는 하지 않는다.
+      await page.locator('.scp-form-group-label:visible').filter({ hasText: 'Visibility' }).locator('i.i-edit').first().click();
+      const vis = visibleModal(page);
+      await vis.waitFor({ timeout: 10_000 });
+      await vis.getByRole('button', { name: 'Shared', exact: true }).click();
+      await vis.getByRole('button', { name: '확인', exact: true }).click();
+      await confirmModal(page, /Visibility를 수정하시겠습니까/);
+      await expect
+        .poll(
+          async () => {
+            await openImageDetail(page);
+            return (await page.locator('body').innerText()).replace(/\s+/g, ' ').match(/Visibility (\w+)/)?.[1];
+          },
+          { message: 'Image Visibility 가 shared 로 바뀌어야 합니다', timeout: 120_000, intervals: [3_000, 10_000] },
+        )
+        .toMatch(/shared/i);
+      await expect(page.getByRole('button', { name: '다른 Account로 공유' }).first()).toHaveAttribute('aria-disabled', 'false');
+      await deleteImage(page);
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), stepCtx(6));
+    });
+
+    await test.step(`steps[7] 서버 ${vars.vm} 에 네트워크 포트(${vars.nic_ip}) 추가 → 삭제`, async () => {
+      // 상세 "네트워크" 절: "신규 네트워크 포트로 추가" 모달(일반 Subnet명 드롭다운 기본 선택, IP 필수) → 확인 → "네트워크를 추가하시겠습니까?" → 확인.
+      // 추가된 포트는 절 안의 회색 상자(.gray_box) 하나로 보이고, 상자 오른쪽 위 i.i-btn-del → "네트워크를 삭제하시겠습니까?" 로 뗀다.
+      // Public NAT IP 연결(static NAT)은 compute.vm-stack-net 이 기본 포트로 이미 다룬다 → 여기서는 생략.
+      await openServerDetail(page);
+      await page.getByRole('button', { name: '신규 네트워크 포트로 추가', exact: true }).first().click();
+      const add = visibleModal(page);
+      await add.waitFor({ timeout: 10_000 });
+      await fillStable(page, add.locator('input[type=text]:visible').first(), vars.nic_ip!, '추가 포트 IP');
+      await add.getByRole('button', { name: '확인', exact: true }).click();
+      await confirmModal(page, /네트워크를 추가하시겠습니까/);
+      const nicBox = () => page.locator('.gray_box:visible').filter({ hasText: vars.nic_ip! });
+      await expect
+        .poll(
+          async () => {
+            await openServerDetail(page);
+            return nicBox().count();
+          },
+          { message: `추가한 포트 ${vars.nic_ip} 가 상세에 보여야 합니다`, timeout: 300_000, intervals: [5_000, 10_000] },
+        )
+        .toBeGreaterThan(0);
+      await gotoRoute(page, ROUTES.vm);
+      await expect(row(page, vars.vm!).first()).toContainText(vars.nic_ip!);
+      await openServerDetail(page);
+      await nicBox().locator('i.i-btn-del').first().click();
+      await confirmModal(page, /네트워크를 삭제하시겠습니까/);
+      await expect
+        .poll(
+          async () => {
+            await openServerDetail(page);
+            return nicBox().count();
+          },
+          { message: `포트 ${vars.nic_ip} 가 사라져야 합니다`, timeout: 300_000, intervals: [5_000, 10_000] },
+        )
+        .toBe(0);
+      await gotoRoute(page, ROUTES.vm);
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), stepCtx(7));
+    });
+
+    await test.step(`steps[8] 서버 ${vars.vm} Dump 생성`, async () => {
+      // "Dump를 생성하시겠습니까? Dump 파일은 Virtual Server 안에 생성됩니다." — 파일 다운로드 없음. 결과는 토스트 "Dump 생성이 성공하였습니다. 서버명: …"
+      await openServerDetail(page);
+      await page.getByRole('button', { name: 'Dump 생성', exact: true }).click();
+      await confirmModal(page, /Dump를 생성하시겠습니까/);
+      await expect(page.getByText(/Dump 생성이 성공하였습니다/).first()).toBeVisible({ timeout: 30_000 });
+      await waitForRow(page, ROUTES.vm, vars.vm!, { status: /Active/, timeoutMs: 300_000, intervalMs: 15_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), stepCtx(8));
+    });
   });
+
+  async function openServerDetail(page: Page) {
+    await gotoRoute(page, ROUTES.vm);
+    await row(page, vars.vm!).getByText(vars.vm!, { exact: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 800 });
+    await page.getByRole('button', { name: 'Dump 생성', exact: true }).waitFor({ timeout: 30_000 });
+  }
+
+  async function openImageDetail(page: Page) {
+    await gotoRoute(page, ROUTES.image);
+    await row(page, vars.image!).getByText(vars.image!, { exact: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 800 });
+    await page.getByRole('button', { name: 'Image 삭제', exact: true }).waitFor({ timeout: 30_000 });
+  }
+
+  /** 상세 "Image 삭제" → "Image명: … Image를 삭제하시겠습니까?" → 확인 → 목록에서 소멸(수 초) */
+  async function deleteImage(page: Page) {
+    await openImageDetail(page);
+    await page.getByRole('button', { name: 'Image 삭제', exact: true }).click();
+    await confirmModal(page, /Image를 삭제하시겠습니까/, '확인', { agree: true, resourceName: vars.image });
+    await waitForRow(page, ROUTES.image, vars.image!, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+  }
 });

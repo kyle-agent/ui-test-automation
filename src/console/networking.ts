@@ -133,9 +133,60 @@ export async function openDetailTab(page: Page, route: string, name: string, tab
   await gotoRoute(page, route);
   await row(page, name).getByText(name, { exact: true }).first().click();
   await settleConsole(page, { appearGraceMs: 800 });
-  await page.getByText(tab).first().click();
-  await settleConsole(page, { appearGraceMs: 800 });
+  // 2026-09-30 Peering 규칙 삭제: 탭 클릭이 먹지 않고 상세 정보(detail/info)에 머문 채 다음 단계로 넘어갔다 → 보이는 탭만 누르고 주소가 바뀔 때까지 다시 누른다
+  const before = page.url();
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    await page.getByText(tab).filter({ visible: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 800 });
+    if (page.url() !== before) break;
+    await page.waitForTimeout(1_500);
+  }
   return '#' + page.url().split('#')[1]!;
+}
+
+/** 상세 화면의 "Public NAT IP" 값 (예: "123.41.34.44 Active", "-"). */
+async function publicNatText(page: Page): Promise<string> {
+  const cell = page.locator('[formlabel="Public NAT IP"]').first();
+  return ((await cell.innerText({ timeout: 5_000 }).catch(() => '')) || '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * 지금 열린 상세 화면(Subnet Virtual IP 상세 · Load Balancer 상세)의 "Public NAT IP" 를 설정(ip)하거나 해제(null)한다 (2026-09-30 프로브, 에이전트 B).
+ * 라벨 옆 연필 아이콘 → "Public NAT IP 수정" 모달: "사용" 체크 → Public NAT IP 드롭다운(예약한 IP) → "확인"
+ * → "Public NAT IP를 설정/수정하시겠습니까?" 또는 해제 "…해제 하시겠습니까?" → Creating/Deleting ≈10~20초 → "<ip> Active" / "-".
+ * VIP 는 VPC 에 Internet Gateway 가 있어야 아이콘이 모달을 연다(없으면 아무 반응 없음). 드롭다운엔 구분 "Internet Gateway" 로 예약한 IP 가 나온다.
+ */
+export async function setPublicNatIp(
+  page: Page,
+  ip: string | null,
+  log?: (line: string) => void,
+  timeoutMs = 600_000,
+): Promise<void> {
+  const detail = page.url();
+  await page.locator('.scp-form-group-label').filter({ hasText: /^\s*Public NAT IP\s*$/ }).first().locator('i').first().click();
+  const modal = visibleModal(page);
+  await modal.waitFor({ timeout: 15_000 });
+  const use = modal.locator('.scp-select:visible').first();
+  if (((await use.getAttribute('class')) ?? '').includes('scp-select-checked') !== !!ip) await use.click();
+  if (ip) {
+    await modal.locator('.scp-dropdown:visible').first().click();
+    const item = page.locator('.scp-menu:visible .scp-menu-item').filter({ hasText: ip }).first();
+    await item.waitFor({ timeout: 10_000 });
+    await item.click();
+  }
+  await page.waitForTimeout(500);
+  await modal.getByRole('button', { name: '확인', exact: true }).click();
+  await confirmModal(page, ip ? /Public NAT IP를 (설정|수정)하시겠습니까/ : /해제\s*하시겠습니까/);
+  for (const start = Date.now(); ; ) {
+    await page.waitForTimeout(10_000);
+    if (page.url() !== detail) await page.goto(detail).catch(() => undefined);
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+    await settleConsole(page, { appearGraceMs: 1_000 });
+    const text = await publicNatText(page);
+    log?.(`  Public NAT IP: ${text}`);
+    if (ip ? text.includes(ip) && /Active/.test(text) : text === '-') return;
+    if (Date.now() - start > timeoutMs) throw new Error(`Public NAT IP ${ip ?? '해제'} 대기 ${timeoutMs / 1000}초 초과. 마지막: ${text}`);
+  }
 }
 
 /**

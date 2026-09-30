@@ -13,3 +13,8 @@ rows: 0
 buttons: ["Private","Public","사용 가능 여부 조회","태그 추가","취소","생성(dis)"]
   dropdown "등록할": []
   dropdown "등록할": []
+
+## 레코드 (2026-09-30, 에이전트 A)
+- 상세 #/dns/hosted-zone/detail/info → 탭 "레코드 (2)"(기본 SOA·NS) #/dns/hosted-zone/detail/record: 버튼 삭제 · 상세 검색 · "레코드 추가"
+- "레코드 추가" 모달: 유형(A 기본 · AAAA · SPF · CNAME · MX · TXT, 바꾸면 이름·데이터 초기화) · 이름(+ .<zone>) · 값(입력 + "추가", A 는 최대 8) · TTL(formid=ttlInput, 300~86400) → 확인
+- 행: "www.<zone> A 192.0.2.10 300초 N Active". 삭제는 행 선택 → "삭제"

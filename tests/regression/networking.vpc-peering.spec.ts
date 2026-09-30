@@ -1,18 +1,23 @@
 // 직접 작성 (2026-09-23). 시나리오: scenarios/networking/vpc-peering.yaml.
-// VPC 2개 → VPC Peering(동일 Account) → 상세에서 삭제 → VPC 해지. 콘솔 사실은 yaml 머리 주석.
+// VPC 2개 → VPC Peering(동일 Account) → 규칙 추가·삭제(2026-09-30 에이전트 B) → 상세에서 삭제 → VPC 해지. 콘솔 사실은 yaml 머리 주석.
+import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
+import { openDetailTab } from '../../src/console/networking';
 import { settleConsole } from '../../src/console/overlays';
 import {
   confirmModal,
   dismissModalIfAny,
   fillField,
+  fillStable,
   openCreateForm,
   pickOption,
   row,
+  selectRow,
   submitForm,
   topButton,
+  visibleModal,
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
@@ -27,6 +32,26 @@ const ctx = (step: number) => ({
   step,
   testInfo: test.info(),
 });
+
+const rules = (page: Page) => openDetailTab(page, ROUTES.peer, vars.name!, /^규칙 \(/);
+
+/** 규칙 탭에서 이 실행의 규칙(목적지 peer_dest)을 지우고 사라질 때까지 기다린다. 없으면 건너뜀. */
+async function deleteRule(page: Page): Promise<void> {
+  const tab = await rules(page);
+  // 탭 표가 늦게 채워진다(2026-09-30 TGW 규칙에서 "행 없음" 오판) → 탭 이름 "규칙 (n)" 으로 판단하고 n > 0 이면 행을 기다린다
+  const label = (await page.getByText(/^규칙 \(\d+\)/).first().innerText().catch(() => '')).trim();
+  if (/\(0\)/.test(label)) return;
+  const shown = await waitForRow(page, tab, vars.peer_dest!, { timeoutMs: 60_000, intervalMs: 10_000, log }).then(
+    () => true,
+    () => false,
+  );
+  if (!shown) return;
+  await waitForRow(page, tab, vars.peer_dest!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+  await selectRow(page, vars.peer_dest!);
+  await topButton(page, '삭제').click();
+  await confirmModal(page, /규칙을 삭제하시겠습니까/);
+  await waitForRow(page, tab, vars.peer_dest!, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+}
 
 async function createVpc(page: Parameters<typeof gotoRoute>[0], name: string, cidr: string) {
   await openCreateForm(page, ROUTES.vpc, '서비스 생성');
@@ -55,7 +80,7 @@ async function deleteVpc(page: Parameters<typeof gotoRoute>[0], name: string) {
 }
 
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@network'] }, () => {
-  test.describe.configure({ mode: 'serial', timeout: 30 * 60_000 });
+  test.describe.configure({ mode: 'serial', timeout: 40 * 60_000 });
 
   test.afterEach('정리 (역순: Peering → VPC 2개)', async ({ page }) => {
     test
@@ -84,6 +109,8 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
           intervalMs: 15_000,
           log,
         });
+        await deleteRule(page); // 본 단계가 중간에 실패했을 때만 남아 있다
+        await gotoRoute(page, ROUTES.peer);
         await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
         await settleConsole(page, { appearGraceMs: 800 });
         await topButton(page, 'VPC Peering 삭제').click();
@@ -144,6 +171,23 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         `  Peering 행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`,
       );
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] 규칙 추가 (요청 VPC → 승인 VPC ${vars.peer_dest})`, async () => {
+      const tab = await rules(page);
+      await page.getByRole('button', { name: '규칙 추가', exact: true }).first().click();
+      const modal = visibleModal(page);
+      await modal.waitFor();
+      await pickOption(page, '출발지', '요청 VPC'); // 모달 안, 목적지는 자동으로 승인 VPC
+      await fillStable(page, modal.locator('input[type=text]:visible').last(), vars.peer_dest!, '목적지 IP 대역');
+      await modal.getByRole('button', { name: '확인', exact: true }).click();
+      await confirmModal(page, /규칙을 추가하시겠습니까/);
+      await waitForRow(page, tab, vars.peer_dest!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      log(`  규칙 행: ${(await row(page, vars.peer_dest!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step(`steps[4] 규칙 ${vars.peer_dest} 삭제`, async () => {
+      await deleteRule(page);
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
   });
 });

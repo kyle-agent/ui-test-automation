@@ -1,0 +1,62 @@
+{
+  "spec": "networking.cdn",
+  "started": "2026-09-30T06:40:01.613Z",
+  "ended": "2026-09-30T06:42:26.900Z",
+  "seconds": 145,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cdn",
+    "run_id": "0930-1540-6b62",
+    "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Global CDN 생성 후 해지",
+      "status": "failed",
+      "seconds": 105.8,
+      "annotations": {
+        "scenario": "networking.cdn",
+        "run_id": "0930-1540-6b62",
+        "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Global CDN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] CDN cdn093015406b62 생성",
+          "status": "pass",
+          "seconds": 38.2
+        }
+      ],
+      "error": "Error: CDN 상세에 해지 버튼이 없습니다: [\"시작(dis)\",\"중지(dis)\",\"Purge 적용(dis)\",\"서비스 해지(dis)\",\"수정(dis)\"]",
+      "attachments": [
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: CDN 상세에 해지 버튼이 없습니다: [\"시작(dis)\",\"중지(dis)\",\"Purge 적용(dis)\",\"서비스 해지(dis)\",\"수정(dis)\"]",
+  "attachments": [
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip"
+  ]
+}

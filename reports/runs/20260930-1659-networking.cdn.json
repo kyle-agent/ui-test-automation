@@ -1,0 +1,46 @@
+{
+  "spec": "networking.cdn",
+  "started": "2026-09-30T07:59:24.865Z",
+  "ended": "2026-09-30T08:24:43.300Z",
+  "seconds": 1518,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.cdn",
+    "run_id": "0930-1659-4da3",
+    "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Global CDN 생성 후 해지",
+      "status": "passed",
+      "seconds": 1476.2,
+      "annotations": {
+        "scenario": "networking.cdn",
+        "run_id": "0930-1659-4da3",
+        "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Global CDN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] CDN cdn093016594da3 생성",
+          "status": "pass",
+          "seconds": 29.3
+        }
+      ]
+    }
+  ]
+}

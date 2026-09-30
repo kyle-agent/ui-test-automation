@@ -33,6 +33,22 @@ steps:
       url: "#/epas/epas/list"
       text: ["{{name}}"]
 
+  # 2026-09-30 추가(에이전트 C, API epascreatereplica 202): 읽기 복제본. Master 는 백업을 켠 채 만든다(백업이 꺼져 있으면 Replica 요청이 500).
+  # Master 상세 더보기 "Replica 구성" → "Replica 명"(소문자 시작, 3~19자) → 완료 → Replica 는 목록의 별도 행(Replica Cluster). 해지는 Master 와 같은 상세 "서비스 해지".
+  - goal: "EPAS 클러스터 {{name}} 에 읽기 복제본 {{replica}} 를 추가하고 Running 을 기다린다"
+    vars:
+      replica: "rep{{run_id_compact}}"
+    expect:
+      url: "#/epas/epas/list"
+      text: ["{{replica}}", "{{name}}"]
+
+  - goal: "복제본 {{replica}} 를 상세의 서비스 해지로 지우고 목록에서 사라질 때까지 기다린다"
+    expect:
+      url: "#/epas/epas/list"
+      text: ["{{name}}"]
+      not_text: ["{{replica}}"]
+      timeout: 1800000
+
 teardown:
   - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:

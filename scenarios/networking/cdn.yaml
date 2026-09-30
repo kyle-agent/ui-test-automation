@@ -1,0 +1,36 @@
+id: networking.cdn
+title: Global CDN 생성 후 해지
+service: Global CDN
+category: Networking
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-30 프로브, recordings/probe/cdn-cdn-list.md): 목록 #/cdn/cdn/list, 버튼 "서비스 생성". 폼 #/cdn/cdn/request:
+# "CDN명"(영문·숫자 3~20자), "CDN 도메인"(소문자·숫자 4~40자 + .cdn.e.samsungsdscloud.com), "원본 위치"(Domain/IP 드롭다운 + 입력),
+# 프로토콜(HTTPS/HTTP), "Port 번호", "원본 경로", Forward host header·Cache key hostname(Incoming host header 기본), 캐싱 옵션, "Cache 만료시간"(초).
+# 원본은 공개 도메인 example.com(도메인 소유 확인 없음). API 자동화: createcdnservice 202, 삭제는 STOPPED 뒤에만 된다(STOPPING 고착 관측).
+# 실측(2026-09-30): 목록 Creating → Active ≈1분이지만 상세 "CDN 설정 버전 1 Pending"(배포) ≈6분 동안 시작·중지·Purge·서비스 해지·수정 버튼이 모두 비활성.
+# 배포 뒤 "서비스 해지" 는 여전히 비활성, "중지" 만 활성 → 중지 → Stopping ≈15분(설정 버전 Pending_deactivation) → Stopped/Deactivated 에서 "서비스 해지" 활성
+# → Deleting → 수십 초 뒤 소멸. 전체 ≈25분 (정리 로직: src/console/inventory.ts deleteCdn).
+steps:
+  - goal: "Global CDN 목록으로 이동한다"
+    goto: "#/cdn/cdn/list"
+    expect:
+      url: "#/cdn/cdn/list"
+
+  - goal: "CDN {{name}} 을 원본 example.com(HTTP 80)으로 생성한다"
+    vars:
+      name: "cdn{{run_id_compact}}"
+    expect:
+      url: "#/cdn/cdn/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "CDN {{name}} 을 (필요하면 중지 뒤) 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 600000

@@ -1,0 +1,76 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-09-30T06:57:24.384Z",
+  "ended": "2026-09-30T07:06:27.036Z",
+  "seconds": 543,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "0930-1557-afba",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 462.2,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "0930-1557-afba",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.6
+        },
+        {
+          "title": "steps[1] Private DNS pdns-0930-1557-afba 생성",
+          "status": "pass",
+          "seconds": 229.2
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-0930-1557-afba.com 생성",
+          "status": "pass",
+          "seconds": 35.1
+        },
+        {
+          "title": "steps[3] 탐색",
+          "status": "fail",
+          "seconds": 59.3
+        }
+      ],
+      "error": "TimeoutError: locator.innerText: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.innerText: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

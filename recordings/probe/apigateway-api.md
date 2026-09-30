@@ -14,3 +14,13 @@ list buttons: ["서비스 해지(dis)","서비스 생성","API 생성"]; headers
 ## 스테이지 #/apigateway/stage — 트리(스테이지) + 배포 이력 표(배포 일시 | 상태 Active | 설명 | 배포 ID), 버튼 스테이지 생성·배포 변경·삭제·수정
 
 ## 해지: 목록 행 "서비스 해지" → "API를 해지하시겠습니까? 확인을 위해 삭제를 입력" → 바로 사라짐(스테이지·리소스 포함).
+
+## 2차 (2026-09-30, 에이전트 A) — 인증·접근 제어·사용량 정책·API Key·Cloud Functions 트리거
+- 인증 #/apigateway/authentication: 버튼 "JSON Web Token 생성" → 모달(JWT명 소문자 시작 3~50 · 만료 기간 드롭다운 31 Days · 연결할 스테이지 "사용" 체크 → 스테이지명 다중 선택 드롭다운(고른 뒤에도 메뉴가 열려 있음)) → 확인.
+  목록 헤더 인증명 | 인증 수단 JWT(JSON WEB TOKEN) | 연결된 스테이지 수 | 만료 예정 일시(+31일). 삭제는 행 선택 → "삭제".
+- 접근 제어 #/apigateway/accessControl: "접근 제어 생성" 모달(접근 제어명 · Public 접근 허용 IP(쉼표, 최대 100) · 연결할 스테이지 사용 · 설명) → 확인.
+- 사용량 정책 #/apigateway/usagePlan: "사용량 정책 생성" → 화면 /usagePlan/request(연결할 API명 · 사용량 정책명 · 할당량 + 매월/매일/매시 · 설명) → "완료".
+  상세 /usagePlan/detail: 버튼 "사용량 정책 삭제", "연결된 API Key" 표(삭제 · 추가 · "API Key 생성"). "API Key 생성" 모달: API Key명 · 설명.
+- 세 목록 모두 제목 옆 API 드롭다운 + "조회" 가 있어야 행이 보인다.
+- Cloud Functions 상세 "트리거 추가" → 트리거 종류 API Gateway → API명 → 스테이지명 → 확인 → "트리거를 추가하시겠습니까?" → 모달이 스피너로 ≈20초 남은 뒤 닫힘.
+  결과: API 에 리소스 /<함수명> + 메서드 7종(DELETE·GET·HEAD·OPTIONS·PATCH·POST·PUT) 자동 생성, 함수 "트리거 (7)" (행 "apigateway <API>/<METHOD>/<함수명>").

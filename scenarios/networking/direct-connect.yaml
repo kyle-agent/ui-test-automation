@@ -1,5 +1,5 @@
 id: networking.direct-connect
-title: VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → 역순 삭제
+title: VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → Private NAT 생성·삭제 → 역순 삭제
 service: Direct Connect
 category: Networking
 tags: [regression, destructive, crud, stack]
@@ -14,6 +14,10 @@ precondition:
 # 물리 회선 신청이 아니다: 상세에 "회선 신청/해지 요청 바로가기" 가 따로 있고 외부 회선은 영업 담당자 신청 → 콘솔 자원만 만들고 바로 지운다(API 도 65회 생성·삭제 검증).
 # Creating ≈10초 → Active. 상세 탭 "규칙 (n)" → "규칙 추가" 모달: 목적지(VPC / 원격지) 드롭다운 + 목적지 IP → "확인" → "…규칙을 추가하시겠습니까?" → Active ≈1분.
 # 규칙 삭제: 행 선택 → 상단 "삭제". Direct Connect 해지: 목록 행 끝 "서비스 해지". Firewall "FW_<dc명>" 은 미사용으로 따라 생겼다가 같이 사라진다.
+# Private NAT(2026-09-30 프로브, 에이전트 B, API createprivatenat): 목록 #/vpc/private-nat/list "Private NAT 생성" → Private NAT명(3~20), 연결 자원 유형
+# (Direct Connect / Transit Gateway (Uplink)), 연결 자원명(그 유형의 자원), NAT IP 대역(/22~/28, VPC·On-Premise·다른 Private NAT 대역과 겹치지 않게), 설명, "요금 확인"(시간 과금).
+# "Private NAT를 생성하시겠습니까?" → Creating ≈20초 → Active. 상세 탭: 상세 정보 / IP 관리 (n) / 태그 / 작업 이력. 삭제: 목록 행 끝 "삭제" → "Private NAT를 삭제하시겠습니까?" ≈30초.
+# API 는 연결 자원 id 가 없어 4xx 였지만(placeholder), 콘솔에선 이 spec 의 Direct Connect 를 연결 자원으로 바로 쓴다 → DC 를 따로 만들 필요 없이 여기에 붙였다.
 steps:
   - goal: "Direct Connect 목록으로 이동한다"
     goto: "#/directconnect/directconnect/list"
@@ -44,6 +48,19 @@ steps:
       url: "#/directconnect/directconnect/detail/route"
       not_text: ["11.11.11.0/24"]
 
+  - goal: "Direct Connect {{name}} 에 연결한 Private NAT {{pnat}} ({{pnat_cidr}}) 를 만들고 Active 를 기다린다"
+    vars:
+      pnat: "pnat-{{run_id}}"
+      pnat_cidr: "192.168.100.0/24"
+    expect:
+      url: "#/vpc/private-nat/list"
+      text: ["{{pnat}}", "{{name}}"]
+
+  - goal: "Private NAT {{pnat}} 를 삭제한다"
+    expect:
+      url: "#/vpc/private-nat/list"
+      not_text: ["{{pnat}}"]
+
 teardown:
   - goal: "Direct Connect {{name}} 를 해지한다"
     expect:
@@ -53,3 +70,7 @@ teardown:
     expect:
       url: "#/vpc/vpc/list"
       not_text: ["{{vpc}}"]
+  - goal: "Private NAT {{pnat}} 를 삭제한다 (본 단계가 중간에 실패했을 때만 남아 있다)"
+    expect:
+      url: "#/vpc/private-nat/list"
+      not_text: ["{{pnat}}"]

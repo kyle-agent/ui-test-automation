@@ -421,3 +421,21 @@
   이 기준으로 화면 자동화가 아직 없는 것: CDN · GSLB, Hosted Zone 레코드, Subnet VIP(+NAT IP·포트), Transit Gateway 규칙, Peering 규칙, Private NAT, Private Link Service,
   LB Public NAT IP, VM 커스텀 이미지(+공유·멤버)·서버 인터페이스(+NAT)·볼륨 이전·덤프, API Gateway 인증·API 키·사용량 계획, Cloud Functions API Gateway 트리거,
   File Storage 스냅샷 스케줄·복제, DB 복제본 4종. (의도적 제외: IAM 사용자 · Trail · ASG 알림 · SKE kubeconfig 다운로드)
+
+### 9.17 2차 확장 (09-30 오후, 에이전트 3개) + 탭 동시 소멸 원인
+
+- 기준: API 의 마지막 생성 응답이 2xx 인 것. 결과(단독 PASS):
+  - A: CDN(새, 25분: 배포 ≈6분 뒤 "중지" ≈15분 → 해지), GSLB(새), Hosted Zone 레코드(L3), API Gateway 인증·접근 제어·사용량 정책·API Key(L3),
+    Cloud Functions API Gateway 트리거(api-gateway spec steps[8]), File Storage 스냅샷 스케줄. 건너뜀: File Storage 복제(다른 리전 kr-east1 만 가능).
+  - B: Subnet VIP·VIP Port·VIP NAT IP(vpc-port), Transit Gateway 규칙, LB Public NAT IP, Private Link Service + Endpoint 승인(새, L3), Private NAT(direct-connect).
+    VPC Peering 규칙은 본 단계 통과·정리 중 SSO 만료 → 재확인 필요. **TGW·Peering 은 규칙이 남아 있으면 삭제가 조용히 무시된다** → 정리 도구가 규칙부터 지운다.
+  - C: VM Image 생성·Shared 전환·삭제, 포트 추가·제거, Dump(vm-stack steps[6~8]), 볼륨 이전·취소(volume-snapshot), PostgreSQL Replica(45분).
+    MySQL Replica 는 본 단계 통과·정리 중 SSO 만료. MariaDB·EPAS Replica 는 작성만(주석으로 꺼 둠).
+    **Replica 는 Master 백업이 켜져 있어야 한다**(꺼져 있으면 POST …/replicas 500, 화면 안내 없음). 건너뜀: 이미지 멤버·볼륨 이전 받기(다른 Account 필요),
+    공유용 Image(Snapshot-Based 만), 서버 인터페이스 NAT(vm-stack-net 과 중복).
+- **탭 동시 소멸 원인**: `connectLiveBrowser` 가 (a) 연결 20초 초과 또는 (b) 브라우저 내부 탭(edge://downloads-hub)을 보면 살아 있는 공유 브라우저를 강제 종료·재기동했다.
+  16:26 에는 볼륨 이전 "승인 Key" 확인(키 파일 다운로드)이 내부 탭을 만들었고, 다른 실행의 연결이 그걸 보고 브라우저를 죽였다.
+  → 기본은 살아 있는 브라우저를 죽이지 않는다(`PW_FORCE_RELAUNCH=1` 일 때만). 연결 초과는 60초 더 기다려 다시 붙는다. 내부 탭이 있으면 사람에게 닫아 달라고 오류를 낸다.
+  → volume-snapshot 은 승인 Key 모달의 확인을 누르지 않는다.
+- 09-30 19:23 SSO 만료로 전원 중단. 재로그인 후: 잔여 확인(vpc/sub-0930-1839-74ce, vpc/vpcb/peer-0930-1910-70b3, MySQL mycajdabidjhece·rep0930183974ce),
+  Peering·MySQL 재실행, MariaDB·EPAS replica 켜서 1회씩.

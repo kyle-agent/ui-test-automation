@@ -44,6 +44,40 @@ steps:
       url: "#/apigateway/stage"
       text: ["{{stage}}", "Active"]
 
+  # L3 2차 (2026-09-30, 에이전트 A): 인증 #/apigateway/authentication "JSON Web Token 생성" 모달(JWT명 · 만료 기간 31 Days · 연결할 스테이지 사용),
+  # 접근 제어 #/apigateway/accessControl "접근 제어 생성" 모달(접근 제어명 · Public 접근 허용 IP(쉼표로 최대 100) · 연결할 스테이지 · 설명),
+  # 사용량 정책 #/apigateway/usagePlan "사용량 정책 생성" → 화면 #/apigateway/usagePlan/request(연결할 API명 · 사용량 정책명 · 할당량 + 매월/매일/매시 · 설명) → "완료".
+  # 세 목록 모두 제목 옆 API 드롭다운 + "조회", 삭제는 행 선택 → 표 위 "삭제".
+  - goal: "JWT 인증 {{jwt}} 을 스테이지 {{stage}} 에 연결해 만들고 지운다"
+    vars:
+      jwt: "jwt-{{run_id}}"
+    expect:
+      url: "#/apigateway/authentication"
+      text: ["{{jwt}}"]
+
+  - goal: "접근 제어 {{acl}} (허용 IP 192.0.2.0/24) 를 스테이지 {{stage}} 에 연결해 만들고 지운다"
+    vars:
+      acl: "acl-{{run_id}}"
+    expect:
+      url: "#/apigateway/accessControl"
+      text: ["{{acl}}"]
+
+  - goal: "사용량 정책 {{plan}} (매일 100회) 과 API Key {{key}} 를 만들고 지운다"
+    vars:
+      plan: "plan-{{run_id}}"
+      key: "key-{{run_id}}"
+    expect:
+      url: "#/apigateway/usagePlan"
+      text: ["{{plan}}"]
+
+  # Cloud Functions API Gateway 트리거 (2026-09-30, 에이전트 A 2차): 함수(Function명, Node.js 24 기본) → 상세 "트리거 추가" 모달
+  # 트리거 종류 API Gateway → API명 → 스테이지명 → 확인 → "트리거를 추가하시겠습니까?". 트리거 탭 행 선택 → "삭제". 함수는 teardown 에서 API 보다 먼저 해지.
+  - goal: "Cloud Function {{fn}} 에 API {{name}} · 스테이지 {{stage}} 로 API Gateway 트리거를 달고 지운다"
+    vars:
+      fn: "fn-{{run_id}}"
+    expect:
+      text: ["{{fn}}"]
+
 teardown:
   - goal: "API {{name}} 을 해지한다"
     expect:

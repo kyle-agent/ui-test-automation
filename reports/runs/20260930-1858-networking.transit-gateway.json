@@ -1,0 +1,71 @@
+{
+  "spec": "networking.transit-gateway",
+  "started": "2026-09-30T09:58:27.228Z",
+  "ended": "2026-09-30T10:10:07.642Z",
+  "seconds": 700,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.transit-gateway",
+    "run_id": "0930-1858-b045",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Transit Gateway 생성 → VPC 연결 추가 → 규칙 추가·삭제 → 연결 해제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 665.2,
+      "annotations": {
+        "scenario": "networking.transit-gateway",
+        "run_id": "0930-1858-b045",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Transit Gateway 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1858-b045 생성",
+          "status": "pass",
+          "seconds": 26.3
+        },
+        {
+          "title": "steps[2] Transit Gateway tgw-0930-1858-b045 생성",
+          "status": "pass",
+          "seconds": 125.4
+        },
+        {
+          "title": "steps[3] VPC 연결 추가 (vpc-0930-1858-b045)",
+          "status": "pass",
+          "seconds": 156.1
+        },
+        {
+          "title": "steps[4] 규칙 추가 (vpc-0930-1858-b045 → TGW 192.168.30.0/24)",
+          "status": "pass",
+          "seconds": 58.5
+        },
+        {
+          "title": "steps[5] 규칙 192.168.30.0/24 삭제",
+          "status": "pass",
+          "seconds": 54.4
+        },
+        {
+          "title": "steps[6] VPC 연결 해제",
+          "status": "pass",
+          "seconds": 128.1
+        }
+      ]
+    }
+  ]
+}

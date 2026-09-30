@@ -14,4 +14,5 @@ defineDbaasSpec({
     { label: 'Database 사용자명', value: 'qauser' },
     { label: 'Database Port번호', value: '3306' },
   ],
+  replica: true, // 2026-09-30: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4]). 본 단계 통과, 정리 중 SSO 만료로 실행 기록은 FAIL
 });

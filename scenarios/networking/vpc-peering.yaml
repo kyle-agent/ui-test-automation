@@ -1,5 +1,5 @@
 id: networking.vpc-peering
-title: VPC 2개 → VPC Peering 생성 후 역순 삭제
+title: VPC 2개 → VPC Peering 생성 → 규칙 추가·삭제 → 역순 삭제
 service: VPC
 category: Networking
 tags: [regression, destructive, crud, stack]
@@ -12,6 +12,10 @@ precondition:
 # 콘솔(2026-09-23 프로브): 목록 #/vpc/vpc-peering/list, 버튼 "VPC Peering 생성". 목록에는 행 선택·삭제가 없고 이름 링크 → 상세(#/vpc/vpc-peering/detail/info) 의
 # "VPC Peering 삭제" 가 유일한 삭제 경로. 폼: "VPC Peering명"(20자), "요청 VPC명"(드롭다운), "승인 Account"(동일 Account/다른 Account 버튼), "승인 VPC명"(드롭다운), "설명".
 # 동일 Account 면 승인 절차 없이 Creating → Active. 생성 모달 "VPC Peering을 생성하시겠습니까?". 무과금(전송량 과금만).
+# 규칙(2026-09-30 프로브, 에이전트 B, API createvpcpeeringrule): 상세 "규칙 (n)" 탭(#/vpc/vpc-peering/detail/route) → "규칙 추가" 모달:
+# 출발지(요청 VPC / 승인 VPC, 목적지는 자동), 목적지 IP 대역(목적지 VPC 대역 안, 안내문은 "Subnet 대역과 동일" 이지만 Subnet 없는 VPC 의 /24 도 받아들였다)
+# → "입력하신 목적지 IP 대역으로 규칙을 추가하시겠습니까?" → Creating ≈20초 → Active (행: "요청 VPC 승인 VPC 10.250.16.0/24 …").
+# 삭제: 행 선택 → 상단 "삭제" → "목적지: 승인 VPC / 목적지 IP 대역: … 규칙을 삭제하시겠습니까?" → Deleting ≈20초.
 steps:
   - goal: "VPC 목록으로 이동한다"
     goto: "#/vpc/vpc/list"
@@ -34,6 +38,18 @@ steps:
     expect:
       url: "#/vpc/vpc-peering/list"
       text: ["{{name}}"]
+
+  - goal: "규칙 탭에서 요청 VPC → 승인 VPC 목적지 {{peer_dest}} 규칙을 추가하고 Active 를 기다린다"
+    vars:
+      peer_dest: "10.250.16.0/24"
+    expect:
+      url: "#/vpc/vpc-peering/detail/route"
+      text: ["{{peer_dest}}"]
+
+  - goal: "규칙 {{peer_dest}} 를 삭제한다"
+    expect:
+      url: "#/vpc/vpc-peering/detail/route"
+      not_text: ["{{peer_dest}}"]
 
 teardown:
   - goal: "상세 화면의 VPC Peering 삭제로 {{name}} 을 지운다"

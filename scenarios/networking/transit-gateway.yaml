@@ -1,5 +1,5 @@
 id: networking.transit-gateway
-title: VPC → Transit Gateway 생성 → VPC 연결 추가 → 연결 해제 → 역순 삭제
+title: VPC → Transit Gateway 생성 → VPC 연결 추가 → 규칙 추가·삭제 → 연결 해제 → 역순 삭제
 service: VPC
 category: Networking
 tags: [regression, destructive, crud, stack]
@@ -14,6 +14,11 @@ precondition:
 # "연결 VPC 관리" 탭 "VPC 연결 추가" → 모달(연결 VPC명 드롭다운) → "확인" → "VPC 연결을 추가하시겠습니까?" → Creating ≈2분 → Active.
 # 해제: 행 선택 → 상단 "삭제" → "VPC 연결을 삭제하시겠습니까?" → Deleting ≈2분. TGW 삭제: 목록 행 선택 → "삭제" → Deleting ≈1분.
 # VPC 는 Subnet 없이 연결된다(API vpc-transit-gateway-children 과 같음).
+# 규칙(2026-09-30 프로브, 에이전트 B, API createtransitgatewayrule): 상세 "규칙 (n)" 탭(#/vpc/transit-gateway/detail/route) → "규칙 추가" 모달:
+# 규칙 유형(VPC-TGW 규칙 기본 / TGW-Uplink 규칙), 연결 VPC명(연결된 VPC 만), 출발지(자동), 목적지(VPC / TGW), 목적지 IP 대역.
+# 목적지 VPC 는 "Subnet 대역과 동일" 해야 해서 Subnet 이 없는 이 spec 은 목적지 TGW + VPC 밖 대역(192.168.30.0/24)을 쓴다.
+# "확인" → "입력하신 목적지 IP 대역으로 규칙을 추가하시겠습니까?" → Creating ≈20초 → Active (행: "TGW-VPC <vpc> VPC TGW 192.168.30.0/24 …").
+# 삭제: 행 선택 → 상단 "삭제" → "규칙을 삭제하시겠습니까?" → Deleting ≈20초. 규칙 추가는 VPC 연결이 Active 인 뒤에만(연결 VPC 드롭다운).
 steps:
   - goal: "Transit Gateway 목록으로 이동한다"
     goto: "#/vpc/transit-gateway/list"
@@ -38,6 +43,18 @@ steps:
     expect:
       url: "#/vpc/transit-gateway/detail/vpc-connection"
       text: ["{{vpc}}"]
+
+  - goal: "규칙 탭에서 {{vpc}} → TGW 목적지 {{tgw_dest}} 규칙을 추가하고 Active 를 기다린다"
+    vars:
+      tgw_dest: "192.168.30.0/24"
+    expect:
+      url: "#/vpc/transit-gateway/detail/route"
+      text: ["{{tgw_dest}}"]
+
+  - goal: "규칙 {{tgw_dest}} 를 삭제한다"
+    expect:
+      url: "#/vpc/transit-gateway/detail/route"
+      not_text: ["{{tgw_dest}}"]
 
   - goal: "VPC 연결을 해제한다"
     expect:

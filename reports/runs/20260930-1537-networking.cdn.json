@@ -1,0 +1,66 @@
+{
+  "spec": "networking.cdn",
+  "started": "2026-09-30T06:37:31.320Z",
+  "ended": "2026-09-30T06:38:44.571Z",
+  "seconds": 73,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cdn",
+    "run_id": "0930-1537-c892",
+    "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Global CDN 생성 후 해지",
+      "status": "failed",
+      "seconds": 41.5,
+      "annotations": {
+        "scenario": "networking.cdn",
+        "run_id": "0930-1537-c892",
+        "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Global CDN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] CDN cdn09301537c892 생성",
+          "status": "fail",
+          "seconds": 32.4
+        }
+      ],
+      "error": "Error: \"원본 위치\" 입력값이 남아 있어야 합니다",
+      "attachments": [
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: \"원본 위치\" 입력값이 남아 있어야 합니다",
+  "attachments": [
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip"
+  ]
+}

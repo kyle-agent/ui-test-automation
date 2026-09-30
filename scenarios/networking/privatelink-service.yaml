@@ -1,0 +1,79 @@
+id: networking.privatelink-service
+title: VPC → Subnet → PrivateLink Service → PrivateLink Endpoint 연결 요청 · 승인 → 역순 삭제
+service: VPC
+category: Networking
+tags: [regression, destructive, crud, stack]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-30 프로브, 에이전트 B, recordings/probe/vpc-privatelink-service-list.md · vpc-privatelink-endpoint-list.md, API createprivatelinkservice):
+# - Service 목록 #/vpc/privatelink-service/list "PrivateLink Service 생성" → 폼: PrivateLink Service명(3~20, 영문·숫자·-), 승인 방식(자동/수동 — 기본 수동, 이후 변경 불가),
+#   VPC명, Subnet명, PrivateLink Service IP(Subnet 대역 안, 사용 중 IP·첫/마지막 IP 불가), 연결 자원(Load Balancer / IP — IP 는 같은 VPC 의 Compute IP 를 적는다,
+#   실제 서버 없이도 생성된다: API 와 같음), Security Group(선택), 설명. "PrivateLink Service를 생성하시겠습니까?" → Creating ≈30초 → Active.
+#   상세: 상세 정보(Service ID · 자동 생성 Port "prvlink-<이름>-customer-xxxx") / 연결 관리 (n) / 태그 / 작업 이력, 상단 "PrivateLink Service 삭제".
+# - Endpoint 목록 #/vpc/privatelink-endpoint/list "PrivateLink Endpoint 생성" → Endpoint명, VPC명, Subnet명, Endpoint IP, 서비스 구분
+#   (Samsung Cloud Platform 제공 서비스(OpenAPI·ServiceWatch) / 기타 PrivateLink 서비스 → PrivateLink Service ID 입력), Security Group, 설명.
+#   같은 계정·같은 Subnet 의 Service ID 로도 만들어진다(API createprivatelinkendpoint 는 placeholder id 라 404 였다).
+#   "PrivateLink Endpoint를 생성하시겠습니까? … 승인이 필요한 경우에는 승인을 대기합니다" → Requesting.
+# - 승인: Service 상세 "연결 관리" 탭(#/vpc/privatelink-service/detail/connection) 행("<Endpoint ID> <일시> Requesting 거부 승인") 끝 "승인"
+#   → "PrivateLink Service 연결 요청을 승인하시겠습니까?" → Creating ≈30초 → Active, Endpoint 도 Active.
+# - 삭제: Endpoint 목록 행 끝 "삭제" → "PrivateLink Endpoint를 삭제하시겠습니까?" ≈1분 → Service 목록 행 끝 "삭제" → "PrivateLink Service를 삭제하시겠습니까?" ≈1분.
+#   Service 는 연결된 Endpoint 가 모두 없어야 지워진다(API 409 exist-connected-endpoint 와 같음).
+steps:
+  - goal: "PrivateLink Service 목록으로 이동한다"
+    goto: "#/vpc/privatelink-service/list"
+    expect:
+      url: "#/vpc/privatelink-service/list"
+
+  - goal: "VPC {{vpc}} 와 Subnet {{subnet}} (10.250.0.0/24) 을 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/list"
+      text: ["{{subnet}}"]
+
+  - goal: "PrivateLink Service {{pls}} (수동 승인, Service IP {{pls_ip}}, 연결 자원 IP {{target_ip}}) 를 만들고 Active 를 기다린다"
+    vars:
+      pls: "pls-{{run_id}}"
+      pls_ip: "10.250.0.5"
+      target_ip: "10.250.0.10"
+    expect:
+      url: "#/vpc/privatelink-service/list"
+      text: ["{{pls}}"]
+
+  - goal: "같은 Subnet 에 PrivateLink Endpoint {{ple}} ({{ple_ip}}) 를 {{pls}} 의 Service ID 로 만든다 (Requesting)"
+    vars:
+      ple: "ple-{{run_id}}"
+      ple_ip: "10.250.0.20"
+    expect:
+      url: "#/vpc/privatelink-endpoint/list"
+      text: ["{{ple}}"]
+
+  - goal: "Service 연결 관리 탭에서 연결 요청을 승인하고 Endpoint 가 Active 가 되기를 기다린다"
+    expect:
+      url: "#/vpc/privatelink-endpoint/list"
+      text: ["{{ple}}", "Active"]
+
+  - goal: "PrivateLink Endpoint {{ple}} 를 삭제한다"
+    expect:
+      url: "#/vpc/privatelink-endpoint/list"
+      not_text: ["{{ple}}"]
+
+  - goal: "PrivateLink Service {{pls}} 를 삭제한다"
+    expect:
+      url: "#/vpc/privatelink-service/list"
+      not_text: ["{{pls}}"]
+
+teardown:
+  - goal: "남은 Endpoint {{ple}} · Service {{pls}} 를 삭제한다"
+    expect:
+      url: "#/vpc/privatelink-service/list"
+      not_text: ["{{pls}}"]
+  - goal: "Subnet {{subnet}} 과 VPC {{vpc}} 를 지운다"
+    expect:
+      url: "#/vpc/vpc/list"
+      not_text: ["{{vpc}}"]

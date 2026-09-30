@@ -1,0 +1,91 @@
+{
+  "spec": "networking.vpc-port",
+  "started": "2026-09-30T08:03:48.678Z",
+  "ended": "2026-09-30T08:19:17.349Z",
+  "seconds": 929,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-port",
+    "run_id": "0930-1704-c1f1",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Port 생성 → Virtual IP 예약 · Port 연결 · Public NAT IP 연결 → 역순 삭제",
+      "status": "passed",
+      "seconds": 893.6,
+      "annotations": {
+        "scenario": "networking.vpc-port",
+        "run_id": "0930-1704-c1f1",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.2
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1704-c1f1 생성",
+          "status": "pass",
+          "seconds": 24.5
+        },
+        {
+          "title": "steps[2] Subnet sub-0930-1704-c1f1 생성",
+          "status": "pass",
+          "seconds": 225.9
+        },
+        {
+          "title": "steps[3] Port port-0930-1704-c1f1 생성",
+          "status": "pass",
+          "seconds": 25.7
+        },
+        {
+          "title": "steps[4] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 78.1
+        },
+        {
+          "title": "steps[5] Virtual IP 예약 (vip-0930-1704-c1f1)",
+          "status": "pass",
+          "seconds": 28.9
+        },
+        {
+          "title": "steps[6] VIP 10.250.0.205 에 Port port-0930-1704-c1f1 연결",
+          "status": "pass",
+          "seconds": 31.7
+        },
+        {
+          "title": "steps[7] VIP Public NAT IP 123.41.35.52 연결",
+          "status": "pass",
+          "seconds": 41
+        },
+        {
+          "title": "steps[8] VIP Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 39.7
+        },
+        {
+          "title": "steps[9] Port port-0930-1704-c1f1 연결 해제",
+          "status": "pass",
+          "seconds": 14.7
+        },
+        {
+          "title": "steps[10] VIP 10.250.0.205 반납",
+          "status": "pass",
+          "seconds": 28.4
+        }
+      ]
+    }
+  ]
+}

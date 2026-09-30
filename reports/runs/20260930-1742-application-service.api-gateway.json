@@ -1,0 +1,102 @@
+{
+  "spec": "application-service.api-gateway",
+  "started": "2026-09-30T08:42:51.997Z",
+  "ended": "2026-09-30T08:51:34.771Z",
+  "seconds": 523,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "application-service.api-gateway",
+    "run_id": "0930-1743-dbd5",
+    "title": "API 목록 | API Gateway | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "API Gateway API 생성 → 리소스·메서드 추가 → 스테이지 배포 → 해지",
+      "status": "failed",
+      "seconds": 454.8,
+      "annotations": {
+        "scenario": "application-service.api-gateway",
+        "run_id": "0930-1743-dbd5",
+        "title": "API 목록 | API Gateway | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] API 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] API apigw-0930-1743-dbd5 생성",
+          "status": "pass",
+          "seconds": 236.3
+        },
+        {
+          "title": "steps[2] 리소스 /items 생성",
+          "status": "pass",
+          "seconds": 15.2
+        },
+        {
+          "title": "steps[3] /items GET 메서드 생성",
+          "status": "pass",
+          "seconds": 10.2
+        },
+        {
+          "title": "steps[4] 스테이지 stg-0930-1743-dbd5 로 배포",
+          "status": "pass",
+          "seconds": 17.8
+        },
+        {
+          "title": "steps[5] JWT 인증 jwt-0930-1743-dbd5 생성·삭제",
+          "status": "pass",
+          "seconds": 59.7
+        },
+        {
+          "title": "steps[6] 접근 제어 acl-0930-1743-dbd5 생성·삭제",
+          "status": "pass",
+          "seconds": 43.6
+        },
+        {
+          "title": "steps[7] 사용량 정책 plan-0930-1743-dbd5 + API Key key-0930-1743-dbd5 생성·삭제",
+          "status": "fail",
+          "seconds": 34.4
+        }
+      ],
+      "error": "Error: 탐색 끝",
+      "attachments": [
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-7.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-6.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-1.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-3.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-4.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-2.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-5.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/error-context.md",
+        "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 탐색 끝",
+  "attachments": [
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-7.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-6.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-1.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-3.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-4.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-2.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-5.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/error-context.md",
+    "test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip"
+  ]
+}

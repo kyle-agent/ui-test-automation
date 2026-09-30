@@ -1,5 +1,5 @@
 id: networking.vpc-port
-title: VPC → Subnet → Port 생성 후 역순 삭제
+title: VPC → Subnet → Port 생성 → Virtual IP 예약 · Port 연결 · Public NAT IP 연결 → 역순 삭제
 service: VPC
 category: Networking
 tags: [regression, destructive, crud, stack]
@@ -12,6 +12,16 @@ precondition:
 # 콘솔(2026-09-23 프로브, VPC·Subnet 이 있는 상태): Port 목록 #/vpc/port/list, 버튼 "Port 생성" / 상단 "삭제"(행 선택 후).
 # 폼: "VPC명"(드롭다운), "Subnet명"(드롭다운, 항목 텍스트 "sub-… (10.250.0.0/24)"), "Port명"(영문·숫자·- 로 3~20자), "IP 할당 방식"(자동 할당 기본),
 # "설명"(50자), Security Group 사용(체크). VPC·Subnet·Port명을 채우면 "생성" 이 활성화된다. 서버에 붙이지 않은 Port 는 무과금.
+#
+# Subnet Virtual IP (2026-09-30 프로브, 에이전트 B, API createsubnetvip·createsubnetvipport·createsubnetvipnatip 대응):
+# - VIP 는 별도 메뉴가 없고 Subnet 상세 "Virtual IP 관리 (n)" 탭(#/vpc/subnet/detail/vip)에 있다. "Virtual IP 예약" → 모달(Virtual IP: "자동 생성" 기본, 설명)
+#   → "확인" → "Virtual IP를 예약하시겠습니까?" → 즉시 행("10.250.0.x - 0개 <일시> 반납"). 이름이 없어 설명에 vip-<run_id> 를 넣는다.
+# - VIP 상세(IP 링크, #/vpc/subnet/vip/detail): "Public NAT IP"(연필 아이콘) · "연결 Port"(표 + "추가"/"연결 해제") · 설명.
+#   Port 연결: "추가" → "연결 Port 추가" 모달(같은 Subnet 의 Port 표) → 행 선택 → "확인" → "연결 Port를 추가하시겠습니까?" → 즉시 반영.
+#   Public NAT IP: VPC 에 Internet Gateway 가 없으면 연필 아이콘이 반응하지 않는다(API 도 IGW 를 만들었다). IGW + Public IP(구분 Internet Gateway) 예약 뒤
+#   "Public NAT IP 수정" 모달 → "사용" 체크 → IP 드롭다운 → "확인" → "Public NAT IP를 수정하시겠습니까?" → Creating ≈10초 → "<ip> Active". 해제는 체크를 끄고
+#   "…사용 해제하시겠습니까?" → Deleting ≈10초 → "-". Port 해제: 행 끝 "연결 해제" → "연결 Port를 해제하시겠습니까?". 반납: 탭 행 끝 "반납" → "Virtual IP를 반납하시겠습니까?".
+# - IGW·Public IP 는 시간 과금(짧게 쓰고 바로 지운다).
 steps:
   - goal: "VPC 목록으로 이동한다"
     goto: "#/vpc/vpc/list"
@@ -41,8 +51,42 @@ steps:
       url: "#/vpc/port/list"
       text: ["{{name}}"]
 
+  - goal: "Public NAT 용 Internet Gateway 와 Public IP 를 준비한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+
+  - goal: "Subnet {{subnet}} 에 Virtual IP 를 예약한다 (설명 {{vip_desc}})"
+    vars:
+      vip_desc: "vip-{{run_id}}"
+    expect:
+      url: "#/vpc/subnet/detail/vip"
+      text: ["반납"]
+
+  - goal: "Virtual IP 에 Port {{name}} 을 연결한다"
+    expect:
+      url: "#/vpc/subnet/vip/detail"
+      text: ["{{name}}", "{{vip_desc}}"]
+
+  - goal: "Virtual IP 에 Public NAT IP 를 연결하고 Active 를 기다린다"
+    expect:
+      url: "#/vpc/subnet/vip/detail"
+      text: ["Active"]
+
+  - goal: "Public NAT IP 연결을 해제한다"
+    expect:
+      url: "#/vpc/subnet/vip/detail"
+
+  - goal: "Port {{name}} 연결을 해제한다"
+    expect:
+      url: "#/vpc/subnet/vip/detail"
+      not_text: ["{{name}}"]
+
+  - goal: "Virtual IP 를 반납한다"
+    expect:
+      url: "#/vpc/subnet/detail/vip"
+
 teardown:
-  - goal: "Port {{name}} 을 삭제한다"
+  - goal: "Port {{name}} 을 삭제한다 (남은 Virtual IP 는 먼저 반납)"
     expect:
       not_text: ["{{name}}"]
       timeout: 180000
@@ -53,4 +97,9 @@ teardown:
   - goal: "VPC {{vpc}} 를 해지한다"
     expect:
       not_text: ["{{vpc}}"]
+      timeout: 180000
+  - goal: "Public IP 를 반납하고 Internet Gateway 를 삭제한다"
+    expect:
+      url: "#/vpc/internet-gateway/list"
+      not_text: ["IGW_{{vpc}}"]
       timeout: 180000

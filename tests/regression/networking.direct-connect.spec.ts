@@ -1,5 +1,5 @@
 // 직접 작성 (2026-09-29). 시나리오: scenarios/networking/direct-connect.yaml. 콘솔 사실은 yaml 머리 주석.
-// VPC → Direct Connect(콘솔 자원만, 물리 회선 신청 아님) → 라우팅 규칙 추가·삭제(L3) → 해지 → VPC 해지.
+// VPC → Direct Connect(콘솔 자원만, 물리 회선 신청 아님) → 라우팅 규칙 추가·삭제(L3) → Private NAT 생성·삭제(2026-09-30 에이전트 B) → 해지 → VPC 해지.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
@@ -34,6 +34,16 @@ const ctx = (step: number) => ({
 const DEST = '11.11.11.0/24';
 const rules = (page: Page) => openDetailTab(page, ROUTES.dc, vars.name!, /^규칙 \(/);
 
+/** Private NAT 삭제 (목록 행 끝 "삭제"). 없으면 건너뜀. */
+async function deletePrivateNat(page: Page): Promise<void> {
+  await gotoRoute(page, ROUTES.pnat);
+  if ((await row(page, vars.pnat!).count()) === 0) return;
+  await waitForRow(page, ROUTES.pnat, vars.pnat!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+  await row(page, vars.pnat!).getByRole('button', { name: '삭제', exact: true }).click();
+  await confirmModal(page, /Private NAT를 삭제하시겠습니까/, '확인', { agree: true, resourceName: vars.pnat });
+  await waitForRow(page, ROUTES.pnat, vars.pnat!, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+}
+
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@network'] }, () => {
   test.describe.configure({ mode: 'serial', timeout: 40 * 60_000 });
 
@@ -53,6 +63,14 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         log(`  정리 실패 ${name}: ${errors[errors.length - 1]}`);
       }
     };
+    await attempt('Private NAT 삭제', async () => {
+      await gotoRoute(page, ROUTES.pnat);
+      if ((await row(page, vars.pnat!).count()) === 0) return;
+      await test.step(`teardown[2] Private NAT ${vars.pnat} 삭제`, async () => {
+        await deletePrivateNat(page);
+        await expectStep(page, resolveExpectation(scenario.teardown[2]!.expect, vars), ctx(2));
+      });
+    });
     await attempt('Direct Connect 해지', async () => {
       await gotoRoute(page, ROUTES.dc);
       if ((await row(page, vars.name!).count()) === 0) return;
@@ -122,6 +140,22 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await confirmModal(page, /규칙을 삭제하시겠습니까/);
       await waitForRow(page, tab, DEST, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] Private NAT ${vars.pnat} 생성 (연결 자원 ${vars.name})`, async () => {
+      await openCreateForm(page, ROUTES.pnat, 'Private NAT 생성');
+      await fillField(page, 'Private NAT명', vars.pnat!);
+      await pickOption(page, '연결 자원 유형', 'Direct Connect');
+      await pickLate(page, '연결 자원명', vars.name!, log); // 유형을 고른 뒤 비동기로 채워진다
+      await fillField(page, 'NAT IP 대역', vars.pnat_cidr!);
+      await submitForm(page, '생성');
+      await confirmUntil(page, /Private NAT를 생성하시겠습니까/, log);
+      await waitForRow(page, ROUTES.pnat, vars.pnat!, { status: /Active/, timeoutMs: 900_000, intervalMs: 15_000, log });
+      log(`  Private NAT 행: ${(await row(page, vars.pnat!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+    });
+    await test.step(`steps[6] Private NAT ${vars.pnat} 삭제`, async () => {
+      await deletePrivateNat(page);
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
     });
   });
 });

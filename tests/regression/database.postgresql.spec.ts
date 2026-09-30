@@ -14,4 +14,5 @@ defineDbaasSpec({
     { label: 'Database 사용자명', value: 'qauser' },
     { label: 'Database Port번호', value: '5432' },
   ],
+  replica: true, // 2026-09-30: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4])
 });

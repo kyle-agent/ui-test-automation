@@ -1,0 +1,81 @@
+{
+  "spec": "networking.load-balancer",
+  "started": "2026-09-30T08:55:03.675Z",
+  "ended": "2026-09-30T09:17:16.289Z",
+  "seconds": 1333,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.load-balancer",
+    "run_id": "0930-1755-18ce",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener → Public NAT IP 연결·해제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1291.9,
+      "annotations": {
+        "scenario": "networking.load-balancer",
+        "run_id": "0930-1755-18ce",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Load Balancer 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] VPC · Subnet 준비",
+          "status": "pass",
+          "seconds": 325
+        },
+        {
+          "title": "steps[2] Load Balancer lb-0930-1755-18ce 생성",
+          "status": "pass",
+          "seconds": 110.1
+        },
+        {
+          "title": "steps[3] LB 헬스 체크 lbhc-0930-1755-18ce 생성",
+          "status": "pass",
+          "seconds": 32.7
+        },
+        {
+          "title": "steps[4] LB 서버 그룹 lbsg-0930-1755-18ce 생성",
+          "status": "pass",
+          "seconds": 38.6
+        },
+        {
+          "title": "steps[5] Listener lbls-0930-1755-18ce 생성 (TCP 80)",
+          "status": "pass",
+          "seconds": 50.7
+        },
+        {
+          "title": "steps[6] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 68.4
+        },
+        {
+          "title": "steps[7] Public NAT IP 123.41.34.112 연결",
+          "status": "pass",
+          "seconds": 33.4
+        },
+        {
+          "title": "steps[8] Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 22.5
+        }
+      ]
+    }
+  ]
+}

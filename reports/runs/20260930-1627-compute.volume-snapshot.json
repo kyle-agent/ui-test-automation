@@ -1,0 +1,56 @@
+{
+  "spec": "compute.volume-snapshot",
+  "started": "2026-09-30T07:27:41.547Z",
+  "ended": "2026-09-30T07:30:31.777Z",
+  "seconds": 170,
+  "status": "fail",
+  "class": "environment",
+  "annotations": {
+    "scenario": "compute.volume-snapshot",
+    "run_id": "0930-1628-ed71",
+    "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Block Storage 볼륨 스냅샷 생성·복구·삭제",
+      "status": "failed",
+      "seconds": 144.3,
+      "annotations": {
+        "scenario": "compute.volume-snapshot",
+        "run_id": "0930-1628-ed71",
+        "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Block Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.6
+        },
+        {
+          "title": "steps[1] snap-0930-1628-ed71 생성",
+          "status": "fail",
+          "seconds": 137.3
+        }
+      ],
+      "error": "Error: page.goto: Target page, context or browser has been closed",
+      "attachments": [
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: page.goto: Target page, context or browser has been closed",
+  "attachments": [
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip"
+  ]
+}

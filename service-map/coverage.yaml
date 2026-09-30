@@ -89,10 +89,10 @@ resources:
     service: "Global CDN"
     category: "Networking"
     route: /cdn/cdn/list
-    level: 1
-    specs: [smoke.global-cdn]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.global-cdn, networking.cdn]
+    last_pass: "2026-09-30"
+    note: "원본 example.com(HTTP 80) 생성 → 배포(설정 버전 Pending ≈6분) → 중지(Stopping ≈15분) → 서비스 해지. PASS 25분"
   - key: certificate
     service: "Certificate Manager"
     category: "Security"
@@ -139,8 +139,8 @@ resources:
     route: /dns/hosted-zone/list
     level: 4
     specs: [smoke.dns, networking.dns-hosted-zone]
-    last_pass: "2026-09-23"
-    note: "Private DNS 위에 Private 용도 .com 존 생성(사용 가능 여부 조회 후 생성 활성, 즉시 Active) → 행 삭제. Public 존·실제 도메인은 미구현"
+    last_pass: "2026-09-30"
+    note: "Private DNS 위에 Private 용도 .com 존 생성(사용 가능 여부 조회 후 생성 활성, 즉시 Active) → 레코드 탭 A 레코드 www → 192.0.2.10 추가·삭제(L3, 2026-09-30) → 행 삭제. Public 존·실제 도메인은 미구현"
   - key: private-dns
     service: "DNS"
     category: "Networking"
@@ -179,8 +179,8 @@ resources:
     route: /filestorage/filestorage/list
     level: 3
     specs: [smoke.file-storage, storage.file-storage, storage.file-storage-snapshot]
-    last_pass: "2026-09-29"
-    note: "NFS·Single-AZ·HDD 볼륨 생성(이름 뒤에 6자리 UUID 가 붙는다) → 행 선택·서비스 해지. 용량 과금이라 짧게. 상세 스냅샷 생성(자동 이름)·삭제 (storage.file-storage-snapshot, 2026-09-29)"
+    last_pass: "2026-09-30"
+    note: "NFS·Single-AZ·HDD 볼륨 생성(이름 뒤에 6자리 UUID 가 붙는다) → 행 선택·서비스 해지. 용량 과금이라 짧게. 상세 스냅샷 생성(자동 이름)·삭제 (storage.file-storage-snapshot, 2026-09-29) + 스냅샷 스케줄 켜기·끄기(2026-09-30). 복제는 kr-east1 리전간이라 미구현"
   - key: firewall
     service: "Firewall"
     category: "Networking"
@@ -225,10 +225,10 @@ resources:
     service: "GSLB"
     category: "Networking"
     route: /gslb/gslb/list
-    level: 1
-    specs: [smoke.gslb]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.gslb, networking.gslb]
+    last_pass: "2026-09-30"
+    note: "연결 대상 192.0.2.10(Weight 필수) · ICMP 헬스 체크 · Round Robin 생성 → 상세 Active → 행 서비스 해지. PASS 2분"
   - key: gslb-rrc
     service: "GSLB"
     category: "Networking"
@@ -329,10 +329,10 @@ resources:
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer/list
-    level: 2
+    level: 3
     specs: [smoke.load-balancer, networking.load-balancer]
     last_pass: "2026-09-30"
-    note: "LB 생성·삭제(VPC→Subnet→LB→헬스 체크→서버 그룹→Listener). 2026-09-30 PASS 16분"
+    note: "LB 생성·삭제(VPC→Subnet→LB→헬스 체크→서버 그룹→Listener) + Public NAT IP 설정·해제(L3, IGW·Public IP 필요). PASS 22분 (2026-09-30)"
   - key: mariadb
     service: "MariaDB(DBaaS)"
     category: "Database"
@@ -364,7 +364,7 @@ resources:
     level: 4
     specs: [smoke.mysql-dbaas, database.mysql]
     last_pass: "2026-09-28"
-    note: "PostgreSQL 과 같은 폼. DATA 8GB 배수. 공유 VPC 병렬 PASS 16.2분"
+    note: "PostgreSQL 과 같은 폼. DATA 8GB 배수. 공유 VPC 병렬 PASS 16.2분. 2026-09-30: 읽기 복제본 추가·해지 단계(steps[3]·[4]) 동작 확인 — 실행은 정리 중 SSO 만료로 FAIL 기록"
   - key: bucket@object-storage
     service: "Object Storage"
     category: "Storage"
@@ -395,8 +395,8 @@ resources:
     route: /postgresql/postgresql/list
     level: 4
     specs: [smoke.postgresql-dbaas, database.postgresql]
-    last_pass: "2026-09-28"
-    note: "VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, 백업·Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지"
+    last_pass: "2026-09-30"
+    note: "2026-09-30: 읽기 복제본 추가(상세 더보기 Replica 구성, Running ≈10분)·해지 (steps[3]·[4], 백업은 켠 채 생성 — 꺼져 있으면 Replica 요청 500). VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지"
   - key: resource-group
     service: "Resource Groups"
     category: "Management"
@@ -491,16 +491,16 @@ resources:
     route: /virtualserver/block-storage/list
     level: 3
     specs: [compute.vm-volume, compute.volume-snapshot]
-    last_pass: "2026-09-29"
-    note: "서버에 연결/분리. 서버 없이 스냅샷 생성·복구(Reverting→Available)·삭제 (compute.volume-snapshot, 2026-09-29)"
+    last_pass: "2026-09-30"
+    note: "서버에 연결/분리. 서버 없이 스냅샷 생성·복구(Reverting→Available)·삭제 (compute.volume-snapshot, 2026-09-29). 볼륨 이전 신청→Awaiting Transfer→취소 (2026-09-30, 받기는 다른 Account 필요)"
   - key: image@virtual-server
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/image/list
-    level: 1
-    specs: [smoke.virtual-server]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.virtual-server, compute.vm-stack]
+    last_pass: "2026-09-30"
+    note: "서버 상세 Image 생성(Queued→Active ≈2분) → 상세 Visibility Private→Shared 수정(L3) → Image 삭제 (compute.vm-stack steps[6]). 다른 Account 공유(멤버)는 대상 Account 가 없어, 공유용 Image 생성은 Snapshot-Based 이미지만 가능해 제외. Image 목록의 직접 생성은 Object Storage qcow2 URL 필요"
   - key: keypair@virtual-server
     service: "Virtual Server"
     category: "Compute"
@@ -531,8 +531,8 @@ resources:
     route: /virtualserver/virtualserver/list
     level: 4
     specs: [compute.vm-stack, compute.vm-volume, compute.vm-stack-net]
-    last_pass: "2026-09-28"
-    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28)"
+    last_pass: "2026-09-30"
+    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28). 2026-09-30: 네트워크 포트 추가·삭제, Dump 생성, 커스텀 Image (compute.vm-stack steps[6~8])"
   - key: internet-gateway
     service: "VPC"
     category: "Networking"
@@ -555,32 +555,32 @@ resources:
     route: /vpc/port/list
     level: 4
     specs: [smoke.vpc, networking.vpc-port]
-    last_pass: "2026-09-23"
-    note: "VPC → Subnet 위에서 자동 할당 IP 로 생성(상태 Down, 서버 미연결) → 행 선택·상단 삭제. 무과금"
+    last_pass: "2026-09-30"
+    note: "VPC → Subnet 위 Port(자동 할당 IP) → Subnet Virtual IP 예약 → VIP 에 Port 연결 → VIP Public NAT IP(IGW 필요) 연결·해제 → 연결 해제 → VIP 반납 → 역순. PASS 15.5분 (2026-09-30)"
   - key: private-nat
     service: "VPC"
     category: "Networking"
     route: /vpc/private-nat/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.vpc, networking.direct-connect]
+    last_pass: "2026-09-30"
+    note: "networking.direct-connect 체인: 이 spec 의 Direct Connect 를 연결 자원으로 Private NAT(192.168.100.0/24) 생성·삭제. PASS 6.5분"
   - key: privatelink-endpoint
     service: "VPC"
     category: "Networking"
     route: /vpc/privatelink-endpoint/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.vpc, networking.privatelink-service]
+    last_pass: "2026-09-30"
+    note: "기타 PrivateLink 서비스 + 같은 계정 Service ID 로 생성 → Requesting → 승인 뒤 Active → 삭제 (networking.privatelink-service)"
   - key: privatelink-service
     service: "VPC"
     category: "Networking"
     route: /vpc/privatelink-service/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.vpc, networking.privatelink-service]
+    last_pass: "2026-09-30"
+    note: "IP 연결·수동 승인 Service → 같은 계정 Endpoint 요청 → 연결 관리 탭에서 승인(L3) → 역순. PASS 14분"
   - key: publicip
     service: "VPC"
     category: "Networking"
@@ -604,7 +604,7 @@ resources:
     level: 3
     specs: [smoke.vpc, networking.transit-gateway]
     last_pass: "2026-09-30"
-    note: "TGW 생성 → VPC 연결 추가·해제(L3) → 삭제. PASS 10분"
+    note: "TGW 생성 → VPC 연결 추가(L3) → 규칙(VPC→TGW 목적지 192.168.30.0/24) 추가·삭제 → 연결 해제 → 삭제. 규칙이 남아 있으면 연결 해제가 조용히 무시된다. PASS 11.7분 (2026-09-30)"
   - key: vpc-endpoint
     service: "VPC"
     category: "Networking"
@@ -620,7 +620,7 @@ resources:
     level: 4
     specs: [smoke.vpc, networking.vpc-peering]
     last_pass: "2026-09-23"
-    note: "VPC 2개 → 동일 Account Peering(승인 불필요, Creating → Active ≈1분) → 상세 VPC Peering 삭제 → VPC 해지(직후 요청은 무시되므로 재시도)"
+    note: "VPC 2개 → 동일 Account Peering(승인 불필요, Creating → Active ≈1분) → 상세 VPC Peering 삭제 → VPC 해지(직후 요청은 무시되므로 재시도). 2026-09-30 규칙 탭 추가·삭제 단계 추가 — 본 단계 통과, 정리 중 SSO 만료로 전체 PASS 는 재확인 필요. 규칙이 남아 있으면 Peering 삭제가 조용히 무시된다"
   - key: vpc
     service: "VPC"
     category: "Networking"
@@ -651,8 +651,8 @@ resources:
     route: /apigateway/api
     level: 3
     specs: [smoke.api-gateway, application-service.api-gateway]
-    last_pass: "2026-09-29"
-    note: "Region API(Creating ≈4분) → 리소스 /items → GET 메서드(HTTP) → 새 스테이지 배포(L3) → 목록 행 '서비스 해지'(스테이지·리소스 함께 삭제)"
+    last_pass: "2026-09-30"
+    note: "Region API(Creating ≈4분) → 리소스 /items → GET 메서드(HTTP) → 새 스테이지 배포(L3) → JWT 인증·접근 제어(스테이지 연결)·사용량 정책+API Key 생성·삭제(L3, 2026-09-30) → 목록 행 '서비스 해지'(스테이지·리소스 함께 삭제). PASS 9분"
   - key: connection
     service: "Cloud Fabric Connect"
     category: "Networking"
@@ -874,9 +874,9 @@ resources:
     category: "Compute"
     route: /scf/cloudfunctions
     level: 3
-    specs: [smoke.cloud-functions, compute.cloud-function]
-    last_pass: "2026-09-29"
-    note: "새로 작성(Node.js 24 기본) 생성 → 약 1분 뒤 Ready → 상세 Cronjob 트리거(매분) 추가 → 로그 탭에서 크론 호출 기동 로그 확인(L3) → 트리거 삭제 → 해지. 호출 과금"
+    specs: [smoke.cloud-functions, compute.cloud-function, application-service.api-gateway]
+    last_pass: "2026-09-30"
+    note: "새로 작성(Node.js 24 기본) 생성 → 약 1분 뒤 Ready → 상세 Cronjob 트리거(매분) 추가 → 로그 탭에서 크론 호출 기동 로그 확인(L3) → 트리거 삭제 → 해지. 호출 과금. API Gateway 트리거(API·스테이지 선택 → 메서드 7종 트리거)는 application-service.api-gateway steps[8] (2026-09-30)"
   - key: container-registry
     service: "Container Registry"
     category: "Container"

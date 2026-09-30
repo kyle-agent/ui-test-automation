@@ -55,4 +55,7 @@ export const SUITE_ORDER: readonly string[] = [
   'networking.vpc-endpoint', // VPC → VPC Endpoint 유형 Subnet → Endpoint(Object Storage) → 역순
   'networking.direct-connect', // VPC → Direct Connect → 규칙 추가·삭제(L3) → 해지. 시간 과금이라 즉시 해지
   'data-analytics.event-streams', // VPC(공유 가능) → Event Streams 클러스터(Broker 1, 최소 사양) → 해지
+  'networking.cdn', // Global CDN(원본 example.com) 생성 → 해지
+  'networking.gslb', // GSLB(연결 대상 192.0.2.10, Round Robin) 생성 → 해지
+  'networking.privatelink-service', // 에이전트 B 2차: VPC → Subnet → PrivateLink Service → 같은 계정 Endpoint 요청·승인(L3) → 역순
 ];

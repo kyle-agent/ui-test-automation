@@ -1,0 +1,33 @@
+id: networking.gslb
+title: GSLB 생성 후 해지
+service: GSLB
+category: Networking
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-09-30 프로브, recordings/probe/gslb-gslb-list.md): 목록 #/gslb/gslb/list, 버튼 "서비스 생성" / 상단 "서비스 해지"(행 선택 후).
+# 폼 #/gslb/gslb/request: 용도 Public(고정), "도메인명"(소문자·숫자 4~40자, + .gslb.e.samsungsdscloud.com), "연결 대상 추가"(IP + 위치 KR-WEST-1 + 설명 → "추가", 최대 8),
+# Health Check(ICMP 기본 · TCP · HTTP · HTTPS · 사용 안함) + Interval/Timeout/Probe Timeout(초), 알고리즘(Ratio 기본 · Round Robin).
+# 연결 대상 IP 는 문서용 대역 192.0.2.10 (API 자동화와 같음). API: creategslb 202, CREATING → ACTIVE 10초 안.
+steps:
+  - goal: "GSLB 목록으로 이동한다"
+    goto: "#/gslb/gslb/list"
+    expect:
+      url: "#/gslb/gslb/list"
+
+  - goal: "GSLB {{name}} 을 연결 대상 192.0.2.10, Round Robin 으로 생성한다"
+    vars:
+      name: "gslb{{run_id_compact}}"
+    expect:
+      url: "#/gslb/gslb/list"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "GSLB {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

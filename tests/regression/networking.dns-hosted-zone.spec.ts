@@ -1,5 +1,6 @@
 // 직접 작성 (2026-09-23). 시나리오: scenarios/networking/dns-hosted-zone.yaml.
-// Private DNS(Active) → Hosted Zone(Private, .com) 생성 → 행 삭제 → Private DNS 상세 서비스 해지. 콘솔 사실은 yaml 머리 주석.
+// Private DNS(Active) → Hosted Zone(Private, .com) 생성 → 레코드 A 추가·삭제(L3) → 행 삭제 → Private DNS 상세 서비스 해지. 콘솔 사실은 yaml 머리 주석.
+import { expect } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
@@ -8,11 +9,14 @@ import {
   confirmModal,
   dismissModalIfAny,
   fillField,
+  fillStable,
   openCreateForm,
   pickOption,
   row,
+  selectRow,
   submitForm,
   topButton,
+  visibleModal,
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
@@ -21,6 +25,8 @@ const scenario = loadScenario('scenarios/networking/dns-hosted-zone.yaml');
 const CONSOLE_CHECKS = process.env.CONSOLE_BASE_PATH === undefined;
 const vars = scenarioVars(scenario);
 const log = (line: string) => console.log(line);
+const RECORD = 'www';
+const RECORD_IP = '192.0.2.10'; // 문서용 대역 (RFC 5737)
 const ctx = (step: number) => ({
   consoleTitle: CONSOLE_CHECKS,
   scenario: scenario.id,
@@ -138,6 +144,41 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         `  Hosted Zone 행: ${(await row(page, vars.zone!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`,
       );
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    // L3 (2026-09-30, 에이전트 A): 상세 "레코드 (n)" 탭 → "레코드 추가" 모달(유형 A 기본 · 이름 · 값 + "추가" · TTL) → 확인 → 행 확인 → 행 선택 "삭제"
+    await test.step(`steps[3] 레코드 ${RECORD}.${vars.zone} A ${RECORD_IP} 추가`, async () => {
+      await gotoRoute(page, ROUTES.hz);
+      await row(page, vars.zone!).getByText(vars.zone!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByText(/^레코드 \(\d+\)$/).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByRole('button', { name: '레코드 추가', exact: true }).first().click();
+      const modal = visibleModal(page);
+      await modal.getByText('레코드 타입은').first().waitFor({ timeout: 10_000 });
+      const inputs = modal.locator('input:visible:not([formid=ttlInput])');
+      await fillStable(page, inputs.nth(0), RECORD, '레코드 이름');
+      await fillStable(page, inputs.nth(1), RECORD_IP, '레코드 값');
+      await modal.getByRole('button', { name: '추가', exact: true }).click();
+      await expect(modal, '값 목록 1개').toContainText(/1\s*\/\s*8/, { timeout: 10_000 });
+      await fillStable(page, modal.locator('input[formid=ttlInput]:visible'), '300', 'TTL');
+      await modal.getByRole('button', { name: '확인', exact: true }).click();
+      // 이어지는 "…추가하시겠습니까?" 확인 모달이 있으면 누른다
+      if (await visibleModal(page).getByText(/하시겠습니까/).first().waitFor({ timeout: 5_000 }).then(() => true, () => false))
+        await confirmModal(page, /하시겠습니까/);
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      const recordRoute = '#' + page.url().split('#')[1]!;
+      await waitForRow(page, recordRoute, RECORD_IP, { timeoutMs: 180_000, intervalMs: 10_000, log });
+      log(`  레코드 행: ${(await row(page, RECORD_IP).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step(`steps[4] 레코드 ${RECORD} 삭제`, async () => {
+      const recordRoute = '#' + page.url().split('#')[1]!;
+      await selectRow(page, RECORD_IP);
+      await topButton(page, '삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await waitForRow(page, recordRoute, RECORD_IP, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
   });
 });

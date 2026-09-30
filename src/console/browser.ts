@@ -122,22 +122,45 @@ export async function relaunchLoginBrowser(
   return false;
 }
 
+/**
+ * 살아 있는 로그인 브라우저를 강제로 죽이고 다시 띄워도 되는가. 기본은 **안 된다**:
+ * 병렬 스위트·여러 에이전트가 같은 브라우저를 나눠 쓰는 동안 한 프로세스의 연결 시간 초과(부하)나 내부 탭(다운로드) 때문에
+ * 강제 재기동하면 다른 spec 의 탭이 전부 닫힌다(2026-09-30 16:26 실측, 09-29 13:50·09-30 11:01 의 "탭 동시 소멸" 도 같은 경로로 추정).
+ * 혼자 돌릴 때만 PW_FORCE_RELAUNCH=1 로 켠다. 브라우저가 실제로 죽었을 때(CDP 무응답) 다시 띄우는 것은 그대로 한다.
+ */
+const forceRelaunchAllowed = () => process.env.PW_FORCE_RELAUNCH === '1';
+
 export async function connectLiveBrowser(log: (line: string) => void = console.log): Promise<Browser> {
-  // 내부 페이지 타깃이 있으면 connectOverCDP 가 거기에 붙으려다 타임아웃된다. /json/close 로는 닫히지 않으므로 재기동한다.
+  // 내부 페이지 타깃이 있으면 connectOverCDP 가 거기에 붙으려다 타임아웃된다. /json/close 로는 닫히지 않는다.
   if (process.env.PW_AUTO_RELAUNCH !== '0' && (await cdpAlive())) {
     const internal = await internalTargets();
     if (internal.length) {
-      log(
-        `브라우저 내부 페이지 타깃(${internal.join(', ')}) 때문에 연결이 막히므로 로그인 브라우저를 재기동합니다.`,
-      );
+      if (!forceRelaunchAllowed())
+        throw connectError(
+          new Error(
+            `브라우저 내부 페이지 탭(${internal.join(', ')})이 열려 있어 연결할 수 없습니다. 그 탭을 손으로 닫아 주세요 ` +
+              '(다른 실행이 같은 브라우저를 쓰고 있을 수 있어 자동 재기동하지 않습니다. 혼자 돌릴 때는 PW_FORCE_RELAUNCH=1).',
+          ),
+        );
+      log(`브라우저 내부 페이지 타깃(${internal.join(', ')}) 때문에 연결이 막히므로 로그인 브라우저를 재기동합니다.`);
       if (!(await relaunchLoginBrowser(log, { force: true }))) throw connectError(new Error('재기동 실패'));
     }
   }
   try {
     return await chromium.connectOverCDP(CDP_URL, { timeout: 20_000 });
   } catch (err) {
-    // 죽었거나(ECONNREFUSED) 붙지 못하는 상태(타임아웃). 둘 다 강제 종료 후 재기동으로 푼다.
-    if (!(await relaunchLoginBrowser(log, { force: true }))) throw connectError(err);
+    // 죽었으면(ECONNREFUSED) 다시 띄운다. 살아 있는데 붙지 못한 것(부하 중 타임아웃)이면 강제 재기동하지 않고 한 번 더 기다려 붙는다.
+    if (await cdpAlive()) {
+      if (!forceRelaunchAllowed()) {
+        log('CDP 연결이 시간 안에 안 됐지만 브라우저는 살아 있어 재기동하지 않고 다시 붙습니다.');
+        try {
+          return await chromium.connectOverCDP(CDP_URL, { timeout: 60_000 });
+        } catch (err2) {
+          throw connectError(err2);
+        }
+      }
+    }
+    if (!(await relaunchLoginBrowser(log, { force: forceRelaunchAllowed() }))) throw connectError(err);
     try {
       return await chromium.connectOverCDP(CDP_URL, { timeout: 20_000 });
     } catch (err2) {

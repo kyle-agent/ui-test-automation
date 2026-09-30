@@ -15,7 +15,7 @@ export const DEFAULT_PLAN: SpecPlan = { vpc: 0, minutes: 3 };
 
 export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpc.create-delete': { vpc: 1, minutes: 1 },
-  'compute.vm-stack': { vpc: 1, minutes: 13 },
+  'compute.vm-stack': { vpc: 1, minutes: 18 }, // 09-30 Image·포트·Dump 단계 추가 (에이전트 C)
   'compute.vm-volume': { vpc: 1, minutes: 16.5 },
   'compute.vm-stack-net': { vpc: 1, minutes: 14.5 },
   'compute.server-group': { vpc: 0, minutes: 1.5 },
@@ -24,17 +24,17 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'management.resource-group': { vpc: 0, minutes: 1 },
   'iam.user-group': { vpc: 0, minutes: 1 },
   'compute.launch-configuration': { vpc: 0, minutes: 1.5 },
-  'networking.vpc-port': { vpc: 1, minutes: 11 },
+  'networking.vpc-port': { vpc: 1, minutes: 15.5 }, // VIP·Port 연결·Public NAT 단계 포함(2026-09-30, IGW·Public IP 도 만든다)
   'networking.private-dns': { vpc: 0, minutes: 7 },
   'storage.file-storage': { vpc: 0, minutes: 2 },
-  'networking.dns-hosted-zone': { vpc: 0, minutes: 7 },
+  'networking.dns-hosted-zone': { vpc: 0, minutes: 8.5 }, // 레코드 추가·삭제 포함(2026-09-30)
   'security.security-group-rule': { vpc: 0, minutes: 2 },
   'networking.nat-gateway': { vpc: 1, minutes: 11.5 },
   'compute.auto-scaling-group': { vpc: 1, minutes: 15 },
-  'networking.vpc-peering': { vpc: 2, minutes: 12 },
+  'networking.vpc-peering': { vpc: 2, minutes: 14 }, // 규칙 단계 포함(2026-09-30), VPC 2개
   'container.ske-cluster': { vpc: 1, minutes: 30 }, // 노드 풀 단계 포함(2026-09-30)
-  'database.postgresql': { vpc: 0, shared: true, minutes: 17 },
-  'database.mysql': { vpc: 0, shared: true, minutes: 16 },
+  'database.postgresql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분)
+  'database.mysql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C)
   'database.mariadb': { vpc: 0, shared: true, minutes: 16 },
   'database.epas': { vpc: 0, shared: true, minutes: 16 },
   'database.cachestore': { vpc: 0, shared: true, minutes: 15.5 },
@@ -43,18 +43,23 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'container.container-registry': { vpc: 0, minutes: 6.5 },
   'iam.role': { vpc: 0, minutes: 4.5 },
   // 에이전트 B(네트워킹): 모두 자기 VPC 1개. load-balancer 는 본 단계 실측 11분, 나머지는 콘솔 프로브 시간으로 추정(아직 SUITE_ORDER 밖)
-  'networking.load-balancer': { vpc: 1, minutes: 12 },
+  'networking.load-balancer': { vpc: 1, minutes: 22 }, // Public NAT IP 단계(IGW·Public IP) 포함 실측 22분(2026-09-30)
   'networking.firewall': { vpc: 1, minutes: 5 },
-  'networking.transit-gateway': { vpc: 1, minutes: 10 },
+  'networking.transit-gateway': { vpc: 1, minutes: 12 }, // 규칙 단계 포함(2026-09-30)
   'networking.vpn': { vpc: 1, minutes: 8 },
   'networking.vpc-endpoint': { vpc: 1, minutes: 9 },
-  'networking.direct-connect': { vpc: 1, minutes: 5 },
+  'networking.direct-connect': { vpc: 1, minutes: 6.5 }, // Private NAT 단계 포함(2026-09-30)
   'data-analytics.event-streams': { vpc: 0, shared: true, minutes: 20 }, // defineDbaasSpec → 공유 VPC 채택 (추정)
-  'application-service.api-gateway': { vpc: 0, minutes: 6 }, // 에이전트 A: API Creating ≈4분. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
+  'application-service.api-gateway': { vpc: 0, minutes: 9.5 }, // 에이전트 A: API Creating ≈4분, 2026-09-30 JWT·접근 제어·사용량 정책·API Key·함수 트리거 포함. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
   // 에이전트 C (2026-09-29 단독 통과): Cronjob 실행 확인·스냅샷 L3
   'compute.cloud-function': { vpc: 0, minutes: 4 },
-  'storage.file-storage-snapshot': { vpc: 0, minutes: 2.5 },
+  'storage.file-storage-snapshot': { vpc: 0, minutes: 3.5 }, // 스냅샷 스케줄 포함(2026-09-30)
   'compute.volume-snapshot': { vpc: 0, minutes: 5 },
+  // 에이전트 B 2차 (2026-09-30): VPC 1개(+Subnet)
+  'networking.privatelink-service': { vpc: 1, minutes: 14 },
+  // 에이전트 A 2차 (2026-09-30): VPC 없음. CDN 은 배포·중지 대기로 ≈25분
+  'networking.cdn': { vpc: 0, minutes: 25 },
+  'networking.gslb': { vpc: 0, minutes: 2 },
 };
 
 export function planFor(spec: string): SpecPlan {

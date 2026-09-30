@@ -1,0 +1,68 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-09-30T07:31:40.200Z",
+  "ended": "2026-09-30T07:49:13.197Z",
+  "seconds": 1053,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "0930-1632-73f4",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 935.7,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "0930-1632-73f4",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9.8
+        },
+        {
+          "title": "steps[1] Private DNS pdns-0930-1632-73f4 생성",
+          "status": "fail",
+          "seconds": 918.1
+        }
+      ],
+      "error": "Error: pdns-0930-1632-73f4 상태 /Active/i 대기 900초 초과. 마지막: (행 없음)",
+      "attachments": [
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: pdns-0930-1632-73f4 상태 /Active/i 대기 900초 초과. 마지막: (행 없음)",
+  "attachments": [
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

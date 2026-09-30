@@ -1,0 +1,71 @@
+{
+  "spec": "networking.direct-connect",
+  "started": "2026-09-30T08:48:15.713Z",
+  "ended": "2026-09-30T08:54:40.760Z",
+  "seconds": 385,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.direct-connect",
+    "run_id": "0930-1748-ebeb",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → Private NAT 생성·삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 348.9,
+      "annotations": {
+        "scenario": "networking.direct-connect",
+        "run_id": "0930-1748-ebeb",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Direct Connect 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.4
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1748-ebeb 생성",
+          "status": "pass",
+          "seconds": 30.2
+        },
+        {
+          "title": "steps[2] Direct Connect dc-0930-1748-ebeb 생성",
+          "status": "pass",
+          "seconds": 44.1
+        },
+        {
+          "title": "steps[3] 규칙 추가 (원격지 11.11.11.0/24)",
+          "status": "pass",
+          "seconds": 47.6
+        },
+        {
+          "title": "steps[4] 규칙 삭제",
+          "status": "pass",
+          "seconds": 51.4
+        },
+        {
+          "title": "steps[5] Private NAT pnat-0930-1748-ebeb 생성 (연결 자원 dc-0930-1748-ebeb)",
+          "status": "pass",
+          "seconds": 70.4
+        },
+        {
+          "title": "steps[6] Private NAT pnat-0930-1748-ebeb 삭제",
+          "status": "pass",
+          "seconds": 48
+        }
+      ]
+    }
+  ]
+}
