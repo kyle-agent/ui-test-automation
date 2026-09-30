@@ -220,7 +220,9 @@ export async function submitForm(page: Page, button: string = '생성'): Promise
 }
 
 export function row(page: Page, name: string): Locator {
-  return page.locator('tr.scp-body-row').filter({ hasText: name });
+  // :visible — 콘솔은 앞서 연 화면의 표를 숨긴 채 DOM 에 남겨 둔다. 거기 같은 이름(예: IGW 행의 VPC명)이 있으면
+  // 숨은 행이 먼저 잡혀 버튼 클릭이 30초 시간 초과로 끝났다(2026-09-30 정리 도구 IGW·VPC, firewall spec)
+  return page.locator('tr.scp-body-row:visible').filter({ hasText: name });
 }
 
 export async function selectRow(page: Page, name: string): Promise<void> {
@@ -329,6 +331,14 @@ export async function terminateVpc(
     if ((await row(page, name).count()) === 0) break;
     await row(page, name).getByRole('button', { name: '서비스 해지', exact: true }).click();
     await confirmModal(page, /해지하시겠습니까/);
+    // 딸린 자원(Internet Gateway 등)이 남아 있으면 콘솔이 해지를 거절하고 그 자원을 링크로 보여 주는 안내를 띄운다(사용자 확인 2026-09-30)
+    // → 기다리며 재시도하지 말고 안내 문구를 그대로 오류로 올린다. 호출부가 그 자원을 먼저 지워야 한다.
+    const refusal = visibleModal(page).filter({ hasText: /Internet Gateway|삭제 후|먼저|해지할 수 없|연결된/ });
+    if (await refusal.waitFor({ timeout: 4_000 }).then(() => true, () => false)) {
+      const text = (await refusal.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+      await refusal.getByRole('button').last().click({ timeout: 5_000 }).catch(() => undefined);
+      throw new Error(`VPC ${name} 해지 거절: ${text.slice(0, 300)}`);
+    }
     try {
       await waitForRow(page, route, name, { gone: true, timeoutMs: 60_000, intervalMs: 15_000, log });
       break;

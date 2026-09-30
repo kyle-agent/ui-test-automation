@@ -384,3 +384,21 @@
     → `waitForRow` 가 소멸 대기 중 목록을 한 번이라도 새로 고쳤으면 끝날 때 page.reload 1회. 재실행 PASS.
   - file-storage: 생성 확인 모달이 10초 안에 안 뜸, container-registry: 생성 후 600초 동안 목록에 행 없음 → 둘 다 단독 재실행 PASS(부하성 간헐 실패로 본다).
 - 쓰는 법: `npm run test:suite` (기본 탭 5) → 실패한 것만 `npm run test:suite -- --only a,b --max 3` → `npm run results`.
+
+### 9.16 API 자동화 대비 화면 자동화 확장 (2026-09-29 저녁 ~ 09-30 아침)
+
+- 사용자 결정: API 자동화(kyle-agent/api-test-automation)에서 생성·삭제가 검증된 리소스는 모두 화면 자동화도 한다. 라이선스·자원 부재로 API 도 접근성만 보는 서비스는 제외.
+  대응표 `docs/api-ui-parity.md`. 에이전트 3개(관리·보안 / VPC 네트워킹 / 동작·무거운 서비스)로 나눠 진행.
+- 새로 통과: KMS · Secrets Manager(해지 7일 예약, 즉시 삭제 불가) · IAM 정책(그룹 연결 L3) · ServiceWatch 대시보드·로그 그룹·이벤트 규칙·알람 · Network Logging · Budget ·
+  API Gateway(스테이지 배포 L3) · MessageHub 도메인·이메일 · File Storage/볼륨 스냅샷 · Cloud Functions Cronjob 트리거 · ASG 정책·스케줄 ·
+  Load Balancer · Transit Gateway · VPN · VPC Endpoint · Direct Connect · Event Streams(공유 VPC) · Firewall.
+- 남은 것: SKE 노드 풀(폼 사실만 확보), Backup(Agent 방식, VM + Agent 체인 필요). 건너뜀: MessageHub Phone(SMS), ASG 알림(실사용자 메일), LB 멤버(실 VM).
+- 커버리지: L2+ 26 → 47/112 (42%), L3+ 21 → 30/112 (27%).
+- 09-29 20:55 SSO 세션 만료로 에이전트 전원 중단 → 재로그인 후 남은 리소스(SKE 클러스터·노드 풀 포함 8개) 정리.
+- 이번에 고친 공통 문제:
+  - `row()` 를 `tr.scp-body-row:visible` 로: 콘솔이 앞 화면의 표를 숨긴 채 DOM 에 남겨, 같은 이름(IGW 행의 VPC명 등)이 든 숨은 행이 먼저 잡혀 클릭이 30초 시간 초과.
+  - 방화벽 규칙이 남아 있으면 IGW 삭제가 막힌다 → `clearIgwFirewallRules()` (inventory.ts) 를 정리 도구와 `deleteIgw()` 가 먼저 부른다.
+  - 규칙 추가 직후 방화벽이 동기화 중이면 "규칙 수정" 이 눌려도 화면이 안 바뀐다 → 넘어갈 때까지 다시 연다.
+  - VPC 해지가 딸린 자원 때문에 거절되면 콘솔이 그 자원(IGW 링크 등)을 안내한다(사용자 확인) → `terminateVpc` 가 안내 문구를 오류로 올리고 재시도하지 않는다.
+  - 정리 도구 이름 정규식 버그 2개(NAT `\d` 누락, File Storage 접미사 `_`).
+- SKE "직접 주소 진입 시 홈으로 튕김" 은 결함 아님(메뉴 그룹 이름일 뿐, 실제 화면 9개 정상) — docs/service-facts/container-ske.md.

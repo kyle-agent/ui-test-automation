@@ -49,6 +49,7 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpn': { vpc: 1, minutes: 8 },
   'networking.vpc-endpoint': { vpc: 1, minutes: 9 },
   'networking.direct-connect': { vpc: 1, minutes: 5 },
+  'data-analytics.event-streams': { vpc: 0, shared: true, minutes: 20 }, // defineDbaasSpec → 공유 VPC 채택 (추정)
   'application-service.api-gateway': { vpc: 0, minutes: 6 }, // 에이전트 A: API Creating ≈4분. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
   // 에이전트 C (2026-09-29 단독 통과): Cronjob 실행 확인·스냅샷 L3
   'compute.cloud-function': { vpc: 0, minutes: 4 },

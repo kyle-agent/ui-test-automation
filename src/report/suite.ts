@@ -49,4 +49,10 @@ export const SUITE_ORDER: readonly string[] = [
   'application-service.api-gateway', // API(Region, ≈4분 Creating) → 리소스·GET 메서드 → 스테이지 배포(L3) → 해지. ≈8분
   'application-service.messagehub-domain', // 발신 도메인(example.com 하위) 등록·삭제. 인증 안 함
   'application-service.messagehub-email', // 발신 Email(example.com) 등록 → 가려진 목록 검색·상세 확인 → 삭제. 인증 메일 안 보냄
+  'networking.firewall', // VPC → IGW(Firewall 사용) → 방화벽 규칙 추가·삭제(L3) → 역순
+  'networking.transit-gateway', // TGW → VPC 연결 추가·해제(L3) → 삭제
+  'networking.vpn', // VPC → VPN Gateway → 터널 → 역순. 이름 영문·숫자만
+  'networking.vpc-endpoint', // VPC → VPC Endpoint 유형 Subnet → Endpoint(Object Storage) → 역순
+  'networking.direct-connect', // VPC → Direct Connect → 규칙 추가·삭제(L3) → 해지. 시간 과금이라 즉시 해지
+  'data-analytics.event-streams', // VPC(공유 가능) → Event Streams 클러스터(Broker 1, 최소 사양) → 해지
 ];

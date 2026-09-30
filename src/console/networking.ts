@@ -4,7 +4,7 @@
  */
 import type { Page } from '@playwright/test';
 import { gotoRoute } from './expect';
-import { ROUTES } from './inventory';
+import { clearIgwFirewallRules, ROUTES } from './inventory';
 import { settleConsole } from './overlays';
 import {
   confirmModal,
@@ -51,7 +51,12 @@ export async function createIgw(
 export async function deleteIgw(page: Page, vpc: string, log?: (line: string) => void): Promise<void> {
   await gotoRoute(page, ROUTES.igw);
   if ((await row(page, vpc).count()) === 0) return;
-  await row(page, vpc).getByRole('button', { name: '삭제', exact: true }).click();
+  // 방화벽 규칙이 남아 있으면 IGW 삭제가 막힌다 → 먼저 지운다(없으면 아무것도 안 함)
+  await clearIgwFirewallRules(page, `IGW_${vpc}`, log ?? (() => undefined));
+  await gotoRoute(page, ROUTES.igw);
+  await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+  await settleConsole(page, { appearGraceMs: 800 });
+  await row(page, vpc).first().getByRole('button', { name: '삭제', exact: true }).click();
   await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true });
   await waitForRow(page, ROUTES.igw, vpc, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
 }

@@ -315,7 +315,18 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
       return;
     case 'igw':
-      await row(page, item.name).getByRole('button', { name: '삭제', exact: true }).click();
+      // 방화벽에 규칙이 남아 있으면 IGW 삭제 버튼이 눌리지 않는다(2026-09-30 networking.firewall 잔여물) → 규칙부터 지운다
+      await clearIgwFirewallRules(page, item.name, log);
+      // Firewall 화면을 거친 뒤 해시 이동만 하면 IGW 행의 삭제 버튼 클릭이 30초 동안 걸린다(새 탭에선 정상) → 다시 읽고 보이는 행만
+      await gotoRoute(page, route);
+      await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page
+        .locator('tr.scp-body-row:visible')
+        .filter({ hasText: item.name })
+        .first()
+        .getByRole('button', { name: '삭제', exact: true })
+        .click();
       await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
       return;
@@ -672,4 +683,40 @@ async function deleteLbListeners(page: Page, lbName: string, log: (line: string)
     await confirmModal(page, /삭제하시겠습니까/);
     await waitForRow(page, tab, name, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
   }
+}
+
+/**
+ * IGW 에 딸린 방화벽(FW_<IGW명>)의 규칙을 모두 지운다. 규칙 탭 이름 "규칙 (n)" 이 0 이면 아무것도 하지 않는다.
+ * 흐름은 networking.firewall spec 과 같다: 규칙 탭 → 규칙 수정 → 행 선택 → 삭제("삭제 예정") → 완료 → 확인.
+ */
+export async function clearIgwFirewallRules(page: Page, igwName: string, log: (line: string) => void): Promise<void> {
+  const fwName = `FW_${igwName}`;
+  await gotoRoute(page, '#/firewall/firewall/list');
+  const link = page.locator('tr.scp-body-row:visible').getByText(fwName, { exact: true }).first();
+  if (!(await link.count())) return;
+  await link.click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  const tab = page.getByText(/^규칙 \(\d+\)/).first();
+  const n = Number(((await tab.innerText().catch(() => '규칙 (0)')).match(/\((\d+)\)/) ?? [])[1] ?? 0);
+  if (!n) return;
+  log(`  ${fwName} 규칙 ${n}개 삭제`);
+  await tab.click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  const rulesRoute = '#' + page.url().split('#')[1]!;
+  await page.getByRole('button', { name: '규칙 수정', exact: true }).click();
+  await page.waitForURL(/\/rule\/edit/, { timeout: 30_000 });
+  await settleConsole(page, { appearGraceMs: 1000 });
+  const rows = page.locator('tr.scp-body-row:visible');
+  for (let i = 0; i < (await rows.count()); i++) await rows.nth(i).locator('i.table-select').first().click();
+  await page.getByRole('button', { name: '삭제', exact: true }).first().click();
+  await page.getByRole('button', { name: '완료', exact: true }).last().click();
+  await confirmModal(page, /수정하시겠습니까/);
+  await settleConsole(page, { appearGraceMs: 800 });
+  for (const start = Date.now(); Date.now() - start < 300_000; ) {
+    await gotoRoute(page, rulesRoute);
+    const left = Number(((await page.getByText(/^규칙 \(\d+\)/).first().innerText().catch(() => '')).match(/\((\d+)\)/) ?? [])[1] ?? -1);
+    if (left === 0) return;
+    await page.waitForTimeout(10_000);
+  }
+  throw new Error(`${fwName} 규칙이 5분 안에 지워지지 않았습니다`);
 }

@@ -22,7 +22,8 @@ const ctx = (step: number) => ({
 const FW_ROUTE = '#/firewall/firewall/list';
 const SRC = '192.168.1.1';
 const DST = '10.250.0.10';
-const ruleRow = (page: Page) => page.locator('tr.scp-body-row').filter({ hasText: SRC });
+// :visible — 규칙 수정 화면으로 넘어가도 규칙 탭의 행이 숨은 채 DOM 에 남아 first() 가 그걸 잡았다(2026-09-30 스위트 실패)
+const ruleRow = (page: Page) => page.locator('tr.scp-body-row:visible').filter({ hasText: SRC });
 
 /** Firewall 상세 "규칙" 탭을 열고 그 route 를 돌려준다. */
 async function openRules(page: Page): Promise<string> {
@@ -115,9 +116,17 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     });
     await test.step('steps[3] 규칙 삭제 (규칙 수정 화면)', async () => {
       const rules = await openRules(page);
-      await page.getByRole('button', { name: '규칙 수정', exact: true }).click();
+      // 규칙 추가 직후엔 방화벽이 Syncing 이라 "규칙 수정" 이 눌려도 화면이 안 바뀐다(2026-09-30 재실행 실패) → 넘어갈 때까지 다시 연다(최대 5분)
+      for (let attempt = 1; ; attempt++) {
+        await page.getByRole('button', { name: '규칙 수정', exact: true }).click();
+        const moved = await page.waitForURL(/\/rule\/edit/, { timeout: 20_000 }).then(() => true, () => false);
+        if (moved) break;
+        if (attempt >= 15) throw new Error('"규칙 수정" 화면으로 5분 안에 넘어가지 않았습니다(방화벽 동기화 대기)');
+        log(`  규칙 수정 화면 대기 ${attempt} (방화벽 동기화 중으로 보임)`);
+        await gotoRoute(page, rules);
+      }
       await settleConsole(page, { appearGraceMs: 1000 });
-      await ruleRow(page).first().locator('i.table-select, .scp-select').first().click();
+      await ruleRow(page).first().locator('i.table-select').first().click();
       await page.getByRole('button', { name: '삭제', exact: true }).first().click();
       await expect(ruleRow(page).first(), '변경 사항이 "삭제 예정" 이어야 합니다').toContainText('삭제 예정');
       await submitForm(page, '완료');

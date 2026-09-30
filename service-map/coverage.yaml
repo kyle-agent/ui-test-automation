@@ -129,10 +129,10 @@ resources:
     service: "Direct Connect"
     category: "Networking"
     route: /directconnect/directconnect/list
-    level: 1
-    specs: [smoke.direct-connect]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.direct-connect, networking.direct-connect]
+    last_pass: "2026-09-30"
+    note: "Direct Connect 생성 → 규칙 추가·삭제(L3) → 해지. 시간 과금이라 즉시 해지. PASS 4분"
   - key: hosted-zone
     service: "DNS"
     category: "Networking"
@@ -169,10 +169,10 @@ resources:
     service: "Event Streams"
     category: "Data Analytics"
     route: /eventstreams/eventstreams/list
-    level: 1
-    specs: [smoke.event-streams]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.event-streams, data-analytics.event-streams]
+    last_pass: "2026-09-30"
+    note: "Broker 1·최소 사양, 공유 VPC 위에서 PASS 14분"
   - key: volume@file-storage
     service: "File Storage"
     category: "Storage"
@@ -185,10 +185,10 @@ resources:
     service: "Firewall"
     category: "Networking"
     route: /firewall/firewall/list
-    level: 1
-    specs: [smoke.firewall]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.firewall, networking.firewall]
+    last_pass: "2026-09-30"
+    note: "IGW(Firewall 사용) → 규칙 추가·삭제(L3, 규칙 추가 뒤 동기화 끝나야 수정 가능) → 역순. PASS 4.6분"
   - key: volume@gpu-server
     service: "GPU Server"
     category: "Compute"
@@ -313,26 +313,26 @@ resources:
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer-health-check/list
-    level: 1
-    specs: [smoke.load-balancer]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.load-balancer, networking.load-balancer]
+    last_pass: "2026-09-30"
+    note: "networking.load-balancer 체인에서 생성·삭제"
   - key: lb-server-group
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer-server-group/list
-    level: 1
-    specs: [smoke.load-balancer]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.load-balancer, networking.load-balancer]
+    last_pass: "2026-09-30"
+    note: "networking.load-balancer 체인에서 생성·삭제 (멤버는 실제 VM 필요로 미포함)"
   - key: loadbalancer
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer/list
-    level: 1
-    specs: [smoke.load-balancer]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.load-balancer, networking.load-balancer]
+    last_pass: "2026-09-30"
+    note: "LB 생성·삭제(VPC→Subnet→LB→헬스 체크→서버 그룹→Listener). 2026-09-30 PASS 16분"
   - key: mariadb
     service: "MariaDB(DBaaS)"
     category: "Database"
@@ -601,18 +601,18 @@ resources:
     service: "VPC"
     category: "Networking"
     route: /vpc/transit-gateway/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.vpc, networking.transit-gateway]
+    last_pass: "2026-09-30"
+    note: "TGW 생성 → VPC 연결 추가·해제(L3) → 삭제. PASS 10분"
   - key: vpc-endpoint
     service: "VPC"
     category: "Networking"
     route: /vpc/vpc-endpoint/list
-    level: 1
-    specs: [smoke.vpc]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.vpc, networking.vpc-endpoint]
+    last_pass: "2026-09-30"
+    note: "VPC Endpoint 유형 Subnet → Endpoint(Object Storage) 생성·삭제. PASS 5분"
   - key: vpc-peering
     service: "VPC"
     category: "Networking"
@@ -633,18 +633,18 @@ resources:
     service: "VPN"
     category: "Networking"
     route: /vpn/vpn-tunnel/list
-    level: 1
-    specs: [smoke.vpn]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.vpn, networking.vpn]
+    last_pass: "2026-09-30"
+    note: "상대 장비 없이도 터널 Active. networking.vpn 체인"
   - key: vpn-gateway
     service: "VPN"
     category: "Networking"
     route: /vpn/vpn/list
-    level: 1
-    specs: [smoke.vpn]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.vpn, networking.vpn]
+    last_pass: "2026-09-30"
+    note: "VPN Gateway 생성·삭제(터널 먼저 삭제). PASS 7분"
   - key: api
     service: "API Gateway"
     category: "Application Service"

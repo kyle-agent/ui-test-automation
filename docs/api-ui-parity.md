@@ -28,17 +28,17 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Container | ske nodepools | 프로브·실생성 1회(폼 사실 확보), spec 미작성 — 세션 만료로 중단 | 🔧 |
 | Container | scr container-registries · repositories | container.container-registry · container.repository | ✅ |
 | Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
-| Data Analytics | eventstreams clusters | data-analytics.event-streams 작성, 미실행 | 🔧 |
+| Data Analytics | eventstreams clusters | data-analytics.event-streams (공유 VPC) | ✅ |
 | Networking | vpcs · subnets | networking.vpc.create-delete · 모든 VPC 체인 | ✅ |
 | Networking | internet-gateways · publicips | compute.vm-stack-net · networking.nat-gateway | ✅ |
 | Networking | nat-gateways · vpc-peerings · private-dns · hosted-zones | networking.nat-gateway · vpc-peering · private-dns · dns-hosted-zone | ✅ |
 | Networking | security-groups · security-group-rules · address-groups | compute.vm-stack-net · security.security-group-rule · security.address-group | ✅ |
-| Networking | loadbalancers · lb-server-groups · members · lb-listeners · static-nats | networking.load-balancer (본 단계 통과, 정리 중 세션 만료로 재확인 필요). 멤버는 실제 VM 필요로 미포함 | 🔧 |
-| Networking | firewalls rules | networking.firewall 작성(콘솔 프로브 통과), 미실행 | 🔧 |
-| Networking | transit-gateways · vpc-connections | networking.transit-gateway 작성(프로브 통과), 미실행 | 🔧 |
-| Networking | vpn gateways · tunnels | networking.vpn 작성(프로브 통과), 미실행 | 🔧 |
-| Networking | vpc endpoints | networking.vpc-endpoint 작성(프로브 통과), 미실행 | 🔧 |
-| Networking | direct-connects | networking.direct-connect 작성(프로브 통과, 시간 과금), 미실행 | 🔧 |
+| Networking | loadbalancers · lb-server-groups · members · lb-listeners · static-nats | networking.load-balancer (2026-09-30 PASS). 멤버는 실제 VM 필요로 미포함 | ✅ |
+| Networking | firewalls rules | networking.firewall (규칙 추가·삭제 L3) | ✅ |
+| Networking | transit-gateways · vpc-connections | networking.transit-gateway (VPC 연결 추가·해제 L3) | ✅ |
+| Networking | vpn gateways · tunnels | networking.vpn (게이트웨이 + 터널) | ✅ |
+| Networking | vpc endpoints | networking.vpc-endpoint | ✅ |
+| Networking | direct-connects | networking.direct-connect (규칙 추가·삭제 L3, 시간 과금이라 즉시 해지) | ✅ |
 | Storage | filestorage volumes | storage.file-storage | ✅ |
 | Storage | filestorage snapshots | storage.file-storage-snapshot | ✅ |
 | Storage | object storage bucket | storage.object-storage-bucket | ✅ |

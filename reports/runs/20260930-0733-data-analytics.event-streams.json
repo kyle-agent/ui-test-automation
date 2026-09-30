@@ -1,0 +1,51 @@
+{
+  "spec": "data-analytics.event-streams",
+  "started": "2026-09-29T22:33:13.846Z",
+  "ended": "2026-09-29T22:47:08.621Z",
+  "seconds": 835,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "data-analytics.event-streams",
+    "run_id": "0930-0733-dc9a",
+    "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Event Streams(Kafka) Broker 1대 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 806.1,
+      "annotations": {
+        "scenario": "data-analytics.event-streams",
+        "run_id": "0930-0733-dc9a",
+        "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 4.9
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 2.9
+        },
+        {
+          "title": "steps[2] esajdaahdddcja 생성",
+          "status": "pass",
+          "seconds": 601.4
+        }
+      ]
+    }
+  ]
+}

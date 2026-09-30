@@ -1,0 +1,61 @@
+{
+  "spec": "networking.direct-connect",
+  "started": "2026-09-29T22:53:05.973Z",
+  "ended": "2026-09-29T22:57:12.688Z",
+  "seconds": 247,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.direct-connect",
+    "run_id": "0930-0753-af3c",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 16,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 214.6,
+      "annotations": {
+        "scenario": "networking.direct-connect",
+        "run_id": "0930-0753-af3c",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Direct Connect 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-0753-af3c 생성",
+          "status": "pass",
+          "seconds": 23.1
+        },
+        {
+          "title": "steps[2] Direct Connect dc-0930-0753-af3c 생성",
+          "status": "pass",
+          "seconds": 38
+        },
+        {
+          "title": "steps[3] 규칙 추가 (원격지 11.11.11.0/24)",
+          "status": "pass",
+          "seconds": 43.5
+        },
+        {
+          "title": "steps[4] 규칙 삭제",
+          "status": "pass",
+          "seconds": 49.6
+        }
+      ]
+    }
+  ]
+}
