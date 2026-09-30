@@ -414,3 +414,10 @@
   아무것도 안 치고 비활성 "확인" 을 강제 클릭했다. 이제 공백 라벨을 읽고 입력값을 확인하며, 칠 값을 못 찾으면 오류를 낸다.
   (교훈: "해지·삭제가 무시된다" 로 보이면 먼저 확인 모달의 입력·버튼 활성 상태를 로그로 볼 것. VM·VPC 재시도 로직도 같은 원인이었을 수 있다.)
 - API 대비 대응표에서 남은 것: Backup(Agent 방식, VM + Backup Agent 체인) 하나. 의도적 제외: MessageHub Phone · ASG 알림 · LB 멤버.
+- **Backup 제외 (09-30, 사용자 지적)**: Backup Agent 는 OS 안에 NetBackup 클라이언트를 설치해야 하는 상품이다. API 자동화도 생성에 성공한 적이 없다
+  (마지막 응답 createbackup 500 · createbackupagent 404, AGENTLESS 로 시도했으나 콘솔엔 Agent 방식만 남음). 콘솔 폼 사실: Agent 생성은 AZ → 대상 서버(모달) →
+  필수 Subnet 절(서버 선택 뒤 나타남, Agent 마다 Backup IP·Port 생성), Agent명은 자동. spec 은 만들지 않았다.
+- **모수 기준 정정**: "lifecycle 에 필수 단계로 적힌 생성" 이 아니라 **API 의 마지막 실행에서 생성이 2xx 로 성공한 것**(api-test-automation `data/endpoint_status.json`)을 기준으로 한다.
+  이 기준으로 화면 자동화가 아직 없는 것: CDN · GSLB, Hosted Zone 레코드, Subnet VIP(+NAT IP·포트), Transit Gateway 규칙, Peering 규칙, Private NAT, Private Link Service,
+  LB Public NAT IP, VM 커스텀 이미지(+공유·멤버)·서버 인터페이스(+NAT)·볼륨 이전·덤프, API Gateway 인증·API 키·사용량 계획, Cloud Functions API Gateway 트리거,
+  File Storage 스냅샷 스케줄·복제, DB 복제본 4종. (의도적 제외: IAM 사용자 · Trail · ASG 알림 · SKE kubeconfig 다운로드)

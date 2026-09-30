@@ -42,7 +42,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Storage | filestorage volumes | storage.file-storage | ✅ |
 | Storage | filestorage snapshots | storage.file-storage-snapshot | ✅ |
 | Storage | object storage bucket | storage.object-storage-bucket | ✅ |
-| Storage | backup backups | 미착수 — Agent 방식만 있어 VM + Backup Agent 체인 필요 | 🔧 |
+| Storage | backup backups | 제외 — 콘솔은 Agent 방식만(OS 안에 NetBackup 클라이언트 설치 필요). API 도 생성 성공 없음(createbackup 500, createbackupagent 404) | ⏭ |
 | Application Service | queueservice queues | application-service.queue | ✅ |
 | Application Service | apigateway apis · resources · methods · stages · usage-plans | application-service.api-gateway (리소스·메서드·스테이지 배포 L3, usage-plan 은 미포함) | ✅ |
 | Application Service | messagehub domains · emails | application-service.messagehub-domain · messagehub-email (소유 확인·인증 메일 발송은 하지 않음) | ✅ |
