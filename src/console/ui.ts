@@ -196,16 +196,18 @@ export async function confirmModal(
     // 입력 확인: "확인을 위해 삭제를 입력해주세요" 처럼 지정한 단어를 텍스트 입력란에 쳐야 "확인" 이 활성화되는 모달 (예: Block Storage 삭제).
     // 단어가 "버킷명"처럼 라벨이면(…명/이름) 그 단어가 아니라 실제 이름을 쳐야 한다: 모달의 "버킷명 : <값>" 에서 찾고, 없으면 opts.resourceName (예: Object Storage 해지).
     const text = (await modal.innerText().catch(() => '')).replace(/\s+/g, ' ');
-    const word = text.match(/확인을 위해\s*(\S+?)(?:을|를)?\s*입력/)?.[1];
+    // 라벨에 공백이 있을 수 있다("노드 풀명을 입력하세요") — 예전 \S+? 는 못 읽어 아무것도 안 쳤고, "확인" 이 비활성인 채 강제 클릭만 되어
+    // 노드 풀 삭제가 조용히 무시됐다(2026-09-30 SKE 3회)
+    const word = (
+      text.match(/확인을 위해\s*(.+?)(?:을|를)\s*입력/)?.[1] ?? text.match(/확인을 위해\s*(\S+?)\s*입력/)?.[1]
+    )?.trim();
     const isLabel = !!word && /(명|이름)$/.test(word);
     const typed = isLabel
       ? (text.match(new RegExp(`${word}\\s*:\\s*(\\S+)`))?.[1] ?? opts.resourceName)
       : word;
     const input = modal.locator('input[type=text]:visible').first();
-    if (typed && (await input.count())) {
-      await input.fill(typed);
-      await input.press('Tab');
-    }
+    if (typed && (await input.count())) await fillStable(page, input, typed, `확인 입력(${word})`);
+    else if (word && (await input.count())) throw new Error(`확인 모달이 "${word}" 입력을 요구하지만 칠 값을 찾지 못했습니다: ${text.slice(0, 200)}`);
   }
   // 모달 버튼도 드물게 "stable" 판정이 안 나 클릭이 오래 매달린다(2026-09-28 SG 규칙 ALL 경고 모달) → 10초 뒤 강제 클릭
   const ok = modal.getByRole('button', { name: button, exact: true });

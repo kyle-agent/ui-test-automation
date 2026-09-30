@@ -1,0 +1,46 @@
+{
+  "spec": "storage.object-storage-bucket",
+  "started": "2026-09-30T04:53:27.868Z",
+  "ended": "2026-09-30T04:54:48.845Z",
+  "seconds": 81,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "storage.object-storage-bucket",
+    "run_id": "0930-1353-3f7a",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Object Storage 버킷 생성 후 해지",
+      "status": "passed",
+      "seconds": 54.7,
+      "annotations": {
+        "scenario": "storage.object-storage-bucket",
+        "run_id": "0930-1353-3f7a",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Object Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.2
+        },
+        {
+          "title": "steps[1] bkt-0930-1353-3f7a 생성",
+          "status": "pass",
+          "seconds": 18.7
+        }
+      ]
+    }
+  ]
+}
