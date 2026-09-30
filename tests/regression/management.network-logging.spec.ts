@@ -38,7 +38,7 @@ async function setStorage(page: Page, from: string, to: string, confirmText: Reg
   await settleConsole(page, { appearGraceMs: 800 });
   let dd = page.locator('.scp-dropdown:visible').filter({ hasText: from }).first();
   // 앞 실행이 중간에 죽어 저장소가 다른 버킷(이미 지워졌을 수도)으로 남아 있을 수 있다(2026-09-30 스위트) → 미사용·테스트 버킷 값인 드롭다운으로 대신 잡는다
-  if (!from || !(await dd.count())) dd = page.locator('.scp-dropdown:visible').filter({ hasText: /미사용|bkt-d{4}-d{4}-[0-9a-f]{4}/ }).first();
+  if (!from || !(await dd.count())) dd = page.locator('.scp-dropdown:visible').filter({ hasText: /미사용|bkt-\d{4}-\d{4}-[0-9a-f]{4}/ }).first();
   await dd.click();
   const menu = page.locator('.scp-menu:visible').last();
   await menu.waitFor({ timeout: 10_000 });

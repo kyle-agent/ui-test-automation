@@ -1,0 +1,74 @@
+{
+  "spec": "container.ske-cluster",
+  "started": "2026-09-30T02:44:31.479Z",
+  "ended": "2026-09-30T03:43:30.023Z",
+  "seconds": 3539,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "container.ske-cluster",
+    "run_id": "0930-1144-4c68",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Kubernetes Engine 클러스터 생성 후 역순 해지",
+      "status": "failed",
+      "seconds": 3400.8,
+      "annotations": {
+        "scenario": "container.ske-cluster",
+        "run_id": "0930-1144-4c68",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.8
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG 생성",
+          "status": "pass",
+          "seconds": 288.6
+        },
+        {
+          "title": "steps[2] 클러스터 ske-0930-1144-4c68 생성",
+          "status": "pass",
+          "seconds": 495
+        },
+        {
+          "title": "steps[3] 노드 풀 np-0930-1144-4c68 추가 → Running → 삭제",
+          "status": "fail",
+          "seconds": 2179.6
+        }
+      ],
+      "error": "Error: np-0930-1144-4c68 소멸 대기 1800초 초과. 마지막: np-0930-1144-4c68 Standard-1 s1v1m2(vCPU 1 | Memory 2G) Ubuntu 24.04 (Kubernetes) v1.36.3 1 / 1 Running",
+      "attachments": [
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-3.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/error-context.md",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: np-0930-1144-4c68 소멸 대기 1800초 초과. 마지막: np-0930-1144-4c68 Standard-1 s1v1m2(vCPU 1 | Memory 2G) Ubuntu 24.04 (Kubernetes) v1.36.3 1 / 1 Running",
+  "attachments": [
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-3.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/error-context.md",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "spec": "management.network-logging",
+  "started": "2026-09-30T02:48:26.187Z",
+  "ended": "2026-09-30T02:50:38.555Z",
+  "seconds": 132,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.network-logging",
+    "run_id": "0930-1148-56d7",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Network Logging(Firewall) 로그 저장소 설정 → 해제 (Object Storage 버킷 체인)",
+      "status": "passed",
+      "seconds": 107.7,
+      "annotations": {
+        "scenario": "management.network-logging",
+        "run_id": "0930-1148-56d7",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Firewall Logging 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.5
+        },
+        {
+          "title": "steps[1] 버킷 bkt-0930-1148-56d7 생성",
+          "status": "pass",
+          "seconds": 19.3
+        },
+        {
+          "title": "steps[2] Firewall 로그 저장소 = bkt-0930-1148-56d7",
+          "status": "pass",
+          "seconds": 35.3
+        },
+        {
+          "title": "steps[3] Firewall 로그 저장소 미사용",
+          "status": "pass",
+          "seconds": 15.7
+        }
+      ]
+    }
+  ]
+}

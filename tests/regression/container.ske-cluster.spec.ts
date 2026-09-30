@@ -276,11 +276,31 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await waitForRow(page, pools, vars.nodepool!, { status: /Running|Active/i, timeoutMs: 1_800_000, intervalMs: 30_000, log });
       log(`  노드 풀 행: ${(await row(page, vars.nodepool!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
-      await selectRow(page, vars.nodepool!);
-      await page.getByRole('button', { name: '노드 풀 삭제' }).first().click();
-      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: vars.nodepool });
-      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
-      await waitForRow(page, pools, vars.nodepool!, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+      // 1차 실측(2026-09-30): 삭제 확인 뒤 30분간 1 / 1 Running 그대로 — 요청이 조용히 무시된 것으로 보인다(VM·VPC 해지와 같은 증상)
+      // → 모달 문구·버튼 상태를 남기고, 10분 안에 상태가 안 바뀌면 최대 3회 다시 누른다.
+      for (let attempt = 1; ; attempt++) {
+        await gotoRoute(page, pools);
+        const now = (await row(page, vars.nodepool!).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
+        if (!now) break;
+        if (!/Deleting|Terminating|Scaling Down/i.test(now)) {
+          await selectRow(page, vars.nodepool!);
+          const del = page.getByRole('button', { name: '노드 풀 삭제' }).first();
+          log(`  노드 풀 삭제 버튼 aria-disabled=${await del.getAttribute('aria-disabled')}`);
+          await del.click();
+          const modal = visibleModal(page);
+          await modal.waitFor({ timeout: 10_000 });
+          log(`  노드 풀 삭제 모달: ${(await modal.innerText()).replace(/\s+/g, ' ').slice(0, 300)}`);
+          await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: vars.nodepool });
+          for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+        }
+        try {
+          await waitForRow(page, pools, vars.nodepool!, { gone: true, timeoutMs: 600_000, intervalMs: 30_000, log });
+          break;
+        } catch (e) {
+          if (attempt >= 3) throw e;
+          log(`  노드 풀 삭제 재시도 ${attempt}/3 (아직 남아 있음)`);
+        }
+      }
     });
   });
 });
