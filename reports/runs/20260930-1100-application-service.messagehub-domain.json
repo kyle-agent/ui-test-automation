@@ -1,0 +1,33 @@
+{
+  "spec": "application-service.messagehub-domain",
+  "started": "2026-09-30T02:00:12.940Z",
+  "ended": "2026-09-30T02:02:32.246Z",
+  "seconds": 139,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 23.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Message Hub 발신 도메인 등록 후 삭제 (인증 없이)",
+      "status": "failed",
+      "seconds": 3.3,
+      "annotations": {},
+      "steps": [],
+      "error": "Error: browserContext.newPage: Target page, context or browser has been closed",
+      "attachments": [
+        "test-results/artifacts/application-service.messagehub-domain/application-service.messag-d13fc-e-Hub-발신-도메인-등록-후-삭제-인증-없이--regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: browserContext.newPage: Target page, context or browser has been closed",
+  "attachments": [
+    "test-results/artifacts/application-service.messagehub-domain/application-service.messag-d13fc-e-Hub-발신-도메인-등록-후-삭제-인증-없이--regression/trace.zip"
+  ]
+}

@@ -36,7 +36,9 @@ async function setStorage(page: Page, from: string, to: string, confirmText: Reg
   await gotoRoute(page, ROUTE);
   await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
   await settleConsole(page, { appearGraceMs: 800 });
-  const dd = page.locator('.scp-dropdown:visible').filter({ hasText: from }).first();
+  let dd = page.locator('.scp-dropdown:visible').filter({ hasText: from }).first();
+  // 앞 실행이 중간에 죽어 저장소가 다른 버킷(이미 지워졌을 수도)으로 남아 있을 수 있다(2026-09-30 스위트) → 미사용·테스트 버킷 값인 드롭다운으로 대신 잡는다
+  if (!from || !(await dd.count())) dd = page.locator('.scp-dropdown:visible').filter({ hasText: /미사용|bkt-d{4}-d{4}-[0-9a-f]{4}/ }).first();
   await dd.click();
   const menu = page.locator('.scp-menu:visible').last();
   await menu.waitFor({ timeout: 10_000 });
@@ -129,6 +131,13 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await expectStep(page, resolveExpectation(scenario.steps[1]!.expect, vars), ctx(1));
     });
     await test.step(`steps[2] Firewall 로그 저장소 = ${vars.bucket}`, async () => {
+      // 시작 상태가 미사용이 아니면(앞 실행이 중간에 죽은 경우) 먼저 되돌린다
+      await gotoRoute(page, ROUTE);
+      await settleConsole(page, { appearGraceMs: 800 });
+      if (!(await page.locator('.scp-dropdown:visible').filter({ hasText: OFF }).count())) {
+        log('  로그 저장소가 미사용이 아니어서 먼저 되돌린다');
+        await setStorage(page, '', OFF, /해제하시겠습니까/);
+      }
       await setStorage(page, OFF, vars.bucket!, /로그 저장소를 수정하시겠습니까/);
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
     });

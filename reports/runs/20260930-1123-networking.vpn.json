@@ -1,0 +1,76 @@
+{
+  "spec": "networking.vpn",
+  "started": "2026-09-30T02:23:02.017Z",
+  "ended": "2026-09-30T02:30:51.352Z",
+  "seconds": 469,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.vpn",
+    "run_id": "0930-1123-ae22",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → IGW → Public IP → VPN Gateway → VPN Tunnel 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 415,
+      "annotations": {
+        "scenario": "networking.vpn",
+        "run_id": "0930-1123-ae22",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.3
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1123-ae22 · IGW · Public IP",
+          "status": "pass",
+          "seconds": 100
+        },
+        {
+          "title": "steps[2] VPN Gateway vpn09301123ae22 생성",
+          "status": "pass",
+          "seconds": 52.1
+        },
+        {
+          "title": "steps[3] VPN Tunnel vpnt09301123ae22 생성",
+          "status": "pass",
+          "seconds": 91.4
+        }
+      ],
+      "error": "Error: 정리 중 실패 (남은 리소스를 확인하세요):",
+      "attachments": [
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/screenshot-networking.vpn.png",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "Error: 정리 중 실패 (남은 리소스를 확인하세요):",
+  "attachments": [
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/screenshot-networking.vpn.png",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.vpn/networking.vpn-VPC-→-IGW-→-1e97f-way-→-VPN-Tunnel-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

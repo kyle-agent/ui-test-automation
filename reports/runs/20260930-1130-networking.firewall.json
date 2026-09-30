@@ -1,0 +1,56 @@
+{
+  "spec": "networking.firewall",
+  "started": "2026-09-30T02:30:54.877Z",
+  "ended": "2026-09-30T02:35:59.298Z",
+  "seconds": 304,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.firewall",
+    "run_id": "0930-1131-e0fc",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Internet Gateway(Firewall 사용) → Firewall 규칙 추가 → 규칙 삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 268.8,
+      "annotations": {
+        "scenario": "networking.firewall",
+        "run_id": "0930-1131-e0fc",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Firewall 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1131-e0fc · IGW(Firewall 사용) 생성",
+          "status": "pass",
+          "seconds": 82.4
+        },
+        {
+          "title": "steps[2] 규칙 추가 (192.168.1.1 → 10.250.0.10, TCP 22, Allow, Inbound)",
+          "status": "pass",
+          "seconds": 16.4
+        },
+        {
+          "title": "steps[3] 규칙 삭제 (규칙 수정 화면)",
+          "status": "pass",
+          "seconds": 90.8
+        }
+      ]
+    }
+  ]
+}

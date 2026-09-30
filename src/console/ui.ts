@@ -68,7 +68,39 @@ export async function fillField(
     await page.keyboard.type(value, { delay: 20 });
     await page.keyboard.press('Tab');
   }
-  await expect(field, `"${label}" 입력값이 남아 있어야 합니다`).toHaveValue(value);
+  // 앞 드롭다운(VPC·Subnet 구분 등) 선택의 늦은 재렌더가 조금 뒤에 값을 지우기도 한다(2026-09-30 스위트, 5탭 부하에서 Subnet "IP 대역" 2회)
+  // → 잠시 뒤 다시 보고, 비었으면 칸을 새로 찾아 키보드로 다시 친다(최대 3회).
+  for (let round = 0; round < 3; round++) {
+    await page.waitForTimeout(1_500);
+    const now = await below(page, label, opts.selector ?? 'input', opts.nth ?? 0);
+    if ((await now.inputValue().catch(() => '')) === value) break;
+    await now.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type(value, { delay: 20 });
+    await page.keyboard.press('Tab');
+  }
+  const final = await below(page, label, opts.selector ?? 'input', opts.nth ?? 0);
+  await expect(final, `"${label}" 입력값이 남아 있어야 합니다`).toHaveValue(value);
+}
+
+/**
+ * 라벨 없는 입력칸(textarea 등)에 값을 넣고 남아 있는지 확인한다. fillField 와 같은 보강:
+ * 부하 중엔 늦은 재렌더가 방금 넣은 값을 지운다(2026-09-30 스위트, Firewall 목적지 주소) → 잠시 뒤 다시 보고 키보드로 다시 친다(최대 3회).
+ */
+export async function fillStable(page: Page, field: Locator, value: string, what = '입력칸'): Promise<void> {
+  await field.fill(value);
+  await field.press('Tab');
+  for (let round = 0; round < 3; round++) {
+    await page.waitForTimeout(1_500);
+    if ((await field.inputValue().catch(() => '')) === value) break;
+    await field.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type(value, { delay: 20 });
+    await page.keyboard.press('Tab');
+  }
+  await expect(field, `${what} 값이 남아 있어야 합니다`).toHaveValue(value);
 }
 
 export function dropdown(page: Page, label: string, nth = 0): Promise<Locator> {
@@ -258,9 +290,11 @@ export async function waitForRow(
   const interval = opts.intervalMs ?? 10_000;
   const start = Date.now();
   const want = opts.gone ? '소멸' : opts.status ? `상태 ${opts.status}` : '등장';
-  let refreshed = false;
   for (;;) {
-    if (!page.url().includes(`#${route.replace(/^#/, '')}`)) await gotoRoute(page, route);
+    // 포함이 아니라 경로 일치로 본다: 생성 폼 '#/scr/registry/create' 도 '#/scr/registry' 를 포함해, 목록으로 안 넘어간 채
+    // 폼을 계속 새로 고치다 600초 초과로 끝났다(2026-09-29·30 스위트 Container Registry 2회)
+    const hashPath = (u: string) => (u.split('#')[1] ?? '').split('?')[0]!.replace(/\/$/, '');
+    if (hashPath(page.url()) !== hashPath(`#${route.replace(/^#/, '')}`)) await gotoRoute(page, route);
     const r = row(page, name);
     let count = await r.count();
     // 행이 읽는 사이에 사라질 수 있다(반납·삭제 직후 목록 갱신) → 짧게 기다리고, 못 읽으면 "행 없음" 으로 다시 센다.
@@ -279,9 +313,17 @@ export async function waitForRow(
     if (ok) {
       // 목록 아이콘 새로 고침은 토스트("vm-…: 해지 요청…")를 지우지 않는다. 소멸 뒤엔 호출부가 보통 본문 not_text 를 검사하므로 한 번 다시 읽는다
       // (2026-09-29 스위트 run 3: vm-stack 서버 해지 not_text 가 토스트에 걸림).
-      if (opts.gone && refreshed) {
+      // 첫 확인에서 바로 사라진 경우에도 토스트는 남는다(2026-09-30 VPN 터널 not_text) → 소멸이면 항상 한 번 다시 읽는다
+      if (opts.gone) {
         await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
-        await settleConsole(page, { appearGraceMs: 800 });
+        await settleConsole(page, { appearGraceMs: 1_500 });
+        // 아이콘 새로 고침 직후 표가 잠깐 비는 순간을 "소멸" 로 볼 수 있다(2026-09-30 VPN 해지: 행 0 → 다시 읽으니 해지 중인 행이 그대로)
+        // → 다시 읽은 페이지에서 한 번 더 세고, 행이 있으면 계속 기다린다.
+        if ((await row(page, name).count()) > 0) {
+          opts.log?.(`  ${name} 소멸로 보였지만 다시 읽으니 행이 있음 → 계속 대기`);
+          await page.waitForTimeout(interval);
+          continue;
+        }
       }
       return;
     }
@@ -291,7 +333,6 @@ export async function waitForRow(
       throw new Error(`${name} ${want} 대기 ${timeout / 1000}초 초과. 마지막: ${text || '(행 없음)'}`);
     await page.waitForTimeout(interval);
     await refreshList(page);
-    refreshed = true;
   }
 }
 

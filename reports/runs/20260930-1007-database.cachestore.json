@@ -1,0 +1,51 @@
+{
+  "spec": "database.cachestore",
+  "started": "2026-09-30T01:07:11.181Z",
+  "ended": "2026-09-30T01:22:13.804Z",
+  "seconds": 903,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.cachestore",
+    "run_id": "0930-1007-24d5",
+    "title": "CacheStore(DBaaS) 목록 | CacheStore(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → CacheStore(Redis) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 858.4,
+      "annotations": {
+        "scenario": "database.cachestore",
+        "run_id": "0930-1007-24d5",
+        "title": "CacheStore(DBaaS) 목록 | CacheStore(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.2
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.5
+        },
+        {
+          "title": "steps[2] rdcajdabaahcedf 생성",
+          "status": "pass",
+          "seconds": 668.9
+        }
+      ]
+    }
+  ]
+}

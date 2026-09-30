@@ -1,0 +1,61 @@
+{
+  "spec": "networking.transit-gateway",
+  "started": "2026-09-30T01:38:01.319Z",
+  "ended": "2026-09-30T01:49:29.340Z",
+  "seconds": 688,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.transit-gateway",
+    "run_id": "0930-1038-7ed1",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 20.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Transit Gateway 생성 → VPC 연결 추가 → 연결 해제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 635,
+      "annotations": {
+        "scenario": "networking.transit-gateway",
+        "run_id": "0930-1038-7ed1",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Transit Gateway 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.9
+        },
+        {
+          "title": "steps[1] VPC vpc-0930-1038-7ed1 생성",
+          "status": "pass",
+          "seconds": 25.7
+        },
+        {
+          "title": "steps[2] Transit Gateway tgw-0930-1038-7ed1 생성",
+          "status": "pass",
+          "seconds": 144
+        },
+        {
+          "title": "steps[3] VPC 연결 추가 (vpc-0930-1038-7ed1)",
+          "status": "pass",
+          "seconds": 171.2
+        },
+        {
+          "title": "steps[4] VPC 연결 해제",
+          "status": "pass",
+          "seconds": 154.7
+        }
+      ]
+    }
+  ]
+}

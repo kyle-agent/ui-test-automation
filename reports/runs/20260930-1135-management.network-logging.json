@@ -1,0 +1,75 @@
+{
+  "spec": "management.network-logging",
+  "started": "2026-09-30T02:35:04.083Z",
+  "ended": "2026-09-30T02:36:51.743Z",
+  "seconds": 108,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "management.network-logging",
+    "run_id": "0930-1135-7348",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Network Logging(Firewall) 로그 저장소 설정 → 해제 (Object Storage 버킷 체인)",
+      "status": "failed",
+      "seconds": 73.7,
+      "annotations": {
+        "scenario": "management.network-logging",
+        "run_id": "0930-1135-7348",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Firewall Logging 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.1
+        },
+        {
+          "title": "steps[1] 버킷 bkt-0930-1135-7348 생성",
+          "status": "pass",
+          "seconds": 21.2
+        },
+        {
+          "title": "steps[2] Firewall 로그 저장소 = bkt-0930-1135-7348",
+          "status": "fail",
+          "seconds": 24.2
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-1.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-3.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-2.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-4.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-5.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/screenshot-management.network-logging.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-6.png",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/error-context.md",
+        "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-1.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-3.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-2.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-4.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-5.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/screenshot-management.network-logging.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/test-failed-6.png",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/error-context.md",
+    "test-results/artifacts/management.network-logging/management.network-logging-5ac14--→-해제-Object-Storage-버킷-체인--regression/trace.zip"
+  ]
+}

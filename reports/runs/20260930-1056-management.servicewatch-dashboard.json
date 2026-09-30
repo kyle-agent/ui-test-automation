@@ -1,0 +1,46 @@
+{
+  "spec": "management.servicewatch-dashboard",
+  "started": "2026-09-30T01:56:35.634Z",
+  "ended": "2026-09-30T01:58:39.103Z",
+  "seconds": 123,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-dashboard",
+    "run_id": "0930-1057-009f",
+    "title": "대시보드 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 25.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 사용자 대시보드 생성 후 삭제",
+      "status": "passed",
+      "seconds": 76.3,
+      "annotations": {
+        "scenario": "management.servicewatch-dashboard",
+        "run_id": "0930-1057-009f",
+        "title": "대시보드 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 대시보드 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 12.1
+        },
+        {
+          "title": "steps[1] swd-0930-1057-009f 생성",
+          "status": "pass",
+          "seconds": 14.5
+        }
+      ]
+    }
+  ]
+}

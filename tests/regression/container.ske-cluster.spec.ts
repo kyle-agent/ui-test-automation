@@ -207,5 +207,80 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       );
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
     });
+    // 노드 풀(L3). API 자동화의 콘솔-미러 조합: kr-west1-b · s1v1m2 · SSD 13 Units(=104GB) · 노드 1 · 자동 확장 끔 · Keypair 필요.
+    // 에이전트 C 프로브(2026-09-29): 폼은 별도 화면 #/ske/cluster/detail/nodepool/request, Block Storage 기본 SSD_Provisioned(IOPS 필수) → SSD 로 바꾼다,
+    // 확인 모달 "노드 풀을 추가하시겠습니까?" 뒤 "0 / 1 Scaling Up". 노드 1대 시간 과금. SKE_NODEPOOL=0 이면 건너뛴다.
+    if (process.env.SKE_NODEPOOL === '0') return;
+    await test.step(`steps[3] 노드 풀 ${vars.nodepool} 추가 → Running → 삭제`, async () => {
+      const openPools = async () => {
+        await gotoRoute(page, SKE);
+        await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 1_500 });
+        await page.getByText(/^노드 풀 \(\d+\)$/).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+        return '#' + page.url().split('#')[1]!;
+      };
+      const pools = await openPools();
+      await page.getByRole('button', { name: '노드 풀 추가' }).first().click();
+      await page.waitForURL(/nodepool/, { timeout: 30_000 }).catch(() => undefined);
+      await settleConsole(page, { appearGraceMs: 2_000 });
+      // 폼 구조를 로그로 남긴다(라벨 이름이 바뀌거나 빗나갈 때 바로 고치려고)
+      const form = await page.locator('.scp-form-group:visible').evaluateAll((els) =>
+        els
+          .map((g) => {
+            const label = (g.querySelector('.scp-form-group-label') as HTMLElement | null)?.innerText.replace(/\s+/g, ' ').trim();
+            const dd = [...g.querySelectorAll('.scp-dropdown')].map((d) => (d as HTMLElement).innerText.replace(/\s+/g, ' ').trim());
+            const inp = [...g.querySelectorAll('input')]
+              .filter((e) => (e as HTMLElement).offsetParent)
+              .map((e) => `${(e as HTMLInputElement).type}=${(e as HTMLInputElement).value}`);
+            return label ? `${label} :: dd[${dd.join(' | ')}] in[${inp.join(' | ')}]` : '';
+          })
+          .filter(Boolean),
+      );
+      log(`  노드 풀 폼:\n    ${form.join('\n    ')}`);
+      const soft = async (what: string, fn: () => Promise<unknown>) => {
+        try {
+          await fn();
+        } catch (e) {
+          log(`  (노드 풀 폼) ${what} 실패: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}`);
+        }
+      };
+      await fillField(page, '노드 풀명', vars.nodepool!);
+      await soft('서버 타입 계열', () => pickOption(page, '서버 타입', 'Standard-1'));
+      await soft('서버 타입', () => pickOption(page, '서버 타입', /^s1v1m2\b/, { nth: 1 }));
+      await soft('Block Storage SSD', async () => {
+        await page.locator('.scp-dropdown:visible').filter({ hasText: /^SSD_Provisioned/ }).first().click();
+        await page.locator('.scp-menu-item:visible').filter({ hasText: /^SSD$/ }).first().click();
+      });
+      await soft('Keypair', () => pickOption(page, 'Keypair', 'qa-shared-keypair'));
+      await soft('AZ', async () => {
+        for (const label of ['Availability Zone', '가용 영역']) {
+          if (await page.getByText(label).first().isVisible().catch(() => false)) return pickOption(page, label, /kr-west1-b/);
+        }
+        throw new Error('AZ 라벨 없음');
+      });
+      await soft('노드 수', () => fillField(page, '노드 수', '1'));
+      const fee = page.getByRole('button', { name: '요금 확인', exact: true }).first();
+      if (await fee.count()) await fee.click().catch(() => undefined);
+      await page.waitForTimeout(1_500);
+      let submitted = false;
+      for (const name of ['생성', '추가', '완료']) {
+        if (await page.getByRole('button', { name, exact: true }).last().isVisible().catch(() => false)) {
+          await submitForm(page, name);
+          submitted = true;
+          break;
+        }
+      }
+      if (!submitted) throw new Error("노드 풀 폼에 생성·추가·완료 버튼이 없습니다");
+      await confirmModal(page, /노드 풀을 추가하시겠습니까|추가하시겠습니까/, '확인', { agree: true });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await waitForRow(page, pools, vars.nodepool!, { status: /Running|Active/i, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+      log(`  노드 풀 행: ${(await row(page, vars.nodepool!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      await selectRow(page, vars.nodepool!);
+      await page.getByRole('button', { name: '노드 풀 삭제' }).first().click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: vars.nodepool });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await waitForRow(page, pools, vars.nodepool!, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+    });
   });
 });

@@ -1,0 +1,51 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-09-30T01:30:36.430Z",
+  "ended": "2026-09-30T01:36:39.225Z",
+  "seconds": 363,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "0930-1031-b4f2",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 16.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 322.1,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "0930-1031-b4f2",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.2
+        },
+        {
+          "title": "steps[1] Private DNS pdns-0930-1031-b4f2 생성",
+          "status": "pass",
+          "seconds": 227.4
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-0930-1031-b4f2.com 생성",
+          "status": "pass",
+          "seconds": 36.4
+        }
+      ]
+    }
+  ]
+}

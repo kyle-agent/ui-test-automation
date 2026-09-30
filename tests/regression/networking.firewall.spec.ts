@@ -6,7 +6,7 @@ import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { createIgw, createVpcOnly, deleteIgw } from '../../src/console/networking';
 import { settleConsole } from '../../src/console/overlays';
-import { confirmModal, isChecked, row, submitForm, terminateVpc, waitForRow } from '../../src/console/ui';
+import { confirmModal, fillStable, isChecked, row, submitForm, terminateVpc, waitForRow } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
 const scenario = loadScenario('scenarios/networking/firewall.yaml');
@@ -93,11 +93,9 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await settleConsole(page, { appearGraceMs: 1000 });
       // 출발지·목적지 주소는 라벨 연결이 없는 textarea (순서: 출발지, 목적지, 설명)
       const areas = page.locator('textarea:visible');
-      await areas.nth(0).fill(SRC);
-      await areas.nth(0).press('Tab');
-      await areas.nth(1).fill(DST);
-      await areas.nth(1).press('Tab');
-      await expect(areas.nth(1), '목적지 주소가 들어가 있어야 합니다').toHaveValue(DST);
+      await fillStable(page, areas.nth(0), SRC, '출발지 주소');
+      await fillStable(page, areas.nth(1), DST, '목적지 주소');
+      await expect(areas.nth(0), '출발지 주소가 남아 있어야 합니다').toHaveValue(SRC);
       const tcp = page.locator('.scp-select:visible').filter({ hasText: /^TCP$/ }).first();
       if (!(await isChecked(tcp))) await tcp.click();
       await page.waitForTimeout(500);

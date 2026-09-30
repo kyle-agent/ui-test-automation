@@ -1,0 +1,46 @@
+{
+  "spec": "management.notification-group",
+  "started": "2026-09-30T01:53:04.131Z",
+  "ended": "2026-09-30T01:55:10.700Z",
+  "seconds": 127,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.notification-group",
+    "run_id": "0930-1053-4d2c",
+    "title": "알림 그룹 목록 | Notification Manager | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 35,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "알림 그룹 생성 후 삭제",
+      "status": "passed",
+      "seconds": 64,
+      "annotations": {
+        "scenario": "management.notification-group",
+        "run_id": "0930-1053-4d2c",
+        "title": "알림 그룹 목록 | Notification Manager | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 알림 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8
+        },
+        {
+          "title": "steps[1] ntg-0930-1053-4d2c 생성",
+          "status": "pass",
+          "seconds": 18.8
+        }
+      ]
+    }
+  ]
+}

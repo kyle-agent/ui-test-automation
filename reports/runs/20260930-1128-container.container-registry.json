@@ -1,0 +1,46 @@
+{
+  "spec": "container.container-registry",
+  "started": "2026-09-30T02:28:53.710Z",
+  "ended": "2026-09-30T02:35:00.580Z",
+  "seconds": 367,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.container-registry",
+    "run_id": "0930-1129-1cb3",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Container Registry 생성 후 해지",
+      "status": "passed",
+      "seconds": 333.6,
+      "annotations": {
+        "scenario": "container.container-registry",
+        "run_id": "0930-1129-1cb3",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.7
+        },
+        {
+          "title": "steps[1] cr093011291cb3 생성",
+          "status": "pass",
+          "seconds": 151
+        }
+      ]
+    }
+  ]
+}
