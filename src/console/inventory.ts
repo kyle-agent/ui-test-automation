@@ -271,6 +271,10 @@ export async function cleanupLeftovers(
 async function deleteOne(page: Page, item: Leftover, log: (line: string) => void): Promise<void> {
   const route = ROUTES[item.kind];
   await gotoRoute(page, route);
+  // 목록 조회(listLeftovers)가 한 탭에서 수십 개 화면을 해시 이동으로 돌고 나면, 숨겨 둔 옛 화면 때문에 보이는 행의 버튼이
+  // 잡히지 않아 클릭이 30초 시간 초과로 끝났다(2026-09-30 IGW, 10-01 VPC 3개) → 지우기 전에 그 목록을 새로 불러온다.
+  await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+  await settleConsole(page, { appearGraceMs: 800 });
   if ((await row(page, item.name).count()) === 0) return;
   switch (item.kind) {
     case 'ske':
