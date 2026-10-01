@@ -163,7 +163,7 @@ resources:
     route: /epas/epas/list
     level: 4
     specs: [smoke.epas-dbaas, database.epas]
-    last_pass: "2026-09-28"
+    last_pass: "2026-10-01"
     note: "PostgreSQL 과 같은 폼 + License(BYOL) 확인 체크. 공유 VPC 위에서 병렬 PASS 16.2분"
   - key: event-streams
     service: "Event Streams"
@@ -339,7 +339,7 @@ resources:
     route: /mariadb/mariadb/list
     level: 4
     specs: [smoke.mariadb-dbaas, database.mariadb]
-    last_pass: "2026-09-28"
+    last_pass: "2026-10-01"
     note: "PostgreSQL 과 같은 폼(db1v1m2). 공유 VPC 위에서 병렬 PASS 15.7분"
   - key: cluster-fabric
     service: "Multi-node GPU Cluster"
@@ -363,7 +363,7 @@ resources:
     route: /mysql/mysql/list
     level: 4
     specs: [smoke.mysql-dbaas, database.mysql]
-    last_pass: "2026-09-28"
+    last_pass: "2026-10-01"
     note: "PostgreSQL 과 같은 폼. DATA 8GB 배수. 공유 VPC 병렬 PASS 16.2분. 2026-09-30: 읽기 복제본 추가·해지 단계(steps[3]·[4]) 동작 확인 — 실행은 정리 중 SSO 만료로 FAIL 기록"
   - key: bucket@object-storage
     service: "Object Storage"
@@ -619,7 +619,7 @@ resources:
     route: /vpc/vpc-peering/list
     level: 4
     specs: [smoke.vpc, networking.vpc-peering]
-    last_pass: "2026-09-23"
+    last_pass: "2026-10-01"
     note: "VPC 2개 → 동일 Account Peering(승인 불필요, Creating → Active ≈1분) → 상세 VPC Peering 삭제 → VPC 해지(직후 요청은 무시되므로 재시도). 2026-09-30 규칙 탭 추가·삭제 단계 추가 — 본 단계 통과, 정리 중 SSO 만료로 전체 PASS 는 재확인 필요. 규칙이 남아 있으면 Peering 삭제가 조용히 무시된다"
   - key: vpc
     service: "VPC"

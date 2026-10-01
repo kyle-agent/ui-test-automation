@@ -31,7 +31,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3) | ✅ |
 | Container | scr container-registries · repositories | container.container-registry · container.repository | ✅ |
 | Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
-| Database | postgresql · mysql · mariadb · epas replicas (읽기 복제본) | database.postgresql·mysql steps[3]·[4] (dbaas.ts replica 옵션: 백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). PostgreSQL PASS 45분, MySQL 본 단계 통과(정리 중 SSO 만료). MariaDB·EPAS 는 시나리오만 작성·옵션 꺼 둠(미검증) | 🔧 |
+| Database | postgresql · mysql · mariadb · epas replicas (읽기 복제본) | database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분) | ✅ |
 | Data Analytics | eventstreams clusters | data-analytics.event-streams (공유 VPC) | ✅ |
 | Networking | vpcs · subnets | networking.vpc.create-delete · 모든 VPC 체인 | ✅ |
 | Networking | internet-gateways · publicips | compute.vm-stack-net · networking.nat-gateway | ✅ |
@@ -47,7 +47,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Networking | gslbs | networking.gslb (연결 대상 192.0.2.10, 2026-09-30) | ✅ |
 | Networking | subnet vips · vip connected-ports · vip static-nat-ips (createsubnetvip·port·natip 2xx) | networking.vpc-port steps[4~10] (IGW·Public IP → VIP 예약 → Port 연결 → Public NAT IP 연결·해제 → 역순, 2026-09-30 PASS 15.5분) | ✅ |
 | Networking | transit-gateway routing-rules (createtransitgatewayrule 2xx) | networking.transit-gateway steps[4~5] (VPC→TGW 목적지 규칙 추가·삭제, 2026-09-30 PASS 11.7분. 규칙이 남으면 VPC 연결 해제가 조용히 무시됨) | ✅ |
-| Networking | vpc-peering routing-rules (createvpcpeeringrule 2xx) | networking.vpc-peering steps[3~4] (요청→승인 VPC 규칙 추가·삭제). 09-30 19:10 재실행에서 본 단계(규칙 추가·삭제) 통과, 정리 중 SSO 세션 만료로 FAIL → 재로그인 뒤 단독 재확인 필요 | 🔧 |
+| Networking | vpc-peering routing-rules (createvpcpeeringrule 2xx) | networking.vpc-peering steps[3~4] (요청→승인 VPC 규칙 추가·삭제, L3). 10-01 PASS 13.6분 | ✅ |
 | Networking | loadbalancer public-nat-ip (createloadbalancerpublicnatip 2xx) | networking.load-balancer steps[6~8] (IGW·Public IP → LB Public NAT IP 설정·해제, 공유 네트워크면 건너뜀, 2026-09-30 PASS 22분) | ✅ |
 | Networking | privatelink-services (+ endpoints: API 는 404) | networking.privatelink-service (IP 연결 Service → 같은 계정 Endpoint 요청 → 승인 L3 → 역순, 2026-09-30 PASS 14분. Endpoint 도 콘솔에선 생성됨) | ✅ |
 | Networking | private-nats (createprivatenat 202) | networking.direct-connect steps[5~6] (이 spec 의 DC 를 연결 자원으로 Private NAT 생성·삭제, 2026-09-30 PASS 6.5분) | ✅ |

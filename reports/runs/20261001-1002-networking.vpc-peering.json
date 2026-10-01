@@ -1,0 +1,61 @@
+{
+  "spec": "networking.vpc-peering",
+  "started": "2026-10-01T01:02:02.382Z",
+  "ended": "2026-10-01T01:15:35.690Z",
+  "seconds": 813,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-peering",
+    "run_id": "1001-1002-f492",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC 2개 → VPC Peering 생성 → 규칙 추가·삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 770,
+      "annotations": {
+        "scenario": "networking.vpc-peering",
+        "run_id": "1001-1002-f492",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[1] VPC vpc-1001-1002-f492, vpcb-1001-1002-f492 생성",
+          "status": "pass",
+          "seconds": 55.3
+        },
+        {
+          "title": "steps[2] VPC Peering peer-1001-1002-f492 생성",
+          "status": "pass",
+          "seconds": 333
+        },
+        {
+          "title": "steps[3] 규칙 추가 (요청 VPC → 승인 VPC 10.250.16.0/24)",
+          "status": "pass",
+          "seconds": 49.9
+        },
+        {
+          "title": "steps[4] 규칙 10.250.16.0/24 삭제",
+          "status": "pass",
+          "seconds": 54.2
+        }
+      ]
+    }
+  ]
+}

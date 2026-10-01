@@ -15,5 +15,5 @@ defineDbaasSpec({
     { label: 'Database Port번호', value: '5432' },
   ],
   check: ['License'], // BYOL 확인 체크
-  // replica: true, // 2026-09-30 준비만 함: 단독 실행 전 SSO 세션 만료로 미검증. 켜고 단독 PASS 확인 후 유지 (시나리오 steps[3]·[4] 는 작성됨)
+  replica: true, // 2026-10-01 켬: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4])
 });

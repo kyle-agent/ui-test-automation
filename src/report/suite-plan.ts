@@ -35,8 +35,8 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'container.ske-cluster': { vpc: 1, minutes: 30 }, // 노드 풀 단계 포함(2026-09-30)
   'database.postgresql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분)
   'database.mysql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C)
-  'database.mariadb': { vpc: 0, shared: true, minutes: 16 },
-  'database.epas': { vpc: 0, shared: true, minutes: 16 },
+  'database.mariadb': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
+  'database.epas': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
   'database.cachestore': { vpc: 0, shared: true, minutes: 15.5 },
   // 2026-09-29 커버리지 확장(단독 통과 실측). 나머지(queue·notification-group·cloud-function·certificate)는 기본값 3분
   'container.repository': { vpc: 0, minutes: 7 },
