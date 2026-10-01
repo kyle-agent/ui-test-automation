@@ -161,6 +161,15 @@ async function main(): Promise<void> {
       await Promise.race(waits);
     }
   }
+  // 마지막으로 끝난 spec 이 공유 VPC 를 쓰던 것이면 루프가 삭제 확인 전에 끝난다(2026-10-01 DBaaS 만 돌린 실행에서 공유 VPC 가 남음) → 여기서 지운다
+  if (shared && sharedHeld) {
+    log(`공유 네트워크 삭제 시작: ${shared.subnet} → ${shared.vpc}`);
+    await deleteNetwork(sharedPage!, shared.vpc, shared.subnet, () => undefined).then(
+      () => log('공유 네트워크 삭제 완료'),
+      (e) => log(`(경고) 공유 네트워크 정리 실패: ${firstLine(e)} → npm run stacks:cleanup`),
+    );
+    sharedHeld = 0;
+  }
   await sharedPage?.close().catch(() => undefined);
   await page.close().catch(() => undefined);
   await browser.close();
