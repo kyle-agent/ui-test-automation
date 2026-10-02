@@ -119,6 +119,11 @@ function runOne(id: string, issues: readonly KnownIssue[]): RunRecord {
     report,
     reportError: error,
     issues,
+    // 병렬 스위트(scripts/run-suite.ts)가 넘겨 준다. 혼자 돌리면 없다.
+    suiteId: process.env.SUITE_ID || undefined,
+    attempt: process.env.SUITE_ATTEMPT ? Number(process.env.SUITE_ATTEMPT) : undefined,
+    gitSha:
+      spawnSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).stdout?.trim() || undefined,
   });
   const written = writeRunRecord(record);
   console.log(`실행 기록: ${path.relative(process.cwd(), written)}`);

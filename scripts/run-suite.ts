@@ -13,6 +13,7 @@
  * 각 spec 은 `scripts/run-stacks.ts --only <id> --no-preflight` 로 떠서 reports/runs/ 에 기록을 남긴다. 실행 중엔 stacks:cleanup --yes 금지.
  */
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import '../src/console/env';
 import { connectLiveBrowser } from '../src/console/browser';
@@ -20,6 +21,7 @@ import { listLeftovers } from '../src/console/inventory';
 import { createNetwork, deleteNetwork } from '../src/console/shared';
 import { SUITE_ORDER } from '../src/report/suite';
 import { planFor } from '../src/report/suite-plan';
+import { runStamp } from '../src/report/run-record';
 import { newRunId } from '../src/scenario/schema';
 import { parseArgs } from '../src/service-map/io';
 
@@ -29,6 +31,11 @@ const only = typeof flags.only === 'string' ? flags.only.split(',').map((s) => s
 const maxTabs = typeof flags.max === 'string' ? Number(flags.max) : 5;
 const dryRun = flags['dry-run'] === true;
 const staggerMs = (typeof flags.stagger === 'string' ? Number(flags.stagger) : 20) * 1000;
+// 실행 묶음 id 와 시도 차수: 실행 기록(reports/runs)과 스위트 요약(reports/suites)에 남는다. 실패만 다시 돌릴 때는
+// --suite-id <처음 id> --attempt 2 로 같은 묶음에 붙인다(대시보드의 "첫 시도 / 최종" 계산).
+const suiteId = typeof flags['suite-id'] === 'string' ? flags['suite-id'] : `S${runStamp(new Date())}`;
+const attempt = typeof flags.attempt === 'string' ? Number(flags.attempt) : 1;
+const SUITES_DIR = path.resolve(process.cwd(), 'reports', 'suites');
 
 const stamp = () => new Date().toLocaleTimeString('ko-KR', { hour12: false });
 const log = (line: string) => console.log(`[${stamp()}] ${line}`);
@@ -46,7 +53,7 @@ function runOne(spec: string, env: NodeJS.ProcessEnv): Promise<Result> {
     const child = spawn(
       process.execPath,
       [path.join('node_modules', 'tsx', 'dist', 'cli.mjs'), path.join('scripts', 'run-stacks.ts'), '--only', spec, '--no-preflight'],
-      { env: { ...process.env, ...env, MSYS_NO_PATHCONV: '1', FORCE_COLOR: '0' }, stdio: ['ignore', 'pipe', 'pipe'] },
+      { env: { ...process.env, ...env, SUITE_ID: suiteId, SUITE_ATTEMPT: String(attempt), MSYS_NO_PATHCONV: '1', FORCE_COLOR: '0' }, stdio: ['ignore', 'pipe', 'pipe'] },
     );
     const tag = spec.split('.').slice(1).join('.');
     const relay = (chunk: Buffer) => {
@@ -170,6 +177,11 @@ async function main(): Promise<void> {
     );
     sharedHeld = 0;
   }
+  // 끝난 뒤 남은 테스트 리소스(정리 실패 감지용). 실패해도 결과에는 영향 없음
+  const leftoversEnd = await listLeftovers(page).then(
+    (l) => l.leftovers.map((x) => `${x.kind} ${x.name}`),
+    () => null,
+  );
   await sharedPage?.close().catch(() => undefined);
   await page.close().catch(() => undefined);
   await browser.close();
@@ -180,6 +192,28 @@ async function main(): Promise<void> {
     console.log(`  ${r.code === 0 ? 'PASS' : r.code === -1 ? 'SKIP' : 'FAIL'}  ${r.spec}  ${Math.floor(r.seconds / 60)}분 ${r.seconds % 60}초`);
   const fail = results.filter((r) => r.code !== 0).length;
   console.log(`벽시계 ${wall}분 (직렬 예상 ${Math.round(serial)}분), 통과 ${results.length - fail}/${results.length}`);
+  console.log(`남은 리소스: ${leftoversEnd === null ? '확인 실패' : leftoversEnd.length ? leftoversEnd.join(', ') : '없음'}`);
+  fs.mkdirSync(SUITES_DIR, { recursive: true });
+  const summaryFile = path.join(SUITES_DIR, `${suiteId}-a${attempt}.json`);
+  fs.writeFileSync(
+    summaryFile,
+    JSON.stringify(
+      {
+        suite_id: suiteId,
+        attempt,
+        started: new Date(started).toISOString(),
+        ended: new Date().toISOString(),
+        wall_minutes: wall,
+        serial_minutes: Math.round(serial),
+        max_tabs: maxTabs,
+        results: results.map((r) => ({ spec: r.spec, status: r.code === 0 ? 'pass' : r.code === -1 ? 'skip' : 'fail', seconds: r.seconds })),
+        leftovers_end: leftoversEnd,
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  console.log(`스위트 요약: ${path.relative(process.cwd(), summaryFile)} (실패만 다시: --only <ids> --suite-id ${suiteId} --attempt ${attempt + 1})`);
   console.log('결과 정리: npm run results · 남은 리소스: npm run stacks:check');
   process.exitCode = fail ? 1 : 0;
 }

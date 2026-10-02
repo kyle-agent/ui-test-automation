@@ -59,6 +59,12 @@ export interface RunRecord {
   tests: RunTest[];
   /** JSON 리포트가 없거나 못 읽었을 때 그 이유 */
   report_error?: string;
+  /** 병렬 스위트(scripts/run-suite.ts)가 붙이는 실행 묶음 id. 혼자 돌린 spec 은 없다 (2026-10-02~) */
+  suite_id?: string;
+  /** 같은 스위트 안에서 몇 번째 시도인가 (1 = 첫 시도, 2+ = 재실행) */
+  attempt?: number;
+  /** 실행 시점의 git 커밋 (짧은 해시) */
+  git_sha?: string;
 }
 
 /** 세션·브라우저 문제로 보는 오류 문구 (src/console/browser.ts, src/console/expect.ts 의 메시지) */
@@ -70,6 +76,13 @@ export const ENVIRONMENT_PATTERNS: readonly RegExp[] = [
   /PW_CDP_URL/,
   /connectOverCDP/,
   /로그인 브라우저를 다시 띄우세요/,
+  // 공유 로그인 브라우저의 탭·컨텍스트가 사라진 경우(부하·강제 재기동, 2026-09-29~10-01 스위트)
+  /Target page, context or browser has been closed/,
+  /CDP 로 연결한 브라우저에 컨텍스트가 없습니다/,
+  /브라우저 내부 페이지 탭/,
+  /worker process exited unexpectedly/i,
+  // 병렬 실행에서 다른 spec 이 산출물 폴더를 지운 경우(2026-09-29, 지금은 spec 별 폴더)
+  /ENOENT: no such file or directory, open '[^']*playwright-artifacts/,
 ];
 
 export function isEnvironmentError(text: string): boolean {
@@ -176,6 +189,9 @@ export interface BuildRunRecordInput {
   reportError?: string;
   issues: readonly KnownIssue[];
   today?: string;
+  suiteId?: string;
+  attempt?: number;
+  gitSha?: string;
 }
 
 export function buildRunRecord(input: BuildRunRecordInput): RunRecord {
@@ -196,6 +212,9 @@ export function buildRunRecord(input: BuildRunRecordInput): RunRecord {
     tests,
   };
   if (input.reportError) record.report_error = input.reportError;
+  if (input.suiteId) record.suite_id = input.suiteId;
+  if (input.attempt) record.attempt = input.attempt;
+  if (input.gitSha) record.git_sha = input.gitSha;
   if (status === 'fail') {
     const errorText = input.report ? fullErrorText(input.report) : (input.reportError ?? '');
     const first = failedTests.find((t) => t.error)?.error ?? firstLine(errorText);

@@ -439,3 +439,15 @@
   → volume-snapshot 은 승인 Key 모달의 확인을 누르지 않는다.
 - 09-30 19:23 SSO 만료로 전원 중단. 재로그인 후: 잔여 확인(vpc/sub-0930-1839-74ce, vpc/vpcb/peer-0930-1910-70b3, MySQL mycajdabidjhece·rep0930183974ce),
   Peering·MySQL 재실행, MariaDB·EPAS replica 켜서 1회씩.
+
+### 9.18 대시보드 1단계 (2026-10-02)
+
+- 첫 화면: 마지막 스위트 · 핵심 카드(현재 녹색 / 스위트 첫 시도 / 최근 7일 실패 원인 / 불안정 / 커버리지 / API 대응) · **조치 필요** 목록 · 실패 분류(오류 시그니처 묶음).
+  파생 지표는 `src/report/insights.ts`(단위 테스트 tests/unit/insights.spec.ts), 화면은 `src/report/dashboard.ts`.
+- 실패 원인은 화면에서 다시 판정: 알려진 이슈(product/test/environment) > 환경 문구(탭·컨텍스트 소멸, CDP, 세션, 산출물 폴더 ENOENT 추가) > 정리 실패 > 다음 실행 48시간 안 통과(간헐) > 미분류.
+  **제품 결함은 data/known-issues.yaml 에 kind: product 로 등록한 것만.**
+- 실행 기록에 `suite_id`·`attempt`·`git_sha` 추가(run-stacks 가 SUITE_ID·SUITE_ATTEMPT 환경 변수로 받음). 병렬 실행기가 `reports/suites/<id>-a<n>.json` 요약(벽시계·직렬 예상·결과·끝난 뒤 남은 리소스)을 남긴다.
+  실패만 다시 돌릴 때: `npm run test:suite -- --only a,b --suite-id <처음 id> --attempt 2` → 대시보드가 첫 시도/최종을 같은 묶음으로 계산.
+- 불안정 spec 은 스위트 실행 기록(suite_id 있음)만으로 판정(개발 중 재실행까지 넣으면 거의 전부 불안정으로 나옴). 첨부 링크는 그 spec 자신의 스크린샷·trace·error-context 만
+  (공유 CDP 브라우저에서 test-failed-N.png 는 다른 탭을 찍는다).
+- 다음(2단계 이후): 탐색 발견 사항 목록·상태, 커버리지 추세, 팀 공유(같은 HTML 을 사내 호스팅).

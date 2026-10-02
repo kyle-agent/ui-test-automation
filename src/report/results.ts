@@ -6,8 +6,10 @@ import type { RunRecord } from './run-record';
 
 export function fmtSeconds(s: number | undefined): string {
   if (s === undefined) return '-';
-  const m = Math.floor(s / 60);
-  return m ? `${m}분 ${Math.round(s % 60)}초` : `${Math.round(s)}초`;
+  // 먼저 초로 반올림한 뒤 나눈다 (예전엔 1199.6초가 "19분 60초" 로 나왔다)
+  const total = Math.round(s);
+  const m = Math.floor(total / 60);
+  return m ? `${m}분 ${total % 60}초` : `${total}초`;
 }
 
 /** 로컬 시간 YYYY-MM-DD HH:MM */

@@ -17,6 +17,7 @@ import {
   validateCoverage,
 } from '../src/report/coverage';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
+import { readParity, readSuiteSummaries, suiteViews } from '../src/report/insights';
 import { loadKnownIssues } from '../src/report/known-issues';
 import { failuresTable, fmtTime, knownIssuesSection, resultsTable } from '../src/report/results';
 import { readRunRecords, RUNS_DIR } from '../src/report/run-record';
@@ -83,6 +84,8 @@ function main(): void {
       entries: ledger.resources,
       issues,
       explores,
+      suites: suiteViews(readSuiteSummaries()),
+      parity: readParity(),
     }),
   );
   console.log(
