@@ -1,0 +1,52 @@
+{
+  "spec": "financial-management.budget",
+  "started": "2026-10-02T09:42:14.970Z",
+  "ended": "2026-10-02T09:45:10.054Z",
+  "seconds": 175,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "financial-management.budget",
+    "run_id": "1002-1842-ec97",
+    "title": "예산 관리 | Cost Management | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "계정 예산 생성 → 금액 수정 → 삭제",
+      "status": "passed",
+      "seconds": 145.9,
+      "annotations": {
+        "scenario": "financial-management.budget",
+        "run_id": "1002-1842-ec97",
+        "title": "예산 관리 | Cost Management | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 예산 관리 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 20.6
+        },
+        {
+          "title": "steps[1] 예산 bud-1002-1842-ec97 생성",
+          "status": "pass",
+          "seconds": 38.9
+        },
+        {
+          "title": "steps[2] 예산 bud-1002-1842-ec97 금액 수정",
+          "status": "pass",
+          "seconds": 37.3
+        }
+      ]
+    }
+  ],
+  "git_sha": "e79199a"
+}

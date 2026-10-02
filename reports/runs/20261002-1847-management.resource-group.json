@@ -1,0 +1,47 @@
+{
+  "spec": "management.resource-group",
+  "started": "2026-10-02T09:47:52.179Z",
+  "ended": "2026-10-02T09:49:05.633Z",
+  "seconds": 73,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.resource-group",
+    "run_id": "1002-1848-673c",
+    "title": "Resource Group 목록 | Resource Groups | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Resource Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 41,
+      "annotations": {
+        "scenario": "management.resource-group",
+        "run_id": "1002-1848-673c",
+        "title": "Resource Group 목록 | Resource Groups | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Resource Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] rg-1002-1848-673c 생성",
+          "status": "pass",
+          "seconds": 18
+        }
+      ]
+    }
+  ],
+  "git_sha": "d9043af"
+}

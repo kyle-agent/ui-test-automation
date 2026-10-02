@@ -1,0 +1,47 @@
+{
+  "spec": "networking.gslb",
+  "started": "2026-10-02T09:45:15.504Z",
+  "ended": "2026-10-02T09:47:46.181Z",
+  "seconds": 151,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.gslb",
+    "run_id": "1002-1845-f7ff",
+    "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 19.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "GSLB 생성 후 해지",
+      "status": "passed",
+      "seconds": 112.1,
+      "annotations": {
+        "scenario": "networking.gslb",
+        "run_id": "1002-1845-f7ff",
+        "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] GSLB 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.9
+        },
+        {
+          "title": "steps[1] gslb10021845f7ff 생성",
+          "status": "pass",
+          "seconds": 63.5
+        }
+      ]
+    }
+  ],
+  "git_sha": "d9043af"
+}

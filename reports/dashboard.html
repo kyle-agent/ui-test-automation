@@ -5,24 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SCP 콘솔 회귀 대시보드</title>
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --pass:#16a34a; --fail:#dc2626; --env:#d97706;
+  :root { --bg:#f4f5f7; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --pass:#16a34a; --fail:#dc2626; --env:#d97706;
+          --c-product:#b91c1c; --c-unclassified:#7c3aed; --c-cleanup:#c2410c; --c-test:#0369a1; --c-flaky:#a16207; --c-environment:#6b7280;
           --l0:#e5e7eb; --l1:#bfdbfe; --l2:#60a5fa; --l3:#2563eb; --l4:#1e3a8a; }
   * { box-sizing:border-box }
   body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system,"Segoe UI","Malgun Gothic",Roboto,sans-serif; }
-  header { background:#111827; color:#fff; padding:14px 24px; display:flex; gap:16px; align-items:baseline; flex-wrap:wrap }
-  header h1 { margin:0; font-size:18px } header .muted { color:#9ca3af }
-  main { max-width:1400px; margin:0 auto; padding:16px 24px 48px }
-  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:16px 0 }
-  h2 { margin:0 0 12px; font-size:16px } h2 small { color:var(--muted); font-weight:normal; margin-left:8px }
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:12px }
+  header { background:#111827; color:#fff; padding:14px 24px 0; }
+  header .top { display:flex; gap:16px; align-items:baseline; flex-wrap:wrap }
+  header h1 { margin:0; font-size:18px } header .muted { color:#9ca3af; font-size:12px }
+  nav { display:flex; gap:2px; flex-wrap:wrap; margin-top:10px } nav a { color:#d1d5db; text-decoration:none; padding:6px 12px; font-size:13px; border-radius:6px 6px 0 0 } nav a:hover { background:#1f2937; color:#fff }
+  main { max-width:1400px; margin:0 auto; padding:8px 24px 48px }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:16px 0; scroll-margin-top:12px }
+  h2 { margin:0 0 12px; font-size:16px } h2 small { color:var(--muted); font-weight:normal; margin-left:8px; font-size:12px }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:12px }
   .card { border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:#fafafa }
-  .card .k { color:var(--muted); font-size:12px } .card .v { font-size:28px; font-weight:600; line-height:1.2 } .card .s { color:var(--muted); font-size:12px }
+  .card.alert { border-color:#fca5a5; background:#fef2f2 }
+  .card .k { color:var(--muted); font-size:12px } .card .v { font-size:26px; font-weight:600; line-height:1.25 } .card .v .s { font-size:13px; font-weight:400 } .card .s { color:var(--muted); font-size:12px }
   table { width:100%; border-collapse:collapse; font-size:13px } th,td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top }
+  table.compact { width:auto; min-width:420px }
   th { color:var(--muted); font-weight:600; font-size:12px; white-space:nowrap } .num { text-align:right; white-space:nowrap }
   .mono { font-family:Consolas,"SFMono-Regular",Menlo,monospace; font-size:12px } .small { font-size:11px } .muted { color:var(--muted) } .note { color:#374151; font-size:12px }
   .err { font-family:Consolas,Menlo,monospace; font-size:11px; color:#7f1d1d; word-break:break-all }
+  .err details summary { color:#7f1d1d; margin:0 }
   .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:600; color:#fff; white-space:nowrap }
   .badge.pass { background:var(--pass) } .badge.fail { background:var(--fail) } .badge.env { background:var(--env) }
+  .cause { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; font-weight:600; border:1px solid currentColor; white-space:nowrap }
+  .c-product{color:var(--c-product)} .c-unclassified{color:var(--c-unclassified)} .c-cleanup{color:var(--c-cleanup)} .c-test{color:var(--c-test)} .c-flaky{color:var(--c-flaky)} .c-environment{color:var(--c-environment)}
+  .tag { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; font-weight:600 } .tag.warn { background:#fef3c7; color:#92400e }
   .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:2px } .dot.pass{background:var(--pass)} .dot.fail{background:var(--fail)} .dot.env{background:var(--env)}
   .dots { white-space:nowrap }
   .bar { display:flex; height:10px; border-radius:5px; overflow:hidden; background:var(--l0); margin-top:6px; min-width:120px }
@@ -30,823 +39,724 @@
   .lv { display:inline-block; min-width:28px; text-align:center; border-radius:4px; font-size:11px; font-weight:600; padding:1px 4px; color:#111 } .lv.l3,.lv.l4{color:#fff}
   .barcell { width:160px }
   .filters { margin:8px 0 } .filters button { border:1px solid var(--line); background:#fff; border-radius:4px; padding:2px 8px; margin-right:4px; cursor:pointer; font-size:12px } .filters button.on { background:#111827; color:#fff; border-color:#111827 }
-  .trend { display:flex; gap:6px; align-items:flex-end; height:110px; padding:4px 0 } .col { flex:0 0 32px; text-align:center }
-  .stack { display:flex; flex-direction:column-reverse; height:80px; justify-content:flex-start } .stack span { display:block; width:100% } .stack .pass{background:var(--pass)} .stack .fail{background:var(--fail)}
+  .trend { display:flex; gap:6px; align-items:flex-end; height:100px; padding:4px 0 } .col { flex:0 0 30px; text-align:center }
+  .stack { display:flex; flex-direction:column-reverse; height:72px; justify-content:flex-start } .stack span { display:block; width:100% } .stack .pass{background:var(--pass)} .stack .fail{background:var(--fail)}
   .lbl { font-size:10px; color:var(--muted) }
   details summary { cursor:pointer; color:#2563eb; margin:8px 0 }
   .warn { color:var(--fail) }
   .legend span { display:inline-block; margin-right:12px; font-size:12px } .legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:middle }
-  @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} th:nth-child(6),td:nth-child(6){display:none} }
+  ul.actions { list-style:none; padding:0; margin:0 } ul.actions li { padding:6px 8px; border-left:3px solid currentColor; margin:4px 0; background:#fafafa; color:var(--ink) }
+  ul.actions li.c-product{border-color:var(--c-product)} ul.actions li.c-unclassified{border-color:var(--c-unclassified)} ul.actions li.c-cleanup{border-color:var(--c-cleanup)} ul.actions li.c-flaky{border-color:var(--c-flaky)} ul.actions li.c-environment{border-color:var(--c-environment)} ul.actions li.c-test{border-color:var(--c-test)}
+  .causes span { margin-right:10px; white-space:nowrap }
+  a.att { font-size:11px; margin-right:6px }
+  @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
 </style>
 </head>
 <body>
 <header>
-  <h1>SCP 콘솔 회귀 대시보드</h1>
-  <span class="muted">생성 2026-10-01 10:40 · 실행 기록 300건 · 마지막 실행 2026-10-01 10:02 networking.vpc-peering</span>
-  <span class="muted">원본: reports/runs/*.json · service-map/coverage.yaml · data/known-issues.yaml · recordings/explore/*/report.md — <code>npm run results</code> 로 재생성</span>
+  <div class="top">
+    <h1>SCP 콘솔 회귀 대시보드</h1>
+    <span class="muted">마지막 스위트 S20261002-1853 · 2026-10-02 18:56 · 3 spec · 탭 3 · 11분 · 마지막 실행 2026-10-02 18:57 management.servicewatch-log-group · 생성 2026-10-02 19:12</span>
+  </div>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
-<section>
-  <h2>요약</h2>
+<section id="summary">
+  <h2>요약 <small>원본: reports/runs · reports/suites · service-map/coverage.yaml · docs/api-ui-parity.md — <code>npm run results</code> 로 재생성</small></h2>
   <div class="cards">
-    <div class="card"><div class="k">현재 녹색 spec</div><div class="v">55 <span class="s">/ 56 (스위트 55)</span></div><div class="s">각 spec 의 마지막 실행 기준</div></div>
-    <div class="card"><div class="k">통과율(전체 기록)</div><div class="v">63% <span class="s">190/300</span></div><div class="s">실패 분류: unclassified 104 · environment 6</div></div>
-    <div class="card"><div class="k">커버리지 L2+</div><div class="v">47% <span class="s">53/112 리소스</span></div><div class="s">L3+ 33 · 탐색 38회</div></div>
+    <div class="card alert"><div class="k">현재 녹색 spec</div><div class="v">54 <span class="s">/ 55</span></div><div class="s">스위트 spec 의 마지막 실행 기준 · 기록 없음 0</div></div>
+    <div class="card "><div class="k">마지막 스위트 첫 시도</div><div class="v">67% <span class="s">2/3</span></div><div class="s">최종 2/3</div></div>
+    <div class="card alert"><div class="k">최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span></div><div class="v">107 <span class="s">/ 실행 324</span></div><div class="s"><span class="causes"><span class="c-unclassified">미분류 35</span><span class="c-cleanup">정리 실패 5</span><span class="c-flaky">간헐(재시도 통과) 43</span><span class="c-environment">환경 24</span></span></div></div>
+    <div class="card "><div class="k">불안정 spec</div><div class="v">0</div><div class="s">스위트 실행 최근 10회에 실패가 섞이고 마지막은 통과</div></div>
+    <div class="card "><div class="k">커버리지 L2+</div><div class="v">47% <span class="s">53/112</span></div><div class="s">L3+ 33/112 (29%)</div></div>
+    <div class="card "><div class="k">API 대응</div><div class="v">100% <span class="s">52/52</span></div><div class="s">제외 3 · 진행 0</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:5.982905982905983%"></span><span class="pass" style="height:23.076923076923077%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 15 실패 22"><div class="stack"><span class="fail" style="height:18.803418803418804%"></span><span class="pass" style="height:12.82051282051282%"></span></div><div class="lbl">09-28</div></div><div class="col" title="2026-09-29 통과 68 실패 40"><div class="stack"><span class="fail" style="height:34.18803418803419%"></span><span class="pass" style="height:58.119658119658126%"></span></div><div class="lbl">09-29</div></div><div class="col" title="2026-09-30 통과 76 실패 41"><div class="stack"><span class="fail" style="height:35.04273504273504%"></span><span class="pass" style="height:64.95726495726495%"></span></div><div class="lbl">09-30</div></div><div class="col" title="2026-10-01 통과 4 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:3.418803418803419%"></span></div><div class="lbl">10-01</div></div></div>
-  <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span><i style="background:var(--env)"></i>환경(세션·브라우저)</span></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:5.982905982905983%"></span><span class="pass" style="height:23.076923076923077%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 15 실패 22"><div class="stack"><span class="fail" style="height:18.803418803418804%"></span><span class="pass" style="height:12.82051282051282%"></span></div><div class="lbl">09-28</div></div><div class="col" title="2026-09-29 통과 68 실패 40"><div class="stack"><span class="fail" style="height:34.18803418803419%"></span><span class="pass" style="height:58.119658119658126%"></span></div><div class="lbl">09-29</div></div><div class="col" title="2026-09-30 통과 76 실패 41"><div class="stack"><span class="fail" style="height:35.04273504273504%"></span><span class="pass" style="height:64.95726495726495%"></span></div><div class="lbl">09-30</div></div><div class="col" title="2026-10-01 통과 4 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:3.418803418803419%"></span></div><div class="lbl">10-01</div></div><div class="col" title="2026-10-02 통과 54 실패 4"><div class="stack"><span class="fail" style="height:3.418803418803419%"></span><span class="pass" style="height:46.15384615384615%"></span></div><div class="lbl">10-02</div></div></div>
+  <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span class="muted">일별 실행 기록(디버깅 재실행 포함)</span></div>
 </section>
 
-<section>
-  <h2>spec 별 최근 상태 <small>실행 순서 = src/report/suite.ts</small></h2>
+<section id="actions">
+  <h2>조치 필요 <small>마지막 실행이 실패한 spec · 남은 리소스 · 정리 실패 · 불안정 · 대응 진행 중</small></h2>
+  <ul class="actions"><li class="act c-unclassified"><span class="cause c-unclassified">미분류</span> <span class="mono">management.servicewatch-log-group</span> <span class="muted">2026-10-02 18:57</span> <span class="err">Error: swl-1002-1857-5b40 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)</span> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip">trace.zip</a></li>
+<li class="act c-cleanup"><span class="cause c-cleanup">정리 실패</span> 최근 7일 정리 실패 5건 (networking.vpc-peering, networking.vpn, compute.vm-stack, container.repository) — 남은 리소스 확인</li></ul>
+  <p class="legend"><span><span class="cause c-product">제품 결함</span></span><span><span class="cause c-unclassified">미분류</span></span><span><span class="cause c-cleanup">정리 실패</span></span><span><span class="cause c-test">테스트 코드</span></span><span><span class="cause c-flaky">간헐(재시도 통과)</span></span><span><span class="cause c-environment">환경</span></span><span class="muted">제품 결함은 data/known-issues.yaml 에 kind: product 로 등록한 것만. 간헐 = 다음 실행(48시간 안)이 통과.</span></p>
+</section>
+
+<section id="specs">
+  <h2>spec 상태 <small>실행 순서 = src/report/suite.ts · 최근 10회</small></h2>
   <table><thead><tr><th>spec</th><th>결과</th><th>마지막 실행</th><th class="num">소요</th><th>최근 10회</th><th class="num">통과 평균</th></tr></thead>
   <tbody><tr>
         <td class="mono">networking.vpc.create-delete</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:04</td>
-        <td class="num">56초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 17:00 PASS 41초"></span><span class="dot pass" title="2026-09-23 17:09 PASS 42초"></span><span class="dot pass" title="2026-09-23 20:04 PASS 42초"></span><span class="dot pass" title="2026-09-29 15:49 PASS 42초"></span><span class="dot pass" title="2026-09-29 16:55 PASS 1분 15초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 56초"></span> <span class="muted">6/6</span></td>
-        <td class="num">50초</td>
+        <td>2026-10-02 18:47</td>
+        <td class="num">1분 6초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 17:00 PASS 41초"></span><span class="dot pass" title="2026-09-23 17:09 PASS 42초"></span><span class="dot pass" title="2026-09-23 20:04 PASS 42초"></span><span class="dot pass" title="2026-09-29 15:49 PASS 42초"></span><span class="dot pass" title="2026-09-29 16:55 PASS 1분 15초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 56초"></span><span class="dot pass" title="2026-10-02 18:47 PASS 1분 6초"></span> <span class="muted">7/7</span></td>
+        <td class="num">52초</td>
       </tr>
 <tr>
         <td class="mono">compute.vm-stack</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 16:38</td>
-        <td class="num">17분 41초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 17:09 PASS 13분 2초"></span><span class="dot fail" title="2026-09-23 20:05 FAIL(unclassified) 16분 17초"></span><span class="dot pass" title="2026-09-23 22:31 PASS 12분 20초"></span><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 12분 57초"></span><span class="dot pass" title="2026-09-28 10:00 PASS 14분 36초"></span><span class="dot fail" title="2026-09-29 16:23 FAIL(unclassified) 26분 25초"></span><span class="dot pass" title="2026-09-29 17:05 PASS 12분 39초"></span><span class="dot pass" title="2026-09-30 10:17 PASS 19분 53초"></span><span class="dot pass" title="2026-09-30 16:38 PASS 17분 41초"></span> <span class="muted">6/9</span></td>
-        <td class="num">15분 2초</td>
+        <td>2026-10-02 17:29</td>
+        <td class="num">20분 54초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 17:09 PASS 13분 2초"></span><span class="dot fail" title="2026-09-23 20:05 FAIL(unclassified) 16분 17초"></span><span class="dot pass" title="2026-09-23 22:31 PASS 12분 20초"></span><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 12분 57초"></span><span class="dot pass" title="2026-09-28 10:00 PASS 14분 36초"></span><span class="dot fail" title="2026-09-29 16:23 FAIL(unclassified) 26분 25초"></span><span class="dot pass" title="2026-09-29 17:05 PASS 12분 39초"></span><span class="dot pass" title="2026-09-30 10:17 PASS 19분 53초"></span><span class="dot pass" title="2026-09-30 16:38 PASS 17분 41초"></span><span class="dot pass" title="2026-10-02 17:29 PASS 20분 54초"></span> <span class="muted">7/10</span></td>
+        <td class="num">15분 52초</td>
       </tr>
 <tr>
         <td class="mono">compute.vm-volume</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 09:51</td>
-        <td class="num">18분 3초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 17:22 PASS 15분 27초"></span><span class="dot pass" title="2026-09-23 20:21 PASS 16분 21초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 4분 25초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 16분 3초"></span><span class="dot pass" title="2026-09-30 09:51 PASS 18분 3초"></span> <span class="muted">4/5</span></td>
-        <td class="num">16분 29초</td>
+        <td>2026-10-02 17:30</td>
+        <td class="num">19분 51초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 17:22 PASS 15분 27초"></span><span class="dot pass" title="2026-09-23 20:21 PASS 16분 21초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 4분 25초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 16분 3초"></span><span class="dot pass" title="2026-09-30 09:51 PASS 18분 3초"></span><span class="dot pass" title="2026-10-02 17:30 PASS 19분 51초"></span> <span class="muted">5/6</span></td>
+        <td class="num">17분 9초</td>
       </tr>
 <tr>
         <td class="mono">compute.vm-stack-net</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:13</td>
-        <td class="num">24분 48초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 17:38 FAIL(unclassified) 16분 29초"></span><span class="dot fail" title="2026-09-23 20:38 FAIL(unclassified) 63분 31초"></span><span class="dot pass" title="2026-09-28 07:35 PASS 14분 16초"></span><span class="dot fail" title="2026-09-29 13:50 FAIL(unclassified) 22초"></span><span class="dot pass" title="2026-09-29 16:18 PASS 17분 11초"></span><span class="dot pass" title="2026-09-30 10:13 PASS 24분 48초"></span> <span class="muted">3/6</span></td>
-        <td class="num">18분 45초</td>
+        <td>2026-10-02 17:50</td>
+        <td class="num">23분 43초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-23 17:38 FAIL(unclassified) 16분 29초"></span><span class="dot fail" title="2026-09-23 20:38 FAIL(unclassified) 63분 31초"></span><span class="dot pass" title="2026-09-28 07:35 PASS 14분 16초"></span><span class="dot fail" title="2026-09-29 13:50 FAIL(unclassified) 22초"></span><span class="dot pass" title="2026-09-29 16:18 PASS 17분 11초"></span><span class="dot pass" title="2026-09-30 10:13 PASS 24분 48초"></span><span class="dot pass" title="2026-10-02 17:50 PASS 23분 43초"></span> <span class="muted">4/7</span></td>
+        <td class="num">20분 0초</td>
       </tr>
 <tr>
         <td class="mono">compute.server-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:02</td>
-        <td class="num">1분 36초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 21:41 PASS 1분 22초"></span><span class="dot pass" title="2026-09-29 13:42 PASS 2분 4초"></span><span class="dot pass" title="2026-09-29 16:53 PASS 1분 31초"></span><span class="dot pass" title="2026-09-30 11:02 PASS 1분 36초"></span> <span class="muted">4/4</span></td>
-        <td class="num">1분 38초</td>
+        <td>2026-10-02 18:45</td>
+        <td class="num">1분 21초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 21:41 PASS 1분 22초"></span><span class="dot pass" title="2026-09-29 13:42 PASS 2분 4초"></span><span class="dot pass" title="2026-09-29 16:53 PASS 1분 31초"></span><span class="dot pass" title="2026-09-30 11:02 PASS 1분 36초"></span><span class="dot pass" title="2026-10-02 18:45 PASS 1분 21초"></span> <span class="muted">5/5</span></td>
+        <td class="num">1분 35초</td>
       </tr>
 <tr>
         <td class="mono">security.address-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:03</td>
-        <td class="num">2분 14초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 21:43 PASS 1분 23초"></span><span class="dot fail" title="2026-09-28 10:38 FAIL(unclassified) 2분 2초"></span><span class="dot pass" title="2026-09-28 10:43 PASS 1분 16초"></span><span class="dot pass" title="2026-09-29 09:13 PASS 1분 42초"></span><span class="dot fail" title="2026-09-29 13:42 FAIL(unclassified) 6분 19초"></span><span class="dot pass" title="2026-09-29 16:54 PASS 2분 38초"></span><span class="dot pass" title="2026-09-30 11:03 PASS 2분 14초"></span> <span class="muted">5/7</span></td>
-        <td class="num">1분 51초</td>
+        <td>2026-10-02 18:45</td>
+        <td class="num">2분 57초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 21:43 PASS 1분 23초"></span><span class="dot fail" title="2026-09-28 10:38 FAIL(unclassified) 2분 2초"></span><span class="dot pass" title="2026-09-28 10:43 PASS 1분 16초"></span><span class="dot pass" title="2026-09-29 09:13 PASS 1분 42초"></span><span class="dot fail" title="2026-09-29 13:42 FAIL(unclassified) 6분 19초"></span><span class="dot pass" title="2026-09-29 16:54 PASS 2분 38초"></span><span class="dot pass" title="2026-09-30 11:03 PASS 2분 14초"></span><span class="dot pass" title="2026-10-02 18:45 PASS 2분 57초"></span> <span class="muted">6/8</span></td>
+        <td class="num">2분 2초</td>
       </tr>
 <tr>
         <td class="mono">storage.object-storage-bucket</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 13:53</td>
-        <td class="num">1분 21초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 17:37 FAIL(unclassified) 1분 6초"></span><span class="dot pass" title="2026-09-23 17:40 PASS 1분 9초"></span><span class="dot pass" title="2026-09-23 21:44 PASS 1분 20초"></span><span class="dot pass" title="2026-09-29 13:44 PASS 3분 20초"></span><span class="dot pass" title="2026-09-29 16:54 PASS 1분 24초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 1분 33초"></span><span class="dot pass" title="2026-09-30 13:53 PASS 1분 21초"></span> <span class="muted">6/7</span></td>
-        <td class="num">1분 41초</td>
+        <td>2026-10-02 18:46</td>
+        <td class="num">1분 47초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-23 17:37 FAIL(unclassified) 1분 6초"></span><span class="dot pass" title="2026-09-23 17:40 PASS 1분 9초"></span><span class="dot pass" title="2026-09-23 21:44 PASS 1분 20초"></span><span class="dot pass" title="2026-09-29 13:44 PASS 3분 20초"></span><span class="dot pass" title="2026-09-29 16:54 PASS 1분 24초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 1분 33초"></span><span class="dot pass" title="2026-09-30 13:53 PASS 1분 21초"></span><span class="dot pass" title="2026-10-02 18:46 PASS 1분 47초"></span> <span class="muted">7/8</span></td>
+        <td class="num">1분 42초</td>
       </tr>
 <tr>
         <td class="mono">management.resource-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:05</td>
-        <td class="num">1분 18초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 18:00 PASS 52초"></span><span class="dot pass" title="2026-09-23 21:45 PASS 57초"></span><span class="dot fail" title="2026-09-29 13:48 FAIL(unclassified) 2분 28초"></span><span class="dot pass" title="2026-09-29 16:56 PASS 1분 1초"></span><span class="dot pass" title="2026-09-30 11:05 PASS 1분 18초"></span> <span class="muted">4/5</span></td>
-        <td class="num">1분 2초</td>
+        <td>2026-10-02 18:47</td>
+        <td class="num">1분 13초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 18:00 PASS 52초"></span><span class="dot pass" title="2026-09-23 21:45 PASS 57초"></span><span class="dot fail" title="2026-09-29 13:48 FAIL(unclassified) 2분 28초"></span><span class="dot pass" title="2026-09-29 16:56 PASS 1분 1초"></span><span class="dot pass" title="2026-09-30 11:05 PASS 1분 18초"></span><span class="dot pass" title="2026-10-02 18:47 PASS 1분 13초"></span> <span class="muted">5/6</span></td>
+        <td class="num">1분 4초</td>
       </tr>
 <tr>
         <td class="mono">iam.user-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:05</td>
-        <td class="num">1분 6초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 18:01 PASS 53초"></span><span class="dot pass" title="2026-09-23 21:46 PASS 58초"></span><span class="dot fail" title="2026-09-29 13:49 FAIL(unclassified) 1분 40초"></span><span class="dot pass" title="2026-09-29 16:57 PASS 1분 1초"></span><span class="dot pass" title="2026-09-30 11:05 PASS 1분 6초"></span> <span class="muted">4/5</span></td>
-        <td class="num">60초</td>
+        <td>2026-10-02 18:48</td>
+        <td class="num">58초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 18:01 PASS 53초"></span><span class="dot pass" title="2026-09-23 21:46 PASS 58초"></span><span class="dot fail" title="2026-09-29 13:49 FAIL(unclassified) 1분 40초"></span><span class="dot pass" title="2026-09-29 16:57 PASS 1분 1초"></span><span class="dot pass" title="2026-09-30 11:05 PASS 1분 6초"></span><span class="dot pass" title="2026-10-02 18:48 PASS 58초"></span> <span class="muted">5/6</span></td>
+        <td class="num">59초</td>
       </tr>
 <tr>
         <td class="mono">compute.launch-configuration</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:04</td>
-        <td class="num">1분 51초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 18:02 FAIL(unclassified) 51초"></span><span class="dot pass" title="2026-09-23 18:05 PASS 1분 25초"></span><span class="dot pass" title="2026-09-23 21:47 PASS 1분 29초"></span><span class="dot pass" title="2026-09-29 09:15 PASS 1분 19초"></span><span class="dot pass" title="2026-09-29 16:55 PASS 1분 53초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 1분 51초"></span> <span class="muted">5/6</span></td>
-        <td class="num">1분 35초</td>
+        <td>2026-10-02 18:47</td>
+        <td class="num">1분 45초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-23 18:02 FAIL(unclassified) 51초"></span><span class="dot pass" title="2026-09-23 18:05 PASS 1분 25초"></span><span class="dot pass" title="2026-09-23 21:47 PASS 1분 29초"></span><span class="dot pass" title="2026-09-29 09:15 PASS 1분 19초"></span><span class="dot pass" title="2026-09-29 16:55 PASS 1분 53초"></span><span class="dot pass" title="2026-09-30 11:04 PASS 1분 51초"></span><span class="dot pass" title="2026-10-02 18:47 PASS 1분 45초"></span> <span class="muted">6/7</span></td>
+        <td class="num">1분 37초</td>
       </tr>
 <tr>
         <td class="mono">networking.vpc-port</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 17:03</td>
-        <td class="num">15분 29초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 18:47 PASS 9분 25초"></span><span class="dot pass" title="2026-09-23 21:49 PASS 11분 11초"></span><span class="dot pass" title="2026-09-29 16:32 PASS 11분 54초"></span><span class="dot fail" title="2026-09-30 10:37 FAIL(unclassified) 2분 20초"></span><span class="dot pass" title="2026-09-30 11:17 PASS 10분 56초"></span><span class="dot pass" title="2026-09-30 17:03 PASS 15분 29초"></span> <span class="muted">5/6</span></td>
-        <td class="num">11분 47초</td>
+        <td>2026-10-02 17:44</td>
+        <td class="num">18분 58초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 18:47 PASS 9분 25초"></span><span class="dot pass" title="2026-09-23 21:49 PASS 11분 11초"></span><span class="dot pass" title="2026-09-29 16:32 PASS 11분 54초"></span><span class="dot fail" title="2026-09-30 10:37 FAIL(unclassified) 2분 20초"></span><span class="dot pass" title="2026-09-30 11:17 PASS 10분 56초"></span><span class="dot pass" title="2026-09-30 17:03 PASS 15분 29초"></span><span class="dot pass" title="2026-10-02 17:44 PASS 18분 58초"></span> <span class="muted">6/7</span></td>
+        <td class="num">12분 59초</td>
       </tr>
 <tr>
         <td class="mono">networking.private-dns</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:24</td>
-        <td class="num">6분 29초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 19:10 FAIL(unclassified) 6분 37초"></span><span class="dot pass" title="2026-09-23 19:30 PASS 6분 31초"></span><span class="dot pass" title="2026-09-23 22:00 PASS 6분 51초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 6분 8초"></span><span class="dot pass" title="2026-09-30 10:24 PASS 6분 29초"></span> <span class="muted">4/6</span></td>
-        <td class="num">6분 30초</td>
+        <td>2026-10-02 18:56</td>
+        <td class="num">5분 58초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-23 19:10 FAIL(unclassified) 6분 37초"></span><span class="dot pass" title="2026-09-23 19:30 PASS 6분 31초"></span><span class="dot pass" title="2026-09-23 22:00 PASS 6분 51초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 6분 8초"></span><span class="dot pass" title="2026-09-30 10:24 PASS 6분 29초"></span><span class="dot fail" title="2026-10-02 18:21 FAIL(unclassified) 18분 50초"></span><span class="dot pass" title="2026-10-02 18:56 PASS 5분 58초"></span> <span class="muted">5/8</span></td>
+        <td class="num">6분 23초</td>
       </tr>
 <tr>
         <td class="mono">storage.file-storage</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:01</td>
-        <td class="num">2분 32초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 19:37 PASS 1분 18초"></span><span class="dot pass" title="2026-09-23 22:07 PASS 1분 55초"></span><span class="dot pass" title="2026-09-29 13:39 PASS 9분 12초"></span><span class="dot fail" title="2026-09-29 16:52 FAIL(unclassified) 1분 25초"></span><span class="dot pass" title="2026-09-29 17:06 PASS 1분 30초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 2분 32초"></span> <span class="muted">5/6</span></td>
-        <td class="num">3분 17초</td>
+        <td>2026-10-02 18:44</td>
+        <td class="num">2분 8초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 19:37 PASS 1분 18초"></span><span class="dot pass" title="2026-09-23 22:07 PASS 1분 55초"></span><span class="dot pass" title="2026-09-29 13:39 PASS 9분 12초"></span><span class="dot fail" title="2026-09-29 16:52 FAIL(unclassified) 1분 25초"></span><span class="dot pass" title="2026-09-29 17:06 PASS 1분 30초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 2분 32초"></span><span class="dot pass" title="2026-10-02 18:44 PASS 2분 8초"></span> <span class="muted">6/7</span></td>
+        <td class="num">3분 6초</td>
       </tr>
 <tr>
         <td class="mono">networking.dns-hosted-zone</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 16:50</td>
-        <td class="num">8분 30초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-23 19:54 PASS 6분 54초"></span><span class="dot pass" title="2026-09-23 22:09 PASS 5분 59초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 54초"></span><span class="dot pass" title="2026-09-29 16:44 PASS 5분 43초"></span><span class="dot pass" title="2026-09-30 10:30 PASS 6분 3초"></span><span class="dot fail" title="2026-09-30 15:57 FAIL(unclassified) 9분 3초"></span><span class="dot fail" title="2026-09-30 16:26 FAIL(unclassified) 3분 56초"></span><span class="dot fail" title="2026-09-30 16:31 FAIL(unclassified) 17분 33초"></span><span class="dot pass" title="2026-09-30 16:50 PASS 8분 30초"></span> <span class="muted">5/9</span></td>
-        <td class="num">6분 38초</td>
+        <td>2026-10-02 18:18</td>
+        <td class="num">8분 32초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 19:54 PASS 6분 54초"></span><span class="dot pass" title="2026-09-23 22:09 PASS 5분 59초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 54초"></span><span class="dot pass" title="2026-09-29 16:44 PASS 5분 43초"></span><span class="dot pass" title="2026-09-30 10:30 PASS 6분 3초"></span><span class="dot fail" title="2026-09-30 15:57 FAIL(unclassified) 9분 3초"></span><span class="dot fail" title="2026-09-30 16:26 FAIL(unclassified) 3분 56초"></span><span class="dot fail" title="2026-09-30 16:31 FAIL(unclassified) 17분 33초"></span><span class="dot pass" title="2026-09-30 16:50 PASS 8분 30초"></span><span class="dot pass" title="2026-10-02 18:18 PASS 8분 32초"></span> <span class="muted">6/10</span></td>
+        <td class="num">6분 57초</td>
       </tr>
 <tr>
         <td class="mono">security.security-group-rule</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:01</td>
-        <td class="num">2분 28초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 09:35 FAIL(unclassified) 1분 51초"></span><span class="dot fail" title="2026-09-28 09:42 FAIL(unclassified) 2분 18초"></span><span class="dot fail" title="2026-09-28 09:56 FAIL(unclassified) 1분 51초"></span><span class="dot fail" title="2026-09-28 10:00 FAIL(unclassified) 2분 0초"></span><span class="dot fail" title="2026-09-28 10:08 FAIL(unclassified) 2분 36초"></span><span class="dot fail" title="2026-09-28 10:16 FAIL(unclassified) 1분 49초"></span><span class="dot pass" title="2026-09-28 10:26 PASS 1분 41초"></span><span class="dot pass" title="2026-09-29 13:41 PASS 7분 40초"></span><span class="dot pass" title="2026-09-29 16:53 PASS 2분 14초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 2분 28초"></span> <span class="muted">4/10</span></td>
-        <td class="num">3분 31초</td>
+        <td>2026-10-02 18:44</td>
+        <td class="num">2분 36초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:42 FAIL(unclassified) 2분 18초"></span><span class="dot fail" title="2026-09-28 09:56 FAIL(unclassified) 1분 51초"></span><span class="dot fail" title="2026-09-28 10:00 FAIL(unclassified) 2분 0초"></span><span class="dot fail" title="2026-09-28 10:08 FAIL(unclassified) 2분 36초"></span><span class="dot fail" title="2026-09-28 10:16 FAIL(unclassified) 1분 49초"></span><span class="dot pass" title="2026-09-28 10:26 PASS 1분 41초"></span><span class="dot pass" title="2026-09-29 13:41 PASS 7분 40초"></span><span class="dot pass" title="2026-09-29 16:53 PASS 2분 14초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 2분 28초"></span><span class="dot pass" title="2026-10-02 18:44 PASS 2분 36초"></span> <span class="muted">5/10</span></td>
+        <td class="num">3분 20초</td>
       </tr>
 <tr>
         <td class="mono">networking.nat-gateway</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:23</td>
-        <td class="num">17분 53초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 09:35 FAIL(unclassified) 10분 10초"></span><span class="dot fail" title="2026-09-28 09:48 FAIL(unclassified) 12분 43초"></span><span class="dot fail" title="2026-09-28 10:02 FAIL(unclassified) 14분 16초"></span><span class="dot pass" title="2026-09-28 10:34 PASS 11분 27초"></span><span class="dot pass" title="2026-09-29 16:32 PASS 18분 9초"></span><span class="dot pass" title="2026-09-30 10:23 PASS 17분 53초"></span> <span class="muted">3/6</span></td>
-        <td class="num">15분 50초</td>
+        <td>2026-10-02 18:10</td>
+        <td class="num">12분 49초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:35 FAIL(unclassified) 10분 10초"></span><span class="dot fail" title="2026-09-28 09:48 FAIL(unclassified) 12분 43초"></span><span class="dot fail" title="2026-09-28 10:02 FAIL(unclassified) 14분 16초"></span><span class="dot pass" title="2026-09-28 10:34 PASS 11분 27초"></span><span class="dot pass" title="2026-09-29 16:32 PASS 18분 9초"></span><span class="dot pass" title="2026-09-30 10:23 PASS 17분 53초"></span><span class="dot pass" title="2026-10-02 18:10 PASS 12분 49초"></span> <span class="muted">4/7</span></td>
+        <td class="num">15분 5초</td>
       </tr>
 <tr>
         <td class="mono">compute.auto-scaling-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:09</td>
-        <td class="num">14분 15초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 17분 7초"></span><span class="dot pass" title="2026-09-28 10:03 PASS 14분 51초"></span><span class="dot fail" title="2026-09-29 13:39 FAIL(unclassified) 11분 25초"></span><span class="dot pass" title="2026-09-29 16:18 PASS 14분 21초"></span><span class="dot pass" title="2026-09-29 19:30 PASS 11분 49초"></span><span class="dot pass" title="2026-09-29 19:42 PASS 17분 45초"></span><span class="dot fail" title="2026-09-29 20:00 FAIL(unclassified) 14분 22초"></span><span class="dot pass" title="2026-09-29 20:18 PASS 14분 41초"></span><span class="dot pass" title="2026-09-30 10:09 PASS 14분 15초"></span> <span class="muted">6/9</span></td>
-        <td class="num">14분 37초</td>
+        <td>2026-10-02 17:50</td>
+        <td class="num">13분 31초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 09:45 FAIL(unclassified) 17분 7초"></span><span class="dot pass" title="2026-09-28 10:03 PASS 14분 51초"></span><span class="dot fail" title="2026-09-29 13:39 FAIL(unclassified) 11분 25초"></span><span class="dot pass" title="2026-09-29 16:18 PASS 14분 21초"></span><span class="dot pass" title="2026-09-29 19:30 PASS 11분 49초"></span><span class="dot pass" title="2026-09-29 19:42 PASS 17분 45초"></span><span class="dot fail" title="2026-09-29 20:00 FAIL(unclassified) 14분 22초"></span><span class="dot pass" title="2026-09-29 20:18 PASS 14분 41초"></span><span class="dot pass" title="2026-09-30 10:09 PASS 14분 15초"></span><span class="dot pass" title="2026-10-02 17:50 PASS 13분 31초"></span> <span class="muted">7/10</span></td>
+        <td class="num">14분 28초</td>
       </tr>
 <tr>
         <td class="mono">networking.vpc-peering</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-01 10:02</td>
-        <td class="num">13분 33초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 19:31 FAIL(unclassified) 13분 14초"></span><span class="dot pass" title="2026-09-23 19:49 PASS 11분 36초"></span><span class="dot pass" title="2026-09-23 22:15 PASS 11분 53초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 12분 49초"></span><span class="dot pass" title="2026-09-30 10:30 PASS 12분 16초"></span><span class="dot fail" title="2026-09-30 18:17 FAIL(unclassified) 26분 8초"></span><span class="dot fail" title="2026-09-30 19:10 FAIL(unclassified) 13분 0초"></span><span class="dot pass" title="2026-10-01 10:02 PASS 13분 33초"></span> <span class="muted">5/8</span></td>
-        <td class="num">12분 25초</td>
+        <td>2026-10-02 18:07</td>
+        <td class="num">13분 57초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-23 19:31 FAIL(unclassified) 13분 14초"></span><span class="dot pass" title="2026-09-23 19:49 PASS 11분 36초"></span><span class="dot pass" title="2026-09-23 22:15 PASS 11분 53초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 12분 49초"></span><span class="dot pass" title="2026-09-30 10:30 PASS 12분 16초"></span><span class="dot fail" title="2026-09-30 18:17 FAIL(unclassified) 26분 8초"></span><span class="dot fail" title="2026-09-30 19:10 FAIL(unclassified) 13분 0초"></span><span class="dot pass" title="2026-10-01 10:02 PASS 13분 33초"></span><span class="dot pass" title="2026-10-02 18:07 PASS 13분 57초"></span> <span class="muted">6/9</span></td>
+        <td class="num">12분 41초</td>
       </tr>
 <tr>
         <td class="mono">container.ske-cluster</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 13:56</td>
-        <td class="num">29분 53초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-28 14:04 PASS 22분 37초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 17분 30초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 56초"></span><span class="dot pass" title="2026-09-29 16:01 PASS 21분 22초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 22분 49초"></span><span class="dot fail" title="2026-09-30 11:44 FAIL(unclassified) 58분 59초"></span><span class="dot fail" title="2026-09-30 12:49 FAIL(unclassified) 59분 29초"></span><span class="dot pass" title="2026-09-30 13:56 PASS 29분 53초"></span> <span class="muted">5/8</span></td>
-        <td class="num">22분 50초</td>
+        <td>2026-10-02 16:56</td>
+        <td class="num">30분 3초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-28 14:04 PASS 22분 37초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 17분 30초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 56초"></span><span class="dot pass" title="2026-09-29 16:01 PASS 21분 22초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 22분 49초"></span><span class="dot fail" title="2026-09-30 11:44 FAIL(unclassified) 58분 59초"></span><span class="dot fail" title="2026-09-30 12:49 FAIL(unclassified) 59분 29초"></span><span class="dot pass" title="2026-09-30 13:56 PASS 29분 53초"></span><span class="dot pass" title="2026-10-02 16:56 PASS 30분 3초"></span> <span class="muted">6/9</span></td>
+        <td class="num">24분 2초</td>
       </tr>
 <tr>
         <td class="mono">database.postgresql</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 17:53</td>
-        <td class="num">45분 35초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 14:04 FAIL(unclassified) 19분 48초"></span><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 26분 30초"></span><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 22초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 42초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 56초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 15분 29초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 16분 10초"></span><span class="dot fail" title="2026-09-30 17:06 FAIL(unclassified) 46분 16초"></span><span class="dot pass" title="2026-09-30 17:53 PASS 45분 35초"></span> <span class="muted">6/10</span></td>
-        <td class="num">24분 2초</td>
+        <td>2026-10-02 16:55</td>
+        <td class="num">30분 26초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-28 14:41 PASS 23분 48초"></span><span class="dot pass" title="2026-09-28 15:13 PASS 26분 30초"></span><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 22초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 42초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 15분 56초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 15분 29초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 16분 10초"></span><span class="dot fail" title="2026-09-30 17:06 FAIL(unclassified) 46분 16초"></span><span class="dot pass" title="2026-09-30 17:53 PASS 45분 35초"></span><span class="dot pass" title="2026-10-02 16:55 PASS 30분 26초"></span> <span class="muted">7/10</span></td>
+        <td class="num">24분 57초</td>
       </tr>
 <tr>
         <td class="mono">database.mysql</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-01 10:01</td>
-        <td class="num">34분 16초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 17초"></span><span class="dot fail" title="2026-09-28 16:12 FAIL(unclassified) 3분 13초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 35초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 16분 13초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 15분 32초"></span><span class="dot pass" title="2026-09-30 09:51 PASS 14분 45초"></span><span class="dot env" title="2026-09-30 18:39 FAIL(environment) 45분 41초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 34분 16초"></span> <span class="muted">4/9</span></td>
-        <td class="num">20분 12초</td>
+        <td>2026-10-02 16:55</td>
+        <td class="num">34분 56초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:57 FAIL(unclassified) 1분 17초"></span><span class="dot fail" title="2026-09-28 16:12 FAIL(unclassified) 3분 13초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 35초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 16분 13초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:02 PASS 15분 32초"></span><span class="dot pass" title="2026-09-30 09:51 PASS 14분 45초"></span><span class="dot env" title="2026-09-30 18:39 FAIL(environment) 45분 41초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 34분 16초"></span><span class="dot pass" title="2026-10-02 16:55 PASS 34분 56초"></span> <span class="muted">5/10</span></td>
+        <td class="num">23분 8초</td>
       </tr>
 <tr>
         <td class="mono">database.mariadb</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-01 10:01</td>
-        <td class="num">34분 45초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 15분 43초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 4분 27초"></span><span class="dot pass" title="2026-09-29 16:03 PASS 14분 17초"></span><span class="dot pass" title="2026-09-30 10:05 PASS 12분 17초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 34분 45초"></span> <span class="muted">4/6</span></td>
-        <td class="num">19분 16초</td>
+        <td>2026-10-02 16:56</td>
+        <td class="num">32분 40초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 15분 43초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 4분 27초"></span><span class="dot pass" title="2026-09-29 16:03 PASS 14분 17초"></span><span class="dot pass" title="2026-09-30 10:05 PASS 12분 17초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 34분 45초"></span><span class="dot pass" title="2026-10-02 16:56 PASS 32분 40초"></span> <span class="muted">5/7</span></td>
+        <td class="num">21분 56초</td>
       </tr>
 <tr>
         <td class="mono">database.epas</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-01 10:01</td>
-        <td class="num">30분 18초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 12초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 56초"></span><span class="dot pass" title="2026-09-29 16:17 PASS 15분 5초"></span><span class="dot pass" title="2026-09-30 10:06 PASS 17분 17초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 30분 18초"></span> <span class="muted">4/6</span></td>
-        <td class="num">19분 43초</td>
+        <td>2026-10-02 16:56</td>
+        <td class="num">33분 2초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 15:58 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-09-28 16:12 PASS 16분 12초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 56초"></span><span class="dot pass" title="2026-09-29 16:17 PASS 15분 5초"></span><span class="dot pass" title="2026-09-30 10:06 PASS 17분 17초"></span><span class="dot pass" title="2026-10-01 10:01 PASS 30분 18초"></span><span class="dot pass" title="2026-10-02 16:56 PASS 33분 2초"></span> <span class="muted">5/7</span></td>
+        <td class="num">22분 23초</td>
       </tr>
 <tr>
         <td class="mono">database.cachestore</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:07</td>
-        <td class="num">15분 3초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-28 16:03 FAIL(unclassified) 1분 31초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 34초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 15분 21초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:17 PASS 16분 11초"></span><span class="dot pass" title="2026-09-30 10:07 PASS 15분 3초"></span> <span class="muted">3/6</span></td>
-        <td class="num">15분 32초</td>
+        <td>2026-10-02 17:47</td>
+        <td class="num">16분 5초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-28 16:03 FAIL(unclassified) 1분 31초"></span><span class="dot fail" title="2026-09-28 16:34 FAIL(unclassified) 1분 34초"></span><span class="dot pass" title="2026-09-28 18:53 PASS 15분 21초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:17 PASS 16분 11초"></span><span class="dot pass" title="2026-09-30 10:07 PASS 15분 3초"></span><span class="dot pass" title="2026-10-02 17:47 PASS 16분 5초"></span> <span class="muted">4/7</span></td>
+        <td class="num">15분 40초</td>
       </tr>
 <tr>
         <td class="mono">application-service.queue</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:52</td>
-        <td class="num">2분 34초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 13:15 PASS 58초"></span><span class="dot pass" title="2026-09-29 13:37 PASS 4분 42초"></span><span class="dot pass" title="2026-09-29 15:47 PASS 1분 4초"></span><span class="dot pass" title="2026-09-29 16:51 PASS 1분 27초"></span><span class="dot pass" title="2026-09-30 10:52 PASS 2분 34초"></span> <span class="muted">5/5</span></td>
-        <td class="num">2분 9초</td>
+        <td>2026-10-02 18:35</td>
+        <td class="num">1분 41초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 13:15 PASS 58초"></span><span class="dot pass" title="2026-09-29 13:37 PASS 4분 42초"></span><span class="dot pass" title="2026-09-29 15:47 PASS 1분 4초"></span><span class="dot pass" title="2026-09-29 16:51 PASS 1분 27초"></span><span class="dot pass" title="2026-09-30 10:52 PASS 2분 34초"></span><span class="dot pass" title="2026-10-02 18:35 PASS 1분 41초"></span> <span class="muted">6/6</span></td>
+        <td class="num">2분 4초</td>
       </tr>
 <tr>
         <td class="mono">management.notification-group</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:53</td>
-        <td class="num">2분 7초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 13:17 PASS 1분 16초"></span><span class="dot env" title="2026-09-29 13:37 FAIL(environment) 12분 56초"></span><span class="dot pass" title="2026-09-29 16:51 PASS 1분 41초"></span><span class="dot pass" title="2026-09-30 10:53 PASS 2분 7초"></span> <span class="muted">3/4</span></td>
-        <td class="num">1분 41초</td>
+        <td>2026-10-02 18:36</td>
+        <td class="num">1분 20초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 13:17 PASS 1분 16초"></span><span class="dot env" title="2026-09-29 13:37 FAIL(environment) 12분 56초"></span><span class="dot pass" title="2026-09-29 16:51 PASS 1분 41초"></span><span class="dot pass" title="2026-09-30 10:53 PASS 2분 7초"></span><span class="dot pass" title="2026-10-02 18:36 PASS 1분 20초"></span> <span class="muted">4/5</span></td>
+        <td class="num">1분 36초</td>
       </tr>
 <tr>
         <td class="mono">compute.cloud-function</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:51</td>
-        <td class="num">4분 37초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 13:19 FAIL(unclassified) 2분 28초"></span><span class="dot pass" title="2026-09-29 13:22 PASS 1분 44초"></span><span class="dot pass" title="2026-09-29 13:37 PASS 5분 13초"></span><span class="dot pass" title="2026-09-29 16:52 PASS 2분 4초"></span><span class="dot fail" title="2026-09-29 18:18 FAIL(unclassified) 1분 42초"></span><span class="dot pass" title="2026-09-29 18:21 PASS 1분 45초"></span><span class="dot fail" title="2026-09-29 18:24 FAIL(unclassified) 8분 34초"></span><span class="dot fail" title="2026-09-29 18:46 FAIL(unclassified) 8분 46초"></span><span class="dot pass" title="2026-09-29 18:55 PASS 3분 43초"></span><span class="dot pass" title="2026-09-30 10:51 PASS 4분 37초"></span> <span class="muted">6/10</span></td>
-        <td class="num">3분 11초</td>
+        <td>2026-10-02 18:33</td>
+        <td class="num">4분 3초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 13:22 PASS 1분 44초"></span><span class="dot pass" title="2026-09-29 13:37 PASS 5분 13초"></span><span class="dot pass" title="2026-09-29 16:52 PASS 2분 4초"></span><span class="dot fail" title="2026-09-29 18:18 FAIL(unclassified) 1분 42초"></span><span class="dot pass" title="2026-09-29 18:21 PASS 1분 45초"></span><span class="dot fail" title="2026-09-29 18:24 FAIL(unclassified) 8분 34초"></span><span class="dot fail" title="2026-09-29 18:46 FAIL(unclassified) 8분 46초"></span><span class="dot pass" title="2026-09-29 18:55 PASS 3분 43초"></span><span class="dot pass" title="2026-09-30 10:51 PASS 4분 37초"></span><span class="dot pass" title="2026-10-02 18:33 PASS 4분 3초"></span> <span class="muted">7/10</span></td>
+        <td class="num">3분 18초</td>
       </tr>
 <tr>
         <td class="mono">container.container-registry</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:28</td>
-        <td class="num">6분 7초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 13:24 FAIL(unclassified) 5분 59초"></span><span class="dot env" title="2026-09-29 13:32 FAIL(environment) 3분 5초"></span><span class="dot fail" title="2026-09-29 13:37 FAIL(unclassified) 3분 35초"></span><span class="dot fail" title="2026-09-29 13:55 FAIL(unclassified) 15분 1초"></span><span class="dot pass" title="2026-09-29 14:11 PASS 6분 18초"></span><span class="dot fail" title="2026-09-29 16:49 FAIL(unclassified) 11분 44초"></span><span class="dot pass" title="2026-09-29 17:06 PASS 5분 40초"></span><span class="dot fail" title="2026-09-30 10:42 FAIL(unclassified) 12분 51초"></span><span class="dot pass" title="2026-09-30 11:28 PASS 6분 7초"></span> <span class="muted">3/9</span></td>
-        <td class="num">6분 2초</td>
+        <td>2026-10-02 18:56</td>
+        <td class="num">6분 54초</td>
+        <td class="dots"><span class="dot env" title="2026-09-29 13:32 FAIL(environment) 3분 5초"></span><span class="dot fail" title="2026-09-29 13:37 FAIL(unclassified) 3분 35초"></span><span class="dot fail" title="2026-09-29 13:55 FAIL(unclassified) 15분 1초"></span><span class="dot pass" title="2026-09-29 14:11 PASS 6분 18초"></span><span class="dot fail" title="2026-09-29 16:49 FAIL(unclassified) 11분 44초"></span><span class="dot pass" title="2026-09-29 17:06 PASS 5분 40초"></span><span class="dot fail" title="2026-09-30 10:42 FAIL(unclassified) 12분 51초"></span><span class="dot pass" title="2026-09-30 11:28 PASS 6분 7초"></span><span class="dot fail" title="2026-10-02 18:23 FAIL(unclassified) 12분 18초"></span><span class="dot pass" title="2026-10-02 18:56 PASS 6분 54초"></span> <span class="muted">4/10</span></td>
+        <td class="num">6분 15초</td>
       </tr>
 <tr>
         <td class="mono">iam.role</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:49</td>
-        <td class="num">1분 46초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 13:42 PASS 4분 32초"></span><span class="dot pass" title="2026-09-29 16:50 PASS 1분 21초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 1분 46초"></span> <span class="muted">3/3</span></td>
-        <td class="num">2분 33초</td>
+        <td>2026-10-02 18:32</td>
+        <td class="num">1분 31초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 13:42 PASS 4분 32초"></span><span class="dot pass" title="2026-09-29 16:50 PASS 1분 21초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 1분 46초"></span><span class="dot pass" title="2026-10-02 18:32 PASS 1분 31초"></span> <span class="muted">4/4</span></td>
+        <td class="num">2분 18초</td>
       </tr>
 <tr>
         <td class="mono">security.certificate</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:55</td>
-        <td class="num">2분 31초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 13:53 PASS 1분 11초"></span><span class="dot pass" title="2026-09-29 16:52 PASS 1분 23초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 2분 31초"></span> <span class="muted">3/3</span></td>
-        <td class="num">1분 42초</td>
+        <td>2026-10-02 18:37</td>
+        <td class="num">1분 40초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 13:53 PASS 1분 11초"></span><span class="dot pass" title="2026-09-29 16:52 PASS 1분 23초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 2분 31초"></span><span class="dot pass" title="2026-10-02 18:37 PASS 1분 40초"></span> <span class="muted">4/4</span></td>
+        <td class="num">1분 41초</td>
       </tr>
 <tr>
         <td class="mono">container.repository</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:36</td>
-        <td class="num">7분 14초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 14:20 FAIL(unclassified) 9분 8초"></span><span class="dot pass" title="2026-09-29 14:31 PASS 7분 55초"></span><span class="dot pass" title="2026-09-29 14:40 PASS 6분 54초"></span><span class="dot pass" title="2026-09-29 16:45 PASS 7분 11초"></span><span class="dot pass" title="2026-09-30 10:36 PASS 7분 14초"></span> <span class="muted">4/5</span></td>
-        <td class="num">7분 19초</td>
+        <td>2026-10-02 18:21</td>
+        <td class="num">8분 2초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 14:20 FAIL(unclassified) 9분 8초"></span><span class="dot pass" title="2026-09-29 14:31 PASS 7분 55초"></span><span class="dot pass" title="2026-09-29 14:40 PASS 6분 54초"></span><span class="dot pass" title="2026-09-29 16:45 PASS 7분 11초"></span><span class="dot pass" title="2026-09-30 10:36 PASS 7분 14초"></span><span class="dot pass" title="2026-10-02 18:21 PASS 8분 2초"></span> <span class="muted">5/6</span></td>
+        <td class="num">7분 27초</td>
       </tr>
 <tr>
         <td class="mono">security.kms-key</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:55</td>
-        <td class="num">2분 10초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 18:15 PASS 1분 15초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 2분 10초"></span> <span class="muted">2/2</span></td>
-        <td class="num">1분 43초</td>
+        <td>2026-10-02 18:37</td>
+        <td class="num">1분 33초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 18:15 PASS 1분 15초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 2분 10초"></span><span class="dot pass" title="2026-10-02 18:37 PASS 1분 33초"></span> <span class="muted">3/3</span></td>
+        <td class="num">1분 39초</td>
       </tr>
 <tr>
         <td class="mono">security.secrets-manager</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:55</td>
-        <td class="num">3분 10초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 18:23 FAIL(unclassified) 38초"></span><span class="dot pass" title="2026-09-29 18:25 PASS 1분 19초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 3분 10초"></span> <span class="muted">2/3</span></td>
-        <td class="num">2분 15초</td>
+        <td>2026-10-02 18:38</td>
+        <td class="num">2분 14초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 18:23 FAIL(unclassified) 38초"></span><span class="dot pass" title="2026-09-29 18:25 PASS 1분 19초"></span><span class="dot pass" title="2026-09-30 10:55 PASS 3분 10초"></span><span class="dot pass" title="2026-10-02 18:38 PASS 2분 14초"></span> <span class="muted">3/4</span></td>
+        <td class="num">2분 14초</td>
       </tr>
 <tr>
         <td class="mono">iam.policy</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:56</td>
-        <td class="num">4분 8초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 18:38 FAIL(unclassified) 1분 54초"></span><span class="dot pass" title="2026-09-29 18:41 PASS 1분 49초"></span><span class="dot pass" title="2026-09-30 10:56 PASS 4분 8초"></span> <span class="muted">2/3</span></td>
-        <td class="num">2분 59초</td>
+        <td>2026-10-02 18:38</td>
+        <td class="num">3분 45초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 18:38 FAIL(unclassified) 1분 54초"></span><span class="dot pass" title="2026-09-29 18:41 PASS 1분 49초"></span><span class="dot pass" title="2026-09-30 10:56 PASS 4분 8초"></span><span class="dot pass" title="2026-10-02 18:38 PASS 3분 45초"></span> <span class="muted">3/4</span></td>
+        <td class="num">3분 14초</td>
       </tr>
 <tr>
         <td class="mono">storage.file-storage-snapshot</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 18:57</td>
-        <td class="num">3분 21초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:05 PASS 2분 22초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 3분 9초"></span><span class="dot fail" title="2026-09-30 18:46 FAIL(unclassified) 3분 36초"></span><span class="dot fail" title="2026-09-30 18:50 FAIL(unclassified) 2분 50초"></span><span class="dot fail" title="2026-09-30 18:54 FAIL(unclassified) 2분 28초"></span><span class="dot pass" title="2026-09-30 18:57 PASS 3분 21초"></span> <span class="muted">3/6</span></td>
-        <td class="num">2분 57초</td>
+        <td>2026-10-02 18:33</td>
+        <td class="num">3분 39초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 19:05 PASS 2분 22초"></span><span class="dot pass" title="2026-09-30 11:01 PASS 3분 9초"></span><span class="dot fail" title="2026-09-30 18:46 FAIL(unclassified) 3분 36초"></span><span class="dot fail" title="2026-09-30 18:50 FAIL(unclassified) 2분 50초"></span><span class="dot fail" title="2026-09-30 18:54 FAIL(unclassified) 2분 28초"></span><span class="dot pass" title="2026-09-30 18:57 PASS 3분 21초"></span><span class="dot pass" title="2026-10-02 18:33 PASS 3분 39초"></span> <span class="muted">4/7</span></td>
+        <td class="num">3분 8초</td>
       </tr>
 <tr>
         <td class="mono">management.servicewatch-dashboard</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:56</td>
-        <td class="num">2분 3초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:10 PASS 1분 20초"></span><span class="dot pass" title="2026-09-30 10:56 PASS 2분 3초"></span> <span class="muted">2/2</span></td>
-        <td class="num">1분 42초</td>
+        <td>2026-10-02 18:39</td>
+        <td class="num">1분 59초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 19:10 PASS 1분 20초"></span><span class="dot pass" title="2026-09-30 10:56 PASS 2분 3초"></span><span class="dot pass" title="2026-10-02 18:39 PASS 1분 59초"></span> <span class="muted">3/3</span></td>
+        <td class="num">1분 47초</td>
       </tr>
 <tr>
         <td class="mono">management.servicewatch-log-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:57</td>
-        <td class="num">1분 57초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 19:12 FAIL(unclassified) 1분 35초"></span><span class="dot fail" title="2026-09-29 19:14 FAIL(unclassified) 1분 35초"></span><span class="dot pass" title="2026-09-29 19:16 PASS 1분 23초"></span><span class="dot pass" title="2026-09-30 10:57 PASS 1분 57초"></span> <span class="muted">2/4</span></td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td>2026-10-02 18:57</td>
+        <td class="num">3분 58초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 19:12 FAIL(unclassified) 1분 35초"></span><span class="dot fail" title="2026-09-29 19:14 FAIL(unclassified) 1분 35초"></span><span class="dot pass" title="2026-09-29 19:16 PASS 1분 23초"></span><span class="dot pass" title="2026-09-30 10:57 PASS 1분 57초"></span><span class="dot env" title="2026-10-02 18:39 FAIL(environment) 5분 41초"></span><span class="dot fail" title="2026-10-02 18:57 FAIL(unclassified) 3분 58초"></span> <span class="muted">2/6</span></td>
         <td class="num">1분 40초</td>
       </tr>
 <tr>
         <td class="mono">management.servicewatch-event-rule</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:58</td>
-        <td class="num">1분 48초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:18 PASS 1분 22초"></span><span class="dot pass" title="2026-09-30 10:58 PASS 1분 48초"></span> <span class="muted">2/2</span></td>
-        <td class="num">1분 35초</td>
+        <td>2026-10-02 18:40</td>
+        <td class="num">1분 46초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 19:18 PASS 1분 22초"></span><span class="dot pass" title="2026-09-30 10:58 PASS 1분 48초"></span><span class="dot pass" title="2026-10-02 18:40 PASS 1분 46초"></span> <span class="muted">3/3</span></td>
+        <td class="num">1분 39초</td>
       </tr>
 <tr>
         <td class="mono">management.servicewatch-alert</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 10:58</td>
-        <td class="num">2분 16초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:19 PASS 1분 19초"></span><span class="dot pass" title="2026-09-30 10:58 PASS 2분 16초"></span> <span class="muted">2/2</span></td>
-        <td class="num">1분 48초</td>
+        <td>2026-10-02 18:40</td>
+        <td class="num">2분 36초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 19:19 PASS 1분 19초"></span><span class="dot pass" title="2026-09-30 10:58 PASS 2분 16초"></span><span class="dot pass" title="2026-10-02 18:40 PASS 2분 36초"></span> <span class="muted">3/3</span></td>
+        <td class="num">2분 4초</td>
       </tr>
 <tr>
         <td class="mono">compute.volume-snapshot</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 16:33</td>
-        <td class="num">3분 22초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 19:16 FAIL(unclassified) 5분 10초"></span><span class="dot pass" title="2026-09-29 19:24 PASS 5분 3초"></span><span class="dot pass" title="2026-09-30 10:44 PASS 3분 26초"></span><span class="dot pass" title="2026-09-30 13:54 PASS 3분 32초"></span><span class="dot fail" title="2026-09-30 16:22 FAIL(unclassified) 2분 50초"></span><span class="dot env" title="2026-09-30 16:27 FAIL(environment) 2분 50초"></span><span class="dot pass" title="2026-09-30 16:33 PASS 3분 22초"></span> <span class="muted">4/7</span></td>
+        <td>2026-10-02 18:28</td>
+        <td class="num">3분 53초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 19:16 FAIL(unclassified) 5분 10초"></span><span class="dot pass" title="2026-09-29 19:24 PASS 5분 3초"></span><span class="dot pass" title="2026-09-30 10:44 PASS 3분 26초"></span><span class="dot pass" title="2026-09-30 13:54 PASS 3분 32초"></span><span class="dot fail" title="2026-09-30 16:22 FAIL(unclassified) 2분 50초"></span><span class="dot env" title="2026-09-30 16:27 FAIL(environment) 2분 50초"></span><span class="dot pass" title="2026-09-30 16:33 PASS 3분 22초"></span><span class="dot pass" title="2026-10-02 18:28 PASS 3분 53초"></span> <span class="muted">5/8</span></td>
         <td class="num">3분 51초</td>
       </tr>
 <tr>
         <td class="mono">management.network-logging</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:48</td>
+        <td>2026-10-02 18:41</td>
+        <td class="num">3분 4초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 19:26 PASS 1분 21초"></span><span class="dot fail" title="2026-09-30 10:59 FAIL(unclassified) 1분 46초"></span><span class="dot fail" title="2026-09-30 11:35 FAIL(unclassified) 1분 48초"></span><span class="dot fail" title="2026-09-30 11:45 FAIL(unclassified) 1분 52초"></span><span class="dot pass" title="2026-09-30 11:48 PASS 2분 12초"></span><span class="dot pass" title="2026-10-02 18:41 PASS 3분 4초"></span> <span class="muted">3/6</span></td>
         <td class="num">2분 12초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:26 PASS 1분 21초"></span><span class="dot fail" title="2026-09-30 10:59 FAIL(unclassified) 1분 46초"></span><span class="dot fail" title="2026-09-30 11:35 FAIL(unclassified) 1분 48초"></span><span class="dot fail" title="2026-09-30 11:45 FAIL(unclassified) 1분 52초"></span><span class="dot pass" title="2026-09-30 11:48 PASS 2분 12초"></span> <span class="muted">2/5</span></td>
-        <td class="num">1분 47초</td>
       </tr>
 <tr>
         <td class="mono">networking.load-balancer</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 17:55</td>
-        <td class="num">22분 13초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 19:32 FAIL(unclassified) 14분 2초"></span><span class="dot fail" title="2026-09-29 19:55 FAIL(unclassified) 15분 29초"></span><span class="dot fail" title="2026-09-29 20:12 FAIL(unclassified) 10분 55초"></span><span class="dot fail" title="2026-09-29 20:24 FAIL(unclassified) 14분 19초"></span><span class="dot env" title="2026-09-29 20:43 FAIL(environment) 11분 11초"></span><span class="dot pass" title="2026-09-30 07:33 PASS 16분 11초"></span><span class="dot fail" title="2026-09-30 10:22 FAIL(unclassified) 2분 40초"></span><span class="dot pass" title="2026-09-30 11:17 PASS 19분 7초"></span><span class="dot pass" title="2026-09-30 17:55 PASS 22분 13초"></span> <span class="muted">3/9</span></td>
-        <td class="num">19분 10초</td>
+        <td>2026-10-02 17:26</td>
+        <td class="num">20분 18초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 19:32 FAIL(unclassified) 14분 2초"></span><span class="dot fail" title="2026-09-29 19:55 FAIL(unclassified) 15분 29초"></span><span class="dot fail" title="2026-09-29 20:12 FAIL(unclassified) 10분 55초"></span><span class="dot fail" title="2026-09-29 20:24 FAIL(unclassified) 14분 19초"></span><span class="dot env" title="2026-09-29 20:43 FAIL(environment) 11분 11초"></span><span class="dot pass" title="2026-09-30 07:33 PASS 16분 11초"></span><span class="dot fail" title="2026-09-30 10:22 FAIL(unclassified) 2분 40초"></span><span class="dot pass" title="2026-09-30 11:17 PASS 19분 7초"></span><span class="dot pass" title="2026-09-30 17:55 PASS 22분 13초"></span><span class="dot pass" title="2026-10-02 17:26 PASS 20분 18초"></span> <span class="muted">4/10</span></td>
+        <td class="num">19분 27초</td>
       </tr>
 <tr>
         <td class="mono">financial-management.budget</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:36</td>
-        <td class="num">1분 56초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 19:34 FAIL(unclassified) 51초"></span><span class="dot pass" title="2026-09-29 19:35 PASS 1분 44초"></span><span class="dot env" title="2026-09-30 10:59 FAIL(environment) 1분 7초"></span><span class="dot pass" title="2026-09-30 11:36 PASS 1분 56초"></span> <span class="muted">2/4</span></td>
-        <td class="num">1분 50초</td>
+        <td>2026-10-02 18:42</td>
+        <td class="num">2분 55초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 19:34 FAIL(unclassified) 51초"></span><span class="dot pass" title="2026-09-29 19:35 PASS 1분 44초"></span><span class="dot env" title="2026-09-30 10:59 FAIL(environment) 1분 7초"></span><span class="dot pass" title="2026-09-30 11:36 PASS 1분 56초"></span><span class="dot pass" title="2026-10-02 18:42 PASS 2분 55초"></span> <span class="muted">3/5</span></td>
+        <td class="num">2분 12초</td>
       </tr>
 <tr>
         <td class="mono">application-service.api-gateway</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 18:36</td>
-        <td class="num">9분 5초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 19:51 PASS 5분 38초"></span><span class="dot pass" title="2026-09-30 10:42 PASS 6분 11초"></span><span class="dot fail" title="2026-09-30 17:25 FAIL(unclassified) 7분 47초"></span><span class="dot fail" title="2026-09-30 17:35 FAIL(unclassified) 6분 48초"></span><span class="dot fail" title="2026-09-30 17:42 FAIL(unclassified) 8분 43초"></span><span class="dot pass" title="2026-09-30 17:52 PASS 7분 33초"></span><span class="dot fail" title="2026-09-30 18:02 FAIL(unclassified) 9분 50초"></span><span class="dot fail" title="2026-09-30 18:12 FAIL(unclassified) 9분 20초"></span><span class="dot fail" title="2026-09-30 18:24 FAIL(unclassified) 9분 24초"></span><span class="dot pass" title="2026-09-30 18:36 PASS 9분 5초"></span> <span class="muted">4/10</span></td>
-        <td class="num">7분 7초</td>
+        <td>2026-10-02 18:08</td>
+        <td class="num">9분 54초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 10:42 PASS 6분 11초"></span><span class="dot fail" title="2026-09-30 17:25 FAIL(unclassified) 7분 47초"></span><span class="dot fail" title="2026-09-30 17:35 FAIL(unclassified) 6분 48초"></span><span class="dot fail" title="2026-09-30 17:42 FAIL(unclassified) 8분 43초"></span><span class="dot pass" title="2026-09-30 17:52 PASS 7분 33초"></span><span class="dot fail" title="2026-09-30 18:02 FAIL(unclassified) 9분 50초"></span><span class="dot fail" title="2026-09-30 18:12 FAIL(unclassified) 9분 20초"></span><span class="dot fail" title="2026-09-30 18:24 FAIL(unclassified) 9분 24초"></span><span class="dot pass" title="2026-09-30 18:36 PASS 9분 5초"></span><span class="dot pass" title="2026-10-02 18:08 PASS 9분 54초"></span> <span class="muted">4/10</span></td>
+        <td class="num">7분 40초</td>
       </tr>
 <tr>
         <td class="mono">application-service.messagehub-domain</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:36</td>
-        <td class="num">1분 13초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-29 20:03 PASS 58초"></span><span class="dot fail" title="2026-09-30 11:00 FAIL(unclassified) 2분 19초"></span><span class="dot pass" title="2026-09-30 11:36 PASS 1분 13초"></span> <span class="muted">2/3</span></td>
-        <td class="num">1분 6초</td>
+        <td>2026-10-02 18:42</td>
+        <td class="num">1분 30초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-29 20:03 PASS 58초"></span><span class="dot fail" title="2026-09-30 11:00 FAIL(unclassified) 2분 19초"></span><span class="dot pass" title="2026-09-30 11:36 PASS 1분 13초"></span><span class="dot pass" title="2026-10-02 18:42 PASS 1분 30초"></span> <span class="muted">3/4</span></td>
+        <td class="num">1분 14초</td>
       </tr>
 <tr>
         <td class="mono">application-service.messagehub-email</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:00</td>
-        <td class="num">2분 39초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-29 20:04 FAIL(unclassified) 3분 2초"></span><span class="dot pass" title="2026-09-29 20:12 PASS 1분 28초"></span><span class="dot pass" title="2026-09-30 11:00 PASS 2분 39초"></span> <span class="muted">2/3</span></td>
-        <td class="num">2분 4초</td>
+        <td>2026-10-02 18:43</td>
+        <td class="num">1분 59초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-29 20:04 FAIL(unclassified) 3분 2초"></span><span class="dot pass" title="2026-09-29 20:12 PASS 1분 28초"></span><span class="dot pass" title="2026-09-30 11:00 PASS 2분 39초"></span><span class="dot pass" title="2026-10-02 18:43 PASS 1분 59초"></span> <span class="muted">3/4</span></td>
+        <td class="num">2분 2초</td>
       </tr>
 <tr>
         <td class="mono">networking.firewall</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:30</td>
-        <td class="num">5분 4초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-30 07:52 FAIL(unclassified) 22분 29초"></span><span class="dot fail" title="2026-09-30 08:55 FAIL(unclassified) 22분 16초"></span><span class="dot pass" title="2026-09-30 09:30 PASS 4분 38초"></span><span class="dot fail" title="2026-09-30 10:47 FAIL(unclassified) 5분 24초"></span><span class="dot pass" title="2026-09-30 11:30 PASS 5분 4초"></span> <span class="muted">2/5</span></td>
-        <td class="num">4분 51초</td>
+        <td>2026-10-02 18:29</td>
+        <td class="num">6분 1초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-30 07:52 FAIL(unclassified) 22분 29초"></span><span class="dot fail" title="2026-09-30 08:55 FAIL(unclassified) 22분 16초"></span><span class="dot pass" title="2026-09-30 09:30 PASS 4분 38초"></span><span class="dot fail" title="2026-09-30 10:47 FAIL(unclassified) 5분 24초"></span><span class="dot pass" title="2026-09-30 11:30 PASS 5분 4초"></span><span class="dot pass" title="2026-10-02 18:29 PASS 6분 1초"></span> <span class="muted">3/6</span></td>
+        <td class="num">5분 14초</td>
       </tr>
 <tr>
         <td class="mono">networking.transit-gateway</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 18:58</td>
-        <td class="num">11분 40초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:33 PASS 10분 1초"></span><span class="dot pass" title="2026-09-30 10:38 PASS 11분 28초"></span><span class="dot fail" title="2026-09-30 17:19 FAIL(unclassified) 28분 10초"></span><span class="dot pass" title="2026-09-30 18:58 PASS 11분 40초"></span> <span class="muted">3/4</span></td>
-        <td class="num">11분 3초</td>
+        <td>2026-10-02 18:07</td>
+        <td class="num">13분 52초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:33 PASS 10분 1초"></span><span class="dot pass" title="2026-09-30 10:38 PASS 11분 28초"></span><span class="dot fail" title="2026-09-30 17:19 FAIL(unclassified) 28분 10초"></span><span class="dot pass" title="2026-09-30 18:58 PASS 11분 40초"></span><span class="dot pass" title="2026-10-02 18:07 PASS 13분 52초"></span> <span class="muted">4/5</span></td>
+        <td class="num">11분 45초</td>
       </tr>
 <tr>
         <td class="mono">networking.vpn</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:44</td>
-        <td class="num">7분 50초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:52 PASS 7분 21초"></span><span class="dot fail" title="2026-09-30 10:41 FAIL(unclassified) 10분 53초"></span><span class="dot fail" title="2026-09-30 11:23 FAIL(unclassified) 7분 49초"></span><span class="dot pass" title="2026-09-30 11:44 PASS 7분 50초"></span> <span class="muted">2/4</span></td>
-        <td class="num">7분 36초</td>
+        <td>2026-10-02 18:19</td>
+        <td class="num">8분 16초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:52 PASS 7분 21초"></span><span class="dot fail" title="2026-09-30 10:41 FAIL(unclassified) 10분 53초"></span><span class="dot fail" title="2026-09-30 11:23 FAIL(unclassified) 7분 49초"></span><span class="dot pass" title="2026-09-30 11:44 PASS 7분 50초"></span><span class="dot pass" title="2026-10-02 18:19 PASS 8분 16초"></span> <span class="muted">3/5</span></td>
+        <td class="num">7분 49초</td>
       </tr>
 <tr>
         <td class="mono">networking.vpc-endpoint</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 11:18</td>
-        <td class="num">4분 44초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:43 PASS 4분 48초"></span><span class="dot fail" title="2026-09-30 10:40 FAIL(unclassified) 2분 47초"></span><span class="dot pass" title="2026-09-30 11:18 PASS 4분 44초"></span> <span class="muted">2/3</span></td>
-        <td class="num">4분 46초</td>
+        <td>2026-10-02 18:14</td>
+        <td class="num">5분 20초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:43 PASS 4분 48초"></span><span class="dot fail" title="2026-09-30 10:40 FAIL(unclassified) 2분 47초"></span><span class="dot pass" title="2026-09-30 11:18 PASS 4분 44초"></span><span class="dot pass" title="2026-10-02 18:14 PASS 5분 20초"></span> <span class="muted">3/4</span></td>
+        <td class="num">4분 57초</td>
       </tr>
 <tr>
         <td class="mono">networking.direct-connect</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 17:48</td>
-        <td class="num">6분 25초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:53 PASS 4분 7초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 6분 17초"></span><span class="dot pass" title="2026-09-30 17:48 PASS 6분 25초"></span> <span class="muted">3/3</span></td>
-        <td class="num">5분 36초</td>
+        <td>2026-10-02 18:26</td>
+        <td class="num">6분 28초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:53 PASS 4분 7초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 6분 17초"></span><span class="dot pass" title="2026-09-30 17:48 PASS 6분 25초"></span><span class="dot pass" title="2026-10-02 18:26 PASS 6분 28초"></span> <span class="muted">4/4</span></td>
+        <td class="num">5분 49초</td>
       </tr>
 <tr>
         <td class="mono">data-analytics.event-streams</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 09:50</td>
-        <td class="num">14분 42초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:33 PASS 13분 55초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 14분 42초"></span> <span class="muted">2/2</span></td>
-        <td class="num">14분 19초</td>
+        <td>2026-10-02 17:28</td>
+        <td class="num">15분 44초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:33 PASS 13분 55초"></span><span class="dot pass" title="2026-09-30 09:50 PASS 14분 42초"></span><span class="dot pass" title="2026-10-02 17:28 PASS 15분 44초"></span> <span class="muted">3/3</span></td>
+        <td class="num">14분 47초</td>
       </tr>
 <tr>
         <td class="mono">networking.cdn</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 16:59</td>
-        <td class="num">25분 18초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-30 15:37 FAIL(unclassified) 1분 13초"></span><span class="dot fail" title="2026-09-30 15:40 FAIL(unclassified) 2분 25초"></span><span class="dot fail" title="2026-09-30 16:06 FAIL(unclassified) 18분 48초"></span><span class="dot pass" title="2026-09-30 16:59 PASS 25분 18초"></span> <span class="muted">1/4</span></td>
-        <td class="num">25분 18초</td>
+        <td>2026-10-02 17:25</td>
+        <td class="num">25분 58초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-30 15:37 FAIL(unclassified) 1분 13초"></span><span class="dot fail" title="2026-09-30 15:40 FAIL(unclassified) 2분 25초"></span><span class="dot fail" title="2026-09-30 16:06 FAIL(unclassified) 18분 48초"></span><span class="dot pass" title="2026-09-30 16:59 PASS 25분 18초"></span><span class="dot pass" title="2026-10-02 17:25 PASS 25분 58초"></span> <span class="muted">2/5</span></td>
+        <td class="num">25분 38초</td>
       </tr>
 <tr>
         <td class="mono">networking.gslb</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 15:54</td>
-        <td class="num">2분 2초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-30 15:45 FAIL(unclassified) 1분 19초"></span><span class="dot fail" title="2026-09-30 15:48 FAIL(unclassified) 1분 21초"></span><span class="dot fail" title="2026-09-30 15:51 FAIL(unclassified) 2분 8초"></span><span class="dot pass" title="2026-09-30 15:54 PASS 2분 2초"></span> <span class="muted">1/4</span></td>
-        <td class="num">2분 2초</td>
+        <td>2026-10-02 18:45</td>
+        <td class="num">2분 31초</td>
+        <td class="dots"><span class="dot fail" title="2026-09-30 15:45 FAIL(unclassified) 1분 19초"></span><span class="dot fail" title="2026-09-30 15:48 FAIL(unclassified) 1분 21초"></span><span class="dot fail" title="2026-09-30 15:51 FAIL(unclassified) 2분 8초"></span><span class="dot pass" title="2026-09-30 15:54 PASS 2분 2초"></span><span class="dot pass" title="2026-10-02 18:45 PASS 2분 31초"></span> <span class="muted">2/5</span></td>
+        <td class="num">2분 17초</td>
       </tr>
 <tr>
         <td class="mono">networking.privatelink-service</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-09-30 18:44</td>
-        <td class="num">14분 11초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 18:44 PASS 14분 11초"></span> <span class="muted">1/1</span></td>
-        <td class="num">14분 11초</td>
-      </tr>
-<tr>
+        <td>2026-10-02 17:51</td>
+        <td class="num">18분 50초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 18:44 PASS 14분 11초"></span><span class="dot pass" title="2026-10-02 17:51 PASS 18분 50초"></span> <span class="muted">2/2</span></td>
+        <td class="num">16분 31초</td>
+      </tr></tbody></table>
+  <details><summary>스위트에 없는 spec (제외·이름 바뀜) 1개</summary><table><tbody><tr>
         <td class="mono">database.searchengine</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
         <td>2026-09-28 16:04</td>
         <td class="num">1분 20초</td>
         <td class="dots"><span class="dot fail" title="2026-09-28 16:04 FAIL(unclassified) 1분 20초"></span> <span class="muted">0/1</span></td>
         <td class="num">-</td>
-      </tr></tbody></table>
+      </tr></tbody></table></details>
 </section>
 
-<section>
-  <h2>실행 기록 <small>최신 40건</small></h2>
-  <div class="filters">보기:
-    <button data-st="all" class="on">전체</button><button data-st="fail">실패</button><button data-st="env">환경</button><button data-st="pass">통과</button>
-  </div>
-  <table id="runs"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>run_id</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
-  <tbody><tr class="run pass" data-status="pass">
-        <td>2026-10-01 10:02</td>
-        <td class="mono">networking.vpc-peering</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">13분 33초</td>
-        <td class="mono small">1001-1002-f492</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-01 10:01</td>
-        <td class="mono">database.epas</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">30분 18초</td>
-        <td class="mono small">1001-1002-0299</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-01 10:01</td>
-        <td class="mono">database.mariadb</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">34분 45초</td>
-        <td class="mono small">1001-1001-8c19</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-01 10:01</td>
-        <td class="mono">database.mysql</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">34분 16초</td>
-        <td class="mono small">1001-1001-a9af</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 19:10</td>
-        <td class="mono">networking.vpc-peering</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">13분 0초</td>
-        <td class="mono small">0930-1910-70b3</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/screenshot-networking.vpc-peering.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 18:58</td>
-        <td class="mono">networking.transit-gateway</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">11분 40초</td>
-        <td class="mono small">0930-1858-b045</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 18:57</td>
-        <td class="mono">storage.file-storage-snapshot</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">3분 21초</td>
-        <td class="mono small">0930-1858-9f1d</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:54</td>
-        <td class="mono">storage.file-storage-snapshot</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">2분 28초</td>
-        <td class="mono small">0930-1854-75d4</td>
-        <td class="err">[steps[1] fss_0930185475d4 생성] Error: 탐색 끝 <span class="muted mono small">test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-12.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:50</td>
-        <td class="mono">storage.file-storage-snapshot</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">2분 50초</td>
-        <td class="mono small">0930-1851-03d6</td>
-        <td class="err">[steps[1] fss_0930185103d6 생성] Error: 탐색 끝 <span class="muted mono small">test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-5.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:46</td>
-        <td class="mono">storage.file-storage-snapshot</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">3분 36초</td>
-        <td class="mono small">0930-1846-305d</td>
-        <td class="err">[steps[1] fss_09301846305d 생성] TimeoutError: locator.innerText: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-12.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 18:44</td>
-        <td class="mono">networking.privatelink-service</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">14분 11초</td>
-        <td class="mono small">0930-1844-59e9</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run env" data-status="env">
-        <td>2026-09-30 18:39</td>
-        <td class="mono">database.mysql</td>
-        <td><span class="badge env">FAIL(environment)</span></td>
-        <td class="num">45분 41초</td>
-        <td class="mono small">0930-1839-74ce</td>
-        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요): <span class="muted mono small">test-results/artifacts/database.mysql/database.mysql-VPC-→-Subne-58be9-ySQL-DBaaS-단일-서버-생성-후-역순-해지-regression/screenshot-dbaas.ts.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 18:36</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">9분 5초</td>
-        <td class="mono small">0930-1836-54e5</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:24</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">9분 24초</td>
-        <td class="mono small">0930-1824-fd94</td>
-        <td class="err">[steps[8] Cloud Function fn-0930-1824-fd94 에 API Gateway 트리거 추가·삭제] Error: 트리거 탭 개수 1 <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-10.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:17</td>
-        <td class="mono">networking.vpc-peering</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">26분 8초</td>
-        <td class="mono small">0930-1817-f885</td>
-        <td class="err">[steps[4] 규칙 10.250.16.0/24 삭제] Error: URL 에 &quot;#/vpc/vpc-peering/detail/route&quot; 가 포함되어야 합니다 <span class="muted mono small">test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/test-failed-9.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
+<section id="failures">
+  <h2>실패 분류 <small>최근 14일 · 오류 첫 줄의 숫자·이름을 지워 같은 원인끼리 묶음</small></h2>
+  <table><thead><tr><th>원인</th><th class="num">건수</th><th>오류 시그니처</th><th>spec</th><th>최근</th><th>첨부</th></tr></thead><tbody><tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">15</td>
+        <td class="err">TimeoutError: locator.click: Timeout #ms exceeded.</td>
+        <td class="mono small">application-service.api-gateway<br>management.network-logging<br>networking.firewall<br>management.servicewatch-log-group<br>security.address-group<br>container.container-registry<br>database.searchengine<br>networking.nat-gateway<br>security.security-group-rule<br>compute.launch-configuration<br>storage.object-storage-bucket</td>
         <td>2026-09-30 18:12</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">9분 20초</td>
-        <td class="mono small">0930-1813-cf29</td>
-        <td class="err">[steps[8] Cloud Function fn-0930-1813-cf29 에 API Gateway 트리거 추가·삭제] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-5.png</span></td>
+        <td><a class="att" href="../test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png" title="test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png">screenshot-application-service.api-gateway.png</a> <a class="att" href="../test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip" title="test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip">trace.zip</a></td>
       </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 18:02</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">9분 50초</td>
-        <td class="mono small">0930-1802-891b</td>
-        <td class="err">[steps[8] Cloud Function fn-0930-1802-891b 에 API Gateway 트리거 추가·삭제] Error: 트리거 탭 개수 1 <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-4.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 17:55</td>
-        <td class="mono">networking.load-balancer</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">22분 13초</td>
-        <td class="mono small">0930-1755-18ce</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 17:53</td>
-        <td class="mono">database.postgresql</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">45분 35초</td>
-        <td class="mono small">0930-1753-5a41</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 17:52</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">7분 33초</td>
-        <td class="mono small">0930-1753-961a</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 17:48</td>
-        <td class="mono">networking.direct-connect</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">6분 25초</td>
-        <td class="mono small">0930-1748-ebeb</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 17:42</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">8분 43초</td>
-        <td class="mono small">0930-1743-dbd5</td>
-        <td class="err">[steps[7] 사용량 정책 plan-0930-1743-dbd5 + API Key key-0930-1743-dbd5 생성·삭제] Error: 탐색 끝 <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-7.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 17:35</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">6분 48초</td>
-        <td class="mono small">0930-1735-ceeb</td>
-        <td class="err">[steps[5] JWT 인증 jwt-0930-1735-ceeb 생성·삭제] TimeoutError: locator.click: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-5.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 17:25</td>
-        <td class="mono">application-service.api-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">7분 47초</td>
-        <td class="mono small">0930-1725-3096</td>
-        <td class="err">[탐색] Error: 탐색 끝 <span class="muted mono small">test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/test-failed-6.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 17:19</td>
-        <td class="mono">networking.transit-gateway</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">28분 10초</td>
-        <td class="mono small">0930-1720-b084</td>
-        <td class="err">[steps[5] 규칙 192.168.30.0/24 삭제] Error: URL 에 &quot;#/vpc/transit-gateway/detail/route&quot; 가 포함되어야 합니다 <span class="muted mono small">test-results/artifacts/networking.transit-gateway/networking.transit-gateway-097bb--→-규칙-추가·삭제-→-연결-해제-→-역순-삭제-regression/test-failed-5.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 17:06</td>
-        <td class="mono">database.postgresql</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">46분 16초</td>
-        <td class="mono small">0930-1706-338b</td>
-        <td class="err">[steps[4] Replica rep09301706338b 해지] Error: URL 에 &quot;#/postgresql/postgresql/list&quot; 가 포함되어야 합니다 <span class="muted mono small">test-results/artifacts/database.postgresql/database.postgresql-VPC-→--d0e4e-eSQL-DBaaS-단일-서버-생성-후-역순-해지-regression/test-failed-1.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 17:03</td>
-        <td class="mono">networking.vpc-port</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">15분 29초</td>
-        <td class="mono small">0930-1704-c1f1</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 16:59</td>
-        <td class="mono">networking.cdn</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">25분 18초</td>
-        <td class="mono small">0930-1659-4da3</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 16:50</td>
-        <td class="mono">networking.dns-hosted-zone</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">8분 30초</td>
-        <td class="mono small">0930-1650-088d</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 16:38</td>
-        <td class="mono">compute.vm-stack</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">17분 41초</td>
-        <td class="mono small">0930-1639-b5ee</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 16:33</td>
-        <td class="mono">compute.volume-snapshot</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">3분 22초</td>
-        <td class="mono small">0930-1634-83dc</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 16:31</td>
-        <td class="mono">networking.dns-hosted-zone</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">17분 33초</td>
-        <td class="mono small">0930-1632-73f4</td>
-        <td class="err">[steps[1] Private DNS pdns-0930-1632-73f4 생성] Error: pdns-0930-1632-73f4 상태 /Active/i 대기 900초 초과. 마지막: (행 없음) <span class="muted mono small">test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png</span></td>
-      </tr>
-<tr class="run env" data-status="env">
-        <td>2026-09-30 16:27</td>
-        <td class="mono">compute.volume-snapshot</td>
-        <td><span class="badge env">FAIL(environment)</span></td>
-        <td class="num">2분 50초</td>
-        <td class="mono small">0930-1628-ed71</td>
-        <td class="err">[steps[1] snap-0930-1628-ed71 생성] Error: page.goto: Target page, context or browser has been closed <span class="muted mono small">test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 16:26</td>
-        <td class="mono">networking.dns-hosted-zone</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">3분 56초</td>
-        <td class="mono small">0930-1626-9ae1</td>
-        <td class="err">[steps[1] Private DNS pdns-0930-1626-9ae1 생성] Error: locator.count: Target page, context or browser has been closed <span class="muted mono small">test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 16:22</td>
-        <td class="mono">compute.volume-snapshot</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">2분 50초</td>
-        <td class="mono small">0930-1623-2ee9</td>
-        <td class="err">Error: page.waitForTimeout: Target page, context or browser has been closed <span class="muted mono small">test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 16:06</td>
-        <td class="mono">networking.cdn</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">18분 48초</td>
-        <td class="mono small">0930-1607-0629</td>
-        <td class="err">Error: page.waitForTimeout: Target page, context or browser has been closed <span class="muted mono small">test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 15:57</td>
-        <td class="mono">networking.dns-hosted-zone</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">9분 3초</td>
-        <td class="mono small">0930-1557-afba</td>
-        <td class="err">[steps[3] 탐색] TimeoutError: locator.innerText: Timeout 15000ms exceeded. <span class="muted mono small">test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png</span></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-09-30 15:54</td>
-        <td class="mono">networking.gslb</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">2분 2초</td>
-        <td class="mono small">0930-1554-f6cf</td>
-        <td class="err"></td>
-      </tr>
-<tr class="run fail" data-status="fail">
-        <td>2026-09-30 15:51</td>
-        <td class="mono">networking.gslb</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">2분 8초</td>
-        <td class="mono small">0930-1551-bf30</td>
-        <td class="err">[steps[1] gslb09301551bf30 생성] SyntaxError: Unexpected token 'export' <span class="muted mono small">test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-2.png</span></td>
-      </tr>
-<tr class="run fail" data-status="fail">
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">14</td>
+        <td class="err">TimeoutError: locator.waitFor: Timeout #ms exceeded.</td>
+        <td class="mono small">networking.gslb<br>networking.load-balancer<br>iam.policy<br>compute.cloud-function<br>storage.file-storage<br>database.cachestore<br>database.mysql<br>database.postgresql<br>security.security-group-rule</td>
         <td>2026-09-30 15:48</td>
-        <td class="mono">networking.gslb</td>
-        <td><span class="badge fail">FAIL(unclassified)</span></td>
-        <td class="num">1분 21초</td>
-        <td class="mono small">0930-1548-cf0a</td>
-        <td class="err">TimeoutError: locator.waitFor: Timeout 10000ms exceeded. <span class="muted mono small">test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png</span></td>
+        <td><a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="cleanup">
+        <td><span class="cause c-cleanup">정리 실패</span></td>
+        <td class="num">11</td>
+        <td class="err">Error: 정리 중 실패 (남은 리소스를 확인하세요):</td>
+        <td class="mono small">networking.vpc-peering<br>database.mysql<br>networking.vpn<br>networking.load-balancer<br>compute.vm-stack<br>container.repository<br>compute.vm-stack-net</td>
+        <td>2026-09-30 19:10</td>
+        <td><a class="att" href="../test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/screenshot-networking.vpc-peering.png" title="test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/screenshot-networking.vpc-peering.png">screenshot-networking.vpc-peering.png</a> <a class="att" href="../test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">9</td>
+        <td class="err">Error: &quot;#&quot; 입력값이 남아 있어야 합니다</td>
+        <td class="mono small">networking.cdn<br>networking.vpc-endpoint<br>networking.vpc-port<br>networking.load-balancer<br>database.mysql<br>database.epas<br>database.mariadb<br>database.postgresql</td>
+        <td>2026-09-30 15:37</td>
+        <td><a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png">screenshot-networking.cdn.png</a> <a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">5</td>
+        <td class="err">Error: page.waitForTimeout: Target page, context or browser has been closed</td>
+        <td class="mono small">compute.volume-snapshot<br>networking.cdn<br>management.network-logging<br>networking.dns-hosted-zone<br>database.postgresql</td>
+        <td>2026-09-30 16:22</td>
+        <td><a class="att" href="../test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip" title="test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">4</td>
+        <td class="err">Error: 탐색 끝</td>
+        <td class="mono small">storage.file-storage-snapshot<br>application-service.api-gateway</td>
+        <td>2026-09-30 18:54</td>
+        <td><a class="att" href="../test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">4</td>
+        <td class="err">Error: locator.count: Target page, context or browser has been closed</td>
+        <td class="mono small">networking.dns-hosted-zone<br>financial-management.budget<br>compute.auto-scaling-group<br>container.container-registry</td>
+        <td>2026-09-30 16:26</td>
+        <td><a class="att" href="../test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png" title="test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png">screenshot-networking.dns-hosted-zone.png</a> <a class="att" href="../test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">4</td>
+        <td class="err">Error: page.title: Target page, context or browser has been closed</td>
+        <td class="mono small">networking.private-dns<br>database.cachestore<br>database.mysql<br>database.epas</td>
+        <td>2026-09-29 13:34</td>
+        <td><a class="att" href="../test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png" title="test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png">screenshot-session.setup.ts.png</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">3</td>
+        <td class="err">Error: # 상태 /Running|Active|Ready|Available/i 대기 #초 초과. 마지막: (행 없음)</td>
+        <td class="mono small">container.container-registry</td>
+        <td>2026-10-02 18:23</td>
+        <td><a class="att" href="../test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png" title="test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png">screenshot-container.container-registry.png</a> <a class="att" href="../test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip" title="test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">3</td>
+        <td class="err">Error: URL 에 &quot;#&quot; 가 포함되어야 합니다</td>
+        <td class="mono small">networking.vpc-peering<br>networking.transit-gateway<br>database.postgresql</td>
+        <td>2026-09-30 18:17</td>
+        <td><a class="att" href="../test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/screenshot-networking.vpc-peering.png" title="test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/screenshot-networking.vpc-peering.png">screenshot-networking.vpc-peering.png</a> <a class="att" href="../test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.vpc-peering/networking.vpc-peering-VPC-a8c33-ering-생성-→-규칙-추가·삭제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">3</td>
+        <td class="err">Error: browserContext.newPage: Target page, context or browser has been closed</td>
+        <td class="mono small">application-service.messagehub-domain<br>compute.vm-volume<br>database.mariadb</td>
+        <td>2026-09-30 11:00</td>
+        <td><a class="att" href="../test-results/artifacts/application-service.messagehub-domain/application-service.messag-d13fc-e-Hub-발신-도메인-등록-후-삭제-인증-없이--regression/trace.zip" title="test-results/artifacts/application-service.messagehub-domain/application-service.messag-d13fc-e-Hub-발신-도메인-등록-후-삭제-인증-없이--regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">3</td>
+        <td class="err">Error: worker process exited unexpectedly (code=#, signal=null)</td>
+        <td class="mono small">compute.vm-stack-net<br>iam.user-group<br>management.resource-group</td>
+        <td>2026-09-29 13:50</td>
+        <td></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">Error: # 상태 /Active/ 대기 #초 초과. 마지막: (행 없음)</td>
+        <td class="mono small">management.servicewatch-log-group</td>
+        <td>2026-10-02 18:57</td>
+        <td><a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">2</td>
+        <td class="err">Test timeout of #ms exceeded.</td>
+        <td class="mono small">networking.private-dns<br>compute.cloud-function</td>
+        <td>2026-10-02 18:21</td>
+        <td><a class="att" href="../test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md" title="test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md">error-context.md</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">TimeoutError: locator.innerText: Timeout #ms exceeded.</td>
+        <td class="mono small">storage.file-storage-snapshot<br>networking.dns-hosted-zone</td>
+        <td>2026-09-30 18:46</td>
+        <td><a class="att" href="../test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">Error: 트리거 탭 개수 #</td>
+        <td class="mono small">application-service.api-gateway</td>
+        <td>2026-09-30 18:24</td>
+        <td><a class="att" href="../test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png" title="test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/screenshot-application-service.api-gateway.png">screenshot-application-service.api-gateway.png</a> <a class="att" href="../test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip" title="test-results/artifacts/application-service.api-gateway/application-service.api-ga-0915e-→-리소스·메서드-추가-→-스테이지-배포-→-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">Error: # 소멸 대기 #초 초과. 마지막: # Standard-# s#v#m#(vCPU # | Memory #G) Ubuntu #.# (Kubernetes) v#.#.# # / # Running</td>
+        <td class="mono small">container.ske-cluster</td>
+        <td>2026-09-30 12:49</td>
+        <td><a class="att" href="../test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png" title="test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png">screenshot-container.ske-cluster.png</a> <a class="att" href="../test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip" title="test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">Error: 크론 호출 기동 로그: #초 초과. 마지막 로그: #-#-#T#:#:#.#Z Got SIGTERM. Graceful shutdown start #-#-#T#:#:#.#Z / #-#-#T#:#:#.#Z nodejs REST API running on port #! / #-#-</td>
+        <td class="mono small">compute.cloud-function</td>
+        <td>2026-09-29 18:46</td>
+        <td><a class="att" href="../test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip" title="test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">2</td>
+        <td class="err">Error: 추가한 규칙이 규칙 탭에 보여야 합니다</td>
+        <td class="mono small">security.security-group-rule</td>
+        <td>2026-09-28 10:08</td>
+        <td><a class="att" href="../test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png" title="test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png">screenshot-security.security-group-rule.png</a> <a class="att" href="../test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip" title="test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1</td>
+        <td class="err">Error: # 상태 /Active/i 대기 #초 초과. 마지막: (행 없음)</td>
+        <td class="mono small">networking.dns-hosted-zone</td>
+        <td>2026-09-30 16:31</td>
+        <td><a class="att" href="../test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png" title="test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png">screenshot-networking.dns-hosted-zone.png</a> <a class="att" href="../test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="environment">
+        <td><span class="cause c-environment">환경</span></td>
+        <td class="num">1</td>
+        <td class="err">Error: page.goto: Target page, context or browser has been closed</td>
+        <td class="mono small">compute.volume-snapshot</td>
+        <td>2026-09-30 16:27</td>
+        <td><a class="att" href="../test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip" title="test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1</td>
+        <td class="err">SyntaxError: Unexpected token '#'</td>
+        <td class="mono small">networking.gslb</td>
+        <td>2026-09-30 15:51</td>
+        <td><a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">1</td>
+        <td class="err">Error: CDN 상세에 해지 버튼이 없습니다: [&quot;#&quot;,&quot;#&quot;,&quot;#&quot;,&quot;#&quot;,&quot;#&quot;]</td>
+        <td class="mono small">networking.cdn</td>
+        <td>2026-09-30 15:40</td>
+        <td><a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png">screenshot-networking.cdn.png</a> <a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1</td>
+        <td class="err">Error: 목적지 주소가 들어가 있어야 합니다</td>
+        <td class="mono small">networking.firewall</td>
+        <td>2026-09-30 10:47</td>
+        <td><a class="att" href="../test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/screenshot-networking.firewall.png" title="test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/screenshot-networking.firewall.png">screenshot-networking.firewall.png</a> <a class="att" href="../test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1</td>
+        <td class="err">TimeoutError: page.waitForURL: Timeout #ms exceeded.</td>
+        <td class="mono small">networking.firewall</td>
+        <td>2026-09-30 08:55</td>
+        <td><a class="att" href="../test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/screenshot-networking.firewall.png" title="test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/screenshot-networking.firewall.png">screenshot-networking.firewall.png</a> <a class="att" href="../test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.firewall/networking.firewall-VPC-→--e8719-ewall-규칙-추가-→-규칙-삭제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
       </tr></tbody></table>
 </section>
 
-<section>
+<section id="suites">
+  <h2>스위트 이력 <small>reports/suites · 첫 시도 = 재실행 없이 통과 · 최종 = 같은 묶음의 재실행 포함</small></h2>
+  <table><thead><tr><th>스위트</th><th>시작</th><th class="num">첫 시도</th><th class="num">최종</th><th class="num">벽시계</th><th>남은 리소스</th><th>여전히 실패</th></tr></thead><tbody><tr>
+        <td class="mono">S20261002-1853</td>
+        <td>2026-10-02 18:56</td>
+        <td class="num">2/3 <span class="muted">(67%)</span></td>
+        <td class="num">2/3</td>
+        <td class="num">11분 <span class="muted">/ 직렬 17분 · 탭 3</span></td>
+        <td class="small">0</td>
+        <td class="mono small">management.servicewatch-log-group</td>
+      </tr></tbody></table>
+</section>
+
+<section id="coverage">
   <h2>커버리지 <small>service-map/coverage.yaml · level 0 없음 · 1 진입 · 2 CRUD · 3 동작 · 4 통합</small></h2>
+  <div class="cards"><div class="card "><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div><div class="card "><div class="k">L2+ (CRUD 이상)</div><div class="v">53 <span class="s">/ 112 · 47%</span></div><div class="s">L0 0 · L1 59 · L2 20 · L3 15 · L4 18</div></div><div class="card "><div class="k">L3+ (동작·통합)</div><div class="v">33 <span class="s">/ 112 · 29%</span></div><div class="s">L0 없음 · L1 진입 · L2 CRUD · L3 동작 · L4 통합</div></div></div>
   <div class="legend"><span><i class="l0"></i>L0 없음</span><span><i class="l1"></i>L1 진입</span><span><i class="l2"></i>L2 CRUD</span><span><i class="l3"></i>L3 동작</span><span><i class="l4"></i>L4 통합</span></div>
   
-    <div class="cards">
-      <div class="card"><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div>
-      <div class="card"><div class="k">L2+ (CRUD 이상)</div><div class="v">53 <span class="s">/ 112 · 47%</span></div><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:53%" title="L1 진입 59"></span><span class="seg l2" style="width:18%" title="L2 CRUD 20"></span><span class="seg l3" style="width:13%" title="L3 동작 15"></span><span class="seg l4" style="width:16%" title="L4 통합 18"></span></div></div>
-      <div class="card"><div class="k">L3+ (동작·통합)</div><div class="v">33 <span class="s">/ 112 · 29%</span></div><div class="s">L0 없음 0 · L1 진입 59 · L2 CRUD 20 · L3 동작 15 · L4 통합 18</div></div>
-    </div>
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
       <tbody><tr>
@@ -1957,7 +1867,13 @@
     </details>
 </section>
 
-<section>
+<section id="parity">
+  <h2>API 자동화 대비 화면 자동화 <small>docs/api-ui-parity.md · ✅ 화면 자동화 · 🔧 진행 · ⏭ 제외(이유는 항목별 표)</small></h2>
+  <table class="compact"><thead><tr><th>분류</th><th class="num">✅ 화면 자동화</th><th class="num">🔧 진행</th><th class="num">⏭ 제외</th></tr></thead><tbody><tr><td>Compute</td><td class="num">12</td><td class="num"></td><td class="num"></td></tr><tr><td>Container</td><td class="num">3</td><td class="num"></td><td class="num"></td></tr><tr><td>Database</td><td class="num">2</td><td class="num"></td><td class="num"></td></tr><tr><td>Data Analytics</td><td class="num">1</td><td class="num"></td><td class="num"></td></tr><tr><td>Networking</td><td class="num">18</td><td class="num"></td><td class="num"></td></tr><tr><td>Storage</td><td class="num">3</td><td class="num"></td><td class="num">2</td></tr><tr><td>Application Service</td><td class="num">3</td><td class="num"></td><td class="num">1</td></tr><tr><td>Management</td><td class="num">6</td><td class="num"></td><td class="num"></td></tr><tr><td>Financial Management</td><td class="num">1</td><td class="num"></td><td class="num"></td></tr><tr><td>Security</td><td class="num">3</td><td class="num"></td><td class="num"></td></tr></tbody></table>
+    <details><summary>항목별 (55)</summary><table><thead><tr><th></th><th>분류</th><th>API 리소스</th><th>UI spec · 비고</th></tr></thead><tbody><tr><td>✅</td><td>Compute</td><td class="small">virtualserver servers · keypairs · volumes · volume attach</td><td class="small">compute.vm-stack · compute.vm-volume</td></tr><tr><td>✅</td><td>Compute</td><td class="small">virtualserver security-groups · publicips · ports</td><td class="small">compute.vm-stack-net · networking.vpc-port</td></tr><tr><td>✅</td><td>Compute</td><td class="small">server-groups</td><td class="small">compute.server-group</td></tr><tr><td>✅</td><td>Compute</td><td class="small">launch-configurations · auto-scaling-groups</td><td class="small">compute.launch-configuration · compute.auto-scaling-group</td></tr><tr><td>✅</td><td>Compute</td><td class="small">auto-scaling-groups policies · schedules · notifications</td><td class="small">compute.auto-scaling-group steps[3] (정책·스케줄 L3). 알림은 ⏭ 수신자가 로그인 이력 있는 사용자만 가능 + 실제 메일</td></tr><tr><td>✅</td><td>Compute</td><td class="small">snapshots (볼륨 스냅샷)</td><td class="small">compute.volume-snapshot (스냅샷 복구 L3)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers interfaces · static-nats</td><td class="small">compute.vm-stack steps[7] (같은 Subnet 신규 네트워크 포트 추가·삭제, 2026-09-30). static NAT 는 compute.vm-stack-net 의 Public NAT IP 연결</td></tr><tr><td>✅</td><td>Compute</td><td class="small">images (서버 커스텀 Image · updateimage)</td><td class="small">compute.vm-stack steps[6] (Image 생성 → Visibility Shared → 삭제, 2026-09-30). 멤버 추가(createimagemember)는 공유 대상 Account 가 없어 ⏭, 공유용 Image(createsharingimage)는 Snapshot-Based 이미지만 가능해 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers dump</td><td class="small">compute.vm-stack steps[8] (Dump 생성, 파일은 서버 안 — 다운로드 없음)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">volume-transfer</td><td class="small">compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf cloud-functions</td><td class="small">compute.cloud-function</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf triggers cronjob · apigateway</td><td class="small">compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30)</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske clusters</td><td class="small">container.ske-cluster</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske nodepools</td><td class="small">container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3)</td></tr><tr><td>✅</td><td>Container</td><td class="small">scr container-registries · repositories</td><td class="small">container.container-registry · container.repository</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas · cachestore clusters</td><td class="small">database.* 5종</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas replicas (읽기 복제본)</td><td class="small">database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분)</td></tr><tr><td>✅</td><td>Data Analytics</td><td class="small">eventstreams clusters</td><td class="small">data-analytics.event-streams (공유 VPC)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpcs · subnets</td><td class="small">networking.vpc.create-delete · 모든 VPC 체인</td></tr><tr><td>✅</td><td>Networking</td><td class="small">internet-gateways · publicips</td><td class="small">compute.vm-stack-net · networking.nat-gateway</td></tr><tr><td>✅</td><td>Networking</td><td class="small">nat-gateways · vpc-peerings · private-dns · hosted-zones · hosted-zone records</td><td class="small">networking.nat-gateway · vpc-peering · private-dns · dns-hosted-zone (A 레코드 추가·삭제 L3, 2026-09-30)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">security-groups · security-group-rules · address-groups</td><td class="small">compute.vm-stack-net · security.security-group-rule · security.address-group</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancers · lb-server-groups · members · lb-listeners · static-nats</td><td class="small">networking.load-balancer (2026-09-30 PASS). 멤버는 실제 VM 필요로 미포함</td></tr><tr><td>✅</td><td>Networking</td><td class="small">firewalls rules</td><td class="small">networking.firewall (규칙 추가·삭제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateways · vpc-connections</td><td class="small">networking.transit-gateway (VPC 연결 추가·해제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpn gateways · tunnels</td><td class="small">networking.vpn (게이트웨이 + 터널)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc endpoints</td><td class="small">networking.vpc-endpoint</td></tr><tr><td>✅</td><td>Networking</td><td class="small">direct-connects</td><td class="small">networking.direct-connect (규칙 추가·삭제 L3, 시간 과금이라 즉시 해지)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">cdn services</td><td class="small">networking.cdn (원본 example.com, 배포 대기 → 중지 → 해지 ≈25분, 2026-09-30)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">gslbs</td><td class="small">networking.gslb (연결 대상 192.0.2.10, 2026-09-30)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">subnet vips · vip connected-ports · vip static-nat-ips (createsubnetvip·port·natip 2xx)</td><td class="small">networking.vpc-port steps[4~10] (IGW·Public IP → VIP 예약 → Port 연결 → Public NAT IP 연결·해제 → 역순, 2026-09-30 PASS 15.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateway routing-rules (createtransitgatewayrule 2xx)</td><td class="small">networking.transit-gateway steps[4~5] (VPC→TGW 목적지 규칙 추가·삭제, 2026-09-30 PASS 11.7분. 규칙이 남으면 VPC 연결 해제가 조용히 무시됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc-peering routing-rules (createvpcpeeringrule 2xx)</td><td class="small">networking.vpc-peering steps[3~4] (요청→승인 VPC 규칙 추가·삭제, L3). 10-01 PASS 13.6분</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancer public-nat-ip (createloadbalancerpublicnatip 2xx)</td><td class="small">networking.load-balancer steps[6~8] (IGW·Public IP → LB Public NAT IP 설정·해제, 공유 네트워크면 건너뜀, 2026-09-30 PASS 22분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">privatelink-services (+ endpoints: API 는 404)</td><td class="small">networking.privatelink-service (IP 연결 Service → 같은 계정 Endpoint 요청 → 승인 L3 → 역순, 2026-09-30 PASS 14분. Endpoint 도 콘솔에선 생성됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">private-nats (createprivatenat 202)</td><td class="small">networking.direct-connect steps[5~6] (이 spec 의 DC 를 연결 자원으로 Private NAT 생성·삭제, 2026-09-30 PASS 6.5분)</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage volumes</td><td class="small">storage.file-storage</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage snapshots · snapshot-schedules</td><td class="small">storage.file-storage-snapshot (스냅샷 스케줄 켜기·끄기, 2026-09-30)</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">filestorage replications</td><td class="small">— 복제 위치가 kr-east1-a 뿐(리전간 복제, 전송 요금). 정리가 DR 리전에서 일시중지→삭제 + 복제본 볼륨 삭제를 요구해 단일 리전 도구 범위 밖</td></tr><tr><td>✅</td><td>Storage</td><td class="small">object storage bucket</td><td class="small">storage.object-storage-bucket</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">backup backups</td><td class="small">제외 — 콘솔은 Agent 방식만(OS 안에 NetBackup 클라이언트 설치 필요). API 도 생성 성공 없음(createbackup 500, createbackupagent 404)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">queueservice queues</td><td class="small">application-service.queue</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">apigateway apis · resources · methods · stages · auths · access-controls · usage-plans · api-keys</td><td class="small">application-service.api-gateway (리소스·메서드·스테이지 배포 L3, JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제 L3 2026-09-30)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">messagehub domains · emails</td><td class="small">application-service.messagehub-domain · messagehub-email (소유 확인·인증 메일 발송은 하지 않음)</td></tr><tr><td>⏭</td><td>Application Service</td><td class="small">messagehub phones</td><td class="small">—</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam groups · roles</td><td class="small">iam.user-group · iam.role</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam policies · group policy-bindings</td><td class="small">iam.policy (그룹 연결·해제 L3)</td></tr><tr><td>✅</td><td>Management</td><td class="small">resource-groups</td><td class="small">management.resource-group</td></tr><tr><td>✅</td><td>Management</td><td class="small">notification groups</td><td class="small">management.notification-group</td></tr><tr><td>✅</td><td>Management</td><td class="small">servicewatch dashboards · log-groups · log-streams · event-rules · alerts</td><td class="small">management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert</td></tr><tr><td>✅</td><td>Management</td><td class="small">network-logging storages</td><td class="small">management.network-logging (버킷 체인, Firewall Logging 적용·해제)</td></tr><tr><td>✅</td><td>Financial Management</td><td class="small">budgets account</td><td class="small">financial-management.budget (금액 수정 L3)</td></tr><tr><td>✅</td><td>Security</td><td class="small">certificatemanager self-sign</td><td class="small">security.certificate</td></tr><tr><td>✅</td><td>Security</td><td class="small">kms keys</td><td class="small">security.kms-key</td></tr><tr><td>✅</td><td>Security</td><td class="small">secretsmanager secrets</td><td class="small">security.secrets-manager (해지는 7일 예약, 해지 취소 L3)</td></tr></tbody></table></details>
+</section>
+
+<section id="explore">
   <h2>탐색(Level 5, Jev) <small>recordings/explore</small></h2>
   <p class="muted">탐색 38회 · 이상 0건 · 정보 134건 · 누적 비용 $0.0581 (Level 5, 커버리지 분모에 넣지 않음)</p>
     <table><thead><tr><th>시각</th><th>이름</th><th>라우트</th><th class="num">결정/동작</th><th class="num">이상</th><th class="num">정보</th><th class="num">비용</th><th>종료 사유</th><th>보고서</th></tr></thead><tbody><tr>
@@ -1969,7 +1885,7 @@
         <td class="num">3</td>
         <td class="num">$0.0016</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vpc-list-202609272337/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-list-202609272337/report.md">recordings/explore/vpc-list-202609272337/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:48</td>
@@ -1980,7 +1896,7 @@
         <td class="num">3</td>
         <td class="num">$0.0022</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/vpc-list-202609230948/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-list-202609230948/report.md">recordings/explore/vpc-list-202609230948/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:26</td>
@@ -1991,7 +1907,7 @@
         <td class="num">0</td>
         <td class="num">$0.0000</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vpc-list-202609230926/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-list-202609230926/report.md">recordings/explore/vpc-list-202609230926/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-29 00:23</td>
@@ -2002,7 +1918,7 @@
         <td class="num">3</td>
         <td class="num">$0.0016</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/vpc-form-202609290023/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609290023/report.md">recordings/explore/vpc-form-202609290023/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-29 00:19</td>
@@ -2013,7 +1929,7 @@
         <td class="num">9</td>
         <td class="num">$0.0022</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/vpc-form-202609290019/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609290019/report.md">recordings/explore/vpc-form-202609290019/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 23:52</td>
@@ -2024,7 +1940,7 @@
         <td class="num">9</td>
         <td class="num">$0.0022</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/vpc-form-202609282352/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609282352/report.md">recordings/explore/vpc-form-202609282352/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-27 23:50</td>
@@ -2035,7 +1951,7 @@
         <td class="num">19</td>
         <td class="num">$0.0022</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/vpc-form-202609272350/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609272350/report.md">recordings/explore/vpc-form-202609272350/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-27 23:44</td>
@@ -2046,7 +1962,7 @@
         <td class="num">0</td>
         <td class="num">$0.0008</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/vpc-form-202609272344/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609272344/report.md">recordings/explore/vpc-form-202609272344/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 07:54</td>
@@ -2057,7 +1973,7 @@
         <td class="num">6</td>
         <td class="num">$0.0025</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vpc-form-202609230754/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609230754/report.md">recordings/explore/vpc-form-202609230754/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 07:50</td>
@@ -2068,7 +1984,7 @@
         <td class="num">2</td>
         <td class="num">$0.0014</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vpc-form-202609230750/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609230750/report.md">recordings/explore/vpc-form-202609230750/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 07:49</td>
@@ -2079,7 +1995,7 @@
         <td class="num">0</td>
         <td class="num">$0.0000</td>
         <td>Jev 호출 실패: 모델 연결 실패 (UNSPECIFIED: CA certificate key too weak; 경로: 환경 변수 프록시 (http://70.10.15.10:8080)); 동작을 실행하지 않았습니다. 인증서 오류면 docs/windows-node-proxy.md 의 NODE_OPTIONS/NODE_USE_SYSTEM_CA, 연결/DNS 오류면 .env 에 HTTPS_PROXY=http://프록시:포트 를 넣으세요.</td>
-        <td class="mono small">recordings/explore/vpc-form-202609230749/report.md</td>
+        <td class="small"><a href="../recordings/explore/vpc-form-202609230749/report.md">recordings/explore/vpc-form-202609230749/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 11:15</td>
@@ -2090,7 +2006,7 @@
         <td class="num">2</td>
         <td class="num">$0.0008</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/volume-list-202609231115/report.md</td>
+        <td class="small"><a href="../recordings/explore/volume-list-202609231115/report.md">recordings/explore/volume-list-202609231115/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:57</td>
@@ -2101,7 +2017,7 @@
         <td class="num">3</td>
         <td class="num">$0.0021</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/vm-list-202609230957/report.md</td>
+        <td class="small"><a href="../recordings/explore/vm-list-202609230957/report.md">recordings/explore/vm-list-202609230957/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-27 23:29</td>
@@ -2112,7 +2028,7 @@
         <td class="num">3</td>
         <td class="num">$0.0036</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vm-form-202609272325/report.md</td>
+        <td class="small"><a href="../recordings/explore/vm-form-202609272325/report.md">recordings/explore/vm-form-202609272325/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:41</td>
@@ -2123,7 +2039,7 @@
         <td class="num">3</td>
         <td class="num">$0.0035</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/vm-form-202609230936/report.md</td>
+        <td class="small"><a href="../recordings/explore/vm-form-202609230936/report.md">recordings/explore/vm-form-202609230936/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:20</td>
@@ -2134,7 +2050,7 @@
         <td class="num">0</td>
         <td class="num">$0.0000</td>
         <td>Jev 호출 실패: 모델 응답이 유효하지 않습니다; 동작을 실행하지 않았습니다.</td>
-        <td class="mono small">recordings/explore/vm-form-202609230916/report.md</td>
+        <td class="small"><a href="../recordings/explore/vm-form-202609230916/report.md">recordings/explore/vm-form-202609230916/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 11:13</td>
@@ -2145,7 +2061,7 @@
         <td class="num">4</td>
         <td class="num">$0.0015</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/subnet-list-202609231113/report.md</td>
+        <td class="small"><a href="../recordings/explore/subnet-list-202609231113/report.md">recordings/explore/subnet-list-202609231113/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-27 23:22</td>
@@ -2156,7 +2072,7 @@
         <td class="num">2</td>
         <td class="num">$0.0007</td>
         <td>Jev 가 두 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/subnet-form-202609272322/report.md</td>
+        <td class="small"><a href="../recordings/explore/subnet-form-202609272322/report.md">recordings/explore/subnet-form-202609272322/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:34</td>
@@ -2167,7 +2083,7 @@
         <td class="num">3</td>
         <td class="num">$0.0016</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/subnet-form-202609230934/report.md</td>
+        <td class="small"><a href="../recordings/explore/subnet-form-202609230934/report.md">recordings/explore/subnet-form-202609230934/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:14</td>
@@ -2178,7 +2094,7 @@
         <td class="num">1</td>
         <td class="num">$0.0003</td>
         <td>Jev 가 두 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/subnet-form-202609230914/report.md</td>
+        <td class="small"><a href="../recordings/explore/subnet-form-202609230914/report.md">recordings/explore/subnet-form-202609230914/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:09</td>
@@ -2189,7 +2105,7 @@
         <td class="num">6</td>
         <td class="num">$0.0010</td>
         <td>Jev 가 여섯 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/ske-workload-202609280709/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-workload-202609280709/report.md">recordings/explore/ske-workload-202609280709/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:14</td>
@@ -2200,7 +2116,7 @@
         <td class="num">6</td>
         <td class="num">$0.0010</td>
         <td>Jev 가 여섯 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/ske-storage-202609280714/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-storage-202609280714/report.md">recordings/explore/ske-storage-202609280714/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:04</td>
@@ -2211,7 +2127,7 @@
         <td class="num">0</td>
         <td class="num">$0.0005</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/ske-node-202609280704/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-node-202609280704/report.md">recordings/explore/ske-node-202609280704/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:11</td>
@@ -2222,7 +2138,7 @@
         <td class="num">8</td>
         <td class="num">$0.0012</td>
         <td>Jev 가 여섯 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/ske-network-202609280711/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-network-202609280711/report.md">recordings/explore/ske-network-202609280711/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:07</td>
@@ -2233,7 +2149,7 @@
         <td class="num">0</td>
         <td class="num">$0.0005</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/ske-namespace-202609280707/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-namespace-202609280707/report.md">recordings/explore/ske-namespace-202609280707/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:17</td>
@@ -2244,7 +2160,7 @@
         <td class="num">6</td>
         <td class="num">$0.0010</td>
         <td>Jev 가 여섯 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/ske-configuration-202609280717/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-configuration-202609280717/report.md">recordings/explore/ske-configuration-202609280717/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:01</td>
@@ -2255,7 +2171,7 @@
         <td class="num">2</td>
         <td class="num">$0.0019</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/ske-cluster-list-202609280701/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-cluster-list-202609280701/report.md">recordings/explore/ske-cluster-list-202609280701/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 06:51</td>
@@ -2266,7 +2182,7 @@
         <td class="num">3</td>
         <td class="num">$0.0033</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/ske-cluster-form-202609280647/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-cluster-form-202609280647/report.md">recordings/explore/ske-cluster-form-202609280647/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-28 07:19</td>
@@ -2277,7 +2193,7 @@
         <td class="num">6</td>
         <td class="num">$0.0010</td>
         <td>Jev 가 여섯 번 연속 BLOCKED</td>
-        <td class="mono small">recordings/explore/ske-authorization-202609280719/report.md</td>
+        <td class="small"><a href="../recordings/explore/ske-authorization-202609280719/report.md">recordings/explore/ske-authorization-202609280719/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-27 23:39</td>
@@ -2288,7 +2204,7 @@
         <td class="num">1</td>
         <td class="num">$0.0020</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/sgrp-form-202609272339/report.md</td>
+        <td class="small"><a href="../recordings/explore/sgrp-form-202609272339/report.md">recordings/explore/sgrp-form-202609272339/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:50</td>
@@ -2299,7 +2215,7 @@
         <td class="num">1</td>
         <td class="num">$0.0020</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/sgrp-form-202609230950/report.md</td>
+        <td class="small"><a href="../recordings/explore/sgrp-form-202609230950/report.md">recordings/explore/sgrp-form-202609230950/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:27</td>
@@ -2310,7 +2226,7 @@
         <td class="num">0</td>
         <td class="num">$0.0000</td>
         <td>시도할 컨트롤이 더 없음</td>
-        <td class="mono small">recordings/explore/sgrp-form-202609230927/report.md</td>
+        <td class="small"><a href="../recordings/explore/sgrp-form-202609230927/report.md">recordings/explore/sgrp-form-202609230927/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:52</td>
@@ -2321,7 +2237,7 @@
         <td class="num">5</td>
         <td class="num">$0.0022</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/sg-form-202609230952/report.md</td>
+        <td class="small"><a href="../recordings/explore/sg-form-202609230952/report.md">recordings/explore/sg-form-202609230952/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:55</td>
@@ -2332,7 +2248,7 @@
         <td class="num">2</td>
         <td class="num">$0.0021</td>
         <td>5회 연속 화면 변화 없음</td>
-        <td class="mono small">recordings/explore/rg-form-202609230955/report.md</td>
+        <td class="small"><a href="../recordings/explore/rg-form-202609230955/report.md">recordings/explore/rg-form-202609230955/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 11:09</td>
@@ -2343,7 +2259,7 @@
         <td class="num">3</td>
         <td class="num">$0.0034</td>
         <td>결정 예산 소진</td>
-        <td class="mono small">recordings/explore/lc-form-202609231109/report.md</td>
+        <td class="small"><a href="../recordings/explore/lc-form-202609231109/report.md">recordings/explore/lc-form-202609231109/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 11:05</td>
@@ -2354,7 +2270,7 @@
         <td class="num">2</td>
         <td class="num">$0.0015</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/iam-group-form-202609231105/report.md</td>
+        <td class="small"><a href="../recordings/explore/iam-group-form-202609231105/report.md">recordings/explore/iam-group-form-202609231105/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 11:12</td>
@@ -2365,7 +2281,7 @@
         <td class="num">4</td>
         <td class="num">$0.0010</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/bucket-form-202609231112/report.md</td>
+        <td class="small"><a href="../recordings/explore/bucket-form-202609231112/report.md">recordings/explore/bucket-form-202609231112/report.md</a></td>
       </tr>
 <tr>
         <td>2026-09-23 09:53</td>
@@ -2376,12 +2292,500 @@
         <td class="num">4</td>
         <td class="num">$0.0017</td>
         <td>Jev 가 DONE</td>
-        <td class="mono small">recordings/explore/addr-form-202609230953/report.md</td>
+        <td class="small"><a href="../recordings/explore/addr-form-202609230953/report.md">recordings/explore/addr-form-202609230953/report.md</a></td>
       </tr></tbody></table>
 </section>
 
-<section>
-  <h2>알려진 이슈 <small>data/known-issues.yaml</small></h2>
+<section id="runs">
+  <h2>실행 기록 <small>최신 60건 / 전체 358건</small></h2>
+  <div class="filters">보기:
+    <button data-st="all" class="on">전체</button><button data-st="pass">통과</button><button data-st="product">제품 결함</button><button data-st="unclassified">미분류</button><button data-st="cleanup">정리 실패</button><button data-st="test">테스트 코드</button><button data-st="flaky">간헐(재시도 통과)</button><button data-st="environment">환경</button>
+  </div>
+  <table id="runs-t"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>스위트</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
+  <tbody><tr class="run fail" data-status="unclassified">
+        <td>2026-10-02 18:57</td>
+        <td class="mono">management.servicewatch-log-group</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td class="num">3분 58초</td>
+        <td class="mono small">S20261002-1853</td>
+        <td class="err"><details><summary>[steps[1] swl-1002-1857-5b40 생성] Error: swl-1002-1857-5b40 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)</summary>[steps[1] swl-1002-1857-5b40 생성] Error: swl-1002-1857-5b40 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)</details><div><a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:56</td>
+        <td class="mono">container.container-registry</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">6분 54초</td>
+        <td class="mono small">S20261002-1853</td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:56</td>
+        <td class="mono">networking.private-dns</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">5분 58초</td>
+        <td class="mono small">S20261002-1853</td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:48</td>
+        <td class="mono">iam.user-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">58초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:47</td>
+        <td class="mono">management.resource-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 13초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:47</td>
+        <td class="mono">networking.vpc.create-delete</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 6초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:47</td>
+        <td class="mono">compute.launch-configuration</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 45초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:46</td>
+        <td class="mono">storage.object-storage-bucket</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 47초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:45</td>
+        <td class="mono">security.address-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 57초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:45</td>
+        <td class="mono">compute.server-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 21초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:45</td>
+        <td class="mono">networking.gslb</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 31초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:44</td>
+        <td class="mono">security.security-group-rule</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 36초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:44</td>
+        <td class="mono">storage.file-storage</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 8초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:43</td>
+        <td class="mono">application-service.messagehub-email</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 59초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:42</td>
+        <td class="mono">application-service.messagehub-domain</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 30초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:42</td>
+        <td class="mono">financial-management.budget</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 55초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:41</td>
+        <td class="mono">management.network-logging</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">3분 4초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:40</td>
+        <td class="mono">management.servicewatch-alert</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 36초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:40</td>
+        <td class="mono">management.servicewatch-event-rule</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 46초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run env" data-status="environment">
+        <td>2026-10-02 18:39</td>
+        <td class="mono">management.servicewatch-log-group</td>
+        <td><span class="badge env">FAIL(environment)</span> <span class="cause c-environment">환경</span></td>
+        <td class="num">5분 41초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[1] swl-1002-1840-2d0e 생성] Error: swl-1002-1840-2d0e 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)</summary>[steps[1] swl-1002-1840-2d0e 생성] Error: swl-1002-1840-2d0e 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)</details><div><a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md" title="test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:39</td>
+        <td class="mono">management.servicewatch-dashboard</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 59초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:38</td>
+        <td class="mono">iam.policy</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">3분 45초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:38</td>
+        <td class="mono">security.secrets-manager</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">2분 14초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:37</td>
+        <td class="mono">security.kms-key</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 33초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:37</td>
+        <td class="mono">security.certificate</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 40초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:36</td>
+        <td class="mono">management.notification-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 20초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:35</td>
+        <td class="mono">application-service.queue</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 41초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:33</td>
+        <td class="mono">storage.file-storage-snapshot</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">3분 39초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:33</td>
+        <td class="mono">compute.cloud-function</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">4분 3초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:32</td>
+        <td class="mono">iam.role</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 31초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:29</td>
+        <td class="mono">networking.firewall</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">6분 1초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:28</td>
+        <td class="mono">compute.volume-snapshot</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">3분 53초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:26</td>
+        <td class="mono">networking.direct-connect</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">6분 28초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run fail" data-status="flaky">
+        <td>2026-10-02 18:23</td>
+        <td class="mono">container.container-registry</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">12분 18초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[1] cr100218246c60 생성] Error: cr100218246c60 상태 /Running|Active|Ready|Available/i 대기 600초 초과. 마지막: (행 없음)</summary>[steps[1] cr100218246c60 생성] Error: cr100218246c60 상태 /Running|Active|Ready|Available/i 대기 600초 초과. 마지막: (행 없음)</details><div><a class="att" href="../test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png" title="test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png">screenshot-container.container-registry.png</a> <a class="att" href="../test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip" title="test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md" title="test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:21</td>
+        <td class="mono">container.repository</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">8분 2초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run fail" data-status="flaky">
+        <td>2026-10-02 18:21</td>
+        <td class="mono">networking.private-dns</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">18분 50초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[1] pdns-1002-1822-9229 생성] Test timeout of 900000ms exceeded.</summary>[steps[1] pdns-1002-1822-9229 생성] Test timeout of 900000ms exceeded.</details><div><a class="att" href="../test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md" title="test-results/artifacts/networking.private-dns/networking.private-dns-Pri-0dada-생성-후-해지-Private-DNS-생성-후-해지-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:19</td>
+        <td class="mono">networking.vpn</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">8분 16초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:18</td>
+        <td class="mono">networking.dns-hosted-zone</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">8분 32초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:14</td>
+        <td class="mono">networking.vpc-endpoint</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">5분 20초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:10</td>
+        <td class="mono">networking.nat-gateway</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">12분 49초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:08</td>
+        <td class="mono">application-service.api-gateway</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">9분 54초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:07</td>
+        <td class="mono">networking.transit-gateway</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">13분 52초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 18:07</td>
+        <td class="mono">networking.vpc-peering</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">13분 57초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:51</td>
+        <td class="mono">networking.privatelink-service</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">18분 50초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:50</td>
+        <td class="mono">compute.vm-stack-net</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">23분 43초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:50</td>
+        <td class="mono">compute.auto-scaling-group</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">13분 31초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:47</td>
+        <td class="mono">database.cachestore</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">16분 5초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:44</td>
+        <td class="mono">networking.vpc-port</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">18분 58초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:30</td>
+        <td class="mono">compute.vm-volume</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">19분 51초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:29</td>
+        <td class="mono">compute.vm-stack</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">20분 54초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:28</td>
+        <td class="mono">data-analytics.event-streams</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">15분 44초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:26</td>
+        <td class="mono">networking.load-balancer</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">20분 18초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 17:25</td>
+        <td class="mono">networking.cdn</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">25분 58초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 16:56</td>
+        <td class="mono">container.ske-cluster</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">30분 3초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 16:56</td>
+        <td class="mono">database.epas</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">33분 2초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 16:56</td>
+        <td class="mono">database.mariadb</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">32분 40초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 16:55</td>
+        <td class="mono">database.mysql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">34분 56초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-02 16:55</td>
+        <td class="mono">database.postgresql</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">30분 26초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-01 10:02</td>
+        <td class="mono">networking.vpc-peering</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">13분 33초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-01 10:01</td>
+        <td class="mono">database.epas</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">30분 18초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr></tbody></table>
+</section>
+
+<section id="issues">
+  <h2>알려진 이슈 <small>data/known-issues.yaml — 제품 결함으로 확정하려면 여기 등록</small></h2>
   <table><thead><tr><th>id</th><th>kind</th><th>spec</th><th>활성</th><th class="num">적용</th><th>note</th></tr></thead><tbody><tr><td class="mono">KI-000</td><td>product</td><td class="mono small">*</td><td>아니오</td><td class="num">0</td><td class="note">예시 항목 (형식 안내용). 실제 항목을 추가할 때 이 줄을 참고하고, 이 항목은 그대로 둔다.</td></tr></tbody></table>
 </section>
 </main>
@@ -2390,7 +2794,7 @@
     box.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return;
       box.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
-      if (b.dataset.st !== undefined) document.querySelectorAll('#runs tr.run').forEach(function (tr) { tr.style.display = b.dataset.st === 'all' || tr.dataset.status === b.dataset.st ? '' : 'none'; });
+      if (b.dataset.st !== undefined) document.querySelectorAll('#runs-t tr.run').forEach(function (tr) { tr.style.display = b.dataset.st === 'all' || tr.dataset.status === b.dataset.st ? '' : 'none'; });
       if (b.dataset.lv !== undefined) document.querySelectorAll('#res tr.res').forEach(function (tr) { tr.style.display = b.dataset.lv === 'all' || tr.dataset.level === b.dataset.lv ? '' : 'none'; });
     });
   });

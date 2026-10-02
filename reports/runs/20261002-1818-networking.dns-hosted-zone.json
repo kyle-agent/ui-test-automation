@@ -1,0 +1,61 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-02T09:18:06.235Z",
+  "ended": "2026-10-02T09:26:37.778Z",
+  "seconds": 512,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1002-1818-82e8",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 471.2,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1002-1818-82e8",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.7
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1002-1818-82e8 생성",
+          "status": "pass",
+          "seconds": 210.6
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1002-1818-82e8.com 생성",
+          "status": "pass",
+          "seconds": 36.3
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1002-1818-82e8.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 41.6
+        },
+        {
+          "title": "steps[4] 레코드 www 삭제",
+          "status": "pass",
+          "seconds": 38.1
+        }
+      ]
+    }
+  ]
+}

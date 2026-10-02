@@ -1,0 +1,73 @@
+{
+  "spec": "management.servicewatch-log-group",
+  "started": "2026-10-02T09:57:19.879Z",
+  "ended": "2026-10-02T10:01:17.892Z",
+  "seconds": 238,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "management.servicewatch-log-group",
+    "run_id": "1002-1857-5b40",
+    "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 로그 그룹 생성 → 로그 스트림 생성·삭제 → 로그 그룹 삭제",
+      "status": "failed",
+      "seconds": 202.1,
+      "annotations": {
+        "scenario": "management.servicewatch-log-group",
+        "run_id": "1002-1857-5b40",
+        "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 로그 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] swl-1002-1857-5b40 생성",
+          "status": "fail",
+          "seconds": 194.2
+        }
+      ],
+      "error": "Error: swl-1002-1857-5b40 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)",
+      "attachments": [
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md",
+        "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "suite_id": "S20261002-1853",
+  "attempt": 1,
+  "git_sha": "d9043af",
+  "error": "Error: swl-1002-1857-5b40 상태 /Active/ 대기 180초 초과. 마지막: (행 없음)",
+  "attachments": [
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/error-context.md",
+    "test-results/artifacts/management.servicewatch-log-group/management.servicewatch-lo-76946-성-→-로그-스트림-생성·삭제-→-로그-그룹-삭제-regression/trace.zip"
+  ]
+}

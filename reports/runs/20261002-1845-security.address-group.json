@@ -1,0 +1,47 @@
+{
+  "spec": "security.address-group",
+  "started": "2026-10-02T09:45:56.016Z",
+  "ended": "2026-10-02T09:48:53.157Z",
+  "seconds": 177,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.address-group",
+    "run_id": "1002-1846-27ea",
+    "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 19.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Address Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 138.6,
+      "annotations": {
+        "scenario": "security.address-group",
+        "run_id": "1002-1846-27ea",
+        "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Address Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.4
+        },
+        {
+          "title": "steps[1] addr-1002-1846-27ea 생성",
+          "status": "pass",
+          "seconds": 87.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "d9043af"
+}

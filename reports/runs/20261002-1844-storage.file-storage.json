@@ -1,0 +1,47 @@
+{
+  "spec": "storage.file-storage",
+  "started": "2026-10-02T09:44:10.721Z",
+  "ended": "2026-10-02T09:46:19.187Z",
+  "seconds": 128,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "storage.file-storage",
+    "run_id": "1002-1844-ab72",
+    "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 16.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "File Storage 볼륨 생성 후 해지",
+      "status": "passed",
+      "seconds": 88.6,
+      "annotations": {
+        "scenario": "storage.file-storage",
+        "run_id": "1002-1844-ab72",
+        "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] File Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.3
+        },
+        {
+          "title": "steps[1] fs_10021844ab72 생성",
+          "status": "pass",
+          "seconds": 26.7
+        }
+      ]
+    }
+  ],
+  "git_sha": "d9043af"
+}

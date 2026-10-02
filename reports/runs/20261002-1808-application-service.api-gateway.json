@@ -1,0 +1,81 @@
+{
+  "spec": "application-service.api-gateway",
+  "started": "2026-10-02T09:08:08.064Z",
+  "ended": "2026-10-02T09:18:02.436Z",
+  "seconds": 594,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "application-service.api-gateway",
+    "run_id": "1002-1808-ac29",
+    "title": "API 목록 | API Gateway | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "API Gateway API 생성 → 리소스·메서드 추가 → 스테이지 배포 → 해지",
+      "status": "passed",
+      "seconds": 561.5,
+      "annotations": {
+        "scenario": "application-service.api-gateway",
+        "run_id": "1002-1808-ac29",
+        "title": "API 목록 | API Gateway | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] API 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] API apigw-1002-1808-ac29 생성",
+          "status": "pass",
+          "seconds": 206.2
+        },
+        {
+          "title": "steps[2] 리소스 /items 생성",
+          "status": "pass",
+          "seconds": 16
+        },
+        {
+          "title": "steps[3] /items GET 메서드 생성",
+          "status": "pass",
+          "seconds": 9
+        },
+        {
+          "title": "steps[4] 스테이지 stg-1002-1808-ac29 로 배포",
+          "status": "pass",
+          "seconds": 18
+        },
+        {
+          "title": "steps[5] JWT 인증 jwt-1002-1808-ac29 생성·삭제",
+          "status": "pass",
+          "seconds": 45.9
+        },
+        {
+          "title": "steps[6] 접근 제어 acl-1002-1808-ac29 생성·삭제",
+          "status": "pass",
+          "seconds": 50.2
+        },
+        {
+          "title": "steps[7] 사용량 정책 plan-1002-1808-ac29 + API Key key-1002-1808-ac29 생성·삭제",
+          "status": "pass",
+          "seconds": 61.6
+        },
+        {
+          "title": "steps[8] Cloud Function fn-1002-1808-ac29 에 API Gateway 트리거 추가·삭제",
+          "status": "pass",
+          "seconds": 91.5
+        }
+      ]
+    }
+  ]
+}

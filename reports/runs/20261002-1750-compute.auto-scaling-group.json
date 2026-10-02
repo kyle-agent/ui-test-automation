@@ -1,0 +1,56 @@
+{
+  "spec": "compute.auto-scaling-group",
+  "started": "2026-10-02T08:50:29.764Z",
+  "ended": "2026-10-02T09:04:00.589Z",
+  "seconds": 811,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.auto-scaling-group",
+    "run_id": "1002-1750-8ec9",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Launch Configuration → Auto-Scaling Group(0대) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 776.7,
+      "annotations": {
+        "scenario": "compute.auto-scaling-group",
+        "run_id": "1002-1750-8ec9",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.4
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG · LC 생성",
+          "status": "pass",
+          "seconds": 315.9
+        },
+        {
+          "title": "steps[2] Auto-Scaling Group asg-1002-1750-8ec9 생성",
+          "status": "pass",
+          "seconds": 48.6
+        },
+        {
+          "title": "steps[3] 정책 pol-1002-1750-8ec9 · 스케줄 sch-1002-1750-8ec9 추가·삭제",
+          "status": "pass",
+          "seconds": 35.7
+        }
+      ]
+    }
+  ]
+}

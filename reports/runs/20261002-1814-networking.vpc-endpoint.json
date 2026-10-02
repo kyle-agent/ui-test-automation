@@ -1,0 +1,51 @@
+{
+  "spec": "networking.vpc-endpoint",
+  "started": "2026-10-02T09:14:33.793Z",
+  "ended": "2026-10-02T09:19:54.129Z",
+  "seconds": 320,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-endpoint",
+    "run_id": "1002-1814-3742",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → VPC Endpoint 유형 Subnet → VPC Endpoint(Object Storage) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 291.1,
+      "annotations": {
+        "scenario": "networking.vpc-endpoint",
+        "run_id": "1002-1814-3742",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC Endpoint 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] VPC vpc-1002-1814-3742 · Endpoint Subnet sube-1002-1814-3742 생성",
+          "status": "pass",
+          "seconds": 93.4
+        },
+        {
+          "title": "steps[2] VPC Endpoint vpce-1002-1814-3742 생성",
+          "status": "pass",
+          "seconds": 60.5
+        }
+      ]
+    }
+  ]
+}
