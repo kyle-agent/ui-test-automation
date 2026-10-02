@@ -1,0 +1,27 @@
+{
+  "suite_id": "S20261002-1853",
+  "attempt": 1,
+  "started": "2026-10-02T09:56:36.757Z",
+  "ended": "2026-10-02T10:07:25.580Z",
+  "wall_minutes": 11,
+  "serial_minutes": 17,
+  "max_tabs": 3,
+  "results": [
+    {
+      "spec": "networking.private-dns",
+      "status": "pass",
+      "seconds": 361
+    },
+    {
+      "spec": "container.container-registry",
+      "status": "pass",
+      "seconds": 418
+    },
+    {
+      "spec": "management.servicewatch-log-group",
+      "status": "fail",
+      "seconds": 242
+    }
+  ],
+  "leftovers_end": []
+}

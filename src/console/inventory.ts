@@ -6,7 +6,7 @@
 import type { Page } from '@playwright/test';
 import { gotoRoute } from './expect';
 import { settleConsole } from './overlays';
-import { confirmModal, row, selectRow, terminateServer, topButton, waitForRow } from './ui';
+import { confirmModal, row, selectRow, showAllRows, terminateServer, topButton, waitForRow } from './ui';
 
 export const ROUTES = {
   ske: '#/ske/cluster',
@@ -134,7 +134,9 @@ export interface Leftover {
 async function rowsOf(page: Page, route: string): Promise<string[]> {
   await gotoRoute(page, route);
   await page.waitForTimeout(1_500);
-  return (await page.locator('tr.scp-body-row').allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
+  // 여러 페이지 목록은 1페이지만 읽으면 남은 테스트 리소스를 놓친다(2026-10-02 로그 그룹 2개) → 100개씩 보기
+  await showAllRows(page).catch(() => false);
+  return (await page.locator('tr.scp-body-row:visible').allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
 }
 
 /** 모든 목록을 훑어 테스트 이름 규칙에 맞는 리소스를 돌려준다. VPC 총 개수도 함께(계정당 5개 한도). */

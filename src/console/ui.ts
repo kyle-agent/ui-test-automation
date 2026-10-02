@@ -297,6 +297,8 @@ export async function waitForRow(
     // 폼을 계속 새로 고치다 600초 초과로 끝났다(2026-09-29·30 스위트 Container Registry 2회)
     const hashPath = (u: string) => (u.split('#')[1] ?? '').split('?')[0]!.replace(/\/$/, '');
     if (hashPath(page.url()) !== hashPath(`#${route.replace(/^#/, '')}`)) await gotoRoute(page, route);
+    // 행이 안 보이면 다른 페이지에 있을 수 있다 → 여러 페이지면 100개씩 보기로 (소멸 오판 방지가 특히 중요)
+    if ((await row(page, name).count()) === 0) await showAllRows(page).catch(() => false);
     const r = row(page, name);
     let count = await r.count();
     // 행이 읽는 사이에 사라질 수 있다(반납·삭제 직후 목록 갱신) → 짧게 기다리고, 못 읽으면 "행 없음" 으로 다시 센다.
@@ -336,6 +338,33 @@ export async function waitForRow(
     await page.waitForTimeout(interval);
     await refreshList(page);
   }
+}
+
+/**
+ * 목록이 여러 페이지면(머리의 "총 N" > 보이는 행 수) 페이지 크기를 "100개씩 보기" 로 바꾼다. 바꿨으면 true.
+ * 기본 20개씩이라, 자동 생성 자원이 쌓인 목록에서 우리 행이 2페이지로 밀려 "없음"·"소멸" 로 잘못 보였다
+ * (2026-10-02 ServiceWatch 로그 그룹: API Gateway·Cloud Functions 가 만든 /scp/... 그룹 32개).
+ */
+export async function showAllRows(page: Page): Promise<boolean> {
+  const totalText = await page
+    .getByText(/^총\s*\d+/)
+    .first()
+    .innerText({ timeout: 2_000 })
+    .catch(() => '');
+  const total = Number(totalText.match(/\d+/)?.[0] ?? 0);
+  const visible = await page.locator('tr.scp-body-row:visible').count();
+  if (!total || total <= visible) return false;
+  const size = page.locator('.scp-dropdown:visible').filter({ hasText: /개씩 보기/ }).first();
+  if (!(await size.count())) return false;
+  await size.click();
+  const item = page.locator('.scp-menu:visible .scp-menu-item').filter({ hasText: /^100개씩 보기$/ }).first();
+  if (!(await item.count())) {
+    await page.keyboard.press('Escape');
+    return false;
+  }
+  await item.click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  return true;
 }
 
 /**
