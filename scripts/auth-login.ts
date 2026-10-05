@@ -27,6 +27,7 @@ import {
   type SessionKind,
 } from '../src/console/env';
 import { parseArgs } from '../src/service-map/io';
+import { notifyUser } from '../src/console/notify';
 
 async function main(): Promise<void> {
   const { flags } = parseArgs(process.argv.slice(2));
@@ -110,6 +111,11 @@ async function keepAlive(context: BrowserContext, initial: Page, minutes: number
   }
   console.log(`keep-alive: ${minutes}분마다 대시보드 탭을 새로 고칩니다 (--keepalive 0 으로 끔).`);
   let page = initial;
+  // 만료 판정: 제목이 늦게 바뀌는 것을 만료로 오인했다(10-02 낮 24회) → 최대 20초 기다리고, 두 번 연속일 때만 확정·알림
+  let misses = 0;
+  let lastOk = new Date();
+  let alerted = false;
+  const loggedInAt = new Date();
   for (;;) {
     await new Promise((r) => setTimeout(r, minutes * 60_000));
     if (page.isClosed()) {
@@ -122,16 +128,31 @@ async function keepAlive(context: BrowserContext, initial: Page, minutes: number
       if (!page.url().includes(consoleHost()))
         await page.goto(`${CONSOLE_URL}${CONSOLE_BASE_PATH}`, { waitUntil: 'domcontentloaded' });
       else await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(3_000);
-      const title = await page.title();
-      const alive = /\| Console$/.test(title) && page.url().includes(consoleHost());
+      let title = '';
+      let alive = false;
+      for (let i = 0; i < 10 && !alive; i++) {
+        await page.waitForTimeout(2_000);
+        title = await page.title();
+        alive = /\| Console$/.test(title) && page.url().includes(consoleHost());
+      }
+      misses = alive ? 0 : misses + 1;
+      if (alive) {
+        lastOk = new Date();
+        alerted = false;
+      }
       console.log(
-        `[${stamp}] keep-alive: ${alive ? 'OK' : '세션 만료로 보임'} — ${title.slice(0, 60)} (${page.url().slice(0, 80)})`,
+        `[${stamp}] keep-alive: ${alive ? 'OK' : misses >= 2 ? '세션 만료' : '확인 중(1회 실패)'} — ${title.slice(0, 60)} (${page.url().slice(0, 80)})`,
       );
-      if (!alive)
+      if (misses >= 2 && !alerted) {
+        alerted = true;
+        const hours = ((lastOk.getTime() - loggedInAt.getTime()) / 3_600_000).toFixed(1);
         console.log(
-          '  로그인 브라우저에서 다시 로그인하세요. 로그인되면 다음 주기부터 다시 OK 로 표시됩니다.',
+          `  세션 만료 확정: 이 브라우저 로그인 ${loggedInAt.toLocaleString()} · 마지막 OK ${lastOk.toLocaleString()} (약 ${hours}시간). docs/session-log.md 에 적어 두세요.`,
         );
+        notifyUser('SCP 콘솔 세션 만료', `마지막 정상 ${lastOk.toLocaleTimeString()} — 로그인 브라우저에서 다시 로그인하세요.`);
+      }
+      if (!alive && misses >= 2)
+        console.log('  로그인 브라우저에서 다시 로그인하세요. 로그인되면 다음 주기부터 다시 OK 로 표시됩니다.');
     } catch (err) {
       console.log(
         `[${stamp}] keep-alive 실패: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`,
