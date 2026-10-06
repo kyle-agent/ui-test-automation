@@ -1,0 +1,86 @@
+{
+  "spec": "networking.cloud-lan-data-center",
+  "started": "2026-10-06T00:47:59.989Z",
+  "ended": "2026-10-06T01:05:19.422Z",
+  "seconds": 1039,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cloud-lan-data-center",
+    "run_id": "1006-0948-2f79",
+    "title": "vCable 목록 | Cloud LAN-Data Center | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud LAN-Data Center Network·vDevice·vCable 생성 후 해지",
+      "status": "failed",
+      "seconds": 907.8,
+      "annotations": {
+        "scenario": "networking.cloud-lan-data-center",
+        "run_id": "1006-0948-2f79",
+        "title": "vCable 목록 | Cloud LAN-Data Center | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Cloud LAN Network 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] cld-1006-0948-2f79 생성",
+          "status": "pass",
+          "seconds": 20.4
+        },
+        {
+          "title": "steps[2] vDevice {{router}}(vRouter)·{{switch}}(vSwitch) 를 만든다",
+          "status": "pass",
+          "seconds": 127.3
+        },
+        {
+          "title": "steps[3] vCable {{cable}}(Static, {{router}} ↔ {{switch}}) 을 만들고 목록 확인 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 131.8
+        },
+        {
+          "title": "steps[4] vDevice 2개를 삭제한다",
+          "status": "fail",
+          "seconds": 308.9
+        }
+      ],
+      "error": "Error: clds-1006-0948-2f79 소멸 대기 300초 초과. 마지막: cld-1006-0948-2f79 vSwitch 2afb72d933934417920fee0fd594f4c3 clds-1006-0948-2f79 SA-EAST-1 2026-10-06 09:49:39 Failed 삭제",
+      "attachments": [
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: clds-1006-0948-2f79 소멸 대기 300초 초과. 마지막: cld-1006-0948-2f79 vSwitch 2afb72d933934417920fee0fd594f4c3 clds-1006-0948-2f79 SA-EAST-1 2026-10-06 09:49:39 Failed 삭제",
+  "attachments": [
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/trace.zip"
+  ]
+}

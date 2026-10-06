@@ -1,0 +1,67 @@
+{
+  "spec": "networking.vpn",
+  "started": "2026-10-06T00:39:32.860Z",
+  "ended": "2026-10-06T00:50:10.852Z",
+  "seconds": 638,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpn",
+    "run_id": "1006-0939-4dca",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → IGW → Public IP → VPN Gateway → VPN Tunnel 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 604.8,
+      "annotations": {
+        "scenario": "networking.vpn",
+        "run_id": "1006-0939-4dca",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.1
+        },
+        {
+          "title": "steps[1] VPC vpc-1006-0939-4dca · IGW · Public IP",
+          "status": "pass",
+          "seconds": 108.7
+        },
+        {
+          "title": "steps[2] VPN Gateway vpn100609394dca 생성",
+          "status": "pass",
+          "seconds": 64
+        },
+        {
+          "title": "steps[3] VPN Tunnel vpnt100609394dca 생성",
+          "status": "pass",
+          "seconds": 90.8
+        },
+        {
+          "title": "steps[4] VPN Gateway vpn100609394dca 설명 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 13.9
+        },
+        {
+          "title": "steps[5] VPN Tunnel vpnt100609394dca 설정 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 151.1
+        }
+      ]
+    }
+  ],
+  "git_sha": "a567fa9"
+}

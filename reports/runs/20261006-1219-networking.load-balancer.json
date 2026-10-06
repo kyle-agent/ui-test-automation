@@ -1,0 +1,111 @@
+{
+  "spec": "networking.load-balancer",
+  "started": "2026-10-06T03:19:39.083Z",
+  "ended": "2026-10-06T03:39:24.216Z",
+  "seconds": 1185,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.load-balancer",
+    "run_id": "1006-1219-77d4",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener → Public NAT IP 연결·해제 → 역순 삭제",
+      "status": "failed",
+      "seconds": 1082,
+      "annotations": {
+        "scenario": "networking.load-balancer",
+        "run_id": "1006-1219-77d4",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Load Balancer 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] VPC · Subnet 준비",
+          "status": "pass",
+          "seconds": 254.9
+        },
+        {
+          "title": "steps[2] Load Balancer lb-1006-1219-77d4 생성",
+          "status": "pass",
+          "seconds": 102.8
+        },
+        {
+          "title": "steps[3] LB 헬스 체크 lbhc-1006-1219-77d4 생성",
+          "status": "pass",
+          "seconds": 31.3
+        },
+        {
+          "title": "steps[4] LB 서버 그룹 lbsg-1006-1219-77d4 생성",
+          "status": "pass",
+          "seconds": 31.8
+        },
+        {
+          "title": "steps[5] Listener lbls-1006-1219-77d4 생성 (TCP 80)",
+          "status": "pass",
+          "seconds": 39.8
+        },
+        {
+          "title": "steps[6] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 59.5
+        },
+        {
+          "title": "steps[7] Public NAT IP 123.41.32.240 연결",
+          "status": "pass",
+          "seconds": 26.7
+        },
+        {
+          "title": "steps[8] Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 21.6
+        },
+        {
+          "title": "steps[9] LB 헬스 체크 lbhc-1006-1219-77d4 설정 수정 → 반영 → 되돌림 (L3)",
+          "status": "fail",
+          "seconds": 45.9
+        }
+      ],
+      "error": "Error: \"설명\" 수정 아이콘을 눌러도 모달이 열리지 않습니다",
+      "attachments": [
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/screenshot-networking.load-balancer.png",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: \"설명\" 수정 아이콘을 눌러도 모달이 열리지 않습니다",
+  "attachments": [
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/screenshot-networking.load-balancer.png",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/trace.zip"
+  ]
+}

@@ -25,6 +25,17 @@ steps:
       url: "#/scr/registry"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): 상세 "엔드포인트" 연필(Editing ≈1~2분 → Running), 태그 탭.
+  - goal: "엔드포인트를 프라이빗 → 프라이빗&퍼블릭으로 바꿔 퍼블릭 엔드포인트가 생기는지 보고 프라이빗으로 되돌린다"
+    expect:
+      url: "#/scr/registry/detail"
+      text: ["프라이빗"]
+
+  - goal: "태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다"
+    expect:
+      url: "#/scr/registry/detail"
+      text: ["태그 (0)"]
+
 teardown:
   - goal: "Registry {{name}} 을 해지한다"
     expect:

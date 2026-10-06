@@ -16,6 +16,10 @@ precondition:
 # IKE 설정(IKE v1 기본, Encryption·Digest 드롭다운 + "추가", Diffie-Hellman 체크), IPSEC 설정(같은 구조, PFS 기본 켜짐), SA LifeTime 86400/43200, DPD 60 기본.
 # "SCP VPN 서비스는 Passive Mode(Responder)" — 상대 장비가 없어도 터널은 Active 로 만들어진다(연결 상태와 별개). Creating ≈1분.
 # 삭제: VPN·Tunnel 목록엔 삭제가 없고 상세 버튼만 — Tunnel 상세 "VPN Tunnel 삭제", VPN 상세 "서비스 해지"("해지하기 전에는 연결된 Tunnel을 삭제해 주세요").
+# L3(2026-10-06 프로브, 에이전트 3D): Gateway 상세에서 수정 가능한 항목은 "설명"(40자) 하나. Tunnel 상세 연필 항목: Peer VPN GW IP · Remote Subnet(CIDR)(추가/전체 삭제 목록) ·
+# Pre-shared Key(password 8~64) · 설명(40자) · DPD Probe Interval(초), 그리고 절 버튼 "수정" 2개 = "IKE 설정 수정"(IKE Version·알고리즘 추가·DH 체크·SA LifeTime) /
+# "IPSEC 설정 수정"(알고리즘·PFS·DH·SA LifeTime). 저장은 모두 "수정한 정보를 저장하시겠습니까?" → 확인, Tunnel 은 수정 모달이 1~3초 더 남았다 닫힌다(그 사이 "확인" 을 다시 누르면 안 된다).
+# 상대 장비가 없어 "터널링 연결 상태" 는 Down 이지만 수정은 반영된다.
 steps:
   - goal: "VPN 목록으로 이동한다"
     goto: "#/vpn/vpn/list"
@@ -41,6 +45,16 @@ steps:
     expect:
       url: "#/vpn/vpn-tunnel/list"
       text: ["{{tunnel}}", "203.0.113.2"]
+
+  - goal: "VPN Gateway {{vpn}} 상세에서 설명을 바꾸고 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      url: "#/vpn/vpn/detail"
+      text: ["{{vpn}}"]
+
+  - goal: "VPN Tunnel {{tunnel}} 상세에서 DPD 60→30, Peer IP .2→.3, IKE SA LifeTime 86400→28800, 설명을 바꿔 반영을 확인하고 각각 되돌린다 (L3)"
+    expect:
+      url: "#/vpn/vpn-tunnel/detail"
+      text: ["{{tunnel}}"]
 
 teardown:
   - goal: "VPN Tunnel {{tunnel}} 을 삭제한다"

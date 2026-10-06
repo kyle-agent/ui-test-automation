@@ -1,0 +1,62 @@
+{
+  "spec": "management.resource-group",
+  "started": "2026-10-05T23:56:45.641Z",
+  "ended": "2026-10-05T23:58:53.590Z",
+  "seconds": 128,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.resource-group",
+    "run_id": "1006-0857-ddb5",
+    "title": "Resource Group 목록 | Resource Groups | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Resource Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 104.1,
+      "annotations": {
+        "scenario": "management.resource-group",
+        "run_id": "1006-0857-ddb5",
+        "title": "Resource Group 목록 | Resource Groups | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Resource Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] rg-1006-0857-ddb5 생성",
+          "status": "pass",
+          "seconds": 19.9
+        },
+        {
+          "title": "steps[2] 그룹 정의 태그 조건 qa2:{{run_id}} 를 추가해 저장하고 그룹 자원 탭에 조건 2개가 보이는지 확인한다",
+          "status": "pass",
+          "seconds": 23.5
+        },
+        {
+          "title": "steps[3] 추가한 그룹 정의 태그 조건을 제거해 저장하고 조건 1개로 돌아갔는지 확인한다",
+          "status": "pass",
+          "seconds": 8.1
+        },
+        {
+          "title": "steps[4] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 21.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "a567fa9"
+}

@@ -25,6 +25,17 @@ steps:
       url: "#/notification/group"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): 상세 "수정" 화면(…/modify)에서 설명·외부 수신자(example.com 예약 도메인) 저장 → 되돌림.
+  - goal: "상세 수정에서 설명과 외부 수신자 qa-{{run_id}}@example.com 을 저장하고 상세에 반영됐는지 확인한다"
+    expect:
+      url: "#/notification/group/RECEIVER-GROUP-"
+      text: ["scp-console-tests {{run_id}}", "qa-{{run_id}}@example.com"]
+
+  - goal: "외부 수신자를 비워 저장하고 0건으로 돌아갔는지 확인한다"
+    expect:
+      url: "#/notification/group/RECEIVER-GROUP-"
+      not_text: ["qa-{{run_id}}@example.com"]
+
 teardown:
   - goal: "알림 그룹 {{name}} 을 삭제한다"
     expect:

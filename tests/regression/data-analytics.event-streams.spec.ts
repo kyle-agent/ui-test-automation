@@ -18,4 +18,5 @@ defineDbaasSpec({
   dropdowns: [{ label: 'Broker Node 수', option: '1' }],
   passwordInputs: 4, // Zookeeper 비밀번호·확인, Broker 비밀번호·확인
   uncheck: ['Zookeeper 별도 설치', 'AKHQ', '유지 관리 기간', 'ServiceWatch 로그 수집'],
+  stopStart: true, // steps[3] 중지 → 시작 (L3, 2026-10-06)
 });

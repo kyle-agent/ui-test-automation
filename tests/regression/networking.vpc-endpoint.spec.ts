@@ -3,6 +3,7 @@
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
+import { editDetailText, logDetail, openDetail } from '../../src/console/detail-edit';
 import { createVpcOnly, pickLate } from '../../src/console/networking';
 import {
   below,
@@ -117,6 +118,14 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await waitForRow(page, ROUTES.vpce, vars.name!, { status: /Active/, timeoutMs: 900_000, intervalMs: 15_000, log });
       log(`  Endpoint 행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] VPC Endpoint ${vars.name} 설명 수정 → 반영 확인 → 되돌림 (L3)`, async () => {
+      const original = `scp-console-tests ${vars.run_id}`;
+      await openDetail(page, ROUTES.vpce, vars.name!);
+      await logDetail(page, log, 'VPC Endpoint 상세');
+      await editDetailText(page, '설명', `${original} edited`, { log });
+      await editDetailText(page, '설명', original, { log, expectShown: (v) => v === original });
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });
   });
 });

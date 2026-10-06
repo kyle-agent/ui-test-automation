@@ -4,6 +4,17 @@
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import {
+  detailValue,
+  editDetailText,
+  logDetail,
+  logModal,
+  openDetail,
+  openLabelEdit,
+  probeEdits,
+  saveModal,
+  waitDetailValue,
+} from '../../src/console/detail-edit';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
 import {
@@ -19,6 +30,7 @@ import { deleteNetwork, ensureNetwork, type SharedNetwork } from '../../src/cons
 import {
   confirmModal,
   fillField,
+  fillStable,
   openCreateForm,
   row,
   setCheckbox,
@@ -232,6 +244,79 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       if (!publicIp) return;
       await setPublicNatIp(page, null, log);
       await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), ctx(8));
+    });
+    // ---- 동작(L3, 2026-10-06 에이전트 3D): 헬스 체크 · 서버 그룹 · Listener 설정 수정 → 화면 반영 → 되돌림 ----
+    const openListener = async () => {
+      await openLinkedResources(page);
+      await row(page, vars.ls!).getByText(vars.ls!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 1_000 });
+    };
+    const editDesc = async (what: string) => {
+      await logDetail(page, log, `${what} 상세`);
+      const original = await detailValue(page, '설명');
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await editDetailText(page, '설명', original === '-' ? '' : original, {
+        log,
+        expectShown: (v) => v === original || (original === '-' && v === ''),
+      });
+    };
+    /** 연필 아이콘이 있는 라벨인지 확인한다 (2026-10-06 프로브에서 확인된 항목이라 없으면 오류) */
+    const editable = async (name: RegExp) => {
+      const ok = (await page.locator('.scp-form-group-label:visible').filter({ hasText: name }).filter({ has: page.locator('i') }).count()) > 0;
+      if (!ok) throw new Error(`${name} 수정 아이콘이 없습니다 (화면 변경?)`);
+      return ok;
+    };
+    if (process.env.PROBE_EDITS === '1') {
+      // 프로브: 앞 단계가 실패해도 세 화면의 수정 모달 구조를 먼저 남긴다
+      await openDetail(page, ROUTES.lbsg, vars.sg!);
+      await logDetail(page, log, 'LB 서버 그룹 상세');
+      await probeEdits(page, log, 'LB 서버 그룹');
+      await openListener();
+      await logDetail(page, log, 'Listener 상세');
+      await probeEdits(page, log, 'Listener');
+    }
+    await test.step(`steps[9] LB 헬스 체크 ${vars.hc} 탐지 횟수 3→5·설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await openDetail(page, ROUTES.lbhc, vars.hc!);
+      // "헬스 체크 방식" 연필 → 모달: 프로토콜·헬스 체크 포트 드롭다운, 주기·대기 시간·탐지 횟수 입력(순서대로 input 0·1·2). 대기 시간 ≤ 주기
+      for (const value of ['5', '3']) {
+        const modal = await openLabelEdit(page, '헬스 체크 방식');
+        await fillStable(page, modal.locator('input[type=text]:visible').nth(2), value, '탐지 횟수');
+        await saveModal(page, log);
+        await waitDetailValue(page, '탐지 횟수', (v) => v === `${value}회`, { log });
+      }
+      await editDesc('LB 헬스 체크');
+      await expectStep(page, resolveExpectation(scenario.steps[9]!.expect, vars), ctx(9));
+    });
+    await test.step(`steps[10] LB 서버 그룹 ${vars.sg} 설정 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await openDetail(page, ROUTES.lbsg, vars.sg!);
+      if (await editable(/^\s*부하 분산\s*$/)) {
+        const before = await detailValue(page, '부하 분산');
+        const other = /Round Robin/i.test(before) ? /Least Connection/i : /Round Robin/i;
+        for (const target of [other, new RegExp(escapeRe(before), 'i')]) {
+          const modal = await openLabelEdit(page, '부하 분산');
+          await logModal(page, log, '부하 분산 수정');
+          await modal.locator('.scp-dropdown:visible').first().click();
+          await page.locator('.scp-menu:visible .scp-menu-item').filter({ hasText: target }).first().click();
+          await saveModal(page, log);
+          await waitDetailValue(page, '부하 분산', (v) => target.test(v), { log });
+        }
+      }
+      await editDesc('LB 서버 그룹');
+      await expectStep(page, resolveExpectation(scenario.steps[10]!.expect, vars), ctx(10));
+    });
+    await test.step(`steps[11] Listener ${vars.ls} 설정 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await openListener();
+      if (await editable(/^\s*세션 유지 시간\s*$/)) {
+        for (const value of ['300', '120']) {
+          const modal = await openLabelEdit(page, '세션 유지 시간');
+          await logModal(page, log, '세션 유지 시간 수정');
+          await fillStable(page, modal.locator('input[type=text]:visible').first(), value, '세션 유지 시간');
+          await saveModal(page, log);
+          await waitDetailValue(page, '세션 유지 시간', (v) => v.replace(/,/g, '').includes(value), { log });
+        }
+      }
+      await editDesc('Listener');
+      await expectStep(page, resolveExpectation(scenario.steps[11]!.expect, vars), ctx(11));
     });
   });
 });

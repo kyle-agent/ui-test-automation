@@ -1,0 +1,76 @@
+{
+  "spec": "networking.cloud-lan-data-center",
+  "started": "2026-10-06T00:24:48.452Z",
+  "ended": "2026-10-06T00:36:32.772Z",
+  "seconds": 704,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cloud-lan-data-center",
+    "run_id": "1006-0925-7170",
+    "title": "Cloud LAN Network 목록 | Cloud LAN-Data Center | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud LAN-Data Center Network·vDevice·vCable 생성 후 해지",
+      "status": "failed",
+      "seconds": 642.3,
+      "annotations": {
+        "scenario": "networking.cloud-lan-data-center",
+        "run_id": "1006-0925-7170",
+        "title": "Cloud LAN Network 목록 | Cloud LAN-Data Center | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Cloud LAN Network 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] cld-1006-0925-7170 생성",
+          "status": "pass",
+          "seconds": 19.8
+        },
+        {
+          "title": "steps[2] vDevice {{router}}(vRouter)·{{switch}}(vSwitch) 를 만든다",
+          "status": "fail",
+          "seconds": 309.6
+        }
+      ],
+      "error": "Error: cldr-1006-0925-7170 상태 /Active/ 대기 300초 초과. 마지막: cld-1006-0925-7170 vRouter 8fa2730c154a449bbcd27d8a68f4fb9d cldr-1006-0925-7170 SA-EAST-1 - Failed 삭제",
+      "attachments": [
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: cldr-1006-0925-7170 상태 /Active/ 대기 300초 초과. 마지막: cld-1006-0925-7170 vRouter 8fa2730c154a449bbcd27d8a68f4fb9d cldr-1006-0925-7170 SA-EAST-1 - Failed 삭제",
+  "attachments": [
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.cloud-lan-data-center/networking.cloud-lan-data--da791-work·vDevice·vCable-생성-후-해지-regression/trace.zip"
+  ]
+}

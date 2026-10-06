@@ -1,10 +1,12 @@
 // 직접 작성 (2026-09-29). 시나리오: scenarios/container/container-registry.yaml.
 // simple-crud 팩토리 대신 흐름을 직접 쓴다: 해지 뒤 Terminating 이 수 분 이어지는데(실측 2026-09-29 약 3~5분),
 // 팩토리의 소멸 대기는 목록을 다시 읽는 순간(행 0개)을 소멸로 보고 넘어가 not_text 검사(2분)에서 실패했다.
+// 2026-10-06 L3 동작 추가(steps[2]·[3]): 상세 "엔드포인트" 프라이빗 → 프라이빗&퍼블릭(Editing → Running) → 프라이빗(되돌림), 태그 추가 → 삭제.
 // 여기서는 표가 다 그려진 뒤(행, 또는 빈 목록 안내 "서비스를 생성하세요." / "데이터가 없습니다")에 이름이 없을 때만 소멸로 본다.
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { detailValue, openLabelEdit, saveModal } from '../../src/console/detail-edit';
 import { allBodyText } from '../../src/console/frames';
 import { settleConsole } from '../../src/console/overlays';
 import {
@@ -17,6 +19,7 @@ import {
   topButton,
   waitForRow,
 } from '../../src/console/ui';
+import { addTag, removeTag } from '../../src/console/tags';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
 const scenario = loadScenario('scenarios/container/container-registry.yaml');
@@ -68,6 +71,33 @@ async function waitGone(page: Page, name: string, timeoutMs = 600_000): Promise<
     await page.waitForTimeout(15_000);
   }
 }
+
+/**
+ * 상세 "엔드포인트" 연필 → 모달 버튼(프라이빗 / 프라이빗&퍼블릭) → 확인. 저장하면 목록 상태가 Editing(≈1~2분) → Running 으로 돌아오고
+ * 상세 값이 바뀐다(2026-10-06 실측). 퍼블릭을 켜도 퍼블릭 엔드포인트 접근 제어가 "사용"·허용 IP 0개라 외부에서 접근할 수 없다.
+ */
+async function setEndpoint(page: Page, name: string, mode: '프라이빗' | '프라이빗&퍼블릭'): Promise<void> {
+  const modal = await openLabelEdit(page, '엔드포인트');
+  await modal.getByRole('button', { name: mode, exact: true }).click();
+  await saveModal(page, log);
+  const detail = page.url();
+  await waitForRow(page, ROUTE, name, { status: READY, timeoutMs: 600_000, intervalMs: 15_000, log });
+  await page.goto(detail);
+  await settleConsole(page, { appearGraceMs: 800 });
+  const start = Date.now();
+  for (;;) {
+    const v = await detailValue(page, '엔드포인트');
+    if (v === mode) break;
+    if (Date.now() - start > 120_000) throw new Error(`엔드포인트가 ${mode} 로 바뀌지 않았습니다. 마지막: ${v}`);
+    await page.waitForTimeout(10_000);
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+    await settleConsole(page, { appearGraceMs: 800 });
+  }
+  log(`    엔드포인트 = ${mode}`);
+}
+
+const publicEndpointLabel = (page: Page) =>
+  page.locator('.scp-form-group-label:visible').filter({ hasText: /^\s*퍼블릭 엔드포인트\s*$/ });
 
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@light'] }, () => {
   test.describe.configure({ mode: 'serial', timeout: 20 * 60_000 });
@@ -129,6 +159,21 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         `  Registry 행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`,
       );
       await expectStep(page, resolveExpectation(scenario.steps[1]!.expect, vars), ctx(1));
+    });
+    await test.step(`steps[2] ${scenario.steps[2]!.goal}`, async () => {
+      await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      expect(await detailValue(page, '엔드포인트')).toBe('프라이빗');
+      await setEndpoint(page, vars.name!, '프라이빗&퍼블릭');
+      await expect(publicEndpointLabel(page), '퍼블릭 엔드포인트 주소가 보여야 합니다').toHaveCount(1);
+      await setEndpoint(page, vars.name!, '프라이빗');
+      await expect(publicEndpointLabel(page)).toHaveCount(0);
+      await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] ${scenario.steps[3]!.goal}`, async () => {
+      await addTag(page, 'qa-tag', vars.run_id!, log);
+      await removeTag(page, 'qa-tag', log);
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });
   });
 });

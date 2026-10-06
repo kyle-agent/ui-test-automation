@@ -26,6 +26,19 @@ steps:
       url: "#/gslb/gslb/list"
       text: ["{{name}}"]
 
+  # 에이전트 3B (2026-10-06): Regional Routing Controller(#/gslb/rrc/list). GSLB 를 만들면 위치(KR-WEST-1) 행이 "사용" 으로 생긴다.
+  # 상단 "사용" 은 사용 중엔 비활성, 아이콘 버튼(더보기) 메뉴에 "중지". API: setgslbregionalroutingcontrol.
+  - goal: "Regional Routing Controller 에서 {{name}} 위치 라우팅을 중지했다가 다시 사용으로 되돌린다"
+    expect:
+      url: "#/gslb/rrc/list"
+      text: ["{{name}}"]
+
+  # 동작(L3, 2026-10-06 에이전트 3C): 연결 대상 탭 "연결 대상 수정" 으로 Weight 변경, 설명 연필.
+  - goal: "연결 대상 192.0.2.10 의 Weight 를 1 → 5 로 수정하고 설명을 바꾼다"
+    expect:
+      url: "#/gslb/gslb/detail"
+      text: ["scp-console-tests {{run_id}}"]
+
 teardown:
   - goal: "GSLB {{name}} 을 해지한다"
     expect:

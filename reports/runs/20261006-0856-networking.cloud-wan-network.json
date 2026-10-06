@@ -1,0 +1,71 @@
+{
+  "spec": "networking.cloud-wan-network",
+  "started": "2026-10-05T23:56:15.786Z",
+  "ended": "2026-10-05T23:57:28.318Z",
+  "seconds": 73,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cloud-wan-network",
+    "run_id": "1006-0856-ea0c",
+    "title": "Cloud WAN Network 목록 | Cloud WAN | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud WAN Network 생성 후 삭제",
+      "status": "failed",
+      "seconds": 43.7,
+      "annotations": {
+        "scenario": "networking.cloud-wan-network",
+        "run_id": "1006-0856-ea0c",
+        "title": "Cloud WAN Network 목록 | Cloud WAN | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Cloud WAN Network 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] cwn10060856ea0c 생성",
+          "status": "pass",
+          "seconds": 21.7
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip"
+  ]
+}

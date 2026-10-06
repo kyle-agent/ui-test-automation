@@ -1,0 +1,91 @@
+{
+  "spec": "container.repository",
+  "started": "2026-10-06T02:22:57.293Z",
+  "ended": "2026-10-06T02:34:13.517Z",
+  "seconds": 676,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "container.repository",
+    "run_id": "1006-1123-f6bd",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Registry 위에 Repository 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 606.9,
+      "annotations": {
+        "scenario": "container.repository",
+        "run_id": "1006-1123-f6bd",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.7
+        },
+        {
+          "title": "steps[1] Registry cr10061123f6bd 생성",
+          "status": "pass",
+          "seconds": 189.5
+        },
+        {
+          "title": "steps[2] Repository repo-1006-1123-f6bd 생성",
+          "status": "pass",
+          "seconds": 27.4
+        },
+        {
+          "title": "steps[3] 이미지 태그 삭제 정책(Untagged Image 90일 + 삭제 정책 활성화)을 켰다가 끈다",
+          "status": "pass",
+          "seconds": 58.9
+        },
+        {
+          "title": "steps[4] 이미지 잠금 여부를 Lock 으로 바꿨다가 Unlock 으로 되돌린다",
+          "status": "pass",
+          "seconds": 40.4
+        },
+        {
+          "title": "steps[5] 설명을 수정하고 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "fail",
+          "seconds": 56.5
+        }
+      ],
+      "error": "Error: \"scp-console-tests 1006-1123-f6bd\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+      "attachments": [
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/screenshot-container.repository.png",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: \"scp-console-tests 1006-1123-f6bd\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+  "attachments": [
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/screenshot-container.repository.png",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

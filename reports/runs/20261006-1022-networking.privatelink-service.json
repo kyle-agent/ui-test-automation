@@ -1,0 +1,98 @@
+{
+  "spec": "networking.privatelink-service",
+  "started": "2026-10-06T01:22:34.847Z",
+  "ended": "2026-10-06T01:42:25.202Z",
+  "seconds": 1190,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.privatelink-service",
+    "run_id": "1006-1022-955b",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PrivateLink Service → PrivateLink Endpoint 연결 요청 · 승인 → 역순 삭제",
+      "status": "failed",
+      "seconds": 1059.8,
+      "annotations": {
+        "scenario": "networking.privatelink-service",
+        "run_id": "1006-1022-955b",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] PrivateLink Service 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] VPC vpc-1006-1022-955b · Subnet sub-1006-1022-955b 생성",
+          "status": "pass",
+          "seconds": 369.4
+        },
+        {
+          "title": "steps[2] PrivateLink Service pls-1006-1022-955b 생성",
+          "status": "pass",
+          "seconds": 65.5
+        },
+        {
+          "title": "steps[3] PrivateLink Endpoint ple-1006-1022-955b 생성 (연결 요청)",
+          "status": "pass",
+          "seconds": 37.8
+        },
+        {
+          "title": "steps[4] 연결 요청 승인 → Endpoint Active",
+          "status": "pass",
+          "seconds": 49.1
+        },
+        {
+          "title": "steps[5] Endpoint ple-1006-1022-955b · Service pls-1006-1022-955b 설명 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 47.4
+        },
+        {
+          "title": "steps[6] 연결 관리: 연결 차단 → 상태 반영 → 다시 승인 → Active (L3)",
+          "status": "fail",
+          "seconds": 68.6
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/screenshot-networking.privatelink-service.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/screenshot-networking.privatelink-service.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.privatelink-service/networking.privatelink-ser-805fc-Endpoint-연결-요청-·-승인-→-역순-삭제-regression/trace.zip"
+  ]
+}

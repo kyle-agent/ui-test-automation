@@ -18,6 +18,9 @@ precondition:
 # (Direct Connect / Transit Gateway (Uplink)), 연결 자원명(그 유형의 자원), NAT IP 대역(/22~/28, VPC·On-Premise·다른 Private NAT 대역과 겹치지 않게), 설명, "요금 확인"(시간 과금).
 # "Private NAT를 생성하시겠습니까?" → Creating ≈20초 → Active. 상세 탭: 상세 정보 / IP 관리 (n) / 태그 / 작업 이력. 삭제: 목록 행 끝 "삭제" → "Private NAT를 삭제하시겠습니까?" ≈30초.
 # API 는 연결 자원 id 가 없어 4xx 였지만(placeholder), 콘솔에선 이 spec 의 Direct Connect 를 연결 자원으로 바로 쓴다 → DC 를 따로 만들 필요 없이 여기에 붙였다.
+# L3(2026-10-06 프로브, 에이전트 3D): Private NAT 상세에서 수정 가능한 항목은 "설명" 하나(연필 → "설명 수정" 모달 textarea 50자 → 확인 → "수정한 정보를 저장하시겠습니까?").
+# 탭 "IP 관리" 버튼: "반납"(행 선택 전 비활성) · "Private NAT IP 예약" → 모달 입력 1칸(ex 192.168.100.10) → "Private NAT IP를 예약하시겠습니까?" → 즉시 행
+# "192.168.100.10 - - <일시> Reserved 반납" (API createprivatenatip). 행 끝 "반납" → 확인 → 소멸.
 steps:
   - goal: "Direct Connect 목록으로 이동한다"
     goto: "#/directconnect/directconnect/list"
@@ -55,6 +58,11 @@ steps:
     expect:
       url: "#/vpc/private-nat/list"
       text: ["{{pnat}}", "{{name}}"]
+
+  - goal: "Private NAT {{pnat}} 설명을 바꿨다 되돌리고, IP 관리 탭에서 NAT IP 192.168.100.10 을 추가 → Active → 삭제한다 (L3)"
+    expect:
+      url: "#/vpc/private-nat/detail"
+      not_text: ["192.168.100.10"]
 
   - goal: "Private NAT {{pnat}} 를 삭제한다"
     expect:

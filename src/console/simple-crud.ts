@@ -50,6 +50,11 @@ export interface SimpleCrudConfig {
   beforeSubmit?: (page: Page, vars: Record<string, string>) => Promise<void>;
   /** 생성 후 삭제 전 추가 검증·동작 (예: 상세 화면 확인) */
   afterCreate?: (page: Page, vars: Record<string, string>) => Promise<void>;
+  /**
+   * 동작(L3) 단계 (2026-10-06): 생성(steps[1]) 뒤 차례로 steps[2], steps[3] … 으로 기록된다. 단계 이름·검증은 시나리오 steps[n] 의 goal·expect
+   * (expect 는 동작이 끝난 화면에서 검사). 각 동작이 "바꿈 → 화면 반영 확인 → (필요 시) 되돌림" 을 스스로 검증한다.
+   */
+  actions?: ((page: Page, vars: Record<string, string>, log: (line: string) => void) => Promise<void>)[];
   /** 환경 전제가 안 갖춰져 실행할 수 없을 때(예: Object Storage 는 인증키 필요) 사유와 함께 건너뛴다 */
   skipReason?: string;
   /** 폼 하단 주 버튼 문구 (기본 "생성"; Message Hub Domain·Email 추가 화면은 "완료") */
@@ -145,6 +150,10 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
           await submitForm(page, config.submitButton ?? '생성');
           await confirmModal(page, config.confirmText ?? /생성|신청|예약/, '확인', { agree: true });
           for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+          // 확인 직후 폼에 머문 채 곧바로 목록으로 이동하면 생성 요청이 나가기 전에 끊긴다(2026-10-06 Cloud WAN Network: POST 없음)
+          // → 콘솔이 스스로 폼을 떠날 때까지 최대 15초 기다린다(이미 떠났으면 즉시 통과)
+          const formUrl = page.url();
+          await page.waitForURL((u) => u.toString() !== formUrl, { timeout: 15_000 }).catch(() => undefined);
           await waitForRow(page, config.route, vars.name!, {
             status: config.createdStatus,
             timeoutMs: config.createTimeoutMs ?? 180_000,
@@ -154,6 +163,14 @@ export function defineSimpleCrudSpec(config: SimpleCrudConfig): void {
           if (config.afterCreate) await config.afterCreate(page, vars);
           await expectStep(page, resolveExpectation(scenario.steps[1]!.expect, vars), ctx(1));
         });
+        for (const [i, action] of (config.actions ?? []).entries()) {
+          const n = i + 2;
+          const step = scenario.steps[n];
+          await test.step(`steps[${n}] ${step?.goal ?? '동작'}`, async () => {
+            await action(page, vars, log);
+            if (step?.expect) await expectStep(page, resolveExpectation(step.expect, vars), ctx(n));
+          });
+        }
       });
     },
   );

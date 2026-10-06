@@ -32,6 +32,22 @@ steps:
       url: "#/scr/repository"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): Repository 상세 연필(이미지 태그 삭제 정책·이미지 잠금·설명)과 태그 탭.
+  - goal: "이미지 태그 삭제 정책(Untagged Image 90일 + 삭제 정책 활성화)을 켰다가 끈다"
+    expect:
+      url: "#/scr/repository/detail"
+      text: ["Untagged Image 자동 삭제 - 미사용"]
+
+  - goal: "이미지 잠금 여부를 Lock 으로 바꿨다가 Unlock 으로 되돌린다"
+    expect:
+      url: "#/scr/repository/detail"
+      text: ["Unlock"]
+
+  - goal: "설명을 수정하고 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다"
+    expect:
+      url: "#/scr/repository/detail"
+      text: ["태그 (0)"]
+
 teardown:
   - goal: "Repository {{name}} 을 삭제한다"
     expect:

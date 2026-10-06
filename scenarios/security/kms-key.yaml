@@ -27,6 +27,26 @@ steps:
       url: "#/kms/kms/list"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): 상세 상단 "키 회전"·"키 비활성화"/"키 활성화", 설명 연필, 태그 탭.
+  - goal: "키 회전으로 현재 버전이 1 → 2 가 되는지 확인한다"
+    expect:
+      url: "#/kms/kms/detail"
+
+  - goal: "키를 비활성화(Stop)했다가 다시 활성화(Active)한다"
+    expect:
+      url: "#/kms/kms/detail"
+      text: ["키 비활성화"]
+
+  - goal: "설명을 scp-console-tests {{run_id}} 로 수정한다"
+    expect:
+      url: "#/kms/kms/detail"
+      text: ["scp-console-tests {{run_id}}"]
+
+  - goal: "태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다"
+    expect:
+      url: "#/kms/kms/detail"
+      text: ["태그 (0)"]
+
 teardown:
   - goal: "키 {{name}} 을 즉시 해지한다"
     expect:

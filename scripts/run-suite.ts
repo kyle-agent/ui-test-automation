@@ -122,8 +122,10 @@ async function main(): Promise<void> {
   const started = Date.now();
   const env = shared ? { SHARED_VPC: shared.vpc, SHARED_SUBNET: shared.subnet } : {};
 
+  const locksHeld = new Set<string>();
   const canStart = (s: string): boolean => {
     const p = planFor(s);
+    if (p.lock && locksHeld.has(p.lock)) return false;
     if (p.shared) return !!shared;
     return vpcInUse + p.vpc <= budgetBase - sharedHeld;
   };
@@ -144,12 +146,14 @@ async function main(): Promise<void> {
       if (!canStart(s)) continue;
       pending.splice(pending.indexOf(s), 1);
       vpcInUse += planFor(s).vpc;
+      if (planFor(s).lock) locksHeld.add(planFor(s).lock!);
       log(`시작 ${s} (탭 ${running.size + 1}/${maxTabs}, VPC ${vpcInUse + sharedHeld}/${budgetBase})`);
       running.set(
         s,
         runOne(s, planFor(s).shared ? env : {}).then((r) => {
           running.delete(s);
           vpcInUse -= planFor(s).vpc;
+          if (planFor(s).lock) locksHeld.delete(planFor(s).lock!);
           results.push(r);
           log(`${r.code === 0 ? 'PASS' : 'FAIL'} ${s} ${Math.floor(r.seconds / 60)}분 ${r.seconds % 60}초`);
           return r;

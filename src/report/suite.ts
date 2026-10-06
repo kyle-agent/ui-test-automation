@@ -58,4 +58,10 @@ export const SUITE_ORDER: readonly string[] = [
   'networking.cdn', // Global CDN(원본 example.com) 생성 → 해지
   'networking.gslb', // GSLB(연결 대상 192.0.2.10, Round Robin) 생성 → 해지
   'networking.privatelink-service', // 에이전트 B 2차: VPC → Subnet → PrivateLink Service → 같은 계정 Endpoint 요청·승인(L3) → 역순
+  'networking.cloud-wan-network', // 에이전트 3B: Cloud WAN Network(논리 자원) 생성·삭제. Global
+  'networking.cloud-fabric-connect', // 에이전트 3B: Fabric → Policy·Connection 생성·삭제 → Fabric 해지. Global
+  'networking.cloud-lan-data-center', // 에이전트 3B: Cloud LAN Network 생성·해지. Global
+  'iam.saml-provider', // 에이전트 3A: SAML 자격 증명 공급자(더미 메타데이터) 생성·삭제. Global
+  'management.trail', // 에이전트 3A: 버킷 → Trail 생성 → 중지(L3) → 삭제 → 버킷 해지. ≈2분
+  'devops-tools.devops-service', // 에이전트 3A: DevOps Service Tenant 생성 → 상세 해지
 ];

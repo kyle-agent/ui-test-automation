@@ -1,0 +1,62 @@
+{
+  "spec": "storage.object-storage-bucket",
+  "started": "2026-10-06T01:04:36.553Z",
+  "ended": "2026-10-06T01:07:11.775Z",
+  "seconds": 155,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "storage.object-storage-bucket",
+    "run_id": "1006-1004-3dbc",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Object Storage 버킷 생성 후 해지",
+      "status": "passed",
+      "seconds": 131.8,
+      "annotations": {
+        "scenario": "storage.object-storage-bucket",
+        "run_id": "1006-1004-3dbc",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Object Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] bkt-1006-1004-3dbc 생성",
+          "status": "pass",
+          "seconds": 18.3
+        },
+        {
+          "title": "steps[2] 폴더 qa-folder 를 만들고 작은 텍스트 파일 qa-upload.txt 를 올린 뒤 둘 다 삭제한다",
+          "status": "pass",
+          "seconds": 46.2
+        },
+        {
+          "title": "steps[3] 버전 관리를 사용으로 바꿨다가 미사용으로 되돌린다",
+          "status": "pass",
+          "seconds": 16.8
+        },
+        {
+          "title": "steps[4] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 17.3
+        }
+      ]
+    }
+  ],
+  "git_sha": "a567fa9"
+}

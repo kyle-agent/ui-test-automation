@@ -22,6 +22,9 @@ precondition:
 #   → "PrivateLink Service 연결 요청을 승인하시겠습니까?" → Creating ≈30초 → Active, Endpoint 도 Active.
 # - 삭제: Endpoint 목록 행 끝 "삭제" → "PrivateLink Endpoint를 삭제하시겠습니까?" ≈1분 → Service 목록 행 끝 "삭제" → "PrivateLink Service를 삭제하시겠습니까?" ≈1분.
 #   Service 는 연결된 Endpoint 가 모두 없어야 지워진다(API 409 exist-connected-endpoint 와 같음).
+# - L3(2026-10-06 프로브, 에이전트 3D): Endpoint·Service 상세에서 수정 가능한 항목은 "설명"(50자) 하나(연필 → 모달 → "수정한 정보를 저장하시겠습니까?").
+#   연결 관리 탭의 Active 행 버튼은 "차단" 하나 → "연결된 PrivateLink Endpoint를 차단하시겠습니까?" → ≈30초 뒤 연결 행·Endpoint 모두 Disconnected, 행 버튼 "재연결"
+#   → 재연결 → Active. 거부/거절 버튼은 Requesting 행에만 있다("거부 승인"). Disconnected Endpoint 도 목록 "삭제" 로 지워진다.
 steps:
   - goal: "PrivateLink Service 목록으로 이동한다"
     goto: "#/vpc/privatelink-service/list"
@@ -54,6 +57,16 @@ steps:
       text: ["{{ple}}"]
 
   - goal: "Service 연결 관리 탭에서 연결 요청을 승인하고 Endpoint 가 Active 가 되기를 기다린다"
+    expect:
+      url: "#/vpc/privatelink-endpoint/list"
+      text: ["{{ple}}", "Active"]
+
+  - goal: "Endpoint {{ple}} 와 Service {{pls}} 상세에서 설명을 바꾸고 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/privatelink-service/detail"
+      text: ["{{pls}}"]
+
+  - goal: "Service 연결 관리 탭에서 연결을 차단해 Endpoint·연결이 Disconnected 로 바뀐 것을 확인하고, 재연결로 Active 로 되돌린다 (L3)"
     expect:
       url: "#/vpc/privatelink-endpoint/list"
       text: ["{{ple}}", "Active"]

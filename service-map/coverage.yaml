@@ -12,7 +12,7 @@ resources:
     level: 1
     specs: [smoke.simple-ai-training]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): Training Job 리소스 할당이 Workspace(H100/B300 GPU 노드) 전제"
   - key: volume@simple-ai-training
     service: "Simple AI Training"
     category: "AI-ML"
@@ -20,7 +20,7 @@ resources:
     level: 1
     specs: [smoke.simple-ai-training]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): Volume 연결의 File Storage 목록이 NFS HDD·고성능 SSD 볼륨을 만들어도 비어 있음 — Workspace 전제로 추정"
   - key: workspace
     service: "Simple AI Training"
     category: "AI-ML"
@@ -28,7 +28,7 @@ resources:
     level: 1
     specs: [smoke.simple-ai-training]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): 최소 사양이 H100 GPU 1장 노드(at.g2v12h1), 약정/고액 시간 과금"
   - key: bucket@archive-storage
     service: "Archive Storage"
     category: "Storage"
@@ -89,18 +89,18 @@ resources:
     service: "Global CDN"
     category: "Networking"
     route: /cdn/cdn/list
-    level: 2
+    level: 3
     specs: [smoke.global-cdn, networking.cdn]
-    last_pass: "2026-09-30"
-    note: "원본 example.com(HTTP 80) 생성 → 배포(설정 버전 Pending ≈6분) → 중지(Stopping ≈15분) → 서비스 해지. PASS 25분"
+    last_pass: "2026-10-06"
+    note: "원본 example.com(HTTP 80) 생성 → 배포(설정 버전 Pending ≈6분) → 중지(Stopping ≈15분) → 서비스 해지. PASS 25분 / 2026-10-06 L3(3C): 첫 배포(1 Active ≈6분) 뒤 상세 수정(#/cdn/cdn/edit) Cache 만료시간 86400→3600초 → 설정 버전 2 Pending → 2 Active(≈5분). Purge 는 약 4시간 걸린다는 안내라 정리를 막을 수 있어 안 함. PASS 30분"
   - key: certificate
     service: "Certificate Manager"
     category: "Security"
     route: /certificate-manager/certificate-manager/list
-    level: 2
+    level: 3
     specs: [smoke.certificate-manager, security.certificate]
-    last_pass: "2026-09-29"
-    note: "자체 발급 인증서(OU 는 짧으면 거절, 만료일은 달력으로 골라야 함) 생성 → 목록 상단 서비스 해지. 무과금"
+    last_pass: "2026-10-06"
+    note: "자체 발급 인증서(OU 는 짧으면 거절, 만료일은 달력으로 골라야 함) 생성 → 목록 상단 서비스 해지. 무과금 / 2026-10-06 L3(3C): 태그 추가→삭제만(갱신·재발급 버튼 없음, 만료 알림은 실제 수신자 메일이라 안 함). PASS 1.5분"
   - key: circuit-and-edge
     service: "Cloud Last Mile"
     category: "Networking"
@@ -124,7 +124,7 @@ resources:
     level: 1
     specs: [smoke.config-inspection]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): 요금 확인 1개월 예상 ₩77,400(일반 요금제 기본), 요금제 변경 불가. API 생성도 400"
   - key: direct-connect
     service: "Direct Connect"
     category: "Networking"
@@ -169,10 +169,10 @@ resources:
     service: "Event Streams"
     category: "Data Analytics"
     route: /eventstreams/eventstreams/list
-    level: 2
+    level: 3
     specs: [smoke.event-streams, data-analytics.event-streams]
-    last_pass: "2026-09-30"
-    note: "Broker 1·최소 사양, 공유 VPC 위에서 PASS 14분"
+    last_pass: "2026-10-06"
+    note: "Broker 1·최소 사양 생성 → 상세 중지(Stopping ≈1분)→Stopped→시작→Running(L3) → 해지. 단독(자기 VPC) PASS 26분 (2026-10-06)"
   - key: volume@file-storage
     service: "File Storage"
     category: "Storage"
@@ -225,18 +225,18 @@ resources:
     service: "GSLB"
     category: "Networking"
     route: /gslb/gslb/list
-    level: 2
+    level: 3
     specs: [smoke.gslb, networking.gslb]
-    last_pass: "2026-09-30"
-    note: "연결 대상 192.0.2.10(Weight 필수) · ICMP 헬스 체크 · Round Robin 생성 → 상세 Active → 행 서비스 해지. PASS 2분"
+    last_pass: "2026-10-06"
+    note: "연결 대상 192.0.2.10(Weight 필수) · ICMP 헬스 체크 · Round Robin 생성 → 상세 Active → 행 서비스 해지. PASS 2분 / 2026-10-06 L3(3C): 연결 대상 수정(Weight 1→5), 설명 수정. RRC 중지→사용은 steps[2](3B). PASS 3.6분"
   - key: gslb-rrc
     service: "GSLB"
     category: "Networking"
     route: /gslb/rrc/list
-    level: 1
-    specs: [smoke.gslb]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.gslb, networking.gslb]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. GSLB 생성 시 위치(KR-WEST-1) 행이 사용으로 생김 → 행 선택 → 더보기 아이콘 메뉴 중지 → 확인 → 중지 반영 → 상단 사용 → 사용 복귀(L3, networking.gslb steps[2]). PASS 2.5분"
   - key: group@iam
     service: "IAM"
     category: "Management"
@@ -249,10 +249,10 @@ resources:
     service: "IAM"
     category: "Management"
     route: /iam/idp/list
-    level: 1
-    specs: [smoke.iam]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.iam, iam.saml-provider]
+    last_pass: "2026-10-06"
+    note: "SAML 더미 메타데이터(공개 인증서 포함 필수, 없으면 형식 오류) 생성·삭제. 역할 신뢰 없음 → 로그인 영향 없음"
   - key: policy@iam
     service: "IAM"
     category: "Management"
@@ -297,10 +297,10 @@ resources:
     service: "Key Management Service"
     category: "Security"
     route: /kms/kms/list
-    level: 2
+    level: 3
     specs: [smoke.key-management-service, security.kms-key]
-    last_pass: "2026-09-29"
-    note: "키명 영문 소문자·숫자만(kms<run_id_compact>), 퍼블릭 접근 허용 IP 필수(192.0.2.10/32), 프라이빗 접근 제어 끔. 해지 모달 기본 '즉시 해지' → 바로 사라짐"
+    last_pass: "2026-10-06"
+    note: "키명 영문 소문자·숫자만(kms<run_id_compact>), 퍼블릭 접근 허용 IP 필수(192.0.2.10/32), 프라이빗 접근 제어 끔. 해지 모달 기본 '즉시 해지' → 바로 사라짐 / 2026-10-06 L3(3C): 키 회전(버전 1→2), 키 비활성화(Stop)→활성화(Active), 설명 수정, 태그 추가→삭제. PASS 1.5분"
   - key: managed-kms
     service: "Key Management Service"
     category: "Security"
@@ -308,31 +308,31 @@ resources:
     level: 1
     specs: [smoke.key-management-service]
     last_pass: null
-    note: ""
+    note: "플랫폼 관리형 키 목록(조회 전용) — 생성 버튼 없음"
   - key: lb-health-check
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer-health-check/list
-    level: 2
+    level: 3
     specs: [smoke.load-balancer, networking.load-balancer]
-    last_pass: "2026-09-30"
-    note: "networking.load-balancer 체인에서 생성·삭제"
+    last_pass: "2026-10-06"
+    note: "networking.load-balancer 체인에서 생성 → 헬스 체크 방식 탐지 횟수 3→5→3 · 설명 수정·되돌림(L3) → 삭제. PASS 23분 (2026-10-06)"
   - key: lb-server-group
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer-server-group/list
-    level: 2
+    level: 3
     specs: [smoke.load-balancer, networking.load-balancer]
-    last_pass: "2026-09-30"
-    note: "networking.load-balancer 체인에서 생성·삭제 (멤버는 실제 VM 필요로 미포함)"
+    last_pass: "2026-10-06"
+    note: "networking.load-balancer 체인에서 생성 → 부하 분산 Round Robin→Least Connection→Round Robin · 설명 수정(L3) → 삭제 (멤버는 실제 VM 필요로 미포함). PASS 23분 (2026-10-06)"
   - key: loadbalancer
     service: "Load Balancer"
     category: "Networking"
     route: /loadbalancer/loadbalancer/list
     level: 3
     specs: [smoke.load-balancer, networking.load-balancer]
-    last_pass: "2026-09-30"
-    note: "LB 생성·삭제(VPC→Subnet→LB→헬스 체크→서버 그룹→Listener) + Public NAT IP 설정·해제(L3, IGW·Public IP 필요). PASS 22분 (2026-09-30)"
+    last_pass: "2026-10-06"
+    note: "LB 생성·삭제(VPC→Subnet→LB→헬스 체크→서버 그룹→Listener) + Public NAT IP 설정·해제(L3, IGW·Public IP 필요) + Listener 세션 유지 시간 120→300→120·설명 수정(L3, 2026-10-06). PASS 23분 (2026-10-06)"
   - key: mariadb
     service: "MariaDB(DBaaS)"
     category: "Database"
@@ -369,10 +369,10 @@ resources:
     service: "Object Storage"
     category: "Storage"
     route: /objectstorage/objectstorage/list
-    level: 2
+    level: 3
     specs: [smoke.object-storage, storage.object-storage-bucket]
-    last_pass: "2026-09-23"
-    note: "전제: 계정에 Object Storage 인증키(IAM > My Info > 인증키, 영구) 1개 — 2026-09-23 생성. 해지 모달은 실제 버킷명 입력 필요"
+    last_pass: "2026-10-06"
+    note: "전제: 계정에 Object Storage 인증키(IAM > My Info > 인증키, 영구) 1개 — 2026-09-23 생성. 해지 모달은 실제 버킷명 입력 필요 / 2026-10-06 L3(3C): 폴더 리스트 새폴더 + 작은 텍스트 파일 업로드(setInputFiles) → 삭제, 버전 관리 사용→미사용, 태그 추가→삭제. 수명 주기 정책 화면 없음. 비어 있지 않은 버킷은 해지 거절 → 실패 시 비움. PASS 2.6분"
   - key: volume@parallel-file-storage
     service: "Parallel File Storage"
     category: "Storage"
@@ -401,10 +401,10 @@ resources:
     service: "Resource Groups"
     category: "Management"
     route: /resourcegroups/resource-group/list
-    level: 2
+    level: 3
     specs: [smoke.resource-groups, management.resource-group]
-    last_pass: "2026-09-23"
-    note: "생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금"
+    last_pass: "2026-10-06"
+    note: "생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금 / 2026-10-06 L3(3C): 그룹 자원 수정(…/update) 정의 태그 조건 qa2 추가→제거, 그룹 태그 추가→삭제. 실제 자원 편입은 다른 자원 태그 필요라 안 함. PASS 2.1분"
   - key: lastmile
     service: "SASE"
     category: "Networking"
@@ -436,7 +436,7 @@ resources:
     level: 1
     specs: [smoke.secret-vault]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): 1개월 예상 ₩39,904, 인증키 1개당 1개(계정 유일 인증키를 묶음), 해지는 7~30일 예약, 사용엔 계정 인증키 보안설정 변경(임시키 인증·접근 IP) 필요"
   - key: address-group
     service: "Security Group"
     category: "Networking"
@@ -508,7 +508,7 @@ resources:
     level: 1
     specs: [smoke.virtual-server]
     last_pass: null
-    note: "공유 qa-shared-keypair 재사용만, CRUD 는 .pem 다운로드가 Edge 를 죽여 미구현 (docs/service-facts/compute-vm-stack.md)"
+    note: "공유 qa-shared-keypair 재사용만. 생성 폼(2026-10-06 재확인)은 이름·태그뿐이고 공개 키 가져오기가 없어 .pem 다운로드가 필수 → Edge 를 죽여 미구현 (docs/service-facts/compute-vm-stack.md)"
   - key: launch-configuration
     service: "Virtual Server"
     category: "Compute"
@@ -521,10 +521,10 @@ resources:
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/server-group/list
-    level: 2
+    level: 3
     specs: [smoke.virtual-server, compute.server-group]
-    last_pass: 2026-09-23
-    note: "생성(정책 Anti-Affinity) → 목록 → 삭제. 선행 리소스 없음"
+    last_pass: "2026-10-06"
+    note: "생성(정책 Anti-Affinity) → 목록 → 삭제. 선행 리소스 없음 / 2026-10-06 L3(3C): 상세 수정 항목 없음 → 태그 추가→삭제, 작업 이력 Create End 성공 확인. PASS 1.5분"
   - key: virtual-server
     service: "Virtual Server"
     category: "Compute"
@@ -561,26 +561,26 @@ resources:
     service: "VPC"
     category: "Networking"
     route: /vpc/private-nat/list
-    level: 2
+    level: 3
     specs: [smoke.vpc, networking.direct-connect]
-    last_pass: "2026-09-30"
-    note: "networking.direct-connect 체인: 이 spec 의 Direct Connect 를 연결 자원으로 Private NAT(192.168.100.0/24) 생성·삭제. PASS 6.5분"
+    last_pass: "2026-10-06"
+    note: "networking.direct-connect 체인: Private NAT(192.168.100.0/24) 생성 → 설명 수정·되돌림 → IP 관리 탭 Private NAT IP 192.168.100.10 예약(Reserved)·반납(L3, API createprivatenatip) → 삭제. PASS 6.5분 (2026-10-06)"
   - key: privatelink-endpoint
     service: "VPC"
     category: "Networking"
     route: /vpc/privatelink-endpoint/list
-    level: 2
+    level: 3
     specs: [smoke.vpc, networking.privatelink-service]
-    last_pass: "2026-09-30"
-    note: "기타 PrivateLink 서비스 + 같은 계정 Service ID 로 생성 → Requesting → 승인 뒤 Active → 삭제 (networking.privatelink-service)"
+    last_pass: "2026-10-06"
+    note: "같은 계정 Service ID 로 생성 → Requesting → 승인 → Active → 설명 수정·되돌림 → Service 연결 관리 차단 → Disconnected → 재연결 → Active(L3) → 삭제 (networking.privatelink-service, PASS 16분 2026-10-06)"
   - key: privatelink-service
     service: "VPC"
     category: "Networking"
     route: /vpc/privatelink-service/list
     level: 3
     specs: [smoke.vpc, networking.privatelink-service]
-    last_pass: "2026-09-30"
-    note: "IP 연결·수동 승인 Service → 같은 계정 Endpoint 요청 → 연결 관리 탭에서 승인(L3) → 역순. PASS 14분"
+    last_pass: "2026-10-06"
+    note: "IP 연결·수동 승인 Service → 같은 계정 Endpoint 요청 → 연결 관리 탭 승인 → 설명 수정·되돌림 → 연결 차단·재연결(L3) → 역순. PASS 16분 (2026-10-06)"
   - key: publicip
     service: "VPC"
     category: "Networking"
@@ -609,10 +609,10 @@ resources:
     service: "VPC"
     category: "Networking"
     route: /vpc/vpc-endpoint/list
-    level: 2
+    level: 3
     specs: [smoke.vpc, networking.vpc-endpoint]
-    last_pass: "2026-09-30"
-    note: "VPC Endpoint 유형 Subnet → Endpoint(Object Storage) 생성·삭제. PASS 5분"
+    last_pass: "2026-10-06"
+    note: "VPC Endpoint 유형 Subnet → Endpoint(Object Storage) 생성 → 상세 설명 수정·반영·되돌림(L3, 수정 가능 항목은 설명뿐) → 삭제. PASS 4분 (2026-10-06)"
   - key: vpc-peering
     service: "VPC"
     category: "Networking"
@@ -633,18 +633,18 @@ resources:
     service: "VPN"
     category: "Networking"
     route: /vpn/vpn-tunnel/list
-    level: 2
+    level: 3
     specs: [smoke.vpn, networking.vpn]
-    last_pass: "2026-09-30"
-    note: "상대 장비 없이도 터널 Active. networking.vpn 체인"
+    last_pass: "2026-10-06"
+    note: "상대 장비 없이도 터널 Active. networking.vpn steps[5]: DPD 60→30, Peer IP, IKE SA LifeTime 86400→28800, 설명 수정 → 상세 반영 → 되돌림(L3). PASS 10.5분 (2026-10-06)"
   - key: vpn-gateway
     service: "VPN"
     category: "Networking"
     route: /vpn/vpn/list
-    level: 2
+    level: 3
     specs: [smoke.vpn, networking.vpn]
-    last_pass: "2026-09-30"
-    note: "VPN Gateway 생성·삭제(터널 먼저 삭제). PASS 7분"
+    last_pass: "2026-10-06"
+    note: "VPN Gateway 생성 → 설명 수정·반영·되돌림(L3, 수정 가능 항목은 설명뿐) → 삭제(터널 먼저). PASS 10.5분 (2026-10-06)"
   - key: api
     service: "API Gateway"
     category: "Application Service"
@@ -657,26 +657,26 @@ resources:
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/connection
-    level: 1
-    specs: [smoke.cloud-fabric-connect]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Fabric명 + Connection명, 구성 방식 기본 L2 → Active → 행 끝 삭제 (cloud-fabric-connect steps[3])"
   - key: fabric
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/fabric
-    level: 1
-    specs: [smoke.cloud-fabric-connect]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Global, Location Gasan → 즉시 Active → 하위 Policy·Connection 생성·삭제 → 행 끝 서비스 해지. PASS 2.5분"
   - key: policy@cloud-fabric-connect
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/policy
-    level: 1
-    specs: [smoke.cloud-fabric-connect]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Fabric명 + Policy명만 → Active → 행 끝 삭제 (cloud-fabric-connect steps[2])"
   - key: port@cloud-fabric-connect
     service: "Cloud Fabric Connect"
     category: "Networking"
@@ -689,18 +689,18 @@ resources:
     service: "Cloud LAN-Data Center"
     category: "Networking"
     route: /clandc/cable
-    level: 1
-    specs: [smoke.cloud-lan-data-center]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-lan-data-center, networking.cloud-lan-data-center]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Static, vDevice A(vRouter)↔B(vSwitch) → Active → 행 끝 삭제"
   - key: vdevice
     service: "Cloud LAN-Data Center"
     category: "Networking"
     route: /clandc/device
-    level: 1
-    specs: [smoke.cloud-lan-data-center]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-lan-data-center, networking.cloud-lan-data-center]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. vSwitch·vRouter 각 ≈1분 Creating → Active → 행 끝 삭제. 1차 실행에서 vRouter Failed 1회(재실행 정상)"
   - key: interface
     service: "Cloud LAN-Data Center"
     category: "Networking"
@@ -713,10 +713,10 @@ resources:
     service: "Cloud LAN-Data Center"
     category: "Networking"
     route: /clandc/network
-    level: 1
-    specs: [smoke.cloud-lan-data-center]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-lan-data-center, networking.cloud-lan-data-center]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Global, 위치 SA-EAST-1(유일) → Active → 하위 vDevice·vCable → 행 끝 서비스 해지. PASS 8분"
   - key: cssdlan-network
     service: "Cloud Secured SD-LAN"
     category: "Networking"
@@ -737,10 +737,10 @@ resources:
     service: "Cloud WAN"
     category: "Networking"
     route: /cwan/network
-    level: 1
-    specs: [smoke.cloud-wan]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.cloud-wan, networking.cloud-wan-network]
+    last_pass: "2026-10-06"
+    note: "에이전트 3B. Global, 이름 영문·숫자 3~20자 → 즉시 Active → 행 끝 서비스 해지. 계정당 1개. PASS 1.5분"
   - key: segment
     service: "Cloud WAN"
     category: "Networking"
@@ -769,18 +769,18 @@ resources:
     service: "DevOps Service"
     category: "DevOps Tools"
     route: /devopsservice/devops-service
-    level: 1
-    specs: [smoke.devops-service]
-    last_pass: null
-    note: ""
+    level: 2
+    specs: [smoke.devops-service, devops-tools.devops-service]
+    last_pass: "2026-10-06"
+    note: "Tenant명·코드만으로 생성(API 는 409 였으나 콘솔은 됨) → 상세 서비스 해지. 계정당 1개(API 메모)"
   - key: role
     service: "IAM"
     category: "Management"
     route: /iam/role
-    level: 2
+    level: 3
     specs: [smoke.iam, iam.role]
-    last_pass: "2026-09-29"
-    note: "Global. 수행 주체 현재 Account(Value 자동), 정책 없이 생성 → 삭제. 수행 주체 '추가' 는 빈 행을 만들어 생성이 비활성이 된다"
+    last_pass: "2026-10-06"
+    note: "Global. 수행 주체 현재 Account(Value 자동), 정책 없이 생성 → 삭제. 수행 주체 '추가' 는 빈 행을 만들어 생성이 비활성이 된다 / 2026-10-06 L3(3C): 정책 CostNavigatorReadOnlyAccess 연결→해제, 수행 주체 서비스(cloudscope) 추가→제거, 최대 세션 1→2시간, 태그 추가→삭제. PASS 2.1분"
   - key: account
     service: "ID Center"
     category: "Management"
@@ -793,10 +793,10 @@ resources:
     service: "Logging&Audit"
     category: "Management"
     route: /loggingaudit/trail
-    level: 1
-    specs: [smoke.logging-audit]
-    last_pass: null
-    note: ""
+    level: 3
+    specs: [smoke.logging-audit, management.trail]
+    last_pass: "2026-10-06"
+    note: "버킷 → Trail(Active) → 상세 중지(Stopped, L3) → 상세 Trail 삭제 → 버킷 해지. 수 분 안에 지우면 버킷에 로그가 안 쌓여 해지됨"
   - key: phone
     service: "Message Hub"
     category: "Application Service"
@@ -817,10 +817,10 @@ resources:
     service: "Notification Manager"
     category: "Management"
     route: /notification/group
-    level: 2
+    level: 3
     specs: [smoke.notification-manager, management.notification-group]
-    last_pass: "2026-09-29"
-    note: "Global. 수신자 없이 생성(실제 메일 방지) → 목록 확인 → 행 선택 후 삭제. 무과금"
+    last_pass: "2026-10-06"
+    note: "Global. 수신자 없이 생성(실제 메일 방지) → 목록 확인 → 행 선택 후 삭제. 무과금 / 2026-10-06 L3(3C): 상세 수정(…/modify) 설명 + 외부 수신자 qa-<run>@example.com(예약 도메인) 저장 → 비워 되돌림. 사용자 추가는 실제 사용자라 안 함. PASS 1.5분"
   - key: oracle-services
     service: "Oracle Services"
     category: "Hybrid Cloud"
@@ -836,7 +836,7 @@ resources:
     level: 1
     specs: [smoke.organization]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): 조직 화면 \"권한 없음\"(조직 마스터 필요). API 도 403"
   - key: ou
     service: "Organization"
     category: "Management"
@@ -844,7 +844,7 @@ resources:
     level: 1
     specs: [smoke.organization]
     last_pass: null
-    note: ""
+    note: "건너뜀(2026-10-06): 조직 화면 \"권한 없음\"(조직 마스터 필요). API 도 403"
   - key: private-zone
     service: "Private Zone"
     category: "Hybrid Cloud"
@@ -857,10 +857,10 @@ resources:
     service: "Queue Service"
     category: "Application Service"
     route: /queueservice/queueservices
-    level: 2
+    level: 3
     specs: [smoke.queue-service, application-service.queue]
-    last_pass: "2026-09-29"
-    note: "생성(기본 유형, 기본 설정) → 목록 확인 → 목록 상단 서비스 해지. Queue명은 소문자로 시작, 소문자·숫자·- 3~64자. 선행 리소스 없음"
+    last_pass: "2026-10-06"
+    note: "생성(기본 유형, 기본 설정) → 목록 확인 → 목록 상단 서비스 해지. Queue명은 소문자로 시작, 소문자·숫자·- 3~64자. 선행 리소스 없음 / 2026-10-06 L3(3C): 상세 메시지 설정 보존 기간 4→5일 수정, IP 접근 허용 목록 추가→삭제. 메시지 송수신·purge 는 콘솔에 없음. PASS 1.4분"
   - key: sase
     service: "SASE"
     category: "Networking"
@@ -881,18 +881,18 @@ resources:
     service: "Container Registry"
     category: "Container"
     route: /scr/registry
-    level: 2
+    level: 3
     specs: [smoke.container-registry, container.container-registry]
-    last_pass: "2026-09-29"
-    note: "레지스트리명은 '-' 불가(cr<run_id_compact>). 프라이빗 엔드포인트로 생성 → 약 2.5분 뒤 Running → 상세에서 서비스 해지 → Terminating 약 2.5분. 목록에 해지 버튼 없음"
+    last_pass: "2026-10-06"
+    note: "레지스트리명은 '-' 불가(cr<run_id_compact>). 프라이빗 엔드포인트로 생성 → 약 2.5분 뒤 Running → 상세에서 서비스 해지 → Terminating 약 2.5분. 목록에 해지 버튼 없음 / 2026-10-06 L3(3C): 엔드포인트 프라이빗→프라이빗&퍼블릭(Editing ≈1~2분)→프라이빗, 태그 추가→삭제. 계정 쿼터 CONTAINER_REGISTRY.NON_VISIBILITY.MAX.COUNT=1 — 레지스트리를 쓰는 spec 둘(registry·repository)은 동시에 못 돈다. PASS 13.8분"
   - key: repository
     service: "Container Registry"
     category: "Container"
     route: /scr/repository
-    level: 2
+    level: 3
     specs: [smoke.container-registry, container.repository]
-    last_pass: "2026-09-29"
-    note: "선행 Registry(약 2.5분) → Repository(레지스트리 드롭다운 + 리포지토리명, 스캔 끔) 생성 → Active → 상세 'Repository 삭제' → Registry 해지. 목록은 제목 옆 레지스트리 드롭다운 + 조회로 골라야 보인다"
+    last_pass: "2026-10-06"
+    note: "선행 Registry(약 2.5분) → Repository(레지스트리 드롭다운 + 리포지토리명, 스캔 끔) 생성 → Active → 상세 'Repository 삭제' → Registry 해지. 목록은 제목 옆 레지스트리 드롭다운 + 조회로 골라야 보인다 / 2026-10-06 L3(3C): 이미지 태그 삭제 정책(Untagged 90일 + 활성화) 켜기→끄기, 이미지 잠금 Lock→Unlock, 설명 수정, 태그 추가→삭제. 이미지 push(docker)·자동 스캔(과금)은 안 함. PASS 10.7분"
   - key: cluster
     service: "Kubernetes Engine"
     category: "Container"

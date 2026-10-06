@@ -25,6 +25,22 @@ steps:
       url: "#/resourcegroups/resource-group/list"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): "그룹 자원 수정"(…/update/<id>) 으로 그룹 정의 태그 조건 추가·제거, "태그 수정"(…/tag/edit) 으로 그룹 태그 추가·삭제.
+  - goal: "그룹 정의 태그 조건 qa2:{{run_id}} 를 추가해 저장하고 그룹 자원 탭에 조건 2개가 보이는지 확인한다"
+    expect:
+      url: "#/resourcegroups/resource-group/detail/"
+      text: ["qa2:{{run_id}}", "qa:{{run_id}}"]
+
+  - goal: "추가한 그룹 정의 태그 조건을 제거해 저장하고 조건 1개로 돌아갔는지 확인한다"
+    expect:
+      url: "#/resourcegroups/resource-group/detail/"
+      not_text: ["qa2:{{run_id}}"]
+
+  - goal: "태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다"
+    expect:
+      url: "#/resourcegroups/resource-group/detail/"
+      text: ["태그 (0)"]
+
 teardown:
   - goal: "Resource Group {{name}} 을 삭제한다"
     expect:

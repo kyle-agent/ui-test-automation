@@ -1,0 +1,82 @@
+{
+  "spec": "networking.privatelink-service",
+  "started": "2026-10-06T01:47:26.659Z",
+  "ended": "2026-10-06T02:03:39.165Z",
+  "seconds": 973,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.privatelink-service",
+    "run_id": "1006-1047-482f",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PrivateLink Service → PrivateLink Endpoint 연결 요청 · 승인 → 역순 삭제",
+      "status": "passed",
+      "seconds": 930.9,
+      "annotations": {
+        "scenario": "networking.privatelink-service",
+        "run_id": "1006-1047-482f",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] PrivateLink Service 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.3
+        },
+        {
+          "title": "steps[1] VPC vpc-1006-1047-482f · Subnet sub-1006-1047-482f 생성",
+          "status": "pass",
+          "seconds": 254.5
+        },
+        {
+          "title": "steps[2] PrivateLink Service pls-1006-1047-482f 생성",
+          "status": "pass",
+          "seconds": 61.6
+        },
+        {
+          "title": "steps[3] PrivateLink Endpoint ple-1006-1047-482f 생성 (연결 요청)",
+          "status": "pass",
+          "seconds": 37.1
+        },
+        {
+          "title": "steps[4] 연결 요청 승인 → Endpoint Active",
+          "status": "pass",
+          "seconds": 48.9
+        },
+        {
+          "title": "steps[5] Endpoint ple-1006-1047-482f · Service pls-1006-1047-482f 설명 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 50.9
+        },
+        {
+          "title": "steps[6] 연결 관리: 연결 차단 → Disconnected 반영 → 재연결 → Active (L3)",
+          "status": "pass",
+          "seconds": 68.4
+        },
+        {
+          "title": "steps[7] PrivateLink Endpoint ple-1006-1047-482f 삭제",
+          "status": "pass",
+          "seconds": 75.7
+        },
+        {
+          "title": "steps[8] PrivateLink Service pls-1006-1047-482f 삭제",
+          "status": "pass",
+          "seconds": 76.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "a567fa9"
+}

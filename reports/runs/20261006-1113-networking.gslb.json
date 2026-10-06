@@ -1,0 +1,81 @@
+{
+  "spec": "networking.gslb",
+  "started": "2026-10-06T02:13:21.114Z",
+  "ended": "2026-10-06T02:18:18.994Z",
+  "seconds": 298,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.gslb",
+    "run_id": "1006-1113-4a78",
+    "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "GSLB 생성 후 해지",
+      "status": "failed",
+      "seconds": 251.1,
+      "annotations": {
+        "scenario": "networking.gslb",
+        "run_id": "1006-1113-4a78",
+        "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] GSLB 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.5
+        },
+        {
+          "title": "steps[1] gslb100611134a78 생성",
+          "status": "pass",
+          "seconds": 41.1
+        },
+        {
+          "title": "steps[2] Regional Routing Controller 에서 {{name}} 위치 라우팅을 중지했다가 다시 사용으로 되돌린다",
+          "status": "pass",
+          "seconds": 29
+        },
+        {
+          "title": "steps[3] 연결 대상 192.0.2.10 의 Weight 를 1 → 5 로 수정하고 설명을 바꾼다",
+          "status": "fail",
+          "seconds": 138
+        }
+      ],
+      "error": "Error: 연결 대상 Weight 5",
+      "attachments": [
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: 연결 대상 Weight 5",
+  "attachments": [
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip"
+  ]
+}

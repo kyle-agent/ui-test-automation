@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-02 19:12, 실행 기록 358건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-06 08:04, 실행 기록 359건.
 
 ## 1. spec 별 최근 상태
 
@@ -42,7 +42,7 @@
 | iam.policy | 2026-10-02 18:38 | PASS | 3분 45초 | FPPP | 3분 14초 |
 | storage.file-storage-snapshot | 2026-10-02 18:33 | PASS | 3분 39초 | FFFPP | 3분 8초 |
 | management.servicewatch-dashboard | 2026-10-02 18:39 | PASS | 1분 59초 | PPP | 1분 47초 |
-| management.servicewatch-log-group | 2026-10-02 18:57 | FAIL(unclassified) | 3분 58초 | FPPFF | 1분 40초 |
+| management.servicewatch-log-group | 2026-10-02 19:19 | PASS | 1분 9초 | PPFFP | 1분 30초 |
 | management.servicewatch-event-rule | 2026-10-02 18:40 | PASS | 1분 46초 | PPP | 1분 39초 |
 | management.servicewatch-alert | 2026-10-02 18:40 | PASS | 2분 36초 | PPP | 2분 4초 |
 | compute.volume-snapshot | 2026-10-02 18:28 | PASS | 3분 53초 | PFFPP | 3분 51초 |

@@ -2,10 +2,12 @@
 import { expect } from '@playwright/test';
 import { defineSimpleCrudSpec } from '../../src/console/simple-crud';
 import { gotoRoute } from '../../src/console/expect';
+import { editDetailText } from '../../src/console/detail-edit';
 import { settleConsole } from '../../src/console/overlays';
-import { below, fillField, fillStable, pickOption, row } from '../../src/console/ui';
+import { below, confirmModal, dismissModalIfAny, fillField, fillStable, pickOption, row, selectRow, submitForm, topButton, waitForRow } from '../../src/console/ui';
 
 const TARGET = '192.0.2.10'; // 문서용 대역 (RFC 5737)
+const RRC = '#/gslb/rrc/list';
 
 defineSimpleCrudSpec({
   scenario: 'scenarios/networking/gslb.yaml',
@@ -42,6 +44,81 @@ defineSimpleCrudSpec({
       .toMatch(/Active/i);
     await gotoRoute(page, '#/gslb/gslb/list');
   },
+  actions: [
+    // steps[2] Regional Routing Controller(에이전트 3B, 2026-10-06): 이 GSLB 의 KR-WEST-1 위치 행이 "사용" 으로 생긴다.
+    // 행 선택 → 상단 아이콘(더보기) 메뉴 "중지" → 확인 → "중지" 반영 → 다시 선택 → 상단 "사용"(사용 중엔 비활성) → 확인 → "사용" 복귀.
+    // API 의 setgslbregionalroutingcontrol(PUT …/routing-control {region, status}) 에 해당.
+    async (page, vars, log) => {
+      const toggle = async (to: '중지' | '사용') => {
+        await gotoRoute(page, RRC);
+        await waitForRow(page, RRC, vars.name!, { timeoutMs: 120_000, log });
+        await selectRow(page, vars.name!);
+        if (to === '중지') {
+          await page.locator('button.scp-button-icon:visible:not(tr button)').first().click();
+          await page.locator('.scp-menu:visible .scp-menu-item').filter({ hasText: /^중지$/ }).first().click();
+        } else await topButton(page, '사용').click();
+        await confirmModal(page, /중지|사용|변경/, '확인', { agree: true, resourceName: vars.name });
+        for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+        // 행 끝 "사용 여부" 열 (중지 직후 Editing 등 중간 상태가 있을 수 있다)
+        await waitForRow(page, RRC, vars.name!, {
+          status: to === '중지' ? /(중지|미사용)\s*$/ : /(^|[^미])사용\s*$/,
+          timeoutMs: 300_000,
+          log,
+        });
+        log(`  RRC ${vars.name} → ${to}: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ')}`);
+      };
+      await toggle('중지');
+      await toggle('사용');
+    },
+    // steps[3] (에이전트 3C, 2026-10-06): 상세 "연결 대상 (1)" 탭 → "연결 대상 수정"(#/gslb/gslb/connection-target/request) → 표의 Weight 1 → 5
+    // → "완료" → "연결 대상을 수정하시겠습니까?" → 탭 표에 5 (저장 직후 한 번은 옛 값이라 다시 읽는다) → 설명 연필 수정.
+    async (page, vars, log) => {
+      await gotoRoute(page, '#/gslb/gslb/list');
+      await row(page, vars.name!).getByText(new RegExp(`^${vars.name}`)).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      const openTargets = async () => {
+        await page.getByText(/^\s*연결 대상 \(\d+\)\s*$/).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+      };
+      /** 연결 대상 표에서 머리 "Weight" 열의 값 */
+      const weightCell = async () =>
+        row(page, TARGET)
+          .first()
+          // 열 순서: IP · Resource ID · 위치 · 설명 · 사용 여부 · Weight · 연결 상태 (머리는 다른 table 이라 본문 칸으로 센다: 사용 여부 다음 칸)
+          .evaluate((tr) => {
+            const cells = [...tr.querySelectorAll('td')].map((td) => (td.textContent ?? '').trim()).filter(Boolean);
+            const i = cells.findIndex((c) => c === '사용' || c === '중지' || c === '미사용');
+            return i >= 0 && cells[i + 1] !== undefined ? cells[i + 1]! : `?(${cells.join('|')})`;
+          })
+          .catch(() => '');
+      await openTargets();
+      log(`  연결 대상 Weight(수정 전) = ${await weightCell()}`);
+      await topButton(page, '연결 대상 수정').click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.waitForURL(/connection-target\/request/, { timeout: 15_000 });
+      const weight = row(page, TARGET).locator('input:visible').first();
+      await fillStable(page, weight, '5', '연결 대상 Weight');
+      await submitForm(page, '완료');
+      await confirmModal(page, /수정하시겠습니까/, '확인');
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await settleConsole(page, { appearGraceMs: 800 });
+      await expect
+        .poll(
+          async () => {
+            await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+            await settleConsole(page, { appearGraceMs: 800 });
+            if (!/detail\/target/.test(page.url())) await openTargets();
+            return weightCell();
+          },
+          { message: '연결 대상 Weight 5', timeout: 120_000, intervals: [5_000] },
+        )
+        .toBe('5');
+      log(`  연결 대상 ${TARGET} Weight 1 → 5 확인`);
+      await page.getByText(/^\s*상세 정보\s*$/).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id}`, { log });
+    },
+  ],
   deleteButton: '서비스 해지',
   tags: ['@light'],
 });

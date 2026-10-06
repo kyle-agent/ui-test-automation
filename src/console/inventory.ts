@@ -75,6 +75,18 @@ export const ROUTES = {
   ple: '#/vpc/privatelink-endpoint/list',
   pls: '#/vpc/privatelink-service/list',
   pnat: '#/vpc/private-nat/list',
+  // 에이전트 3A (2026-10-06): SAML 자격 증명 공급자, Logging&Audit Trail, DevOps Service
+  saml: '#/iam/idp/list',
+  trl: '#/loggingaudit/trail',
+  dev: '#/devopsservice/devops-service',
+  // 에이전트 3B (2026-10-06): Cloud WAN Network, Cloud Fabric Connect Fabric·Policy·Connection, Cloud LAN-DC Network·vDevice·vCable
+  cwn: '#/cwan/network',
+  cfp: '#/cfc/policy',
+  cfn: '#/cfc/connection',
+  cfc: '#/cfc/fabric',
+  cldc: '#/clandc/cable',
+  cldv: '#/clandc/device',
+  cld: '#/clandc/network',
 } as const;
 
 export type Kind = keyof typeof ROUTES;
@@ -123,6 +135,18 @@ const TEST_EXTRA: Partial<Record<Kind, RegExp>> = {
   ple: /^ple-\d{4}-\d{4}-[0-9a-f]{4}$/,
   pls: /^pls-\d{4}-\d{4}-[0-9a-f]{4}$/,
   pnat: /^pnat-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  // 에이전트 3A: saml-/trl-/dev-<run_id>
+  saml: /^saml-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  trl: /^trl-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  dev: /^dev-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  // 에이전트 3B: 영문·숫자만 허용 → cwn/cfc/cfp/cfn<compact>, Cloud LAN 은 '-' 허용 → cld-/cldr-/clds-/cldc-<run_id>
+  cwn: /^cwn\d{8}[0-9a-f]{4}$/,
+  cfp: /^cfp\d{8}[0-9a-f]{4}$/,
+  cfn: /^cfn\d{8}[0-9a-f]{4}$/,
+  cfc: /^cfc\d{8}[0-9a-f]{4}$/,
+  cldc: /^cldc-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  cldv: /^cld[rs]-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  cld: /^cld-\d{4}-\d{4}-[0-9a-f]{4}$/,
 };
 
 export interface Leftover {
@@ -221,6 +245,7 @@ const ORDER: Kind[] = [
   'vpc',
   'sg',
   'sgrp',
+  'trl', // 에이전트 3A: Trail 은 저장 버킷보다 먼저
   'bkt',
   'addr',
   'rg',
@@ -246,6 +271,15 @@ const ORDER: Kind[] = [
   'mhe',
   'cdn', // 에이전트 A 2차
   'gslb',
+  'saml', // 에이전트 3A
+  'dev',
+  'cwn', // 에이전트 3B
+  'cfp', // Fabric 하위(Policy·Connection)를 먼저
+  'cfn',
+  'cfc',
+  'cldc', // vCable → vDevice → Cloud LAN Network
+  'cldv',
+  'cld',
 ];
 
 /** 남은 리소스를 의존관계 역순으로 지운다. 실패한 항목은 모아서 돌려준다. */
@@ -741,6 +775,39 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await confirmModal(page, /해지|삭제/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
       return;
+    // ── 에이전트 3A (2026-10-06) ──
+    case 'saml':
+      // IAM 자격 증명 공급자: 행 선택 → 상단 "삭제"
+      await selectRow(page, item.name);
+      await topButton(page, '삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 120_000, intervalMs: 5_000, log });
+      return;
+    case 'trl':
+    case 'dev':
+      // 목록에 삭제가 없다 → 상세의 "Trail 삭제" / "서비스 해지"
+      await row(page, item.name).getByText(item.name, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page
+        .getByRole('button', { name: item.kind === 'trl' ? 'Trail 삭제' : '서비스 해지', exact: true })
+        .click();
+      await confirmModal(page, /삭제|해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    // ── 에이전트 3B (2026-10-06) ── 모두 행 끝 버튼: 상위 자원 "서비스 해지", 하위 자원 "삭제"
+    case 'cwn':
+    case 'cfc':
+    case 'cld':
+    case 'cfp':
+    case 'cfn':
+    case 'cldc':
+    case 'cldv':
+      await row(page, item.name)
+        .getByRole('button', { name: ['cwn', 'cfc', 'cld'].includes(item.kind) ? '서비스 해지' : '삭제', exact: true })
+        .click();
+      await confirmModal(page, /삭제|해지/, '확인', { agree: true, resourceName: item.name });
+      await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
     case 'es':
       // Event Streams: 목록에 해지가 없고 상세의 "서비스 해지" (에이전트 C, PostgreSQL 과 같은 절차)
       await waitForRow(page, route, item.name, {
@@ -913,6 +980,13 @@ export async function deleteCdn(
     await page.waitForTimeout(2_000);
     const body = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ');
     const state = `${body.match(/(Active|Stopped|Stopping|Starting|Creating|Deploying|Error|Deleting)/)?.[1] ?? '?'}, 설정 버전 ${body.match(/CDN 설정 버전 (\d+ \S+)/)?.[1] ?? '?'}`;
+    // 상세가 아직 안 그려졌으면(상태 '?') 목록 상단의 "서비스 해지"(행 선택용)를 상세 버튼으로 잘못 누른다(2026-10-06 3C: 클릭 15초 초과) → 다시 연다
+    if (!/\/detail/.test(page.url()) || !/CDN 설정 버전/.test(body)) {
+      log(`  [${Math.round((Date.now() - start) / 1000)}s] CDN ${name} 상세가 아직 안 열림 → 다시 연다`);
+      if (Date.now() - start > timeoutMs) throw new Error(`CDN ${name} 상세 열기 ${timeoutMs / 1000}초 초과`);
+      await page.waitForTimeout(10_000);
+      continue;
+    }
     const del = await enabledButton('서비스 해지');
     if (del) {
       log(`  CDN ${name} 해지 (${state})`);

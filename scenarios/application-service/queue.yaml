@@ -25,6 +25,17 @@ steps:
       url: "#/queueservice/queueservices"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): 상세 수정 아이콘과 IP 접근 허용 목록. 메시지 보내기/받기·purge 는 콘솔에 없다.
+  - goal: "상세 메시지 설정에서 보존 기간을 4일 → 5일로 수정하고 상세에 반영됐는지 확인한다"
+    expect:
+      url: "#/queueservice/queueservices/detail"
+      text: ["5일"]
+
+  - goal: "IP 접근 허용 목록에 192.0.2.10/32 를 추가했다가 삭제한다"
+    expect:
+      url: "#/queueservice/queueservices/detail"
+      not_text: ["192.0.2.10/32"]
+
 teardown:
   - goal: "Queue {{name}} 을 해지한다"
     expect:

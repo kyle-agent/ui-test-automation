@@ -1,0 +1,33 @@
+id: networking.cloud-wan-network
+title: Cloud WAN Network 생성 후 삭제
+service: Cloud WAN
+category: Networking
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-10-06 프로브, recordings/probe/cwan-network.md): Global 화면. 목록 #/cwan/network, 버튼 "서비스 생성".
+# 폼 #/cwan/network/new: "Cloud WAN Network명"(영문·숫자 3~20자, '-' 불가) · 설명 · 태그. 요금 확인 버튼 없음(논리 자원).
+# 생성 직후 Active(수 초), 행 끝 "서비스 해지" → 확인 → 곧 사라짐. 계정당 1개. Segment 는 월 ₩356,240(LiteG·약정 None) 이라 만들지 않는다.
+# API 자동화에는 Cloud WAN 엔드포인트가 없다(endpoint_status.json 에 항목 없음) → 콘솔 프로브로 판단.
+steps:
+  - goal: "Cloud WAN Network 목록으로 이동한다"
+    goto: "#/cwan/network"
+    expect:
+      url: "#/cwan/network"
+
+  - goal: "Cloud WAN Network {{name}} 을 생성한다"
+    vars:
+      name: "cwn{{run_id_compact}}"
+    expect:
+      url: "#/cwan/network"
+      text: ["{{name}}"]
+
+teardown:
+  - goal: "Cloud WAN Network {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

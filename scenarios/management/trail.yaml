@@ -1,0 +1,53 @@
+id: management.trail
+title: Logging&Audit Trail 생성 → 중지 → 삭제 (버킷 체인)
+service: Logging&Audit
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-10-06 프로브): 목록 #/loggingaudit/trail, 버튼 "Trail 생성". 목록 행에는 삭제 버튼이 없고 상세(#/loggingaudit/trail/<id>/info) 상단에 "시작"·"중지"·"Trail 삭제".
+# 폼: "Trail명"(영문·숫자·- 5~26자), 대상 리전/자원 유형/사용자(기본 전체), 저장 버킷 리전(한국 서부1), "저장 버킷"(같은 리전 Object Storage 버킷 필수),
+# 저장 형식 JSON, 로그파일 검증·ServiceWatch 로그 수집 끔. 예상 요금 0원(사용량 과금). 생성 직후 Active.
+# Trail 삭제 확인 모달은 "Trail명: <이름> 삭제하시겠습니까?" (입력 없음). 버킷 해지는 "저장된 데이터가 없는 버킷만" — 수 분 안에 지우면 로그 파일이 쌓이지 않아 해지된다(실측).
+# 이전에 "Trail 이 버킷 삭제를 막는다" 로 제외했으나 Trail 을 먼저 지우면 버킷 해지가 된다(2026-10-06).
+steps:
+  - goal: "Trail 목록으로 이동한다"
+    goto: "#/loggingaudit/trail"
+    expect:
+      url: "#/loggingaudit/trail"
+
+  - goal: "저장용 Object Storage 버킷 {{bucket}} 을 생성한다"
+    vars:
+      bucket: "bkt-{{run_id}}"
+    expect:
+      url: "#/objectstorage/objectstorage/list"
+      text: ["{{bucket}}"]
+
+  - goal: "Trail {{name}} 을 버킷 {{bucket}} 저장으로 생성한다 (Active)"
+    vars:
+      name: "trl-{{run_id}}"
+    expect:
+      url: "#/loggingaudit/trail"
+      text: ["{{name}}"]
+
+  - goal: "Trail {{name}} 상세에서 중지한다"
+    expect:
+      text: ["{{name}}"]
+
+  - goal: "Trail {{name}} 을 상세에서 삭제한다"
+    expect:
+      url: "#/loggingaudit/trail"
+      not_text: ["{{name}}"]
+
+teardown:
+  - goal: "남은 Trail {{name}} 을 삭제한다"
+    expect:
+      not_text: ["{{name}}"]
+  - goal: "버킷 {{bucket}} 을 해지한다"
+    expect:
+      not_text: ["{{bucket}}"]
+      timeout: 180000

@@ -29,6 +29,12 @@ steps:
       url: "#/cdn/cdn/list"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-06): 상세 "수정"(#/cdn/cdn/edit) 으로 Cache 만료시간 변경 → 설정 버전 2 배포.
+  - goal: "Cache 만료시간을 86400초 → 3600초로 수정하고 설정 버전 2 가 배포(Active)되는지 확인한다"
+    expect:
+      url: "#/cdn/cdn/detail"
+      text: ["3600초"]
+
 teardown:
   - goal: "CDN {{name}} 을 (필요하면 중지 뒤) 해지한다"
     expect:

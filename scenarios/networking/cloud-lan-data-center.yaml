@@ -1,0 +1,52 @@
+id: networking.cloud-lan-data-center
+title: Cloud LAN-Data Center Network·vDevice·vCable 생성 후 해지
+service: Cloud LAN-Data Center
+category: Networking
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-10-06 프로브, recordings/probe/clandc-network.md): Global 화면. 목록 #/clandc/network, 버튼 "서비스 생성" / 상단 "서비스 해지".
+# 폼 #/clandc/network/new: "Cloud LAN Network명"(영문·숫자·_- 3~21자) · Cloud LAN Network 위치(드롭다운) · 설명 · 태그. 요금 확인 버튼 없음.
+# 위치 항목은 SA-EAST-1 하나뿐. vDevice(#/clandc/device): Network · Type(vRouter/vSwitch/vFirewall/vCore) · "<Type>명". vCable: Network · Type(Static/vCore) · 이름 · vDevice A·B.
+# 하위 자원은 행 끝 "삭제", Network 는 행 끝 "서비스 해지". Interface(1G-T/1G-F, 약정)는 물리 인터페이스라 만들지 않는다.
+# API 자동화에는 Cloud LAN 엔드포인트가 없다 → 콘솔 프로브로 판단.
+steps:
+  - goal: "Cloud LAN Network 목록으로 이동한다"
+    goto: "#/clandc/network"
+    expect:
+      url: "#/clandc/network"
+
+  - goal: "Cloud LAN Network {{name}} 을 생성한다"
+    vars:
+      name: "cld-{{run_id}}"
+      router: "cldr-{{run_id}}"
+      switch: "clds-{{run_id}}"
+      cable: "cldc-{{run_id}}"
+    expect:
+      url: "#/clandc/network"
+      text: ["{{name}}"]
+
+  - goal: "vDevice {{router}}(vRouter)·{{switch}}(vSwitch) 를 만든다"
+    expect:
+      url: "#/clandc/device"
+      text: ["{{router}}", "{{switch}}"]
+
+  - goal: "vCable {{cable}}(Static, {{router}} ↔ {{switch}}) 을 만들고 목록 확인 뒤 삭제한다"
+    expect:
+      url: "#/clandc/cable"
+      not_text: ["{{cable}}"]
+
+  - goal: "vDevice 2개를 삭제한다"
+    expect:
+      url: "#/clandc/device"
+      not_text: ["{{router}}", "{{switch}}"]
+
+teardown:
+  - goal: "Cloud LAN Network {{name}} 을 해지한다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 300000

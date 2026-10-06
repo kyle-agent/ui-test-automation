@@ -3,11 +3,14 @@
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { detailValue, editDetailText, logDetail, logModal, openDetail, probeEdits, saveModal } from '../../src/console/detail-edit';
 import { ROUTES } from '../../src/console/inventory';
+import { settleConsole } from '../../src/console/overlays';
 import { confirmUntil, createVpcOnly, openDetailTab, pickLate } from '../../src/console/networking';
 import {
   confirmModal,
   fillField,
+  fillStable,
   openCreateForm,
   pickOption,
   row,
@@ -32,6 +35,7 @@ const ctx = (step: number) => ({
   testInfo: test.info(),
 });
 const DEST = '11.11.11.0/24';
+const PNAT_IP = '192.168.100.10'; // NAT IP 대역 192.168.100.0/24 안
 const rules = (page: Page) => openDetailTab(page, ROUTES.dc, vars.name!, /^규칙 \(/);
 
 /** Private NAT 삭제 (목록 행 끝 "삭제"). 없으면 건너뜀. */
@@ -153,9 +157,63 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       log(`  Private NAT 행: ${(await row(page, vars.pnat!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
-    await test.step(`steps[6] Private NAT ${vars.pnat} 삭제`, async () => {
-      await deletePrivateNat(page);
+    await test.step(`steps[6] Private NAT ${vars.pnat} 설명 수정·되돌림 + IP 관리에서 NAT IP ${PNAT_IP} 추가·삭제 (L3)`, async () => {
+      await openDetail(page, ROUTES.pnat, vars.pnat!);
+      await logDetail(page, log, 'Private NAT 상세');
+      await probeEdits(page, log, 'Private NAT');
+      const original = await detailValue(page, '설명');
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await editDetailText(page, '설명', original === '-' ? '' : original, {
+        log,
+        expectShown: (v) => v === original || (original === '-' && v === ''),
+      });
+      // IP 관리 탭: NAT IP 추가 → Active → 삭제 (API createprivatenatip / deleteprivatenatip)
+      const before = page.url();
+      await page.getByText(/^IP 관리/).filter({ visible: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      if (page.url() === before) {
+        await page.getByText(/^IP 관리/).filter({ visible: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+      }
+      const tab = '#' + page.url().split('#')[1]!;
+      await logDetail(page, log, 'Private NAT IP 관리 탭');
+      // 탭 버튼(2026-10-06 프로브): "반납"(행 선택 전 비활성) · "Private NAT IP 예약"
+      await topButton(page, 'Private NAT IP 예약').click();
+      const modal = visibleModal(page);
+      const opened = await modal.waitFor({ timeout: 8_000 }).then(() => true, () => false);
+      let ip = PNAT_IP;
+      if (opened) {
+        await logModal(page, log, 'Private NAT IP 예약');
+        const input = modal.locator('input[type=text]:visible').first();
+        if (await input.count()) await fillStable(page, input, PNAT_IP, 'Private NAT IP');
+        else ip = ''; // 자동 할당이면 목록에서 읽는다
+        await saveModal(page, log);
+      } else {
+        await logDetail(page, log, 'Private NAT IP 예약 화면');
+        await fillField(page, 'Private NAT IP', PNAT_IP);
+        await submitForm(page, '확인');
+        await confirmModal(page, /하시겠습니까/);
+      }
+      if (!ip) {
+        await waitForRow(page, tab, '192.168.100.', { timeoutMs: 300_000, intervalMs: 10_000, log });
+        ip = (await row(page, '192.168.100.').first().innerText()).match(/192\.168\.100\.\d+/)![0];
+      }
+      await waitForRow(page, tab, ip, { status: /Active|Reserved|사용/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      log(`  NAT IP 행: ${(await row(page, ip).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      const ipRow = row(page, ip).first();
+      const rowDelete = ipRow.getByRole('button', { name: /^(삭제|반납)$/ });
+      if (await rowDelete.count()) await rowDelete.first().click();
+      else {
+        await selectRow(page, ip);
+        await topButton(page, '반납').click();
+      }
+      await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: ip });
+      await waitForRow(page, tab, ip, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
+    await test.step(`steps[7] Private NAT ${vars.pnat} 삭제`, async () => {
+      await deletePrivateNat(page);
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
     });
   });
 });

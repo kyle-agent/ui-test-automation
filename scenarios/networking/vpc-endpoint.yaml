@@ -14,6 +14,7 @@ precondition:
 # Endpoint 폼 #/vpc/vpc-endpoint/request: VPC명, 대상 서비스 정보(Object Storage / File Storage / Container Registry / DNS) → 연결 자원(Object Storage 는
 # object-store.private… 1개), VPC Endpoint명(3~20), VPC Endpoint IP(Subnet명 + IP 입력), "요금 확인"(월 ₩10,950). "VPC Endpoint를 생성하시겠습니까?" → Active ≈1분.
 # 삭제: 행 끝 "삭제" → "VPC Endpoint를 삭제하시겠습니까?" → Endpoint Subnet 삭제 → VPC 해지.
+# L3(2026-10-06, 에이전트 3D): 상세에서 수정 가능한 항목은 "설명" 하나(연필 → "설명 수정" 모달 textarea 50자 → 확인 → "수정한 정보를 저장하시겠습니까?" → 즉시 반영).
 steps:
   - goal: "VPC Endpoint 목록으로 이동한다"
     goto: "#/vpc/vpc-endpoint/list"
@@ -34,6 +35,11 @@ steps:
     expect:
       url: "#/vpc/vpc-endpoint/list"
       text: ["{{name}}", "10.250.1.10"]
+
+  - goal: "VPC Endpoint {{name}} 상세에서 설명을 바꾸고 화면 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/vpc-endpoint/detail"
+      text: ["{{name}}"]
 
 teardown:
   - goal: "VPC Endpoint {{name}} 를 삭제한다"

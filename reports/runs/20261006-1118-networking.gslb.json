@@ -1,0 +1,57 @@
+{
+  "spec": "networking.gslb",
+  "started": "2026-10-06T02:18:59.442Z",
+  "ended": "2026-10-06T02:22:36.409Z",
+  "seconds": 217,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.gslb",
+    "run_id": "1006-1119-eba0",
+    "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "GSLB 생성 후 해지",
+      "status": "passed",
+      "seconds": 192.6,
+      "annotations": {
+        "scenario": "networking.gslb",
+        "run_id": "1006-1119-eba0",
+        "title": "GSLB 목록 | GSLB | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] GSLB 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.3
+        },
+        {
+          "title": "steps[1] gslb10061119eba0 생성",
+          "status": "pass",
+          "seconds": 43.1
+        },
+        {
+          "title": "steps[2] Regional Routing Controller 에서 {{name}} 위치 라우팅을 중지했다가 다시 사용으로 되돌린다",
+          "status": "pass",
+          "seconds": 28.8
+        },
+        {
+          "title": "steps[3] 연결 대상 192.0.2.10 의 Weight 를 1 → 5 로 수정하고 설명을 바꾼다",
+          "status": "pass",
+          "seconds": 68.9
+        }
+      ]
+    }
+  ],
+  "git_sha": "a567fa9"
+}

@@ -1,0 +1,78 @@
+{
+  "spec": "management.trail",
+  "started": "2026-10-05T23:48:08.372Z",
+  "ended": "2026-10-05T23:50:25.480Z",
+  "seconds": 137,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "management.trail",
+    "run_id": "1006-0848-7c3e",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Logging&Audit Trail 생성 → 중지 → 삭제 (버킷 체인)",
+      "status": "failed",
+      "seconds": 107.7,
+      "annotations": {
+        "scenario": "management.trail",
+        "run_id": "1006-0848-7c3e",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Trail 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.3
+        },
+        {
+          "title": "steps[1] 버킷 bkt-1006-0848-7c3e 생성",
+          "status": "pass",
+          "seconds": 18.5
+        },
+        {
+          "title": "steps[2] Trail trl-1006-0848-7c3e 생성",
+          "status": "pass",
+          "seconds": 23.5
+        },
+        {
+          "title": "steps[3] Trail trl-1006-0848-7c3e 중지",
+          "status": "fail",
+          "seconds": 17.5
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-5.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-1.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-2.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-3.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-4.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/screenshot-management.trail.png",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/error-context.md",
+        "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/trace.zip"
+      ]
+    }
+  ],
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-5.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-1.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-2.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-3.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/test-failed-4.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/screenshot-management.trail.png",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/error-context.md",
+    "test-results/artifacts/management.trail/management.trail-Logging-A-e301c-t-Trail-생성-→-중지-→-삭제-버킷-체인--regression/trace.zip"
+  ]
+}

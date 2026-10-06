@@ -1,0 +1,81 @@
+{
+  "spec": "data-analytics.event-streams",
+  "started": "2026-10-06T02:08:42.736Z",
+  "ended": "2026-10-06T02:33:49.886Z",
+  "seconds": 1507,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "data-analytics.event-streams",
+    "run_id": "1006-1109-970b",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 9.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Event Streams(Kafka) Broker 1대 생성 후 역순 해지",
+      "status": "failed",
+      "seconds": 1412.3,
+      "annotations": {
+        "scenario": "data-analytics.event-streams",
+        "run_id": "1006-1109-970b",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 253.8
+        },
+        {
+          "title": "steps[2] esbaagbbajjhab 생성",
+          "status": "pass",
+          "seconds": 549.1
+        },
+        {
+          "title": "steps[3] esbaagbbajjhab 중지 → Stopped → 시작 → Running (L3)",
+          "status": "fail",
+          "seconds": 19.4
+        }
+      ],
+      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-1.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-5.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-4.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-2.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-3.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-6.png",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/error-context.md",
+        "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-1.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-5.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-4.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-2.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-3.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/screenshot-dbaas.ts.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/test-failed-6.png",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/error-context.md",
+    "test-results/artifacts/data-analytics.event-streams/data-analytics.event-strea-56b91--Kafka-Broker-1대-생성-후-역순-해지-regression/trace.zip"
+  ]
+}

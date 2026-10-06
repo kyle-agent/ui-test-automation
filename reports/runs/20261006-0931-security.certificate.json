@@ -1,0 +1,76 @@
+{
+  "spec": "security.certificate",
+  "started": "2026-10-06T00:31:23.906Z",
+  "ended": "2026-10-06T00:33:58.600Z",
+  "seconds": 155,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.certificate",
+    "run_id": "1006-0931-011c",
+    "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "자체 발급 인증서 생성 후 해지",
+      "status": "failed",
+      "seconds": 122.9,
+      "annotations": {
+        "scenario": "security.certificate",
+        "run_id": "1006-0931-011c",
+        "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Certificate Manager 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] cert-1006-0931-011c 생성",
+          "status": "pass",
+          "seconds": 22.3
+        },
+        {
+          "title": "steps[2] 만료 알림을 사용으로 바꿨다가 미사용으로 되돌린다",
+          "status": "fail",
+          "seconds": 69.5
+        }
+      ],
+      "error": "Error: \"만료 알림\" 값이 60초 안에 바뀌지 않았습니다. 마지막: 미사용",
+      "attachments": [
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "a567fa9",
+  "error": "Error: \"만료 알림\" 값이 60초 안에 바뀌지 않았습니다. 마지막: 미사용",
+  "attachments": [
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/security.certificate/security.certificate-자체-발급-인증서-생성-후-해지-자체-발급-인증서-생성-후-해지-regression/trace.zip"
+  ]
+}

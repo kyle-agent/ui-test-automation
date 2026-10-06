@@ -21,6 +21,12 @@ precondition:
 # - Public NAT IP(2026-09-30 프로브, 에이전트 B, API createloadbalancerpublicnatip): LB 상세 "Public NAT IP" 연필 아이콘 → "Public NAT IP 수정" 모달
 #   "Public NAT IP 설정 — 사용" 체크 → Public NAT IP 드롭다운(구분 Internet Gateway 로 예약한 IP, VPC 에 IGW 필요) → "확인" → "Public NAT IP를 설정하시겠습니까?"
 #   → Creating ≈10초 → "<ip> Active". 해제: 체크 끄기 → "…정말 해제 하시겠습니까?" → Deleting ≈10초 → "-". 공유 네트워크(SHARED_VPC)에선 IGW 를 만들지 않으려고 건너뛴다.
+# - L3(2026-10-06 프로브, 에이전트 3D) 상세 연필 항목과 모달:
+#   헬스 체크: "헬스 체크 방식"(프로토콜·포트 드롭다운 + 주기·대기 시간·탐지 횟수 입력, 대기 시간 ≤ 주기) → "수정할 경우 LB 헬스 체크를 사용 중인 LB 서버그룹에 일괄 반영됩니다" · 설명(255자).
+#   서버 그룹: 부하 분산(Round Robin / Least Connection …) → "부하 분산을 수정하시겠습니까?" · LB 헬스 체크(같은 Subnet 의 헬스 체크) · 설명.
+#   Listener(연결된 자원 탭 → 이름): 세션 유지 시간(초) · 프록시 프로토콜(사용 체크) · 지속성(드롭다운) · 라우팅 규칙(LB 서버 그룹) · 설명. 수정 직후 Listener 행이 잠시 Editing.
+#   spec: 탐지 횟수 3→5→3, 부하 분산 Round Robin→Least Connection→Round Robin, 세션 유지 시간 120→300→120, 세 자원의 설명 수정·되돌림. 저장 직후 같은 화면에서 연필이
+#   모달을 안 연 적이 있어(헬스 체크 설명) openLabelEdit 가 상세를 다시 읽고 누른다.
 steps:
   - goal: "Load Balancer 목록으로 이동한다"
     goto: "#/loadbalancer/loadbalancer/list"
@@ -74,6 +80,20 @@ steps:
   - goal: "Load Balancer {{lb}} 의 Public NAT IP 를 해제한다"
     expect:
       url: "#/loadbalancer/loadbalancer/detail"
+
+  - goal: "LB 헬스 체크 {{hc}} 설정을 바꾸고 상세 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      url: "#/loadbalancer/loadbalancer-health-check/detail"
+      text: ["{{hc}}"]
+
+  - goal: "LB 서버 그룹 {{sg}} 설정을 바꾸고 상세 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      url: "#/loadbalancer/loadbalancer-server-group/detail"
+      text: ["{{sg}}"]
+
+  - goal: "Listener {{ls}} 설정을 바꾸고 상세 반영을 확인한 뒤 되돌린다 (L3)"
+    expect:
+      text: ["{{ls}}"]
 
 teardown:
   - goal: "Listener {{ls}} 를 삭제한다"

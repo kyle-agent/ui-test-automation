@@ -1,15 +1,19 @@
 // 직접 작성 (2026-09-29). 시나리오: scenarios/container/repository.yaml.
 // Registry → Repository → 역순 삭제. Registry 흐름은 container.container-registry.spec.ts 와 같다(상세 해지, Terminating 대기).
+// 2026-10-06 L3 동작 추가(steps[3]~[5]): 상세 "이미지 태그 삭제" 정책(Untagged 90일 + 활성화) 켜기 → 끄기, "이미지 잠금 여부" Lock → Unlock,
+// 설명 연필 수정 + 태그 추가 → 삭제. (이미지 push 는 docker 가 필요해 하지 않는다. 자동 스캔은 push 때 과금이라 건드리지 않는다)
 // Repository 목록은 제목 옆 레지스트리 드롭다운 + "조회" 로 레지스트리를 골라야 행이 보인다.
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { detailValue, editDetailText, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 import { allBodyText } from '../../src/console/frames';
 import { settleConsole } from '../../src/console/overlays';
 import {
   confirmModal,
   dismissModalIfAny,
   fillField,
+  isChecked,
   openCreateForm,
   pickOption,
   row,
@@ -17,6 +21,7 @@ import {
   topButton,
   waitForRow,
 } from '../../src/console/ui';
+import { addTag, removeTag } from '../../src/console/tags';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
 const scenario = loadScenario('scenarios/container/repository.yaml');
@@ -123,6 +128,35 @@ async function deleteRegistry(page: Page) {
   await waitGone(page, vars.registry!, () => reloadRegistryList(page));
 }
 
+/**
+ * 상세 "이미지 태그 삭제" 연필 → "Untagged Image 자동 삭제"(기본 90일) + "삭제 정책 활성화" 체크 → 확인 → "수정한 정보를 저장하시겠습니까?".
+ * 이미지가 없는 빈 Repository 라 실제로 지워질 것은 없다. on=false 로 되돌린다.
+ */
+async function setTagDeletePolicy(page: Page, on: boolean): Promise<void> {
+  const modal = await openLabelEdit(page, '이미지 태그 삭제');
+  const boxes = modal.locator('.scp-select:visible');
+  const untagged = boxes.filter({ hasText: 'Untagged Image 자동 삭제' }).first();
+  const enable = boxes.filter({ hasText: /^\s*사용\s*$/ }).last();
+  for (const box of [untagged, enable]) if ((await isChecked(box)) !== on) await box.click();
+  await expect.poll(async () => [await isChecked(untagged), await isChecked(enable)], { timeout: 3_000 }).toEqual([on, on]);
+  await saveModal(page, log);
+  await waitDetailValue(page, '삭제 정책 활성화', (v) => v === (on ? '사용' : '미사용'), { log, timeoutMs: 60_000 });
+  await waitDetailValue(page, '삭제 정책', (v) => (on ? /Untagged Image 자동 삭제 - 90 Days/.test(v) : /Untagged Image 자동 삭제 - 미사용/.test(v)), {
+    log,
+    timeoutMs: 30_000,
+  });
+}
+
+/** 상세 "이미지 잠금 여부" 연필 → "Lock" 체크 → 확인. 값 Unlock ↔ Lock */
+async function setImageLock(page: Page, lock: boolean): Promise<void> {
+  const modal = await openLabelEdit(page, '이미지 잠금 여부');
+  const box = modal.locator('.scp-select:visible').filter({ hasText: 'Lock' }).first();
+  if ((await isChecked(box)) !== lock) await box.click();
+  await expect.poll(() => isChecked(box), { timeout: 3_000 }).toBe(lock);
+  await saveModal(page, log);
+  await waitDetailValue(page, '이미지 잠금 여부', (v) => v.startsWith(lock ? 'Lock' : 'Unlock'), { log, timeoutMs: 60_000 });
+}
+
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@light'] }, () => {
   test.describe.configure({ mode: 'serial', timeout: 30 * 60_000 });
 
@@ -208,6 +242,27 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         await page.waitForTimeout(10_000);
       }
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
+    });
+    await test.step(`steps[3] ${scenario.steps[3]!.goal}`, async () => {
+      await openRepoList(page);
+      await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.waitForURL(/#\/scr\/repository\/detail/, { timeout: 15_000 });
+      expect(await detailValue(page, '삭제 정책 활성화')).toBe('미사용');
+      await setTagDeletePolicy(page, true);
+      await setTagDeletePolicy(page, false);
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step(`steps[4] ${scenario.steps[4]!.goal}`, async () => {
+      await setImageLock(page, true);
+      await setImageLock(page, false);
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] ${scenario.steps[5]!.goal}`, async () => {
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id}`, { log });
+      await addTag(page, 'qa-tag', vars.run_id!, log);
+      await removeTag(page, 'qa-tag', log);
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
   });
 });

@@ -6,6 +6,7 @@
 import type { Page } from '@playwright/test';
 import { test } from '../fixtures/test';
 import { expectStep, gotoRoute } from './expect';
+import { logDetail } from './detail-edit';
 import { settleConsole } from './overlays';
 import { ROUTES } from './inventory';
 import { deleteNetwork, ensureNetwork, type SharedNetwork } from './shared';
@@ -57,6 +58,8 @@ export interface DbaasConfig {
    * 화면엔 아무 안내 없이 폼에 머문다(2026-09-30 PostgreSQL 실측 2회, 백업을 켠 뒤 같은 요청 202).
    */
   replica?: boolean;
+  /** 생성 뒤 상세 "중지" → Stopped → "시작" → Running 단계(L3)를 켠다. 시나리오에 steps[3] 이 있어야 한다 (replica 와 함께 쓰지 않는다) */
+  stopStart?: boolean;
   tags?: string[];
 }
 
@@ -192,7 +195,19 @@ export function defineDbaasSpec(config: DbaasConfig): void {
             return;
           }
           await test.step('teardown[1] Subnet · VPC 삭제', async () => {
-            await deleteNetwork(page, vars.vpc!, vars.subnet!, log);
+            // 클러스터가 목록에서 사라진 직후엔 Subnet 삭제가 아직 막혀 있을 수 있다(2026-10-06 Event Streams: 삭제 클릭 15초 초과,
+            // 몇 분 뒤 같은 절차로 바로 지워짐) → 1분 쉬고 최대 3회
+            for (let attempt = 1; ; attempt++) {
+              try {
+                await deleteNetwork(page, vars.vpc!, vars.subnet!, log);
+                break;
+              } catch (err) {
+                if (attempt >= 3) throw err;
+                log(`  네트워크 삭제 재시도 ${attempt}/3: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
+                await page.keyboard.press('Escape').catch(() => undefined);
+                await page.waitForTimeout(60_000);
+              }
+            }
             await gotoRoute(page, ROUTES.vpc);
             await expectStep(page, resolveExpectation(scenario.teardown[1]!.expect, vars), ctx(1));
           });
@@ -281,6 +296,30 @@ export function defineDbaasSpec(config: DbaasConfig): void {
           await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
         });
 
+        if (config.stopStart)
+          // 상세 상단 "중지" → Stopping → Stopped → "시작" → Running (L3, 2026-10-06 에이전트 3D). 시나리오 steps[3] 필요
+          await test.step(`steps[3] ${vars.name} 중지 → Stopped → 시작 → Running (L3)`, async () => {
+            for (const [button, want] of [
+              ['중지', /Stopped/i],
+              ['시작', running],
+            ] as const) {
+              await waitForRow(page, config.route, vars.name!, { status: button === '중지' ? running : /Stopped/i, timeoutMs: 1_200_000, intervalMs: 30_000, log });
+              await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+              await settleConsole(page, { appearGraceMs: 800 });
+              if (button === '중지') await logDetail(page, log, `${scenario.service} 상세`);
+              // topButton(^중지$ 텍스트 일치)은 이 버튼을 못 잡았다(2026-10-06, 화면 innerText 는 "중지") → 보이는 버튼 중 innerText 가 정확히 같은 것
+              const buttons = page.locator('button:visible');
+              const texts = (await buttons.allInnerTexts()).map((t) => t.trim());
+              const idx = texts.indexOf(button);
+              if (idx < 0) throw new Error(`상세에 "${button}" 버튼이 없습니다: ${JSON.stringify(texts.slice(0, 30))}`);
+              await buttons.nth(idx).click();
+              await confirmModal(page, new RegExp(button), '확인', { agree: true, resourceName: vars.name });
+              for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+              await waitForRow(page, config.route, vars.name!, { status: want, timeoutMs: 1_800_000, intervalMs: 30_000, log });
+              log(`  ${button} 뒤 행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+            }
+            await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+          });
         if (!config.replica) return;
         // 콘솔(2026-09-30 PostgreSQL 프로브): Master 상세 더보기 "Replica 구성" → "지금 Replica를 추가하시겠습니까? … 1대 최소 20분" → 확인
         // → 폼(#/<engine>/<engine>/replica?…): Replica 수 1, "Replica 명"(소문자로 시작, 소문자·숫자·- 3~19자, 서버명 prefix·클러스터명이 된다),

@@ -1,13 +1,14 @@
 // 직접 작성 (2026-09-30, 에이전트 B). 시나리오: scenarios/networking/privatelink-service.yaml. 콘솔 사실은 yaml 머리 주석.
-// VPC → Subnet → PrivateLink Service(IP 연결, 수동 승인) → 같은 계정 Endpoint 연결 요청 → Service 에서 승인(L3) → Endpoint 삭제 → Service 삭제 → Subnet → VPC.
+// VPC → Subnet → PrivateLink Service(IP 연결, 수동 승인) → 같은 계정 Endpoint 연결 요청 → Service 에서 승인(L3) → 설명 수정·되돌림 · 연결 차단 → 재연결(L3, 2026-10-06 에이전트 3D) → Endpoint 삭제 → Service 삭제 → Subnet → VPC.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { detailValue, editDetailText, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { ROUTES } from '../../src/console/inventory';
 import { confirmUntil, openDetailTab, pickLate } from '../../src/console/networking';
 import { settleConsole } from '../../src/console/overlays';
 import { createNetwork, deleteNetwork } from '../../src/console/shared';
-import { confirmModal, fillField, openCreateForm, row, submitForm, waitForRow } from '../../src/console/ui';
+import { confirmModal, fillField, openCreateForm, row, submitForm, visibleModal, waitForRow } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
 
 const scenario = loadScenario('scenarios/networking/privatelink-service.yaml');
@@ -134,13 +135,71 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       log(`  Endpoint 행: ${(await row(page, vars.ple!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
-    await test.step(`steps[5] PrivateLink Endpoint ${vars.ple} 삭제`, async () => {
-      await deleteFromList(page, ROUTES.ple, vars.ple!, /PrivateLink Endpoint를 삭제하시겠습니까/);
+    await test.step(`steps[5] Endpoint ${vars.ple} · Service ${vars.pls} 설명 수정 → 반영 확인 → 되돌림 (L3)`, async () => {
+      for (const [route, name, what] of [
+        [ROUTES.ple, vars.ple!, 'PrivateLink Endpoint'],
+        [ROUTES.pls, vars.pls!, 'PrivateLink Service'],
+      ] as const) {
+        await openDetail(page, route, name);
+        await logDetail(page, log, `${what} 상세`);
+        await probeEdits(page, log, what);
+        const original = await detailValue(page, '설명');
+        await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+        await editDetailText(page, '설명', original === '-' ? '' : original, {
+          log,
+          expectShown: (v) => v === original || (original === '-' && v === ''),
+        });
+      }
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
-    await test.step(`steps[6] PrivateLink Service ${vars.pls} 삭제`, async () => {
-      await deleteFromList(page, ROUTES.pls, vars.pls!, /PrivateLink Service를 삭제하시겠습니까/);
+    await test.step('steps[6] 연결 관리: 연결 차단 → Disconnected 반영 → 재연결 → Active (L3)', async () => {
+      // 연결 관리 탭의 Active 행 버튼은 "차단" 하나 → "연결된 PrivateLink Endpoint를 차단하시겠습니까?" → ≈30초 뒤 "Disconnected 재연결" (2026-10-06 프로브)
+      const connection = async () => {
+        await openDetailTab(page, ROUTES.pls, vars.pls!, /^연결 관리/);
+        const first = page.locator('tr.scp-body-row:visible').first();
+        const text = (await first.innerText({ timeout: 10_000 }).catch(() => '')).replace(/\s+/g, ' ').trim();
+        const buttons = (await first.locator('button').allInnerTexts().catch(() => [] as string[])).map((s) => s.trim());
+        return { first, text, buttons };
+      };
+      let c = await connection();
+      log(`  연결 행: ${c.text.slice(0, 160)} 버튼 ${JSON.stringify(c.buttons)}`);
+      await c.first.getByRole('button', { name: '차단', exact: true }).click();
+      const modal = visibleModal(page);
+      await modal.waitFor({ timeout: 10_000 });
+      log(`  차단 모달: ${((await modal.innerText()) || '').replace(/\s+/g, ' ').slice(0, 200)}`);
+      await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: vars.ple });
+      // 차단이 반영될 때까지: 행이 Active 를 벗어나고 진행형(…ing)도 아닌 상태
+      for (const start = Date.now(); ; ) {
+        await page.waitForTimeout(15_000);
+        c = await connection();
+        log(`  [${Math.round((Date.now() - start) / 1000)}s] 연결 행: ${c.text.slice(0, 120)} 버튼 ${JSON.stringify(c.buttons)}`);
+        if (c.text && !/\bActive\b/.test(c.text) && !/[A-Za-z]+ing\b/.test(c.text)) break;
+        if (Date.now() - start > 600_000) throw new Error(`연결 차단이 600초 안에 반영되지 않았습니다. 마지막: ${c.text}`);
+      }
+      await gotoRoute(page, ROUTES.ple);
+      await waitForRow(page, ROUTES.ple, vars.ple!, { status: /Disconnected/, timeoutMs: 300_000, intervalMs: 15_000, log });
+      log(`  Endpoint 행(차단 뒤): ${(await row(page, vars.ple!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      c = await connection();
+      const approve = c.first.getByRole('button', { name: '재연결', exact: true }); // 차단 뒤 행: "Disconnected 재연결" (Endpoint 도 Disconnected)
+      await approve.click();
+      const modal2 = visibleModal(page);
+      await modal2.waitFor({ timeout: 10_000 });
+      log(`  재연결 모달: ${((await modal2.innerText()) || '').replace(/\s+/g, ' ').slice(0, 200)}`);
+      await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: vars.ple });
+      await waitForRow(page, ROUTES.ple, vars.ple!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+      c = await connection();
+      log(`  연결 행(재연결 뒤): ${c.text.slice(0, 160)}`);
+      if (!/\bActive\b/.test(c.text)) throw new Error(`재연결 뒤 연결 행이 Active 가 아닙니다: ${c.text}`);
+      await gotoRoute(page, ROUTES.ple);
       await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
+    await test.step(`steps[7] PrivateLink Endpoint ${vars.ple} 삭제`, async () => {
+      await deleteFromList(page, ROUTES.ple, vars.ple!, /PrivateLink Endpoint를 삭제하시겠습니까/);
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
+    });
+    await test.step(`steps[8] PrivateLink Service ${vars.pls} 삭제`, async () => {
+      await deleteFromList(page, ROUTES.pls, vars.pls!, /PrivateLink Service를 삭제하시겠습니까/);
+      await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), ctx(8));
     });
   });
 });

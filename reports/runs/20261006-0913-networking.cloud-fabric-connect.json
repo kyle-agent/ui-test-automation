@@ -1,0 +1,12 @@
+{
+  "spec": "networking.cloud-fabric-connect",
+  "started": "2026-10-06T00:13:59.293Z",
+  "ended": "2026-10-06T00:14:07.309Z",
+  "seconds": 8,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [],
+  "git_sha": "a567fa9",
+  "error": "SyntaxError: C:\\jev\\scp-console-tests\\tests\\regression\\networking.cloud-fabric-connect.spec.ts: Unterminated string constant. (44:90)"
+}

@@ -3,6 +3,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { detailValue, editDetailText, logDetail, logModal, openDetail, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 import { ROUTES } from '../../src/console/inventory';
 import { createIgw, createVpcOnly, deleteIgw, pickLate, releasePublicIp, reservePublicIp } from '../../src/console/networking';
 import { settleConsole } from '../../src/console/overlays';
@@ -10,10 +11,12 @@ import {
   below,
   confirmModal,
   fillField,
+  fillStable,
   openCreateForm,
   row,
   submitForm,
   terminateVpc,
+  visibleModal,
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
@@ -155,6 +158,74 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await waitForRow(page, ROUTES.vpnt, vars.tunnel!, { status: /Active/, timeoutMs: 900_000, intervalMs: 15_000, log });
       log(`  Tunnel 행: ${(await row(page, vars.tunnel!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step(`steps[4] VPN Gateway ${vars.vpn} 설명 수정 → 반영 확인 → 되돌림 (L3)`, async () => {
+      if (process.env.PROBE_EDITS === '1') {
+        // 프로브: 다음 단계가 실패해도 Tunnel 수정 모달 구조를 먼저 남긴다
+        await openDetail(page, ROUTES.vpnt, vars.tunnel!);
+        await logDetail(page, log, 'VPN Tunnel 상세');
+        await probeEdits(page, log, 'VPN Tunnel');
+      }
+      await openDetail(page, ROUTES.vpn, vars.vpn!);
+      await logDetail(page, log, 'VPN Gateway 상세');
+      await probeEdits(page, log, 'VPN Gateway');
+      const original = await detailValue(page, '설명');
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await editDetailText(page, '설명', original === '-' ? '' : original, {
+        log,
+        expectShown: (v) => v === original || (original === '-' && v === ''),
+      });
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] VPN Tunnel ${vars.tunnel} 설정 수정 → 반영 확인 → 되돌림 (L3)`, async () => {
+      await openDetail(page, ROUTES.vpnt, vars.tunnel!);
+      await logDetail(page, log, 'VPN Tunnel 상세');
+      if (process.env.PROBE_EDITS === '1') {
+        // IKE·IPSEC 절의 "수정" 버튼(2개) 구조 프로브: 열어 보고 취소
+        const edits = page.getByRole('button', { name: '수정', exact: true }).filter({ visible: true });
+        for (let i = 0; i < (await edits.count()); i++) {
+          const before = page.url();
+          await edits.nth(i).click();
+          await settleConsole(page, { appearGraceMs: 800 });
+          if (await visibleModal(page).isVisible().catch(() => false)) {
+            await logModal(page, log, `프로브 수정 버튼 ${i}`);
+            await visibleModal(page).getByRole('button', { name: '취소', exact: true }).last().click().catch(() => undefined);
+          } else {
+            await logDetail(page, log, `프로브 수정 버튼 ${i} 화면`);
+            await page.getByRole('button', { name: '취소', exact: true }).filter({ visible: true }).last().click().catch(() => undefined);
+            await page.waitForTimeout(800);
+            await visibleModal(page).getByRole('button', { name: '확인', exact: true }).last().click().catch(() => undefined);
+          }
+          await settleConsole(page, { appearGraceMs: 800 });
+          if (page.url() !== before) await openDetail(page, ROUTES.vpnt, vars.tunnel!);
+        }
+      }
+      // 1) DPD Probe Interval 60 → 30 → 60 (초)
+      await editDetailText(page, 'DPD Probe Interval', '30', { log, expectShown: (v) => /^30\s*초$/.test(v) });
+      await editDetailText(page, 'DPD Probe Interval', '60', { log, expectShown: (v) => /^60\s*초$/.test(v) });
+      // 2) Peer VPN GW IP 203.0.113.2 → .3 → .2 (문서용 주소)
+      await editDetailText(page, 'Peer VPN GW IP', '203.0.113.3', { log, expectShown: (v) => v === '203.0.113.3' });
+      await editDetailText(page, 'Peer VPN GW IP', PEER, { log, expectShown: (v) => v === PEER });
+      // 3) IKE 설정 "수정"(절 버튼 0번 = IKE, 1번 = IPSEC) 모달의 SA LifeTime 86400 → 28800 → 86400 초. 상세의 첫 "SA LifeTime" 이 IKE 값
+      for (const [value, shown] of [
+        ['28800', /^28,800\s*초$/],
+        ['86400', /^86,400\s*초$/],
+      ] as const) {
+        await page.getByRole('button', { name: '수정', exact: true }).filter({ visible: true }).first().click();
+        const modal = visibleModal(page);
+        await modal.getByText('IKE 설정 수정').first().waitFor({ timeout: 10_000 });
+        await fillStable(page, modal.locator('input[type=text]:visible').last(), value, 'IKE SA LifeTime');
+        await saveModal(page, log);
+        await waitDetailValue(page, 'SA LifeTime', (v) => shown.test(v), { log });
+      }
+      // 4) 설명
+      const original = await detailValue(page, '설명');
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await editDetailText(page, '설명', original === '-' ? '' : original, {
+        log,
+        expectShown: (v) => v === original || (original === '-' && v === ''),
+      });
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
   });
 });
