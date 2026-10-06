@@ -1,0 +1,49 @@
+{
+  "spec": "management.servicewatch-event-rule",
+  "started": "2026-10-06T07:10:46.243Z",
+  "ended": "2026-10-06T07:12:35.099Z",
+  "seconds": 109,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-event-rule",
+    "run_id": "1006-1611-58e0",
+    "title": "이벤트 규칙 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 이벤트 규칙 생성 → 비활성화 → 삭제",
+      "status": "passed",
+      "seconds": 71.2,
+      "annotations": {
+        "scenario": "management.servicewatch-event-rule",
+        "run_id": "1006-1611-58e0",
+        "title": "이벤트 규칙 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 이벤트 규칙 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.4
+        },
+        {
+          "title": "steps[1] swe1006161158e0 생성",
+          "status": "pass",
+          "seconds": 27.6
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

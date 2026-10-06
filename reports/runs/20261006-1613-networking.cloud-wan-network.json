@@ -1,0 +1,49 @@
+{
+  "spec": "networking.cloud-wan-network",
+  "started": "2026-10-06T07:13:54.962Z",
+  "ended": "2026-10-06T07:15:45.214Z",
+  "seconds": 110,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.cloud-wan-network",
+    "run_id": "1006-1614-dc3c",
+    "title": "Cloud WAN Network 목록 | Cloud WAN | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud WAN Network 생성 후 삭제",
+      "status": "passed",
+      "seconds": 73.6,
+      "annotations": {
+        "scenario": "networking.cloud-wan-network",
+        "run_id": "1006-1614-dc3c",
+        "title": "Cloud WAN Network 목록 | Cloud WAN | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Cloud WAN Network 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] cwn10061614dc3c 생성",
+          "status": "pass",
+          "seconds": 29.7
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

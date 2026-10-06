@@ -1,0 +1,64 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-06T06:52:00.129Z",
+  "ended": "2026-10-06T07:00:58.015Z",
+  "seconds": 538,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1006-1552-e4e9",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 491,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1006-1552-e4e9",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.7
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1006-1552-e4e9 생성",
+          "status": "pass",
+          "seconds": 232
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1006-1552-e4e9.com 생성",
+          "status": "pass",
+          "seconds": 34
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1006-1552-e4e9.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 42.7
+        },
+        {
+          "title": "steps[4] 레코드 www 삭제",
+          "status": "pass",
+          "seconds": 34.8
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

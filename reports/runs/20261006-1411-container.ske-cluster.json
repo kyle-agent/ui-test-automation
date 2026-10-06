@@ -1,0 +1,59 @@
+{
+  "spec": "container.ske-cluster",
+  "started": "2026-10-06T05:11:52.157Z",
+  "ended": "2026-10-06T05:46:27.711Z",
+  "seconds": 2076,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.ske-cluster",
+    "run_id": "1006-1412-b5db",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 16.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Kubernetes Engine 클러스터 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 2011.2,
+      "annotations": {
+        "scenario": "container.ske-cluster",
+        "run_id": "1006-1412-b5db",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG 생성",
+          "status": "pass",
+          "seconds": 288.4
+        },
+        {
+          "title": "steps[2] 클러스터 ske-1006-1412-b5db 생성",
+          "status": "pass",
+          "seconds": 528.1
+        },
+        {
+          "title": "steps[3] 노드 풀 np-1006-1412-b5db 추가 → Running → 삭제",
+          "status": "pass",
+          "seconds": 688.5
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

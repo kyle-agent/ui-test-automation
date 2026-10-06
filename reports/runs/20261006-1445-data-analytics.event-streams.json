@@ -1,0 +1,59 @@
+{
+  "spec": "data-analytics.event-streams",
+  "started": "2026-10-06T05:45:59.326Z",
+  "ended": "2026-10-06T06:05:05.939Z",
+  "seconds": 1147,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "data-analytics.event-streams",
+    "run_id": "1006-1446-b4a7",
+    "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Event Streams(Kafka) Broker 1대 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 1091.5,
+      "annotations": {
+        "scenario": "data-analytics.event-streams",
+        "run_id": "1006-1446-b4a7",
+        "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9.7
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.6
+        },
+        {
+          "title": "steps[2] esbaagbeegbeah 생성",
+          "status": "pass",
+          "seconds": 571.2
+        },
+        {
+          "title": "steps[3] esbaagbeegbeah 중지 → Stopped → 시작 → Running (L3)",
+          "status": "pass",
+          "seconds": 234
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

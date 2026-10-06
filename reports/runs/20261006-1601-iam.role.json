@@ -1,0 +1,69 @@
+{
+  "spec": "iam.role",
+  "started": "2026-10-06T07:01:02.449Z",
+  "ended": "2026-10-06T07:03:25.201Z",
+  "seconds": 143,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.role",
+    "run_id": "1006-1601-2703",
+    "title": "역할 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 역할 생성 후 삭제",
+      "status": "passed",
+      "seconds": 103.9,
+      "annotations": {
+        "scenario": "iam.role",
+        "run_id": "1006-1601-2703",
+        "title": "역할 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 역할 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] role-1006-1601-2703 생성",
+          "status": "pass",
+          "seconds": 22.3
+        },
+        {
+          "title": "steps[2] 정책 탭에서 기본 정책 CostNavigatorReadOnlyAccess 를 연결했다가 연결 해제한다",
+          "status": "pass",
+          "seconds": 16.2
+        },
+        {
+          "title": "steps[3] 수행 주체에 서비스 cloudscope.samsungsdscloud.com 을 추가했다가 제거한다",
+          "status": "pass",
+          "seconds": 8.7
+        },
+        {
+          "title": "steps[4] 최대 세션 지속 시간을 1시간 → 2시간으로 수정하고 상세에 반영됐는지 확인한다",
+          "status": "pass",
+          "seconds": 4.9
+        },
+        {
+          "title": "steps[5] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 18.3
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

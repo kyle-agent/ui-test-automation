@@ -1,0 +1,64 @@
+{
+  "spec": "iam.policy",
+  "started": "2026-10-06T07:08:52.209Z",
+  "ended": "2026-10-06T07:11:43.021Z",
+  "seconds": 171,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.policy",
+    "run_id": "1006-1609-4167",
+    "title": "정책 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 정책 생성 → 사용자 그룹에 연결·해제 → 삭제",
+      "status": "passed",
+      "seconds": 134.1,
+      "annotations": {
+        "scenario": "iam.policy",
+        "run_id": "1006-1609-4167",
+        "title": "정책 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 정책 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[1] 정책 pol-1006-1609-4167 생성 (BillingplanReadOnlyAccess 불러오기)",
+          "status": "pass",
+          "seconds": 42.7
+        },
+        {
+          "title": "steps[2] 그룹 grp-1006-1609-4167 생성",
+          "status": "pass",
+          "seconds": 18.1
+        },
+        {
+          "title": "steps[3] 그룹에 정책 pol-1006-1609-4167 연결",
+          "status": "pass",
+          "seconds": 10.5
+        },
+        {
+          "title": "steps[4] 정책 pol-1006-1609-4167 연결 해제",
+          "status": "pass",
+          "seconds": 11.2
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

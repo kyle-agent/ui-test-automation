@@ -1,0 +1,59 @@
+{
+  "spec": "container.container-registry",
+  "started": "2026-10-06T06:24:04.353Z",
+  "ended": "2026-10-06T06:39:19.129Z",
+  "seconds": 915,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.container-registry",
+    "run_id": "1006-1524-4fed",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Container Registry 생성 후 해지",
+      "status": "passed",
+      "seconds": 880,
+      "annotations": {
+        "scenario": "container.container-registry",
+        "run_id": "1006-1524-4fed",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8
+        },
+        {
+          "title": "steps[1] cr100615244fed 생성",
+          "status": "pass",
+          "seconds": 288.5
+        },
+        {
+          "title": "steps[2] 엔드포인트를 프라이빗 → 프라이빗&퍼블릭으로 바꿔 퍼블릭 엔드포인트가 생기는지 보고 프라이빗으로 되돌린다",
+          "status": "pass",
+          "seconds": 396.3
+        },
+        {
+          "title": "steps[3] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 24
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

@@ -1,0 +1,49 @@
+{
+  "spec": "application-service.messagehub-domain",
+  "started": "2026-10-06T07:12:40.533Z",
+  "ended": "2026-10-06T07:14:24.678Z",
+  "seconds": 104,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "application-service.messagehub-domain",
+    "run_id": "1006-1613-4eee",
+    "title": "Domain 목록 | Email 관리 | Message Hub | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Message Hub 발신 도메인 등록 후 삭제 (인증 없이)",
+      "status": "passed",
+      "seconds": 65.2,
+      "annotations": {
+        "scenario": "application-service.messagehub-domain",
+        "run_id": "1006-1613-4eee",
+        "title": "Domain 목록 | Email 관리 | Message Hub | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Domain 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 11.4
+        },
+        {
+          "title": "steps[1] mhd-1006-1613-4eee.example.com 생성",
+          "status": "pass",
+          "seconds": 28.2
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

@@ -1,0 +1,94 @@
+{
+  "spec": "networking.vpc-port",
+  "started": "2026-10-06T06:13:58.572Z",
+  "ended": "2026-10-06T06:29:52.664Z",
+  "seconds": 954,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-port",
+    "run_id": "1006-1514-7dc3",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Port 생성 → Virtual IP 예약 · Port 연결 · Public NAT IP 연결 → 역순 삭제",
+      "status": "passed",
+      "seconds": 910.9,
+      "annotations": {
+        "scenario": "networking.vpc-port",
+        "run_id": "1006-1514-7dc3",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9.4
+        },
+        {
+          "title": "steps[1] VPC vpc-1006-1514-7dc3 생성",
+          "status": "pass",
+          "seconds": 25.6
+        },
+        {
+          "title": "steps[2] Subnet sub-1006-1514-7dc3 생성",
+          "status": "pass",
+          "seconds": 255.9
+        },
+        {
+          "title": "steps[3] Port port-1006-1514-7dc3 생성",
+          "status": "pass",
+          "seconds": 27.8
+        },
+        {
+          "title": "steps[4] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 80.2
+        },
+        {
+          "title": "steps[5] Virtual IP 예약 (vip-1006-1514-7dc3)",
+          "status": "pass",
+          "seconds": 13.3
+        },
+        {
+          "title": "steps[6] VIP 10.250.0.101 에 Port port-1006-1514-7dc3 연결",
+          "status": "pass",
+          "seconds": 30.7
+        },
+        {
+          "title": "steps[7] VIP Public NAT IP 123.41.33.92 연결",
+          "status": "pass",
+          "seconds": 22.7
+        },
+        {
+          "title": "steps[8] VIP Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 20.6
+        },
+        {
+          "title": "steps[9] Port port-1006-1514-7dc3 연결 해제",
+          "status": "pass",
+          "seconds": 18.8
+        },
+        {
+          "title": "steps[10] VIP 10.250.0.101 반납",
+          "status": "pass",
+          "seconds": 30.4
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

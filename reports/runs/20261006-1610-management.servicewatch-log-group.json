@@ -1,0 +1,49 @@
+{
+  "spec": "management.servicewatch-log-group",
+  "started": "2026-10-06T07:10:26.067Z",
+  "ended": "2026-10-06T07:12:35.163Z",
+  "seconds": 129,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-log-group",
+    "run_id": "1006-1610-a8a8",
+    "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 로그 그룹 생성 → 로그 스트림 생성·삭제 → 로그 그룹 삭제",
+      "status": "passed",
+      "seconds": 98,
+      "annotations": {
+        "scenario": "management.servicewatch-log-group",
+        "run_id": "1006-1610-a8a8",
+        "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 로그 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] swl-1006-1610-a8a8 생성",
+          "status": "pass",
+          "seconds": 43.4
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

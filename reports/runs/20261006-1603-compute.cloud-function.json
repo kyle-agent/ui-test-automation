@@ -1,0 +1,49 @@
+{
+  "spec": "compute.cloud-function",
+  "started": "2026-10-06T07:03:31.512Z",
+  "ended": "2026-10-06T07:07:52.429Z",
+  "seconds": 261,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.cloud-function",
+    "run_id": "1006-1603-0b79",
+    "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud Function 생성 후 해지",
+      "status": "passed",
+      "seconds": 225.9,
+      "annotations": {
+        "scenario": "compute.cloud-function",
+        "run_id": "1006-1603-0b79",
+        "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Function 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.4
+        },
+        {
+          "title": "steps[1] fn-1006-1603-0b79 생성",
+          "status": "pass",
+          "seconds": 197
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

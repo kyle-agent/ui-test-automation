@@ -1,0 +1,84 @@
+{
+  "spec": "networking.privatelink-service",
+  "started": "2026-10-06T05:47:50.199Z",
+  "ended": "2026-10-06T06:14:03.588Z",
+  "seconds": 1573,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.privatelink-service",
+    "run_id": "1006-1448-c476",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PrivateLink Service → PrivateLink Endpoint 연결 요청 · 승인 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1519,
+      "annotations": {
+        "scenario": "networking.privatelink-service",
+        "run_id": "1006-1448-c476",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] PrivateLink Service 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] VPC vpc-1006-1448-c476 · Subnet sub-1006-1448-c476 생성",
+          "status": "pass",
+          "seconds": 670
+        },
+        {
+          "title": "steps[2] PrivateLink Service pls-1006-1448-c476 생성",
+          "status": "pass",
+          "seconds": 60.8
+        },
+        {
+          "title": "steps[3] PrivateLink Endpoint ple-1006-1448-c476 생성 (연결 요청)",
+          "status": "pass",
+          "seconds": 35.6
+        },
+        {
+          "title": "steps[4] 연결 요청 승인 → Endpoint Active",
+          "status": "pass",
+          "seconds": 45.2
+        },
+        {
+          "title": "steps[5] Endpoint ple-1006-1448-c476 · Service pls-1006-1448-c476 설명 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 44.6
+        },
+        {
+          "title": "steps[6] 연결 관리: 연결 차단 → Disconnected 반영 → 재연결 → Active (L3)",
+          "status": "pass",
+          "seconds": 61.2
+        },
+        {
+          "title": "steps[7] PrivateLink Endpoint ple-1006-1448-c476 삭제",
+          "status": "pass",
+          "seconds": 80.7
+        },
+        {
+          "title": "steps[8] PrivateLink Service pls-1006-1448-c476 삭제",
+          "status": "pass",
+          "seconds": 77.9
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}

@@ -1,0 +1,54 @@
+{
+  "spec": "security.certificate",
+  "started": "2026-10-06T07:07:26.557Z",
+  "ended": "2026-10-06T07:09:20.483Z",
+  "seconds": 114,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.certificate",
+    "run_id": "1006-1607-3320",
+    "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "자체 발급 인증서 생성 후 해지",
+      "status": "passed",
+      "seconds": 80.8,
+      "annotations": {
+        "scenario": "security.certificate",
+        "run_id": "1006-1607-3320",
+        "title": "Certificate Manager 목록 | Certificate Manager | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Certificate Manager 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.2
+        },
+        {
+          "title": "steps[1] cert-1006-1607-3320 생성",
+          "status": "pass",
+          "seconds": 12.7
+        },
+        {
+          "title": "steps[2] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 35.1
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261006-1401",
+  "attempt": 1,
+  "git_sha": "802c582"
+}
