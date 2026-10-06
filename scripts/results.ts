@@ -16,6 +16,7 @@ import {
   summarizeCoverage,
   validateCoverage,
 } from '../src/report/coverage';
+import { productComparison, readApiCoverage } from '../src/report/api-coverage';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
 import { coverageHistory, readFindings, readParity, readSuiteSummaries, suiteViews } from '../src/report/insights';
 import { loadKnownIssues } from '../src/report/known-issues';
@@ -88,6 +89,8 @@ function main(): void {
       parity: readParity(),
       findings: readFindings(),
       coverageHistory: coverageHistory(),
+      products: productComparison(ledger.resources, readApiCoverage()),
+      apiSnapshot: readApiCoverage(),
     }),
   );
   console.log(

@@ -28,6 +28,7 @@ import {
   type CoveragePoint,
   type Finding,
 } from './insights';
+import type { ApiCoverageSnapshot, CategoryRow, ProductRow } from './api-coverage';
 import type { RunRecord } from './run-record';
 
 export const EXPLORE_DIR = path.resolve(process.cwd(), 'recordings', 'explore');
@@ -101,6 +102,9 @@ export interface DashboardInput {
   findings?: readonly Finding[];
   /** 날짜별 커버리지(coverage.yaml git 이력) */
   coverageHistory?: readonly CoveragePoint[];
+  /** 상품·카테고리별 화면 vs API (src/report/api-coverage.ts productComparison) */
+  products?: { products: readonly ProductRow[]; categories: readonly CategoryRow[] };
+  apiSnapshot?: ApiCoverageSnapshot | null;
 }
 
 const esc = (s: unknown): string =>
@@ -337,6 +341,69 @@ function findingsBlock(findings: readonly Finding[]): string {
     <table id="fd-t"><thead><tr><th>구분</th><th>종류</th><th>탐색</th><th>내용</th><th>동작</th><th>상태</th><th>화면</th><th>id</th></tr></thead><tbody>${rows}</tbody></table></details>`;
 }
 
+function dualBar(uiPct: number | null, apiPct: number | null): string {
+  const seg = (v: number | null, cls: string) =>
+    v === null ? '<div class="pb none"></div>' : `<div class="pb"><span class="${cls}" style="width:${v}%"></span></div>`;
+  return `<div class="dual">${seg(uiPct, 'ui')}${seg(apiPct, 'api')}</div>`;
+}
+
+function productsBlock(
+  data: { products: readonly ProductRow[]; categories: readonly CategoryRow[] } | undefined,
+  api: ApiCoverageSnapshot | null,
+): string {
+  if (!data) return '<p class="muted">자료 없음</p>';
+  const uiCell = (u: { resources: number; l2: number; l3: number } | null) =>
+    u && u.resources
+      ? `<td class="num">${u.l2}/${u.resources} <span class="muted">(${pct(u.l2, u.resources)}%)</span></td><td class="num">${u.l3} <span class="muted">(${pct(u.l3, u.resources)}%)</span></td>`
+      : '<td class="num muted">—</td><td class="num muted">—</td>';
+  const apiCell = (a: { total: number; verified: number } | null) =>
+    a && a.total
+      ? `<td class="num">${a.verified}/${a.total} <span class="muted">(${pct(a.verified, a.total)}%)</span></td>`
+      : '<td class="num muted">—</td>';
+  const gap = (u: { resources: number; l2: number } | null, a: { total: number; verified: number } | null) => {
+    if (!u || !u.resources || !a || !a.total) return '<td></td>';
+    const d = pct(u.l2, u.resources) - pct(a.verified, a.total);
+    return `<td class="num ${d < -20 ? 'warn' : d > 20 ? 'good' : 'muted'}">${d > 0 ? '+' : ''}${d}p</td>`;
+  };
+  const tot = data.categories.reduce(
+    (n, c) => ({ r: n.r + c.ui.resources, l2: n.l2 + c.ui.l2, l3: n.l3 + c.ui.l3, t: n.t + c.api.total, v: n.v + c.api.verified }),
+    { r: 0, l2: 0, l3: 0, t: 0, v: 0 },
+  );
+  const catRows = data.categories
+    .map(
+      (c) => `<tr>
+        <td><a href="#cat-${esc(c.category)}">${esc(c.category)}</a></td>
+        ${uiCell(c.ui)}${apiCell(c.api)}${gap(c.ui, c.api)}
+        <td class="barcell">${dualBar(c.ui.resources ? pct(c.ui.l2, c.ui.resources) : null, c.api.total ? pct(c.api.verified, c.api.total) : null)}</td>
+      </tr>`,
+    )
+    .join('\n');
+  const byCat = new Map<string, ProductRow[]>();
+  for (const p of data.products) byCat.set(p.category, [...(byCat.get(p.category) ?? []), p]);
+  const prodRows = [...byCat]
+    .map(
+      ([cat, list]) =>
+        `<tr class="cathead" id="cat-${esc(cat)}"><td colspan="6">${esc(cat)}</td></tr>` +
+        list
+          .map(
+            (p) => `<tr>
+        <td>${esc(p.product)}${p.api && p.api.services.length ? ` <span class="muted small mono">${esc(p.api.services.join(', '))}</span>` : ''}</td>
+        ${uiCell(p.ui)}${apiCell(p.api)}${gap(p.ui, p.api)}
+        <td class="barcell">${dualBar(p.ui && p.ui.resources ? pct(p.ui.l2, p.ui.resources) : null, p.api && p.api.total ? pct(p.api.verified, p.api.total) : null)}</td>
+      </tr>`,
+          )
+          .join('\n'),
+    )
+    .join('\n');
+  return `${api ? '' : '<p class="warn">data/api-coverage.json 없음 — npx tsx scripts/import-api-coverage.ts --repo &lt;api 저장소&gt;</p>'}
+    <div class="legend"><span><i style="background:var(--l2)"></i>화면 L2+ 비율</span><span><i style="background:#f59e0b"></i>API 검증 비율</span><span class="muted">차이 = 화면 L2+% − API%. 화면이 20%p 이상 낮으면 빨강</span></div>
+    <table><thead><tr><th>카테고리</th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead>
+    <tbody>${catRows}<tr class="total"><td>전체</td>${uiCell({ resources: tot.r, l2: tot.l2, l3: tot.l3 })}${apiCell({ total: tot.t, verified: tot.v })}${gap({ resources: tot.r, l2: tot.l2 }, { total: tot.t, verified: tot.v })}<td class="barcell">${dualBar(pct(tot.l2, tot.r), pct(tot.v, tot.t))}</td></tr></tbody></table>
+    <details open><summary>상품별 (${data.products.length})</summary>
+    <table id="prod-t"><thead><tr><th>상품 <span class="muted small">(API 서비스)</span></th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead><tbody>${prodRows}</tbody></table>
+    <p class="muted small">— = 그쪽 장부에 없음. 화면 장부는 리소스 키가 있는 목록 화면만 센다(하위 화면·설정 화면은 빠짐). "(API) …" 는 화면 장부에 대응 상품이 없는 API 서비스.</p></details>`;
+}
+
 export function renderDashboardHtml(input: DashboardInput): string {
   const now = input.now ?? new Date();
   const records = input.records;
@@ -501,6 +568,8 @@ export function renderDashboardHtml(input: DashboardInput): string {
   .causes span { margin-right:10px; white-space:nowrap }
   a.att { font-size:11px; margin-right:6px }
   .badge.info { background:#64748b }
+  .dual { display:flex; flex-direction:column; gap:2px; min-width:140px } .pb { height:7px; background:#eef2f7; border-radius:4px; overflow:hidden } .pb.none { background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#fff 4px,#fff 8px) } .pb span { display:block; height:100% } .pb .ui { background:var(--l2) } .pb .api { background:#f59e0b }
+  tr.cathead td { background:#f3f4f6; font-weight:600; font-size:12px } tr.total td { font-weight:600; border-top:2px solid var(--line) } .good { color:var(--pass) }
   .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
   .trendbox { margin:8px 0 16px }
   @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
@@ -512,7 +581,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
     <h1>SCP 콘솔 회귀 대시보드</h1>
     <span class="muted">${lastSuite ? `마지막 스위트 ${esc(lastSuite.suite_id)} · ${esc(fmtTime(lastSuite.started))} · ${lastSuite.specs} spec · 탭 ${lastSuite.max_tabs} · ${lastSuite.wall_minutes}분` : '스위트 요약 없음'} · 마지막 실행 ${lastRun ? esc(fmtTime(lastRun.started)) + ' ' + esc(lastRun.spec) : '없음'} · 생성 ${esc(input.generated)}</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#products">상품별</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
 <section id="summary">
@@ -568,6 +637,11 @@ export function renderDashboardHtml(input: DashboardInput): string {
   <div class="legend">${LEVELS.map((l) => `<span><i class="l${l}"></i>L${l} ${LEVEL_LABEL[l]}</span>`).join('')}</div>
   ${trendBlock(input.coverageHistory ?? [])}
   ${coverageBlock(input)}
+</section>
+
+<section id="products">
+  <h2>상품·카테고리별 커버리지 — 화면 vs API <small>화면 = 목록 화면 리소스(coverage.yaml) L2+·L3+ 비율 · API = 엔드포인트 검증 비율(data/api-coverage.json${input.apiSnapshot ? ` · ${esc(input.apiSnapshot.source_commit)} · ${esc(input.apiSnapshot.source_date)}` : ''}). 단위가 달라 비율끼리만 비교</small></h2>
+  ${productsBlock(input.products, input.apiSnapshot ?? null)}
 </section>
 
 <section id="parity">
