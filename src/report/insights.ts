@@ -211,3 +211,116 @@ export function parseParity(markdown: string): ParityRow[] {
 export function readParity(file = PARITY_FILE): ParityRow[] {
   return fs.existsSync(file) ? parseParity(fs.readFileSync(file, 'utf8')) : [];
 }
+
+// ───────── 탐색 발견 사항 (recordings/explore/<이름>/report.md 의 "이상·정보 판정") ─────────
+
+export type FindingSeverity = '이상' | '정보';
+export type FindingStatus = '검토 전' | '결함' | '정상' | '무시';
+
+export interface Finding {
+  /** <탐색 폴더>#<번호> — data/findings.yaml 의 키 */
+  id: string;
+  explore: string;
+  dir: string;
+  severity: FindingSeverity;
+  kind: string;
+  text: string;
+  action: string;
+  screenshot?: string;
+  status: FindingStatus;
+  note?: string;
+}
+
+/** "- #9 정보 **validation-text** — 내용 (동작: button "x", [스크린샷](screenshots\09.jpg))" */
+export function parseFindings(markdown: string, dir: string): Omit<Finding, 'status'>[] {
+  const explore = markdown.match(/^# 탐색 보고서: (.+)$/m)?.[1]?.trim() ?? dir;
+  const out: Omit<Finding, 'status'>[] = [];
+  for (const line of markdown.split(/\r?\n/)) {
+    const m = line.match(/^- #(\d+) (이상|정보) \*\*([^*]+)\*\* — (.*)$/);
+    if (!m) continue;
+    let rest = m[4]!;
+    const tail = rest.match(/\s*\(동작: (.*?)(?:, \[스크린샷\]\(([^)]+)\))?\)\s*$/);
+    if (tail) rest = rest.slice(0, tail.index);
+    out.push({
+      id: `${dir}#${m[1]}`,
+      explore,
+      dir,
+      severity: m[2] as FindingSeverity,
+      kind: m[3]!.trim(),
+      text: rest.trim(),
+      action: tail?.[1]?.trim() ?? '',
+      screenshot: tail?.[2] ? `recordings/explore/${dir}/${tail[2].split(String.fromCharCode(92)).join('/')}` : undefined,
+    });
+  }
+  return out;
+}
+
+export const FINDINGS_FILE = path.resolve(process.cwd(), 'data', 'findings.yaml');
+
+/** data/findings.yaml: "<id>: <상태> | <메모>" 한 줄씩 (사람이 검토하며 적는다). 없으면 모두 "검토 전" */
+export function parseFindingStatus(text: string): Map<string, { status: FindingStatus; note?: string }> {
+  const m = new Map<string, { status: FindingStatus; note?: string }>();
+  for (const line of text.split(/\r?\n/)) {
+    const r = line.match(/^\s*"?([^"#\s][^"]*?#\d+)"?\s*:\s*(검토 전|결함|정상|무시)\s*(?:\|\s*(.*))?$/);
+    if (r) m.set(r[1]!, { status: r[2] as FindingStatus, note: r[3]?.trim() || undefined });
+  }
+  return m;
+}
+
+export function readFindings(exploreDir = path.resolve(process.cwd(), 'recordings', 'explore'), statusFile = FINDINGS_FILE): Finding[] {
+  if (!fs.existsSync(exploreDir)) return [];
+  const status = fs.existsSync(statusFile) ? parseFindingStatus(fs.readFileSync(statusFile, 'utf8')) : new Map();
+  const out: Finding[] = [];
+  for (const d of fs.readdirSync(exploreDir).sort().reverse()) {
+    const file = path.join(exploreDir, d, 'report.md');
+    if (!fs.existsSync(file)) continue;
+    for (const f of parseFindings(fs.readFileSync(file, 'utf8'), d)) {
+      const s = status.get(f.id);
+      out.push({ ...f, status: s?.status ?? '검토 전', note: s?.note });
+    }
+  }
+  return out;
+}
+
+// ───────── 커버리지 추세 (service-map/coverage.yaml 의 git 이력) ─────────
+
+export interface CoveragePoint {
+  date: string;
+  resources: number;
+  at_least_2: number;
+  at_least_3: number;
+}
+
+/** coverage.yaml 본문에서 level 분포만 센다(검증 없이) */
+export function countLevels(yaml: string): Omit<CoveragePoint, 'date'> {
+  const levels = [...yaml.matchAll(/^\s{4}level:\s*(\d)/gm)].map((m) => Number(m[1]));
+  return {
+    resources: levels.length,
+    at_least_2: levels.filter((l) => l >= 2).length,
+    at_least_3: levels.filter((l) => l >= 3).length,
+  };
+}
+
+/** 날짜별 마지막 커밋의 coverage.yaml 로 추세를 만든다. 오늘 작업 중인 파일도 오늘 값으로 더한다 */
+export function coverageHistory(file = 'service-map/coverage.yaml'): CoveragePoint[] {
+  const { spawnSync } = require('node:child_process') as typeof import('node:child_process');
+  const log = spawnSync('git', ['log', '--format=%H %cs', '--', file], { encoding: 'utf8' }).stdout ?? '';
+  const lastOfDay = new Map<string, string>();
+  for (const line of log.trim().split('\n').reverse()) {
+    const [sha, date] = line.split(' ');
+    if (sha && date) lastOfDay.set(date, sha);
+  }
+  const points: CoveragePoint[] = [];
+  for (const [date, sha] of lastOfDay) {
+    const body = spawnSync('git', ['show', `${sha}:${file}`], { encoding: 'utf8', maxBuffer: 20_000_000 }).stdout ?? '';
+    if (body) points.push({ date, ...countLevels(body) });
+  }
+  if (fs.existsSync(file)) {
+    const today = new Date().toISOString().slice(0, 10);
+    const now = { date: today, ...countLevels(fs.readFileSync(file, 'utf8')) };
+    const i = points.findIndex((p) => p.date === today);
+    if (i >= 0) points[i] = now;
+    else points.push(now);
+  }
+  return points;
+}

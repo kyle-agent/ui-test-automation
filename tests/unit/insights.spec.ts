@@ -77,3 +77,27 @@ test.describe('대시보드 파생 지표', () => {
     expect(v).toMatchObject({ specs: 3, first_pass: 1, final_pass: 2, attempts: 2, wall_minutes: 70, still_failing: ['c'] });
   });
 });
+
+test.describe('탐색 발견 사항·커버리지 추세', () => {
+  test('보고서의 판정 줄을 id·종류·동작·스크린샷으로 나눈다', async () => {
+    const { parseFindings, parseFindingStatus } = await import('../../src/report/insights');
+    const md = [
+      '# 탐색 보고서: vpc-list',
+      '## 이상·정보 판정',
+      '- #9 정보 **validation-text** — 3~20자로 입력하세요 (동작: button "생성", [스크린샷](screenshots' + String.fromCharCode(92) + '09.jpg))',
+      '- #12 이상 **console-error** — TypeError (동작: click)',
+    ].join('\n');
+    const f = parseFindings(md, 'vpc-list-1');
+    expect(f).toHaveLength(2);
+    expect(f[0]).toMatchObject({ id: 'vpc-list-1#9', severity: '정보', kind: 'validation-text', text: '3~20자로 입력하세요', action: 'button "생성"', screenshot: 'recordings/explore/vpc-list-1/screenshots/09.jpg' });
+    expect(f[1]).toMatchObject({ id: 'vpc-list-1#12', severity: '이상', action: 'click' });
+    const st = parseFindingStatus('vpc-list-1#9: 정상 | 안내 문구\n"vpc-list-1#12": 결함\n# 주석');
+    expect(st.get('vpc-list-1#9')).toEqual({ status: '정상', note: '안내 문구' });
+    expect(st.get('vpc-list-1#12')?.status).toBe('결함');
+  });
+
+  test('장부 본문에서 level 분포를 센다', async () => {
+    const { countLevels } = await import('../../src/report/insights');
+    expect(countLevels('  - key: a\n    level: 1\n  - key: b\n    level: 3\n  - key: c\n    level: 2\n')).toEqual({ resources: 3, at_least_2: 2, at_least_3: 1 });
+  });
+});

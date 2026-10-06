@@ -25,6 +25,8 @@ import {
   type FailureView,
   type ParityRow,
   type SuiteView,
+  type CoveragePoint,
+  type Finding,
 } from './insights';
 import type { RunRecord } from './run-record';
 
@@ -95,6 +97,10 @@ export interface DashboardInput {
   parity?: readonly ParityRow[];
   /** 7일·14일 창의 기준 시각(테스트용). 기본 지금 */
   now?: Date;
+  /** 탐색 발견 사항(recordings/explore + data/findings.yaml) */
+  findings?: readonly Finding[];
+  /** 날짜별 커버리지(coverage.yaml git 이력) */
+  coverageHistory?: readonly CoveragePoint[];
 }
 
 const esc = (s: unknown): string =>
@@ -278,6 +284,59 @@ function issuesBlock(input: DashboardInput): string {
     .join('')}</tbody></table>`;
 }
 
+function trendBlock(points: readonly CoveragePoint[]): string {
+  if (points.length < 2) return '';
+  const w = 640;
+  const h = 150;
+  const pad = 30;
+  const x = (i: number) => pad + (i * (w - pad * 2)) / (points.length - 1);
+  const y = (v: number) => h - pad - (v / 100) * (h - pad * 2);
+  const series = (key: 'at_least_2' | 'at_least_3') =>
+    points.map((p, i) => `${x(i).toFixed(1)},${y(pct(p[key], p.resources)).toFixed(1)}`).join(' ');
+  const labels = points
+    .map(
+      (p, i) =>
+        `<text x="${x(i).toFixed(1)}" y="${h - 8}" text-anchor="middle" class="tl">${esc(p.date.slice(5))}</text>` +
+        `<text x="${x(i).toFixed(1)}" y="${(y(pct(p.at_least_2, p.resources)) - 6).toFixed(1)}" text-anchor="middle" class="tv">${pct(p.at_least_2, p.resources)}%</text>`,
+    )
+    .join('');
+  const last = points[points.length - 1]!;
+  return `<div class="trendbox"><svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px" role="img" aria-label="커버리지 추세">
+    <line x1="${pad}" y1="${y(0)}" x2="${w - pad}" y2="${y(0)}" class="ax"/><line x1="${pad}" y1="${y(50)}" x2="${w - pad}" y2="${y(50)}" class="grid"/><line x1="${pad}" y1="${y(100)}" x2="${w - pad}" y2="${y(100)}" class="grid"/>
+    <polyline points="${series('at_least_2')}" class="s2"/><polyline points="${series('at_least_3')}" class="s3"/>${labels}
+  </svg><div class="legend"><span><i style="background:var(--l2)"></i>L2+ (최근 ${last.at_least_2}/${last.resources})</span><span><i style="background:var(--l4)"></i>L3+ (최근 ${last.at_least_3}/${last.resources})</span><span class="muted">날짜별 마지막 coverage.yaml 기준. 09-28 에 모집단이 80 → 112 로 바뀜</span></div></div>`;
+}
+
+function findingsBlock(findings: readonly Finding[]): string {
+  if (!findings.length) return '<p class="muted">발견 사항 없음</p>';
+  const by = (k: (f: Finding) => string) => {
+    const m = new Map<string, number>();
+    for (const f of findings) m.set(k(f), (m.get(k(f)) ?? 0) + 1);
+    return [...m].sort((a, b) => b[1] - a[1]);
+  };
+  const statusOrder = ['검토 전', '결함', '정상', '무시'];
+  const counts = by((f) => f.status);
+  const kinds = by((f) => `${f.severity} ${f.kind}`);
+  const rows = findings
+    .map(
+      (f) => `<tr class="fd" data-st="${esc(f.status)}" data-sev="${esc(f.severity)}">
+        <td><span class="badge ${f.severity === '이상' ? 'fail' : 'info'}">${esc(f.severity)}</span></td>
+        <td class="mono small">${esc(f.kind)}</td>
+        <td>${esc(f.explore)}</td>
+        <td class="note">${esc(f.text.slice(0, 220))}${f.text.length > 220 ? '…' : ''}</td>
+        <td class="small">${esc(f.action)}</td>
+        <td>${esc(f.status)}${f.note ? ` <span class="muted small">${esc(f.note)}</span>` : ''}</td>
+        <td>${f.screenshot ? `<a class="att" href="../${esc(f.screenshot)}">화면</a>` : ''}</td>
+        <td class="mono small">${esc(f.id)}</td>
+      </tr>`,
+    )
+    .join('\n');
+  return `<p class="muted">${findings.length}건 · ${statusOrder.map((st) => `${st} ${counts.find(([k]) => k === st)?.[1] ?? 0}`).join(' · ')} · 종류: ${kinds.map(([k, n]) => `${esc(k)} ${n}`).join(' · ')}</p>
+    <div class="filters">상태: <button data-fs="all" class="on">전체</button>${statusOrder.map((st) => `<button data-fs="${st}">${st}</button>`).join('')}</div>
+    <details ${findings.some((f) => f.severity === '이상') ? 'open' : ''}><summary>목록 (${findings.length})</summary>
+    <table id="fd-t"><thead><tr><th>구분</th><th>종류</th><th>탐색</th><th>내용</th><th>동작</th><th>상태</th><th>화면</th><th>id</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+}
+
 export function renderDashboardHtml(input: DashboardInput): string {
   const now = input.now ?? new Date();
   const records = input.records;
@@ -441,6 +500,9 @@ export function renderDashboardHtml(input: DashboardInput): string {
   ul.actions li.c-product{border-color:var(--c-product)} ul.actions li.c-unclassified{border-color:var(--c-unclassified)} ul.actions li.c-cleanup{border-color:var(--c-cleanup)} ul.actions li.c-flaky{border-color:var(--c-flaky)} ul.actions li.c-environment{border-color:var(--c-environment)} ul.actions li.c-test{border-color:var(--c-test)}
   .causes span { margin-right:10px; white-space:nowrap }
   a.att { font-size:11px; margin-right:6px }
+  .badge.info { background:#64748b }
+  .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
+  .trendbox { margin:8px 0 16px }
   @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
 </style>
 </head>
@@ -450,7 +512,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
     <h1>SCP 콘솔 회귀 대시보드</h1>
     <span class="muted">${lastSuite ? `마지막 스위트 ${esc(lastSuite.suite_id)} · ${esc(fmtTime(lastSuite.started))} · ${lastSuite.specs} spec · 탭 ${lastSuite.max_tabs} · ${lastSuite.wall_minutes}분` : '스위트 요약 없음'} · 마지막 실행 ${lastRun ? esc(fmtTime(lastRun.started)) + ' ' + esc(lastRun.spec) : '없음'} · 생성 ${esc(input.generated)}</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
 <section id="summary">
@@ -504,12 +566,18 @@ export function renderDashboardHtml(input: DashboardInput): string {
   <h2>커버리지 <small>service-map/coverage.yaml · level 0 없음 · 1 진입 · 2 CRUD · 3 동작 · 4 통합</small></h2>
   ${c ? `<div class="cards">${kpi('리소스(모집단)', String(c.resources), `서비스 ${c.totals.services} · 화면 ${c.totals.screens} · 스모크 진입 ${c.totals.smoke_entries}`)}${kpi('L2+ (CRUD 이상)', `${c.at_least_2} <span class="s">/ ${c.resources} · ${pct(c.at_least_2, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${c.levels[l]}`).join(' · '))}${kpi('L3+ (동작·통합)', `${c.at_least_3} <span class="s">/ ${c.resources} · ${pct(c.at_least_3, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${LEVEL_LABEL[l]}`).join(' · '))}</div>` : ''}
   <div class="legend">${LEVELS.map((l) => `<span><i class="l${l}"></i>L${l} ${LEVEL_LABEL[l]}</span>`).join('')}</div>
+  ${trendBlock(input.coverageHistory ?? [])}
   ${coverageBlock(input)}
 </section>
 
 <section id="parity">
   <h2>API 자동화 대비 화면 자동화 <small>docs/api-ui-parity.md · ✅ 화면 자동화 · 🔧 진행 · ⏭ 제외(이유는 항목별 표)</small></h2>
   ${parityBlock(parity)}
+</section>
+
+<section id="findings">
+  <h2>탐색 발견 사항 <small>recordings/explore/*/report.md 의 "이상·정보 판정" · 검토 상태는 data/findings.yaml 에 "&lt;id&gt;: 결함|정상|무시 | 메모"</small></h2>
+  ${findingsBlock(input.findings ?? [])}
 </section>
 
 <section id="explore">
@@ -537,6 +605,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
       var b = ev.target.closest('button'); if (!b) return;
       box.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
       if (b.dataset.st !== undefined) document.querySelectorAll('#runs-t tr.run').forEach(function (tr) { tr.style.display = b.dataset.st === 'all' || tr.dataset.status === b.dataset.st ? '' : 'none'; });
+      if (b.dataset.fs !== undefined) document.querySelectorAll('#fd-t tr.fd').forEach(function (tr) { tr.style.display = b.dataset.fs === 'all' || tr.dataset.st === b.dataset.fs ? '' : 'none'; });
       if (b.dataset.lv !== undefined) document.querySelectorAll('#res tr.res').forEach(function (tr) { tr.style.display = b.dataset.lv === 'all' || tr.dataset.level === b.dataset.lv ? '' : 'none'; });
     });
   });
