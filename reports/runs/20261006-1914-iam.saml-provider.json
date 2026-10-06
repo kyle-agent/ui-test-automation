@@ -1,0 +1,52 @@
+{
+  "spec": "iam.saml-provider",
+  "started": "2026-10-06T10:14:37.315Z",
+  "ended": "2026-10-06T10:15:51.908Z",
+  "seconds": 75,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.saml-provider",
+    "run_id": "1006-1915-f6d5",
+    "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 자격 증명 공급자(SAML) 생성 후 삭제",
+      "status": "passed",
+      "seconds": 48.1,
+      "annotations": {
+        "scenario": "iam.saml-provider",
+        "run_id": "1006-1915-f6d5",
+        "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 자격 증명 공급자 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5
+        },
+        {
+          "title": "steps[1] saml-1006-1915-f6d5 생성",
+          "status": "pass",
+          "seconds": 19.6
+        },
+        {
+          "title": "steps[2] 상세에서 설명을 edited {{run_id}} 로 수정한다",
+          "status": "pass",
+          "seconds": 11.7
+        }
+      ]
+    }
+  ],
+  "git_sha": "8547231"
+}

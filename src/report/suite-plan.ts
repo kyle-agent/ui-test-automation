@@ -27,9 +27,9 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'iam.user-group': { vpc: 0, minutes: 1 },
   'compute.launch-configuration': { vpc: 0, minutes: 1.5 },
   'networking.vpc-port': { vpc: 1, minutes: 15.5 }, // VIP·Port 연결·Public NAT 단계 포함(2026-09-30, IGW·Public IP 도 만든다)
-  'networking.private-dns': { vpc: 0, minutes: 7 },
+  'networking.private-dns': { vpc: 0, minutes: 7, lock: 'private-dns' }, // 4F 2026-10-06: dns-hosted-zone 의 Private DNS 가 Creating 일 때 같이 신청하면 행이 끝내 안 생긴다(10-02·10-06 실패 2회 모두 겹침)
   'storage.file-storage': { vpc: 0, minutes: 2 },
-  'networking.dns-hosted-zone': { vpc: 0, minutes: 8.5 }, // 레코드 추가·삭제 포함(2026-09-30)
+  'networking.dns-hosted-zone': { vpc: 0, minutes: 8.5, lock: 'private-dns' }, // 레코드 추가·삭제 포함(2026-09-30). private-dns spec 과 동시 실행 불가(4F 10-06)
   'security.security-group-rule': { vpc: 0, minutes: 2 },
   'networking.nat-gateway': { vpc: 1, minutes: 11.5 },
   'compute.auto-scaling-group': { vpc: 1, minutes: 15 },

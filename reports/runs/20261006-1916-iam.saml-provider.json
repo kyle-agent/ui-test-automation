@@ -1,0 +1,85 @@
+{
+  "spec": "iam.saml-provider",
+  "started": "2026-10-06T10:16:22.593Z",
+  "ended": "2026-10-06T10:17:55.515Z",
+  "seconds": 93,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "iam.saml-provider",
+    "run_id": "1006-1916-9b64",
+    "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 자격 증명 공급자(SAML) 생성 후 삭제",
+      "status": "failed",
+      "seconds": 65,
+      "annotations": {
+        "scenario": "iam.saml-provider",
+        "run_id": "1006-1916-9b64",
+        "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 자격 증명 공급자 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 4.5
+        },
+        {
+          "title": "steps[1] saml-1006-1916-9b64 생성",
+          "status": "pass",
+          "seconds": 18.3
+        },
+        {
+          "title": "steps[2] 상세에서 설명을 edited {{run_id}} 로 수정한다",
+          "status": "pass",
+          "seconds": 8.4
+        },
+        {
+          "title": "steps[3] 메타데이터를 entityID 가 다른 더미 문서로 교체한다",
+          "status": "fail",
+          "seconds": 10.2
+        }
+      ],
+      "error": "Error: 첨부한 새 메타데이터 파일이 모달에 보여야 합니다",
+      "attachments": [
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-8.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/error-context.md",
+        "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "9784d2b",
+  "error": "Error: 첨부한 새 메타데이터 파일이 모달에 보여야 합니다",
+  "attachments": [
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-8.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/error-context.md",
+    "test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/trace.zip"
+  ]
+}

@@ -458,3 +458,12 @@
 - keep-alive 오탐 수정: 새로 고친 뒤 3초 만에 제목을 봐서 낮에도 24회 "만료" 로 찍혔다 → 최대 20초 기다림 + 2회 연속일 때만 확정.
 - 만료 확정 시 Windows 알림(로그인 자동화 논의 A 안). 자격 증명은 다루지 않는다.
 - 남은 일: 10-02 스위트가 남긴 ServiceWatch 로그 그룹 2개(swl-1002-1840-2d0e, swl-1002-1857-5b40)는 사용자 정리 대기. 정리 도구는 이제 여러 페이지 목록을 읽어 이 둘을 찾는다.
+
+### 9.20 커버리지 3·4차, 대시보드 2단계, 불안정 spec (2026-10-06)
+
+- 3차(에이전트 4개): L1→L2 SAML·Trail·DevOps·Cloud WAN Network·CFC 3종·Cloud LAN-DC 3종, L2→L3 22개. 회귀 스위트 S20261006-1401: 첫 시도 60/61, 최종 61/61, 136분.
+- 4차: SAML(설명·메타데이터 교체)·DevOps(태그) L3. Cloud WAN Network 상세 진입 실패로 L2 유지(다음엔 상세 주소 형식부터 프로브).
+- 불안정 spec: Private DNS 실패 2회 모두 dns-hosted-zone 이 자기 Private DNS 를 Creating 중일 때 겹침(계정에서 동시 생성 거부로 추정) → suite-plan lock 'private-dns'.
+  Private NAT 정리 전에 예약 IP 를 반납(`releasePrivateNatIps`, 강제 실패로 검증). Cloud LAN-DC 는 실패 시 하위 자원부터 정리.
+- **결함 후보(사람 판단 필요, known-issues 미등록)**: Cloud LAN-DC vDevice 가 입력 오류 없이 Failed (10-06 09:25 vRouter 생성, 09:48 vSwitch 삭제), 같은 순서 재실행은 정상.
+- 대시보드 2단계: 탐색 발견 사항 목록(data/findings.yaml 로 검토 상태), 커버리지 추세(coverage.yaml git 이력).

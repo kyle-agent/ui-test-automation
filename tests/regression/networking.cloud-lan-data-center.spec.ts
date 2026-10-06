@@ -63,6 +63,18 @@ async function deleteRow(page: Page, route: string, name: string, log: (l: strin
   await waitForRow(page, route, name, { gone: true, timeoutMs: 120_000, log });
 }
 
+/** 실패 시 정리: 남은 vCable → vDevice 를 (있으면) 지운다. 각 항목 오류는 기록만 하고 다음으로 간다. */
+async function cleanupChildren(page: Page, vars: Record<string, string>, log: (l: string) => void): Promise<void> {
+  for (const [route, n] of [
+    [CABLE, vars.cable!],
+    [DEVICE, vars.switch!],
+    [DEVICE, vars.router!],
+  ] as const) {
+    await page.goto('about:blank').catch(() => undefined);
+    await deleteRow(page, route, n, log).catch((err) => log('  정리 실패/없음 ' + n + ' ' + (err as Error).message.slice(0, 120)));
+  }
+}
+
 /** vDevice 생성. 가끔 Failed 로 끝난다(2026-10-06 vRouter 1회) → Failed 면 지우고 한 번 다시 만든다. */
 async function createDevice(page: Page, network: string, type: string, name: string, log: (l: string) => void): Promise<void> {
   for (let attempt = 1; ; attempt++) {
@@ -106,19 +118,30 @@ defineSimpleCrudSpec({
     },
     // steps[3] vCable Static A(vRouter) ↔ B(vSwitch) 생성 → 삭제
     async (page, vars, log) => {
-      await openCreateForm(page, CABLE, 'vCable 생성');
-      await pickOption(page, 'Cloud LAN Network명', vars.name!);
-      await pickOption(page, 'vCable Type', 'Static');
-      await fillField(page, 'vCable명', vars.cable!);
-      await pickOption(page, 'vDevice A', new RegExp(vars.router!));
-      await pickOption(page, 'vDevice B', new RegExp(vars.switch!));
-      await submitAndWait(page, CABLE, vars.cable!, log);
-      await deleteRow(page, CABLE, vars.cable!, log);
+      try {
+        await openCreateForm(page, CABLE, 'vCable 생성');
+        await pickOption(page, 'Cloud LAN Network명', vars.name!);
+        await pickOption(page, 'vCable Type', 'Static');
+        await fillField(page, 'vCable명', vars.cable!);
+        await pickOption(page, 'vDevice A', new RegExp(vars.router!));
+        await pickOption(page, 'vDevice B', new RegExp(vars.switch!));
+        await submitAndWait(page, CABLE, vars.cable!, log);
+        await deleteRow(page, CABLE, vars.cable!, log);
+      } catch (e) {
+        // afterEach 는 Network 해지만 한다 → 하위(vCable → vDevice)를 먼저 지워 둔다(4F 2026-10-06)
+        await cleanupChildren(page, vars, log);
+        throw e;
+      }
     },
     // steps[4] vDevice 2개 삭제
     async (page, vars, log) => {
-      await deleteRow(page, DEVICE, vars.switch!, log);
-      await deleteRow(page, DEVICE, vars.router!, log);
+      try {
+        await deleteRow(page, DEVICE, vars.switch!, log);
+        await deleteRow(page, DEVICE, vars.router!, log);
+      } catch (e) {
+        await cleanupChildren(page, vars, log);
+        throw e;
+      }
     },
   ],
   deleteButton: '서비스 해지',

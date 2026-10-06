@@ -4,6 +4,7 @@
  * (docs/service-facts/*.md 의 실측 순서와 같다).
  */
 import type { Page } from '@playwright/test';
+import { openDetail } from './detail-edit';
 import { gotoRoute } from './expect';
 import { settleConsole } from './overlays';
 import { confirmModal, row, selectRow, showAllRows, terminateServer, topButton, waitForRow } from './ui';
@@ -652,6 +653,8 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       // Endpoint 가 Requesting 이면(승인 대기) 그대로 지울 수 있다. Service 는 Endpoint 가 모두 사라진 뒤(ORDER).
       if (/Creating|Deleting/i.test(item.rowText))
         await waitForRow(page, route, item.name, { status: /Active|Requesting|Rejected|Error/i, timeoutMs: 600_000, intervalMs: 15_000, log }).catch(() => undefined);
+      // Private NAT: 예약된 NAT IP 가 남아 있으면 먼저 반납한다(2026-10-06 4F)
+      if (item.kind === 'pnat') await releasePrivateNatIps(page, item.name, log);
       await gotoRoute(page, route);
       if ((await row(page, item.name).count()) === 0) return;
       await row(page, item.name).getByRole('button', { name: '삭제', exact: true }).click();
@@ -1006,4 +1009,43 @@ export async function deleteCdn(
       throw new Error(`CDN ${name} 해지 가능 상태 대기 ${timeoutMs / 1000}초 초과 (${state})`);
     await page.waitForTimeout(30_000);
   }
+}
+
+/**
+ * Private NAT 의 IP 관리 탭에 남은 NAT IP 를 모두 반납한다(2026-10-06 에이전트 4F).
+ * 예약된 IP 가 남아 있으면 Private NAT 삭제가 막히므로 spec teardown·정리 도구 모두 삭제 전에 부른다. 반납한 개수를 돌려준다.
+ */
+export async function releasePrivateNatIps(page: Page, name: string, log: (line: string) => void): Promise<number> {
+  await gotoRoute(page, ROUTES.pnat);
+  if ((await row(page, name).count()) === 0) return 0;
+  await openDetail(page, ROUTES.pnat, name);
+  const before = page.url();
+  for (let i = 0; i < 2 && page.url() === before; i++) {
+    await page.getByText(/^IP 관리/).filter({ visible: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 800 });
+  }
+  const tab = '#' + page.url().split('#')[1]!;
+  const ipRe = /\b(?:\d{1,3}\.){3}\d{1,3}\b(?!\/)/;
+  let released = 0;
+  for (let n = 0; n < 10; n++) {
+    const ipRows = page.locator('tr.scp-body-row:visible').filter({ hasText: ipRe });
+    if ((await ipRows.count()) === 0) break;
+    const ip = (await ipRows.first().innerText()).match(ipRe)![0];
+    // 예약 중·반납 중이면 끝날 때까지 기다린다
+    await waitForRow(page, tab, ip, { status: /Active|Reserved|사용|Error/i, timeoutMs: 600_000, intervalMs: 15_000, log }).catch(
+      () => undefined,
+    );
+    if ((await row(page, ip).count()) === 0) continue;
+    log(`  NAT IP ${ip} 반납 (Private NAT ${name})`);
+    const rowDelete = row(page, ip).first().getByRole('button', { name: /^(삭제|반납)$/ });
+    if (await rowDelete.count()) await rowDelete.first().click();
+    else {
+      await selectRow(page, ip);
+      await topButton(page, '반납').click();
+    }
+    await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: ip });
+    await waitForRow(page, tab, ip, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
+    released++;
+  }
+  return released;
 }

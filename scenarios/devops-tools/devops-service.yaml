@@ -27,6 +27,8 @@ steps:
       url: "#/devopsservice/devops-service"
       text: ["{{name}}"]
 
+  - goal: "상세 태그 탭에서 qa-tag 를 추가한 뒤 삭제한다"
+
 teardown:
   - goal: "DevOps Service {{name}} 을 상세에서 해지한다"
     expect:

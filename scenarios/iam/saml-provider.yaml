@@ -25,6 +25,12 @@ steps:
       url: "#/iam/idp/list"
       text: ["{{name}}"]
 
+  - goal: "상세에서 설명을 edited {{run_id}} 로 수정한다"
+    expect:
+      text: ["edited {{run_id}}"]
+
+  - goal: "메타데이터를 entityID 가 다른 더미 문서로 교체한다"
+
 teardown:
   - goal: "자격 증명 공급자 {{name}} 을 삭제한다"
     expect:

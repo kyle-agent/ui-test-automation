@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { detailValue, editDetailText, logDetail, logModal, openDetail, probeEdits, saveModal } from '../../src/console/detail-edit';
-import { ROUTES } from '../../src/console/inventory';
+import { releasePrivateNatIps, ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
 import { confirmUntil, createVpcOnly, openDetailTab, pickLate } from '../../src/console/networking';
 import {
@@ -43,6 +43,9 @@ async function deletePrivateNat(page: Page): Promise<void> {
   await gotoRoute(page, ROUTES.pnat);
   if ((await row(page, vars.pnat!).count()) === 0) return;
   await waitForRow(page, ROUTES.pnat, vars.pnat!, { status: /Active/, timeoutMs: 600_000, intervalMs: 15_000, log });
+  // 중간 실패로 NAT IP 가 예약된 채 남았으면 먼저 반납(남아 있으면 삭제가 막힌다, 2026-10-06 4F)
+  await releasePrivateNatIps(page, vars.pnat!, log);
+  await gotoRoute(page, ROUTES.pnat);
   await row(page, vars.pnat!).getByRole('button', { name: '삭제', exact: true }).click();
   await confirmModal(page, /Private NAT를 삭제하시겠습니까/, '확인', { agree: true, resourceName: vars.pnat });
   await waitForRow(page, ROUTES.pnat, vars.pnat!, { gone: true, timeoutMs: 600_000, intervalMs: 15_000, log });
@@ -200,6 +203,8 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       }
       await waitForRow(page, tab, ip, { status: /Active|Reserved|사용/, timeoutMs: 600_000, intervalMs: 15_000, log });
       log(`  NAT IP 행: ${(await row(page, ip).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      // 정리 검증용: IP 예약 직후 일부러 실패시킨다(teardown 이 IP 반납 → Private NAT 삭제까지 가는지)
+      if (process.env.FAIL_AFTER_NAT_IP === '1') throw new Error('FAIL_AFTER_NAT_IP=1: NAT IP 예약 직후 의도적 실패');
       const ipRow = row(page, ip).first();
       const rowDelete = ipRow.getByRole('button', { name: /^(삭제|반납)$/ });
       if (await rowDelete.count()) await rowDelete.first().click();

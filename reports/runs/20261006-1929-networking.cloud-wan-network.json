@@ -1,0 +1,12 @@
+{
+  "spec": "networking.cloud-wan-network",
+  "started": "2026-10-06T10:29:32.330Z",
+  "ended": "2026-10-06T10:29:38.689Z",
+  "seconds": 6,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [],
+  "git_sha": "9784d2b",
+  "error": "SyntaxError: C:\\jev\\scp-console-tests\\tests\\regression\\networking.cloud-wan-network.spec.ts: Unexpected token, expected \",\" (25:32)"
+}

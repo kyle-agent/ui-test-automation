@@ -249,10 +249,10 @@ resources:
     service: "IAM"
     category: "Management"
     route: /iam/idp/list
-    level: 2
+    level: 3
     specs: [smoke.iam, iam.saml-provider]
     last_pass: "2026-10-06"
-    note: "SAML 더미 메타데이터(공개 인증서 포함 필수, 없으면 형식 오류) 생성·삭제. 역할 신뢰 없음 → 로그인 영향 없음"
+    note: "L3(에이전트 4L): 상세 설명 수정·메타데이터 파일 교체(확인 알림 후 저장). (태그는 이번에 확인 안 함). SAML 더미 메타데이터(공개 인증서 포함 필수, 없으면 형식 오류) 생성·삭제. 역할 신뢰 없음 → 로그인 영향 없음"
   - key: policy@iam
     service: "IAM"
     category: "Management"
@@ -769,10 +769,10 @@ resources:
     service: "DevOps Service"
     category: "DevOps Tools"
     route: /devopsservice/devops-service
-    level: 2
+    level: 3
     specs: [smoke.devops-service, devops-tools.devops-service]
     last_pass: "2026-10-06"
-    note: "Tenant명·코드만으로 생성(API 는 409 였으나 콘솔은 됨) → 상세 서비스 해지. 계정당 1개(API 메모)"
+    note: "L3(에이전트 4L): 상세 태그 추가→삭제(상세엔 연필 수정 항목 없음, 버튼은 DevOps Console·서비스 해지뿐). Tenant명·코드만으로 생성(API 는 409 였으나 콘솔은 됨) → 상세 서비스 해지. 계정당 1개(API 메모)"
   - key: role
     service: "IAM"
     category: "Management"

@@ -49,6 +49,9 @@
   ul.actions li.c-product{border-color:var(--c-product)} ul.actions li.c-unclassified{border-color:var(--c-unclassified)} ul.actions li.c-cleanup{border-color:var(--c-cleanup)} ul.actions li.c-flaky{border-color:var(--c-flaky)} ul.actions li.c-environment{border-color:var(--c-environment)} ul.actions li.c-test{border-color:var(--c-test)}
   .causes span { margin-right:10px; white-space:nowrap }
   a.att { font-size:11px; margin-right:6px }
+  .badge.info { background:#64748b }
+  .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
+  .trendbox { margin:8px 0 16px }
   @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
 </style>
 </head>
@@ -56,28 +59,29 @@
 <header>
   <div class="top">
     <h1>SCP 콘솔 회귀 대시보드</h1>
-    <span class="muted">마지막 스위트 S20261006-1401 · 2026-10-06 14:10 · 61 spec · 탭 5 · 146분 · 마지막 실행 2026-10-06 16:31 networking.private-dns · 생성 2026-10-06 16:42</span>
+    <span class="muted">마지막 스위트 S20261006-1401 · 2026-10-06 14:10 · 61 spec · 탭 5 · 146분 · 마지막 실행 2026-10-06 19:33 networking.private-dns · 생성 2026-10-06 19:48</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
 <section id="summary">
   <h2>요약 <small>원본: reports/runs · reports/suites · service-map/coverage.yaml · docs/api-ui-parity.md — <code>npm run results</code> 로 재생성</small></h2>
   <div class="cards">
-    <div class="card "><div class="k">현재 녹색 spec</div><div class="v">61 <span class="s">/ 61</span></div><div class="s">스위트 spec 의 마지막 실행 기준 · 기록 없음 0</div></div>
+    <div class="card alert"><div class="k">현재 녹색 spec</div><div class="v">60 <span class="s">/ 61</span></div><div class="s">스위트 spec 의 마지막 실행 기준 · 기록 없음 0</div></div>
     <div class="card "><div class="k">마지막 스위트 첫 시도</div><div class="v">98% <span class="s">60/61</span></div><div class="s">최종 61/61 (재실행 1회)</div></div>
-    <div class="card alert"><div class="k">최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span></div><div class="v">91 <span class="s">/ 실행 361</span></div><div class="s"><span class="causes"><span class="c-unclassified">미분류 29</span><span class="c-cleanup">정리 실패 4</span><span class="c-flaky">간헐(재시도 통과) 47</span><span class="c-environment">환경 11</span></span></div></div>
+    <div class="card alert"><div class="k">최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span></div><div class="v">86 <span class="s">/ 실행 328</span></div><div class="s"><span class="causes"><span class="c-unclassified">미분류 30</span><span class="c-cleanup">정리 실패 4</span><span class="c-flaky">간헐(재시도 통과) 41</span><span class="c-environment">환경 11</span></span></div></div>
     <div class="card "><div class="k">불안정 spec</div><div class="v">2</div><div class="s">스위트 실행 최근 10회에 실패가 섞이고 마지막은 통과</div></div>
-    <div class="card "><div class="k">커버리지 L2+</div><div class="v">57% <span class="s">64/112</span></div><div class="s">L3+ 55/112 (49%)</div></div>
+    <div class="card "><div class="k">커버리지 L2+</div><div class="v">57% <span class="s">64/112</span></div><div class="s">L3+ 57/112 (51%)</div></div>
     <div class="card "><div class="k">API 대응</div><div class="v">100% <span class="s">59/59</span></div><div class="s">제외 9 · 진행 0</div></div>
   </div>
-  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:5.555555555555555%"></span><span class="pass" style="height:21.428571428571427%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 15 실패 22"><div class="stack"><span class="fail" style="height:17.46031746031746%"></span><span class="pass" style="height:11.904761904761903%"></span></div><div class="lbl">09-28</div></div><div class="col" title="2026-09-29 통과 68 실패 40"><div class="stack"><span class="fail" style="height:31.746031746031743%"></span><span class="pass" style="height:53.96825396825397%"></span></div><div class="lbl">09-29</div></div><div class="col" title="2026-09-30 통과 76 실패 41"><div class="stack"><span class="fail" style="height:32.53968253968254%"></span><span class="pass" style="height:60.317460317460316%"></span></div><div class="lbl">09-30</div></div><div class="col" title="2026-10-01 통과 4 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:3.1746031746031744%"></span></div><div class="lbl">10-01</div></div><div class="col" title="2026-10-02 통과 55 실패 4"><div class="stack"><span class="fail" style="height:3.1746031746031744%"></span><span class="pass" style="height:43.65079365079365%"></span></div><div class="lbl">10-02</div></div><div class="col" title="2026-10-06 통과 98 실패 28"><div class="stack"><span class="fail" style="height:22.22222222222222%"></span><span class="pass" style="height:77.77777777777779%"></span></div><div class="lbl">10-06</div></div></div>
+  <div class="trend"><div class="col" title="2026-09-23 통과 27 실패 7"><div class="stack"><span class="fail" style="height:5.072463768115942%"></span><span class="pass" style="height:19.565217391304348%"></span></div><div class="lbl">09-23</div></div><div class="col" title="2026-09-28 통과 15 실패 22"><div class="stack"><span class="fail" style="height:15.942028985507244%"></span><span class="pass" style="height:10.869565217391305%"></span></div><div class="lbl">09-28</div></div><div class="col" title="2026-09-29 통과 68 실패 40"><div class="stack"><span class="fail" style="height:28.985507246376812%"></span><span class="pass" style="height:49.275362318840585%"></span></div><div class="lbl">09-29</div></div><div class="col" title="2026-09-30 통과 76 실패 41"><div class="stack"><span class="fail" style="height:29.71014492753623%"></span><span class="pass" style="height:55.072463768115945%"></span></div><div class="lbl">09-30</div></div><div class="col" title="2026-10-01 통과 4 실패 0"><div class="stack"><span class="fail" style="height:0%"></span><span class="pass" style="height:2.898550724637681%"></span></div><div class="lbl">10-01</div></div><div class="col" title="2026-10-02 통과 55 실패 4"><div class="stack"><span class="fail" style="height:2.898550724637681%"></span><span class="pass" style="height:39.85507246376812%"></span></div><div class="lbl">10-02</div></div><div class="col" title="2026-10-06 통과 103 실패 35"><div class="stack"><span class="fail" style="height:25.36231884057971%"></span><span class="pass" style="height:74.63768115942028%"></span></div><div class="lbl">10-06</div></div></div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span class="muted">일별 실행 기록(디버깅 재실행 포함)</span></div>
 </section>
 
 <section id="actions">
   <h2>조치 필요 <small>마지막 실행이 실패한 spec · 남은 리소스 · 정리 실패 · 불안정 · 대응 진행 중</small></h2>
-  <ul class="actions"><li class="act c-cleanup"><span class="cause c-cleanup">정리 실패</span> 최근 7일 정리 실패 4건 (data-analytics.event-streams, networking.vpc-peering, networking.vpn) — 남은 리소스 확인</li>
+  <ul class="actions"><li class="act c-unclassified"><span class="cause c-unclassified">미분류</span> <span class="mono">networking.cloud-wan-network</span> <span class="muted">2026-10-06 19:31</span> <span class="err">TimeoutError: page.waitForURL: Timeout 20000ms exceeded.</span> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a></li>
+<li class="act c-cleanup"><span class="cause c-cleanup">정리 실패</span> 최근 7일 정리 실패 4건 (data-analytics.event-streams, networking.vpc-peering, networking.vpn) — 남은 리소스 확인</li>
 <li class="act c-flaky"><span class="tag warn">불안정</span> 최근 10회에 실패가 섞인 spec 2개: <span class="mono small">networking.private-dns, management.servicewatch-log-group</span></li></ul>
   <p class="legend"><span><span class="cause c-product">제품 결함</span></span><span><span class="cause c-unclassified">미분류</span></span><span><span class="cause c-cleanup">정리 실패</span></span><span><span class="cause c-test">테스트 코드</span></span><span><span class="cause c-flaky">간헐(재시도 통과)</span></span><span><span class="cause c-environment">환경</span></span><span class="muted">제품 결함은 data/known-issues.yaml 에 kind: product 로 등록한 것만. 간헐 = 다음 실행(48시간 안)이 통과.</span></p>
 </section>
@@ -176,10 +180,10 @@
 <tr>
         <td class="mono">networking.private-dns <span class="tag warn">불안정</span></td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-06 16:31</td>
-        <td class="num">6분 10초</td>
-        <td class="dots"><span class="dot fail" title="2026-09-23 19:10 FAIL(unclassified) 6분 37초"></span><span class="dot pass" title="2026-09-23 19:30 PASS 6분 31초"></span><span class="dot pass" title="2026-09-23 22:00 PASS 6분 51초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 6분 8초"></span><span class="dot pass" title="2026-09-30 10:24 PASS 6분 29초"></span><span class="dot fail" title="2026-10-02 18:21 FAIL(unclassified) 18분 50초"></span><span class="dot pass" title="2026-10-02 18:56 PASS 5분 58초"></span><span class="dot env" title="2026-10-06 15:52 FAIL(environment) 18분 58초"></span><span class="dot pass" title="2026-10-06 16:31 PASS 6분 10초"></span> <span class="muted">6/10</span></td>
-        <td class="num">6분 21초</td>
+        <td>2026-10-06 19:33</td>
+        <td class="num">6분 0초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-23 19:30 PASS 6분 31초"></span><span class="dot pass" title="2026-09-23 22:00 PASS 6분 51초"></span><span class="dot fail" title="2026-09-29 13:34 FAIL(unclassified) 2분 55초"></span><span class="dot pass" title="2026-09-29 16:38 PASS 6분 8초"></span><span class="dot pass" title="2026-09-30 10:24 PASS 6분 29초"></span><span class="dot fail" title="2026-10-02 18:21 FAIL(unclassified) 18분 50초"></span><span class="dot pass" title="2026-10-02 18:56 PASS 5분 58초"></span><span class="dot env" title="2026-10-06 15:52 FAIL(environment) 18분 58초"></span><span class="dot pass" title="2026-10-06 16:31 PASS 6분 10초"></span><span class="dot pass" title="2026-10-06 19:33 PASS 6분 0초"></span> <span class="muted">7/10</span></td>
+        <td class="num">6분 18초</td>
       </tr>
 <tr>
         <td class="mono">storage.file-storage</td>
@@ -488,10 +492,10 @@
 <tr>
         <td class="mono">networking.direct-connect</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-06 15:53</td>
-        <td class="num">6분 16초</td>
-        <td class="dots"><span class="dot pass" title="2026-09-30 07:53 PASS 4분 7초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 6분 17초"></span><span class="dot pass" title="2026-09-30 17:48 PASS 6분 25초"></span><span class="dot pass" title="2026-10-02 18:26 PASS 6분 28초"></span><span class="dot fail" title="2026-10-06 08:46 FAIL(unclassified) 6분 0초"></span><span class="dot pass" title="2026-10-06 08:57 PASS 6분 27초"></span><span class="dot pass" title="2026-10-06 15:53 PASS 6분 16초"></span> <span class="muted">6/7</span></td>
-        <td class="num">6분 0초</td>
+        <td>2026-10-06 19:27</td>
+        <td class="num">5분 46초</td>
+        <td class="dots"><span class="dot pass" title="2026-09-30 07:53 PASS 4분 7초"></span><span class="dot pass" title="2026-09-30 10:49 PASS 6분 17초"></span><span class="dot pass" title="2026-09-30 17:48 PASS 6분 25초"></span><span class="dot pass" title="2026-10-02 18:26 PASS 6분 28초"></span><span class="dot fail" title="2026-10-06 08:46 FAIL(unclassified) 6분 0초"></span><span class="dot pass" title="2026-10-06 08:57 PASS 6분 27초"></span><span class="dot pass" title="2026-10-06 15:53 PASS 6분 16초"></span><span class="dot fail" title="2026-10-06 19:20 FAIL(unclassified) 6분 1초"></span><span class="dot pass" title="2026-10-06 19:27 PASS 5분 46초"></span> <span class="muted">7/9</span></td>
+        <td class="num">5분 58초</td>
       </tr>
 <tr>
         <td class="mono">data-analytics.event-streams</td>
@@ -527,10 +531,10 @@
       </tr>
 <tr>
         <td class="mono">networking.cloud-wan-network</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-06 16:13</td>
-        <td class="num">1분 50초</td>
-        <td class="dots"><span class="dot fail" title="2026-10-06 08:50 FAIL(unclassified) 3분 54초"></span><span class="dot fail" title="2026-10-06 08:56 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-10-06 08:58 PASS 1분 24초"></span><span class="dot pass" title="2026-10-06 09:00 PASS 1분 35초"></span><span class="dot pass" title="2026-10-06 09:02 PASS 1분 24초"></span><span class="dot pass" title="2026-10-06 16:13 PASS 1분 50초"></span> <span class="muted">4/6</span></td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td>2026-10-06 19:31</td>
+        <td class="num">1분 44초</td>
+        <td class="dots"><span class="dot fail" title="2026-10-06 08:50 FAIL(unclassified) 3분 54초"></span><span class="dot fail" title="2026-10-06 08:56 FAIL(unclassified) 1분 13초"></span><span class="dot pass" title="2026-10-06 08:58 PASS 1분 24초"></span><span class="dot pass" title="2026-10-06 09:00 PASS 1분 35초"></span><span class="dot pass" title="2026-10-06 09:02 PASS 1분 24초"></span><span class="dot pass" title="2026-10-06 16:13 PASS 1분 50초"></span><span class="dot fail" title="2026-10-06 19:27 FAIL(unclassified) 1분 46초"></span><span class="dot fail" title="2026-10-06 19:29 FAIL(unclassified) 6초"></span><span class="dot fail" title="2026-10-06 19:29 FAIL(unclassified) 1분 41초"></span><span class="dot fail" title="2026-10-06 19:31 FAIL(unclassified) 1분 44초"></span> <span class="muted">4/10</span></td>
         <td class="num">1분 33초</td>
       </tr>
 <tr>
@@ -552,9 +556,9 @@
 <tr>
         <td class="mono">iam.saml-provider</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-06 16:14</td>
-        <td class="num">1분 46초</td>
-        <td class="dots"><span class="dot fail" title="2026-10-06 08:35 FAIL(unclassified) 3분 48초"></span><span class="dot pass" title="2026-10-06 08:41 PASS 53초"></span><span class="dot pass" title="2026-10-06 16:14 PASS 1분 46초"></span> <span class="muted">2/3</span></td>
+        <td>2026-10-06 19:20</td>
+        <td class="num">1분 24초</td>
+        <td class="dots"><span class="dot fail" title="2026-10-06 08:35 FAIL(unclassified) 3분 48초"></span><span class="dot pass" title="2026-10-06 08:41 PASS 53초"></span><span class="dot pass" title="2026-10-06 16:14 PASS 1분 46초"></span><span class="dot pass" title="2026-10-06 19:14 PASS 1분 15초"></span><span class="dot fail" title="2026-10-06 19:16 FAIL(unclassified) 1분 33초"></span><span class="dot pass" title="2026-10-06 19:20 PASS 1분 24초"></span> <span class="muted">4/6</span></td>
         <td class="num">1분 20초</td>
       </tr>
 <tr>
@@ -568,10 +572,10 @@
 <tr>
         <td class="mono">devops-tools.devops-service</td>
         <td><span class="badge pass">PASS</span></td>
-        <td>2026-10-06 16:15</td>
-        <td class="num">1분 43초</td>
-        <td class="dots"><span class="dot pass" title="2026-10-06 09:04 PASS 1분 12초"></span><span class="dot pass" title="2026-10-06 16:15 PASS 1분 43초"></span> <span class="muted">2/2</span></td>
-        <td class="num">1분 28초</td>
+        <td>2026-10-06 19:24</td>
+        <td class="num">1분 44초</td>
+        <td class="dots"><span class="dot pass" title="2026-10-06 09:04 PASS 1분 12초"></span><span class="dot pass" title="2026-10-06 16:15 PASS 1분 43초"></span><span class="dot fail" title="2026-10-06 19:22 FAIL(unclassified) 1분 38초"></span><span class="dot pass" title="2026-10-06 19:24 PASS 1분 44초"></span> <span class="muted">3/4</span></td>
+        <td class="num">1분 33초</td>
       </tr></tbody></table>
   <details><summary>스위트에 없는 spec (제외·이름 바뀜) 1개</summary><table><tbody><tr>
         <td class="mono">database.searchengine</td>
@@ -587,11 +591,11 @@
   <h2>실패 분류 <small>최근 14일 · 오류 첫 줄의 숫자·이름을 지워 같은 원인끼리 묶음</small></h2>
   <table><thead><tr><th>원인</th><th class="num">건수</th><th>오류 시그니처</th><th>spec</th><th>최근</th><th>첨부</th></tr></thead><tbody><tr data-cause="unclassified">
         <td><span class="cause c-unclassified">미분류</span></td>
-        <td class="num">24</td>
+        <td class="num">26</td>
         <td class="err">TimeoutError: locator.click: Timeout #ms exceeded.</td>
-        <td class="mono small">networking.cdn<br>data-analytics.event-streams<br>networking.privatelink-service<br>networking.cloud-fabric-connect<br>networking.vpn<br>networking.cloud-wan-network<br>management.trail<br>networking.direct-connect<br>application-service.api-gateway<br>management.network-logging<br>networking.firewall<br>management.servicewatch-log-group<br>security.address-group<br>container.container-registry<br>database.searchengine<br>networking.nat-gateway<br>security.security-group-rule<br>compute.launch-configuration<br>storage.object-storage-bucket</td>
-        <td>2026-10-06 11:45</td>
-        <td><a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/screenshot-networking.cdn.png">screenshot-networking.cdn.png</a> <a class="att" href="../test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.cdn/networking.cdn-Global-CDN-생성-후-해지-Global-CDN-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+        <td class="mono small">networking.cloud-wan-network<br>devops-tools.devops-service<br>networking.cdn<br>data-analytics.event-streams<br>networking.privatelink-service<br>networking.cloud-fabric-connect<br>networking.vpn<br>management.trail<br>networking.direct-connect<br>application-service.api-gateway<br>management.network-logging<br>networking.firewall<br>management.servicewatch-log-group<br>security.address-group<br>container.container-registry<br>database.searchengine<br>networking.nat-gateway<br>security.security-group-rule<br>compute.launch-configuration<br>storage.object-storage-bucket</td>
+        <td>2026-10-06 19:27</td>
+        <td><a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a></td>
       </tr>
 <tr data-cause="unclassified">
         <td><span class="cause c-unclassified">미분류</span></td>
@@ -656,6 +660,14 @@
         <td class="mono small">networking.private-dns<br>database.cachestore<br>database.mysql<br>database.epas</td>
         <td>2026-09-29 13:34</td>
         <td><a class="att" href="../test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png" title="test-results/artifacts/session.setup.ts-로그인-세션-확인-root-살아-있는-브라우저--session/screenshot-session.setup.ts.png">screenshot-session.setup.ts.png</a></td>
+      </tr>
+<tr data-cause="unclassified">
+        <td><span class="cause c-unclassified">미분류</span></td>
+        <td class="num">3</td>
+        <td class="err">TimeoutError: page.waitForURL: Timeout #ms exceeded.</td>
+        <td class="mono small">networking.cloud-wan-network<br>networking.firewall</td>
+        <td>2026-10-06 19:31</td>
+        <td><a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a></td>
       </tr>
 <tr data-cause="flaky">
         <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
@@ -761,29 +773,21 @@
         <td>2026-09-28 10:08</td>
         <td><a class="att" href="../test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png" title="test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/screenshot-security.security-group-rule.png">screenshot-security.security-group-rule.png</a> <a class="att" href="../test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip" title="test-results/artifacts/security.security-group-ru-17885-ty-Group-생성-→-규칙-추가·삭제-→-해지-regression/trace.zip">trace.zip</a></td>
       </tr>
-<tr data-cause="flaky">
-        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
-        <td class="num">1</td>
-        <td class="err">Error: &quot;#&quot; 수정 아이콘을 눌러도 모달이 열리지 않습니다</td>
-        <td class="mono small">networking.load-balancer</td>
-        <td>2026-10-06 12:19</td>
-        <td><a class="att" href="../test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/screenshot-networking.load-balancer.png" title="test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/screenshot-networking.load-balancer.png">screenshot-networking.load-balancer.png</a> <a class="att" href="../test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.load-balancer/networking.load-balancer-V-e09f9-Public-NAT-IP-연결·해제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
-      </tr>
-<tr data-cause="flaky">
-        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
-        <td class="num">1</td>
-        <td class="err">Error: &quot;#&quot; 텍스트가 보여야 합니다 (모든 프레임 검사)</td>
-        <td class="mono small">container.repository</td>
-        <td>2026-10-06 11:22</td>
-        <td><a class="att" href="../test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/screenshot-container.repository.png" title="test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/screenshot-container.repository.png">screenshot-container.repository.png</a> <a class="att" href="../test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/trace.zip" title="test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/trace.zip">trace.zip</a></td>
-      </tr>
 <tr data-cause="unclassified">
         <td><span class="cause c-unclassified">미분류</span></td>
         <td class="num">1</td>
-        <td class="err">Error: expect(locator).toContainText(expected) failed</td>
-        <td class="mono small">networking.gslb</td>
-        <td>2026-10-06 11:03</td>
-        <td><a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip" title="test-results/artifacts/networking.gslb/networking.gslb-GSLB-생성-후-해지-GSLB-생성-후-해지-regression/trace.zip">trace.zip</a></td>
+        <td class="err">SyntaxError: C:\jev\scp-console-tests\tests\regression\networking.cloud-wan-network.spec.ts: Unexpected token, expected &quot;#&quot; (#:#)</td>
+        <td class="mono small">networking.cloud-wan-network</td>
+        <td>2026-10-06 19:29</td>
+        <td></td>
+      </tr>
+<tr data-cause="flaky">
+        <td><span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1</td>
+        <td class="err">Error: FAIL_AFTER_NAT_IP=#: NAT IP 예약 직후 의도적 실패</td>
+        <td class="mono small">networking.direct-connect</td>
+        <td>2026-10-06 19:20</td>
+        <td><a class="att" href="../test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/screenshot-networking.direct-connect.png" title="test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/screenshot-networking.direct-connect.png">screenshot-networking.direct-connect.png</a> <a class="att" href="../test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/trace.zip">trace.zip</a></td>
       </tr></tbody></table>
 </section>
 
@@ -811,8 +815,12 @@
 
 <section id="coverage">
   <h2>커버리지 <small>service-map/coverage.yaml · level 0 없음 · 1 진입 · 2 CRUD · 3 동작 · 4 통합</small></h2>
-  <div class="cards"><div class="card "><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div><div class="card "><div class="k">L2+ (CRUD 이상)</div><div class="v">64 <span class="s">/ 112 · 57%</span></div><div class="s">L0 0 · L1 48 · L2 9 · L3 37 · L4 18</div></div><div class="card "><div class="k">L3+ (동작·통합)</div><div class="v">55 <span class="s">/ 112 · 49%</span></div><div class="s">L0 없음 · L1 진입 · L2 CRUD · L3 동작 · L4 통합</div></div></div>
+  <div class="cards"><div class="card "><div class="k">리소스(모집단)</div><div class="v">112</div><div class="s">서비스 89 · 화면 276 · 스모크 진입 282</div></div><div class="card "><div class="k">L2+ (CRUD 이상)</div><div class="v">64 <span class="s">/ 112 · 57%</span></div><div class="s">L0 0 · L1 48 · L2 7 · L3 39 · L4 18</div></div><div class="card "><div class="k">L3+ (동작·통합)</div><div class="v">57 <span class="s">/ 112 · 51%</span></div><div class="s">L0 없음 · L1 진입 · L2 CRUD · L3 동작 · L4 통합</div></div></div>
   <div class="legend"><span><i class="l0"></i>L0 없음</span><span><i class="l1"></i>L1 진입</span><span><i class="l2"></i>L2 CRUD</span><span><i class="l3"></i>L3 동작</span><span><i class="l4"></i>L4 통합</span></div>
+  <div class="trendbox"><svg viewBox="0 0 640 150" width="100%" style="max-width:640px" role="img" aria-label="커버리지 추세">
+    <line x1="30" y1="120" x2="610" y2="120" class="ax"/><line x1="30" y1="75" x2="610" y2="75" class="grid"/><line x1="30" y1="30" x2="610" y2="30" class="grid"/>
+    <polyline points="30.0,99.3 146.0,99.3 262.0,90.3 378.0,77.7 494.0,77.7 610.0,68.7" class="s2"/><polyline points="30.0,107.4 146.0,102.9 262.0,98.4 378.0,93.9 494.0,93.9 610.0,74.1" class="s3"/><text x="30.0" y="142" text-anchor="middle" class="tl">09-23</text><text x="30.0" y="93.3" text-anchor="middle" class="tv">23%</text><text x="146.0" y="142" text-anchor="middle" class="tl">09-28</text><text x="146.0" y="93.3" text-anchor="middle" class="tv">23%</text><text x="262.0" y="142" text-anchor="middle" class="tl">09-29</text><text x="262.0" y="84.3" text-anchor="middle" class="tv">33%</text><text x="378.0" y="142" text-anchor="middle" class="tl">09-30</text><text x="378.0" y="71.7" text-anchor="middle" class="tv">47%</text><text x="494.0" y="142" text-anchor="middle" class="tl">10-01</text><text x="494.0" y="71.7" text-anchor="middle" class="tv">47%</text><text x="610.0" y="142" text-anchor="middle" class="tl">10-06</text><text x="610.0" y="62.7" text-anchor="middle" class="tv">57%</text>
+  </svg><div class="legend"><span><i style="background:var(--l2)"></i>L2+ (최근 64/112)</span><span><i style="background:var(--l4)"></i>L3+ (최근 57/112)</span><span class="muted">날짜별 마지막 coverage.yaml 기준. 09-28 에 모집단이 80 → 112 로 바뀜</span></div></div>
   
     <table>
       <thead><tr><th>카테고리</th><th class="num">리소스</th><th class="num">L0</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L2+</th><th></th></tr></thead>
@@ -861,9 +869,9 @@
 <tr>
         <td>DevOps Tools</td>
         <td class="num">1</td>
-        <td class="num"></td><td class="num"></td><td class="num">1</td><td class="num"></td><td class="num"></td>
+        <td class="num"></td><td class="num"></td><td class="num"></td><td class="num">1</td><td class="num"></td>
         <td class="num">100%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:0%" title="L1 진입 0"></span><span class="seg l2" style="width:100%" title="L2 CRUD 1"></span><span class="seg l3" style="width:0%" title="L3 동작 0"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:0%" title="L1 진입 0"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:100%" title="L3 동작 1"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
       </tr>
 <tr>
         <td>Financial Management</td>
@@ -882,9 +890,9 @@
 <tr>
         <td>Management</td>
         <td class="num">14</td>
-        <td class="num"></td><td class="num">7</td><td class="num">1</td><td class="num">6</td><td class="num"></td>
+        <td class="num"></td><td class="num">7</td><td class="num"></td><td class="num">7</td><td class="num"></td>
         <td class="num">50%</td>
-        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:50%" title="L1 진입 7"></span><span class="seg l2" style="width:7%" title="L2 CRUD 1"></span><span class="seg l3" style="width:43%" title="L3 동작 6"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
+        <td class="barcell"><div class="bar"><span class="seg l0" style="width:0%" title="L0 없음 0"></span><span class="seg l1" style="width:50%" title="L1 진입 7"></span><span class="seg l2" style="width:0%" title="L2 CRUD 0"></span><span class="seg l3" style="width:50%" title="L3 동작 7"></span><span class="seg l4" style="width:0%" title="L4 통합 0"></span></div></td>
       </tr>
 <tr>
         <td>Networking</td>
@@ -1156,6 +1164,15 @@
         <td>2026-10-06</td>
         <td class="note">Broker 1·최소 사양 생성 → 상세 중지(Stopping ≈1분)→Stopped→시작→Running(L3) → 해지. 단독(자기 VPC) PASS 26분 (2026-10-06)</td>
       </tr>
+<tr class="res" data-level="3" data-cat="DevOps Tools">
+        <td><span class="lv l3">L3</span></td>
+        <td class="mono">devops-service</td>
+        <td>DevOps Service</td>
+        <td>DevOps Tools</td>
+        <td class="mono small">smoke.devops-service<br>devops-tools.devops-service</td>
+        <td>2026-10-06</td>
+        <td class="note">L3(에이전트 4L): 상세 태그 추가→삭제(상세엔 연필 수정 항목 없음, 버튼은 DevOps Console·서비스 해지뿐). Tenant명·코드만으로 생성(API 는 409 였으나 콘솔은 됨) → 상세 서비스 해지. 계정당 1개(API 메모)</td>
+      </tr>
 <tr class="res" data-level="3" data-cat="Management">
         <td><span class="lv l3">L3</span></td>
         <td class="mono">group@iam</td>
@@ -1200,6 +1217,15 @@
         <td class="mono small">smoke.iam<br>iam.role</td>
         <td>2026-10-06</td>
         <td class="note">Global. 수행 주체 현재 Account(Value 자동), 정책 없이 생성 → 삭제. 수행 주체 '추가' 는 빈 행을 만들어 생성이 비활성이 된다 / 2026-10-06 L3(3C): 정책 CostNavigatorReadOnlyAccess 연결→해제, 수행 주체 서비스(cloudscope) 추가→제거, 최대 세션 1→2시간, 태그 추가→삭제. PASS 2.1분</td>
+      </tr>
+<tr class="res" data-level="3" data-cat="Management">
+        <td><span class="lv l3">L3</span></td>
+        <td class="mono">saml-provider</td>
+        <td>IAM</td>
+        <td>Management</td>
+        <td class="mono small">smoke.iam<br>iam.saml-provider</td>
+        <td>2026-10-06</td>
+        <td class="note">L3(에이전트 4L): 상세 설명 수정·메타데이터 파일 교체(확인 알림 후 저장). (태그는 이번에 확인 안 함). SAML 더미 메타데이터(공개 인증서 포함 필수, 없으면 형식 오류) 생성·삭제. 역할 신뢰 없음 → 로그인 영향 없음</td>
       </tr>
 <tr class="res" data-level="3" data-cat="Management">
         <td><span class="lv l3">L3</span></td>
@@ -1407,24 +1433,6 @@
         <td class="mono small">smoke.file-storage<br>storage.file-storage<br>storage.file-storage-snapshot</td>
         <td>2026-09-30</td>
         <td class="note">NFS·Single-AZ·HDD 볼륨 생성(이름 뒤에 6자리 UUID 가 붙는다) → 행 선택·서비스 해지. 용량 과금이라 짧게. 상세 스냅샷 생성(자동 이름)·삭제 (storage.file-storage-snapshot, 2026-09-29) + 스냅샷 스케줄 켜기·끄기(2026-09-30). 복제는 kr-east1 리전간이라 미구현</td>
-      </tr>
-<tr class="res" data-level="2" data-cat="DevOps Tools">
-        <td><span class="lv l2">L2</span></td>
-        <td class="mono">devops-service</td>
-        <td>DevOps Service</td>
-        <td>DevOps Tools</td>
-        <td class="mono small">smoke.devops-service<br>devops-tools.devops-service</td>
-        <td>2026-10-06</td>
-        <td class="note">Tenant명·코드만으로 생성(API 는 409 였으나 콘솔은 됨) → 상세 서비스 해지. 계정당 1개(API 메모)</td>
-      </tr>
-<tr class="res" data-level="2" data-cat="Management">
-        <td><span class="lv l2">L2</span></td>
-        <td class="mono">saml-provider</td>
-        <td>IAM</td>
-        <td>Management</td>
-        <td class="mono small">smoke.iam<br>iam.saml-provider</td>
-        <td>2026-10-06</td>
-        <td class="note">SAML 더미 메타데이터(공개 인증서 포함 필수, 없으면 형식 오류) 생성·삭제. 역할 신뢰 없음 → 로그인 영향 없음</td>
       </tr>
 <tr class="res" data-level="2" data-cat="Networking">
         <td><span class="lv l2">L2</span></td>
@@ -1927,7 +1935,1354 @@
 <section id="parity">
   <h2>API 자동화 대비 화면 자동화 <small>docs/api-ui-parity.md · ✅ 화면 자동화 · 🔧 진행 · ⏭ 제외(이유는 항목별 표)</small></h2>
   <table class="compact"><thead><tr><th>분류</th><th class="num">✅ 화면 자동화</th><th class="num">🔧 진행</th><th class="num">⏭ 제외</th></tr></thead><tbody><tr><td>Compute</td><td class="num">12</td><td class="num"></td><td class="num">1</td></tr><tr><td>Container</td><td class="num">3</td><td class="num"></td><td class="num"></td></tr><tr><td>Database</td><td class="num">2</td><td class="num"></td><td class="num"></td></tr><tr><td>Data Analytics</td><td class="num">1</td><td class="num"></td><td class="num"></td></tr><tr><td>Networking</td><td class="num">22</td><td class="num"></td><td class="num">2</td></tr><tr><td>Hybrid Cloud</td><td class="num">0</td><td class="num"></td><td class="num">1</td></tr><tr><td>Storage</td><td class="num">3</td><td class="num"></td><td class="num">2</td></tr><tr><td>Application Service</td><td class="num">3</td><td class="num"></td><td class="num">1</td></tr><tr><td>Management</td><td class="num">8</td><td class="num"></td><td class="num">1</td></tr><tr><td>DevOps Tools</td><td class="num">1</td><td class="num"></td><td class="num"></td></tr><tr><td>Security</td><td class="num">3</td><td class="num"></td><td class="num">1</td></tr><tr><td>Financial Management</td><td class="num">1</td><td class="num"></td><td class="num"></td></tr></tbody></table>
-    <details><summary>항목별 (68)</summary><table><thead><tr><th></th><th>분류</th><th>API 리소스</th><th>UI spec · 비고</th></tr></thead><tbody><tr><td>✅</td><td>Compute</td><td class="small">virtualserver servers · keypairs · volumes · volume attach</td><td class="small">compute.vm-stack · compute.vm-volume</td></tr><tr><td>✅</td><td>Compute</td><td class="small">virtualserver security-groups · publicips · ports</td><td class="small">compute.vm-stack-net · networking.vpc-port</td></tr><tr><td>✅</td><td>Compute</td><td class="small">server-groups</td><td class="small">compute.server-group (태그 추가·삭제 + 작업 이력 확인 L3, 2026-10-06 3C — 상세에 수정 항목 없음)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">launch-configurations · auto-scaling-groups</td><td class="small">compute.launch-configuration · compute.auto-scaling-group</td></tr><tr><td>✅</td><td>Compute</td><td class="small">auto-scaling-groups policies · schedules · notifications</td><td class="small">compute.auto-scaling-group steps[3] (정책·스케줄 L3). 알림은 ⏭ 수신자가 로그인 이력 있는 사용자만 가능 + 실제 메일</td></tr><tr><td>✅</td><td>Compute</td><td class="small">snapshots (볼륨 스냅샷)</td><td class="small">compute.volume-snapshot (스냅샷 복구 L3)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers interfaces · static-nats</td><td class="small">compute.vm-stack steps[7] (같은 Subnet 신규 네트워크 포트 추가·삭제, 2026-09-30). static NAT 는 compute.vm-stack-net 의 Public NAT IP 연결</td></tr><tr><td>✅</td><td>Compute</td><td class="small">images (서버 커스텀 Image · updateimage)</td><td class="small">compute.vm-stack steps[6] (Image 생성 → Visibility Shared → 삭제, 2026-09-30). 멤버 추가(createimagemember)는 공유 대상 Account 가 없어 ⏭, 공유용 Image(createsharingimage)는 Snapshot-Based 이미지만 가능해 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers dump</td><td class="small">compute.vm-stack steps[8] (Dump 생성, 파일은 서버 안 — 다운로드 없음)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">volume-transfer</td><td class="small">compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf cloud-functions</td><td class="small">compute.cloud-function</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf triggers cronjob · apigateway</td><td class="small">compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30)</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske clusters</td><td class="small">container.ske-cluster</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske nodepools</td><td class="small">container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3)</td></tr><tr><td>✅</td><td>Container</td><td class="small">scr container-registries · repositories</td><td class="small">container.container-registry (엔드포인트 프라이빗↔프라이빗&amp;퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas · cachestore clusters</td><td class="small">database.* 5종</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas replicas (읽기 복제본)</td><td class="small">database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분)</td></tr><tr><td>✅</td><td>Data Analytics</td><td class="small">eventstreams clusters (+ 중지·시작)</td><td class="small">data-analytics.event-streams (공유 VPC; 2026-10-06 L3: 상세 중지→Stopped→시작→Running, 단독 PASS 26분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpcs · subnets</td><td class="small">networking.vpc.create-delete · 모든 VPC 체인</td></tr><tr><td>✅</td><td>Networking</td><td class="small">internet-gateways · publicips</td><td class="small">compute.vm-stack-net · networking.nat-gateway</td></tr><tr><td>✅</td><td>Networking</td><td class="small">nat-gateways · vpc-peerings · private-dns · hosted-zones · hosted-zone records</td><td class="small">networking.nat-gateway · vpc-peering · private-dns · dns-hosted-zone (A 레코드 추가·삭제 L3, 2026-09-30)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">security-groups · security-group-rules · address-groups</td><td class="small">compute.vm-stack-net · security.security-group-rule · security.address-group</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancers · lb-server-groups · members · lb-listeners · static-nats (+ 수정)</td><td class="small">networking.load-balancer (2026-09-30 PASS; 2026-10-06 L3: 헬스 체크 탐지 횟수 · 서버 그룹 부하 분산 · Listener 세션 유지 시간 · 설명 수정→반영→되돌림, PASS 23분). 멤버는 실제 VM 필요로 미포함</td></tr><tr><td>✅</td><td>Networking</td><td class="small">firewalls rules</td><td class="small">networking.firewall (규칙 추가·삭제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateways · vpc-connections</td><td class="small">networking.transit-gateway (VPC 연결 추가·해제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpn gateways · tunnels (+ 수정)</td><td class="small">networking.vpn (게이트웨이 + 터널, 2026-10-06 L3: Gateway 설명 · Tunnel DPD·Peer IP·IKE SA LifeTime·설명 수정→반영→되돌림, PASS 10.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc endpoints (+ 설명 수정)</td><td class="small">networking.vpc-endpoint (2026-10-06 L3: 설명 수정→반영→되돌림, 콘솔 수정 항목은 설명뿐. PASS 4분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">direct-connects</td><td class="small">networking.direct-connect (규칙 추가·삭제 L3, 시간 과금이라 즉시 해지)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">cdn services</td><td class="small">networking.cdn (원본 example.com, 배포 대기 → 중지 → 해지 ≈25분, 2026-09-30; Cache 만료시간 수정 → 설정 버전 2 재배포 L3 steps[2], 2026-10-06 3C, ≈30분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">gslbs</td><td class="small">networking.gslb (연결 대상 192.0.2.10, 2026-09-30; 연결 대상 Weight 1→5·설명 수정 L3 steps[3], 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">subnet vips · vip connected-ports · vip static-nat-ips (createsubnetvip·port·natip 2xx)</td><td class="small">networking.vpc-port steps[4~10] (IGW·Public IP → VIP 예약 → Port 연결 → Public NAT IP 연결·해제 → 역순, 2026-09-30 PASS 15.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateway routing-rules (createtransitgatewayrule 2xx)</td><td class="small">networking.transit-gateway steps[4~5] (VPC→TGW 목적지 규칙 추가·삭제, 2026-09-30 PASS 11.7분. 규칙이 남으면 VPC 연결 해제가 조용히 무시됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc-peering routing-rules (createvpcpeeringrule 2xx)</td><td class="small">networking.vpc-peering steps[3~4] (요청→승인 VPC 규칙 추가·삭제, L3). 10-01 PASS 13.6분</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancer public-nat-ip (createloadbalancerpublicnatip 2xx)</td><td class="small">networking.load-balancer steps[6~8] (IGW·Public IP → LB Public NAT IP 설정·해제, 공유 네트워크면 건너뜀, 2026-09-30 PASS 22분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">privatelink-services (+ endpoints: API 는 404)</td><td class="small">networking.privatelink-service (IP 연결 Service → 같은 계정 Endpoint 요청 → 승인 L3 → 설명 수정 · 연결 차단→Disconnected→재연결 L3(2026-10-06) → 역순, PASS 16분. Endpoint 도 콘솔에선 생성됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">private-nats (createprivatenat 202)</td><td class="small">networking.direct-connect steps[5~7] (이 spec 의 DC 를 연결 자원으로 Private NAT 생성 → 설명 수정 · Private NAT IP 예약·반납(createprivatenatip, 2026-10-06 L3) → 삭제, PASS 6.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">gslbs regional-routing-control (setgslbregionalroutingcontrol 202)</td><td class="small">networking.gslb steps[2] (RRC 목록에서 위치 행 중지 → 사용 복귀 L3, 2026-10-06 에이전트 3B)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud WAN network (API 없음)</td><td class="small">networking.cloud-wan-network (2026-10-06 3B). Segment 는 월 ₩356,240 → ⏭, Attachment·Site VPN 은 Segment 필요 → ⏭</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud Fabric Connect fabric · policy · connection (API 없음)</td><td class="small">networking.cloud-fabric-connect (2026-10-06 3B). Port 는 1G/10G 물리 포트 → ⏭</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud LAN-Data Center network · vDevice · vCable (API 없음)</td><td class="small">networking.cloud-lan-data-center (2026-10-06 3B). Interface 는 1G-T/1G-F 물리 인터페이스·약정 → ⏭</td></tr><tr><td>⏭</td><td>Networking</td><td class="small">Cloud Secured SD-LAN · SASE(+Lastmile) · Cloud Last Mile(+Circuit and Edge) (API 없음)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Networking</td><td class="small">DNS public-domain-name (createpublicdomainname 500)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Hybrid Cloud</td><td class="small">Dedicated Cloud · Private Zone · Oracle Services (API 없음)</td><td class="small">—</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage volumes</td><td class="small">storage.file-storage</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage snapshots · snapshot-schedules</td><td class="small">storage.file-storage-snapshot (스냅샷 스케줄 켜기·끄기, 2026-09-30)</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">filestorage replications</td><td class="small">— 복제 위치가 kr-east1-a 뿐(리전간 복제, 전송 요금). 정리가 DR 리전에서 일시중지→삭제 + 복제본 볼륨 삭제를 요구해 단일 리전 도구 범위 밖</td></tr><tr><td>✅</td><td>Storage</td><td class="small">object storage bucket</td><td class="small">storage.object-storage-bucket (폴더·파일 업로드→삭제, 버전 관리 사용→미사용, 태그 L3, 2026-10-06 3C)</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">backup backups</td><td class="small">제외 — 콘솔은 Agent 방식만(OS 안에 NetBackup 클라이언트 설치 필요). API 도 생성 성공 없음(createbackup 500, createbackupagent 404)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">queueservice queues</td><td class="small">application-service.queue (메시지 설정 수정·IP 접근 허용 추가→삭제 L3, 2026-10-06 3C. 메시지 송수신·purge 는 콘솔에 없음)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">apigateway apis · resources · methods · stages · auths · access-controls · usage-plans · api-keys</td><td class="small">application-service.api-gateway (리소스·메서드·스테이지 배포 L3, JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제 L3 2026-09-30)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">messagehub domains · emails</td><td class="small">application-service.messagehub-domain · messagehub-email (소유 확인·인증 메일 발송은 하지 않음)</td></tr><tr><td>⏭</td><td>Application Service</td><td class="small">messagehub phones</td><td class="small">—</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam groups · roles</td><td class="small">iam.user-group · iam.role (역할: 정책 연결·해제, 수행 주체 추가·제거, 세션 시간, 태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam policies · group policy-bindings</td><td class="small">iam.policy (그룹 연결·해제 L3)</td></tr><tr><td>✅</td><td>Management</td><td class="small">resource-groups</td><td class="small">management.resource-group (그룹 정의 태그 조건 추가·제거, 그룹 태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">notification groups</td><td class="small">management.notification-group (설명·외부 수신자 example.com 저장→비움 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">servicewatch dashboards · log-groups · log-streams · event-rules · alerts</td><td class="small">management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert</td></tr><tr><td>✅</td><td>Management</td><td class="small">network-logging storages</td><td class="small">management.network-logging (버킷 체인, Firewall Logging 적용·해제)</td></tr><tr><td>✅</td><td>Management</td><td class="small">loggingaudit trails (createtrail 201 · stoptrail · deletetrail)</td><td class="small">management.trail (버킷 → Trail → 중지 L3 → 삭제 → 버킷 해지, 2026-10-06)</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam identity-providers (SAML)</td><td class="small">iam.saml-provider (더미 메타데이터, 역할 신뢰 없음, 2026-10-06)</td></tr><tr><td>✅</td><td>DevOps Tools</td><td class="small">devopsservice (API createdevopsservice 409)</td><td class="small">devops-tools.devops-service (콘솔은 생성·해지 됨, 2026-10-06)</td></tr><tr><td>⏭</td><td>Management</td><td class="small">organization OU · control-policy (API 403)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Security</td><td class="small">secretvault (API 400) · configinspection (API 400)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Compute</td><td class="small">keypairs (UI 생성)</td><td class="small">—</td></tr><tr><td>✅</td><td>Financial Management</td><td class="small">budgets account</td><td class="small">financial-management.budget (금액 수정 L3)</td></tr><tr><td>✅</td><td>Security</td><td class="small">certificatemanager self-sign</td><td class="small">security.certificate (태그 L3, 2026-10-06 3C. 갱신 버튼 없음, 만료 알림은 실제 메일이라 ⏭)</td></tr><tr><td>✅</td><td>Security</td><td class="small">kms keys</td><td class="small">security.kms-key (키 회전·비활성화→활성화·설명·태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Security</td><td class="small">secretsmanager secrets</td><td class="small">security.secrets-manager (해지는 7일 예약, 해지 취소 L3)</td></tr></tbody></table></details>
+    <details><summary>항목별 (68)</summary><table><thead><tr><th></th><th>분류</th><th>API 리소스</th><th>UI spec · 비고</th></tr></thead><tbody><tr><td>✅</td><td>Compute</td><td class="small">virtualserver servers · keypairs · volumes · volume attach</td><td class="small">compute.vm-stack · compute.vm-volume</td></tr><tr><td>✅</td><td>Compute</td><td class="small">virtualserver security-groups · publicips · ports</td><td class="small">compute.vm-stack-net · networking.vpc-port</td></tr><tr><td>✅</td><td>Compute</td><td class="small">server-groups</td><td class="small">compute.server-group (태그 추가·삭제 + 작업 이력 확인 L3, 2026-10-06 3C — 상세에 수정 항목 없음)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">launch-configurations · auto-scaling-groups</td><td class="small">compute.launch-configuration · compute.auto-scaling-group</td></tr><tr><td>✅</td><td>Compute</td><td class="small">auto-scaling-groups policies · schedules · notifications</td><td class="small">compute.auto-scaling-group steps[3] (정책·스케줄 L3). 알림은 ⏭ 수신자가 로그인 이력 있는 사용자만 가능 + 실제 메일</td></tr><tr><td>✅</td><td>Compute</td><td class="small">snapshots (볼륨 스냅샷)</td><td class="small">compute.volume-snapshot (스냅샷 복구 L3)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers interfaces · static-nats</td><td class="small">compute.vm-stack steps[7] (같은 Subnet 신규 네트워크 포트 추가·삭제, 2026-09-30). static NAT 는 compute.vm-stack-net 의 Public NAT IP 연결</td></tr><tr><td>✅</td><td>Compute</td><td class="small">images (서버 커스텀 Image · updateimage)</td><td class="small">compute.vm-stack steps[6] (Image 생성 → Visibility Shared → 삭제, 2026-09-30). 멤버 추가(createimagemember)는 공유 대상 Account 가 없어 ⏭, 공유용 Image(createsharingimage)는 Snapshot-Based 이미지만 가능해 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">servers dump</td><td class="small">compute.vm-stack steps[8] (Dump 생성, 파일은 서버 안 — 다운로드 없음)</td></tr><tr><td>✅</td><td>Compute</td><td class="small">volume-transfer</td><td class="small">compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf cloud-functions</td><td class="small">compute.cloud-function</td></tr><tr><td>✅</td><td>Compute</td><td class="small">scf triggers cronjob · apigateway</td><td class="small">compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30)</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske clusters</td><td class="small">container.ske-cluster</td></tr><tr><td>✅</td><td>Container</td><td class="small">ske nodepools</td><td class="small">container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3)</td></tr><tr><td>✅</td><td>Container</td><td class="small">scr container-registries · repositories</td><td class="small">container.container-registry (엔드포인트 프라이빗↔프라이빗&amp;퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas · cachestore clusters</td><td class="small">database.* 5종</td></tr><tr><td>✅</td><td>Database</td><td class="small">postgresql · mysql · mariadb · epas replicas (읽기 복제본)</td><td class="small">database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분)</td></tr><tr><td>✅</td><td>Data Analytics</td><td class="small">eventstreams clusters (+ 중지·시작)</td><td class="small">data-analytics.event-streams (공유 VPC; 2026-10-06 L3: 상세 중지→Stopped→시작→Running, 단독 PASS 26분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpcs · subnets</td><td class="small">networking.vpc.create-delete · 모든 VPC 체인</td></tr><tr><td>✅</td><td>Networking</td><td class="small">internet-gateways · publicips</td><td class="small">compute.vm-stack-net · networking.nat-gateway</td></tr><tr><td>✅</td><td>Networking</td><td class="small">nat-gateways · vpc-peerings · private-dns · hosted-zones · hosted-zone records</td><td class="small">networking.nat-gateway · vpc-peering · private-dns · dns-hosted-zone (A 레코드 추가·삭제 L3, 2026-09-30)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">security-groups · security-group-rules · address-groups</td><td class="small">compute.vm-stack-net · security.security-group-rule · security.address-group</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancers · lb-server-groups · members · lb-listeners · static-nats (+ 수정)</td><td class="small">networking.load-balancer (2026-09-30 PASS; 2026-10-06 L3: 헬스 체크 탐지 횟수 · 서버 그룹 부하 분산 · Listener 세션 유지 시간 · 설명 수정→반영→되돌림, PASS 23분). 멤버는 실제 VM 필요로 미포함</td></tr><tr><td>✅</td><td>Networking</td><td class="small">firewalls rules</td><td class="small">networking.firewall (규칙 추가·삭제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateways · vpc-connections</td><td class="small">networking.transit-gateway (VPC 연결 추가·해제 L3)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpn gateways · tunnels (+ 수정)</td><td class="small">networking.vpn (게이트웨이 + 터널, 2026-10-06 L3: Gateway 설명 · Tunnel DPD·Peer IP·IKE SA LifeTime·설명 수정→반영→되돌림, PASS 10.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc endpoints (+ 설명 수정)</td><td class="small">networking.vpc-endpoint (2026-10-06 L3: 설명 수정→반영→되돌림, 콘솔 수정 항목은 설명뿐. PASS 4분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">direct-connects</td><td class="small">networking.direct-connect (규칙 추가·삭제 L3, 시간 과금이라 즉시 해지)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">cdn services</td><td class="small">networking.cdn (원본 example.com, 배포 대기 → 중지 → 해지 ≈25분, 2026-09-30; Cache 만료시간 수정 → 설정 버전 2 재배포 L3 steps[2], 2026-10-06 3C, ≈30분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">gslbs</td><td class="small">networking.gslb (연결 대상 192.0.2.10, 2026-09-30; 연결 대상 Weight 1→5·설명 수정 L3 steps[3], 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">subnet vips · vip connected-ports · vip static-nat-ips (createsubnetvip·port·natip 2xx)</td><td class="small">networking.vpc-port steps[4~10] (IGW·Public IP → VIP 예약 → Port 연결 → Public NAT IP 연결·해제 → 역순, 2026-09-30 PASS 15.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">transit-gateway routing-rules (createtransitgatewayrule 2xx)</td><td class="small">networking.transit-gateway steps[4~5] (VPC→TGW 목적지 규칙 추가·삭제, 2026-09-30 PASS 11.7분. 규칙이 남으면 VPC 연결 해제가 조용히 무시됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">vpc-peering routing-rules (createvpcpeeringrule 2xx)</td><td class="small">networking.vpc-peering steps[3~4] (요청→승인 VPC 규칙 추가·삭제, L3). 10-01 PASS 13.6분</td></tr><tr><td>✅</td><td>Networking</td><td class="small">loadbalancer public-nat-ip (createloadbalancerpublicnatip 2xx)</td><td class="small">networking.load-balancer steps[6~8] (IGW·Public IP → LB Public NAT IP 설정·해제, 공유 네트워크면 건너뜀, 2026-09-30 PASS 22분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">privatelink-services (+ endpoints: API 는 404)</td><td class="small">networking.privatelink-service (IP 연결 Service → 같은 계정 Endpoint 요청 → 승인 L3 → 설명 수정 · 연결 차단→Disconnected→재연결 L3(2026-10-06) → 역순, PASS 16분. Endpoint 도 콘솔에선 생성됨)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">private-nats (createprivatenat 202)</td><td class="small">networking.direct-connect steps[5~7] (이 spec 의 DC 를 연결 자원으로 Private NAT 생성 → 설명 수정 · Private NAT IP 예약·반납(createprivatenatip, 2026-10-06 L3) → 삭제, PASS 6.5분)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">gslbs regional-routing-control (setgslbregionalroutingcontrol 202)</td><td class="small">networking.gslb steps[2] (RRC 목록에서 위치 행 중지 → 사용 복귀 L3, 2026-10-06 에이전트 3B)</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud WAN network (API 없음)</td><td class="small">networking.cloud-wan-network (2026-10-06 3B). Segment 는 월 ₩356,240 → ⏭, Attachment·Site VPN 은 Segment 필요 → ⏭</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud Fabric Connect fabric · policy · connection (API 없음)</td><td class="small">networking.cloud-fabric-connect (2026-10-06 3B). Port 는 1G/10G 물리 포트 → ⏭</td></tr><tr><td>✅</td><td>Networking</td><td class="small">Cloud LAN-Data Center network · vDevice · vCable (API 없음)</td><td class="small">networking.cloud-lan-data-center (2026-10-06 3B). Interface 는 1G-T/1G-F 물리 인터페이스·약정 → ⏭</td></tr><tr><td>⏭</td><td>Networking</td><td class="small">Cloud Secured SD-LAN · SASE(+Lastmile) · Cloud Last Mile(+Circuit and Edge) (API 없음)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Networking</td><td class="small">DNS public-domain-name (createpublicdomainname 500)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Hybrid Cloud</td><td class="small">Dedicated Cloud · Private Zone · Oracle Services (API 없음)</td><td class="small">—</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage volumes</td><td class="small">storage.file-storage</td></tr><tr><td>✅</td><td>Storage</td><td class="small">filestorage snapshots · snapshot-schedules</td><td class="small">storage.file-storage-snapshot (스냅샷 스케줄 켜기·끄기, 2026-09-30)</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">filestorage replications</td><td class="small">— 복제 위치가 kr-east1-a 뿐(리전간 복제, 전송 요금). 정리가 DR 리전에서 일시중지→삭제 + 복제본 볼륨 삭제를 요구해 단일 리전 도구 범위 밖</td></tr><tr><td>✅</td><td>Storage</td><td class="small">object storage bucket</td><td class="small">storage.object-storage-bucket (폴더·파일 업로드→삭제, 버전 관리 사용→미사용, 태그 L3, 2026-10-06 3C)</td></tr><tr><td>⏭</td><td>Storage</td><td class="small">backup backups</td><td class="small">제외 — 콘솔은 Agent 방식만(OS 안에 NetBackup 클라이언트 설치 필요). API 도 생성 성공 없음(createbackup 500, createbackupagent 404)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">queueservice queues</td><td class="small">application-service.queue (메시지 설정 수정·IP 접근 허용 추가→삭제 L3, 2026-10-06 3C. 메시지 송수신·purge 는 콘솔에 없음)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">apigateway apis · resources · methods · stages · auths · access-controls · usage-plans · api-keys</td><td class="small">application-service.api-gateway (리소스·메서드·스테이지 배포 L3, JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제 L3 2026-09-30)</td></tr><tr><td>✅</td><td>Application Service</td><td class="small">messagehub domains · emails</td><td class="small">application-service.messagehub-domain · messagehub-email (소유 확인·인증 메일 발송은 하지 않음)</td></tr><tr><td>⏭</td><td>Application Service</td><td class="small">messagehub phones</td><td class="small">—</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam groups · roles</td><td class="small">iam.user-group · iam.role (역할: 정책 연결·해제, 수행 주체 추가·제거, 세션 시간, 태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam policies · group policy-bindings</td><td class="small">iam.policy (그룹 연결·해제 L3)</td></tr><tr><td>✅</td><td>Management</td><td class="small">resource-groups</td><td class="small">management.resource-group (그룹 정의 태그 조건 추가·제거, 그룹 태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">notification groups</td><td class="small">management.notification-group (설명·외부 수신자 example.com 저장→비움 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Management</td><td class="small">servicewatch dashboards · log-groups · log-streams · event-rules · alerts</td><td class="small">management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert</td></tr><tr><td>✅</td><td>Management</td><td class="small">network-logging storages</td><td class="small">management.network-logging (버킷 체인, Firewall Logging 적용·해제)</td></tr><tr><td>✅</td><td>Management</td><td class="small">loggingaudit trails (createtrail 201 · stoptrail · deletetrail)</td><td class="small">management.trail (버킷 → Trail → 중지 L3 → 삭제 → 버킷 해지, 2026-10-06)</td></tr><tr><td>✅</td><td>Management</td><td class="small">iam identity-providers (SAML)</td><td class="small">iam.saml-provider (더미 메타데이터, 역할 신뢰 없음, 2026-10-06) · 설명 수정·메타데이터 교체(L3, 10-06)</td></tr><tr><td>✅</td><td>DevOps Tools</td><td class="small">devopsservice (API createdevopsservice 409)</td><td class="small">devops-tools.devops-service (콘솔은 생성·해지 됨, 2026-10-06) · 태그 추가·삭제(L3, 10-06)</td></tr><tr><td>⏭</td><td>Management</td><td class="small">organization OU · control-policy (API 403)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Security</td><td class="small">secretvault (API 400) · configinspection (API 400)</td><td class="small">—</td></tr><tr><td>⏭</td><td>Compute</td><td class="small">keypairs (UI 생성)</td><td class="small">—</td></tr><tr><td>✅</td><td>Financial Management</td><td class="small">budgets account</td><td class="small">financial-management.budget (금액 수정 L3)</td></tr><tr><td>✅</td><td>Security</td><td class="small">certificatemanager self-sign</td><td class="small">security.certificate (태그 L3, 2026-10-06 3C. 갱신 버튼 없음, 만료 알림은 실제 메일이라 ⏭)</td></tr><tr><td>✅</td><td>Security</td><td class="small">kms keys</td><td class="small">security.kms-key (키 회전·비활성화→활성화·설명·태그 L3, 2026-10-06 3C)</td></tr><tr><td>✅</td><td>Security</td><td class="small">secretsmanager secrets</td><td class="small">security.secrets-manager (해지는 7일 예약, 해지 취소 L3)</td></tr></tbody></table></details>
+</section>
+
+<section id="findings">
+  <h2>탐색 발견 사항 <small>recordings/explore/*/report.md 의 "이상·정보 판정" · 검토 상태는 data/findings.yaml 에 "&lt;id&gt;: 결함|정상|무시 | 메모"</small></h2>
+  <p class="muted">134건 · 검토 전 134 · 결함 0 · 정상 0 · 무시 0 · 종류: 정보 validation-text 59 · 정보 validation-error 43 · 정보 console-error 32</p>
+    <div class="filters">상태: <button data-fs="all" class="on">전체</button><button data-fs="검토 전">검토 전</button><button data-fs="결함">결함</button><button data-fs="정상">정상</button><button data-fs="무시">무시</button></div>
+    <details ><summary>목록 (134)</summary>
+    <table id="fd-t"><thead><tr><th>구분</th><th>종류</th><th>탐색</th><th>내용</th><th>동작</th><th>상태</th><th>화면</th><th>id</th></tr></thead><tbody><tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">서비스 정보 입력 영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요. 0/20 Public Zone Public Zone의 Availability Zone(가용 영역)은 1-zone(kr-west1-b)으로 확장되어 생성됩니다. 일부 IP 대역은 관리용으로 사용할 수 없습</td>
+        <td class="small">button &quot;서비스 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609272337/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609272337#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609272337/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609272337#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">총 0 20개씩 보기 서비스 해지 검색어를 입력하세요. 상세 검색 서비스 생성 VPC ID IP 대역 수 생성 일시 상태 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요. 서비스 생성</td>
+        <td class="small">button &quot;확인&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609272337/screenshots/14.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609272337#14</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">총 0 10개씩 보기 기간 필터 사용자 시간대 정확한 작업자 정보를 입력하세요. 상세 검색 작업 내역 작업 일시 작업 결과 작업자 정보 데이터가 없습니다.</td>
+        <td class="small">button &quot;작업 이력&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609230948/screenshots/07.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609230948#7</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">시간은 24시간 형태로 입력하세요. 시간대: Asia/Seoul (GMT +09:00) 시작 일시 종료 일시</td>
+        <td class="small">button &quot;직접 입력&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609230948/screenshots/09.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609230948#9</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-list</td>
+        <td class="note">총 0 검색어를 입력하세요. 태그 수정 Key Value 데이터가 없습니다.</td>
+        <td class="small">button &quot;태그 (0)&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-list-202609230948/screenshots/13.jpg">화면</a></td>
+        <td class="mono small">vpc-list-202609230948#13</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vp&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290023/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290023#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/15&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290023/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290023#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/29&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/29&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290023/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290023#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/15&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0919-8db5-x&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0929-0919-8db5-xx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/12.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#12</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0919-8db_@#&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;&lt;b&gt;bold&lt;/b&gt; &amp; \&quot;quote\&quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/15.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#15</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/29&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/29&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/16.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#16</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;한글vpc-0929-0919-8db5&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;한글vpc-0929-0919-8db5&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/17.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#17</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.입력 조건에 맞지 않습니다.0/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/18.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#18</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0919-8db5&quot; → 입력 조건에 맞지 않습니다.18/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0929-0919-8db5&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.251.0.0/20&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.251.0.0/20&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609290019/screenshots/20.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609290019#20</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/15&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;Open 설명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/29&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/29&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/12.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#12</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0852-f08d-x&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0929-0852-f08d-xx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/13.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#13</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0852-f08_@#&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0929-0852-f08_@#&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/15.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#15</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;한글vpc-0929-0852-f08d&quot; → 입력 조건에 맞지 않습니다.20/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;한글vpc-0929-0852-f08d&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/16.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#16</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.입력 조건에 맞지 않습니다.0/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/18.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#18</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0929-0852-f08d&quot; → 입력 조건에 맞지 않습니다.18/20</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0929-0852-f08d&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.251.0.0/20&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.251.0.0/20&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609282352/screenshots/20.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609282352#20</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/15&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;Open 설명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/04.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">button &quot;서비스 정보&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/05.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#5</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">button &quot;Public Zone&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/07.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#7</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">button &quot;취소&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/08.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#8</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">button &quot;취소&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/09.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#9</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vp&quot; → 입력 조건에 맞지 않습니다.2/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;Open VPC명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0928-0850-9656-x&quot; → 입력 조건에 맞지 않습니다.20/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0928-0850-9656-xx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;Open IP 대역&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/12.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#12</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;탐색 0928-0850-9656&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/13.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#13</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0928-0850-965_@#&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/14.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#14</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;한글vpc-0928-0850-9656&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/15.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#15</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;한글vpc-0928-0850-9656&quot; → 입력 조건에 맞지 않습니다.20/20 | &quot;10.250.0.0/15&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;&lt;b&gt;bold&lt;/b&gt; &amp; \&quot;quote\&quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/16.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#16</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;한글vpc-0928-0850-9656&quot; → 입력 조건에 맞지 않습니다.20/20 | &quot;10.250.0.0/29&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.250.0.0/29&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/17.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#17</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;한글vpc-0928-0850-9656&quot; → 입력 조건에 맞지 않습니다.20/20 | &quot;10.251.0.0/20&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;IP 대역&quot; = &quot;10.251.0.0/20&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/18.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#18</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.필수값입니다.0/20 | &quot;10.251.0.0/20&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>vpc-form</td>
+        <td class="note">&quot;vpc-0928-0850-9656&quot; → 필수값입니다.18/20 | &quot;10.251.0.0/20&quot; → 사용할 수 없는 IP 대역입니다.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0928-0850-9656&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609272350/screenshots/20.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609272350#20</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">서비스 정보 입력 영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요. 0/20 Public Zone Public Zone의 Availability Zone(가용 영역)은 1-zone(kr-west1-b)으로 확장되어 생성됩니다. 일부 IP 대역은 관리용으로 사용할 수 없습</td>
+        <td class="small">button &quot;서비스 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">사용할 수 없는 IP 대역입니다. 17/50</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;탐색 0923-1654-49e5&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">654-49e5-x 영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.</td>
+        <td class="small">textbox &quot;VPC명&quot; = &quot;vpc-0923-1654-49e5-xx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/16.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#16</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">50/50 50자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/17.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#17</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">CIDR 형식으로 /16~/28 범위 내에서 입력하세요. ex) 192.168.0.0/16</td>
+        <td class="small">textbox &quot;Open IP 대역&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/18.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#18</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.</td>
+        <td class="small">textbox &quot;Open VPC명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230754/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230754#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">서비스 정보 입력 영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요. 0/20 Public Zone Public Zone의 Availability Zone(가용 영역)은 1-zone(kr-west1-b)으로 확장되어 생성됩니다. 일부 IP 대역은 관리용으로 사용할 수 없습</td>
+        <td class="small">button &quot;서비스 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230750/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230750#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vpc-form</td>
+        <td class="note">사용할 수 없는 IP 대역입니다. 17/50</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;탐색 0923-1650-ebcf&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vpc-form-202609230750/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">vpc-form-202609230750#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>volume-list</td>
+        <td class="note">입력 영문, 숫자, 공백과 특수문자(-_)를 사용하여 255자 이내로 입력하세요. 0/255 - SSD_Provisioned: IOPS, Throughput 설정이 가능한 SSD 볼륨 - SSD/HDD: 일반 SSD/HDD 볼륨 - SSD/HDD_KMS: 전송 암호화 볼륨(일반 볼륨</td>
+        <td class="small">button &quot;Block Storage 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/volume-list-202609231115/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">volume-list-202609231115#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>volume-list</td>
+        <td class="note">총 0 20개씩 보기 삭제 볼륨명을 입력하세요. 상세 검색 볼륨 ID 종류 생성 일시 상태 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요. ※ Available 상태의 볼륨 선택 시 볼륨 이전 버튼이 활성화 되며 동일한 리전 내에서 볼</td>
+        <td class="small">button &quot;취소&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/volume-list-202609231115/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">volume-list-202609231115#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-list</td>
+        <td class="note">S: 최소 5,000 IOPS, 최대 20,000 IOPS 사이의 값을 입력하세요. Throughput: 최소 250MB/s, 최대 1,000MB/s 값을 입력하세요. 기본 OS 정보 선택하세요. Units GB Delete on termination 추가 사용 Server Group</td>
+        <td class="small">button &quot;서비스 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-list-202609230957/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">vm-list-202609230957#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-list</td>
+        <td class="note">1~100 사이의 값을 입력하세요.</td>
+        <td class="small">textbox &quot;Open 서버 수&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-list-202609230957/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">vm-list-202609230957#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-list</td>
+        <td class="note">현재 0 10개씩 보기 상세 보기 정확한 Image명을 입력하세요. 상세 검색 Image명 OS 타입 Visibility Availability Zone 생성 일시 상태 데이터가 없습니다. Image별로 지원하는 Availability Zone이 다르므로 네트워크 설정</td>
+        <td class="small">button &quot;Custom&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-list-202609230957/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">vm-list-202609230957#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">1~100 사이의 값을 입력하세요.</td>
+        <td class="small">textbox &quot;서버 수&quot; = &quot;1&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609272325/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609272325#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">0 1~100 사이의 값을 입력하세요.</td>
+        <td class="small">textbox &quot;서버 수&quot; = &quot;0&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609272325/screenshots/08.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609272325#8</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">현재 0 10개씩 보기 상세 보기 정확한 Image명을 입력하세요. 상세 검색 Image명 OS 타입 Visibility Availability Zone 생성 일시 상태 데이터가 없습니다. Image별로 지원하는 Availability Zone이 다르므로 네트워크 설정</td>
+        <td class="small">button &quot;Custom&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609272325/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609272325#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">1~100 사이의 값을 입력하세요.</td>
+        <td class="small">textbox &quot;서버 수&quot; = &quot;1&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609230936/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609230936#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">0 1~100 사이의 값을 입력하세요.</td>
+        <td class="small">textbox &quot;서버 수&quot; = &quot;0&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609230936/screenshots/08.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609230936#8</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>vm-form</td>
+        <td class="note">현재 0 10개씩 보기 상세 보기 정확한 Image명을 입력하세요. 상세 검색 Image명 OS 타입 Visibility Availability Zone 생성 일시 상태 데이터가 없습니다. Image별로 지원하는 Availability Zone이 다르므로 네트워크 설정</td>
+        <td class="small">button &quot;Custom&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/vm-form-202609230936/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">vm-form-202609230936#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-list</td>
+        <td class="note">총 0 20개씩 보기 반납 Virtual IP를 입력하세요. 상세 검색 Virtual IP 예약 Virtual IP Public NAT IP 연결 Port 수 예약 일시 데이터가 없습니다.</td>
+        <td class="small">button &quot;Virtual IP 관리 (0)&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-list-202609231113/screenshots/04.jpg">화면</a></td>
+        <td class="mono small">subnet-list-202609231113#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-list</td>
+        <td class="note">10개씩 보기 검색어를 입력하세요. 태그 수정 Key Value</td>
+        <td class="small">button &quot;태그 (0)&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-list-202609231113/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">subnet-list-202609231113#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-list</td>
+        <td class="note">한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 48개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-list-202609231113/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">subnet-list-202609231113#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-list</td>
+        <td class="note">한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 현재 입력값을 key로 사용합니다.</td>
+        <td class="small">textbox &quot;한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요.&quot; = &quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-list-202609231113/screenshots/15.jpg">화면</a></td>
+        <td class="mono small">subnet-list-202609231113#15</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">검색어를 입력하세요. 신규 생성 vpc-0928-0822-e691 AZ: kr-west1-b</td>
+        <td class="small">button &quot;선택하세요.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609272322/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609272322#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">총 0 20개씩 보기 삭제 정확한 검색어를 입력하세요. 상세 검색 Subnet ID 생성 일시 상태 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요.</td>
+        <td class="small">button &quot;취소&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609272322/screenshots/04.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609272322#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">검색어를 입력하세요. 신규 생성 vpc-0923-1833-1bb2 AZ: kr-west1-b vpc-0923-1834-4b3d AZ: kr-west1-b</td>
+        <td class="small">button &quot;선택하세요.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609230934/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609230934#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">영문, 숫자와 특수문자(-)를 사용하여 3~20자로 입력하세요.</td>
+        <td class="small">textbox &quot;Open Subnet명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609230934/screenshots/07.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609230934#7</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">총 1 20개씩 보기 삭제 정확한 검색어를 입력하세요. 상세 검색 Subnet ID 생성 일시 상태 sub-0923-1833-1bb2 c3c4a6cf51c14a49a0ffbd7218a642ca 10.250.0.0/24 10.250.0.1 2026-09-23</td>
+        <td class="small">button &quot;확인&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609230934/screenshots/09.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609230934#9</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>subnet-form</td>
+        <td class="note">9f0 10.250.0.0/20 Active 자원 검색 정확한 검색어를 입력하세요. 최근 검색 내역이 없습니다. 자원을 검색하세요.</td>
+        <td class="small">button &quot;VPC&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/subnet-form-202609230914/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">subnet-form-202609230914#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'length')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-workload-202609280709#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'map')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-workload-202609280709#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;My Info.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-workload-202609280709/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-workload-202609280709#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-workload-202609280709#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;알림 목록&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-workload-202609280709/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">ske-workload-202609280709#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-workload</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-workload-202609280709#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'length')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-storage-202609280714#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'map')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-storage-202609280714#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;My Info.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-storage-202609280714/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-storage-202609280714#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-storage-202609280714#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;알림 목록&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-storage-202609280714/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">ske-storage-202609280714#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-storage</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-storage-202609280714#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'length')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-network-202609280711#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'map')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-network-202609280711#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;VPC&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-network-202609280711/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">ske-network-202609280711#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-network-202609280711#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;My Info.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-network-202609280711/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">ske-network-202609280711#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-network-202609280711#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;알림 목록&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-network-202609280711/screenshots/04.jpg">화면</a></td>
+        <td class="mono small">ske-network-202609280711#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-network</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-network-202609280711#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'length')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-configuration-202609280717#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'map')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-configuration-202609280717#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;My Info.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-configuration-202609280717/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-configuration-202609280717#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-configuration-202609280717#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;알림 목록&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-configuration-202609280717/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">ske-configuration-202609280717#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-configuration</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-configuration-202609280717#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>ske-cluster-list</td>
+        <td class="note">나지 않도록 소문자, 숫자와 특수문자(-)를 사용하여 3 ~ 30 자로 입력하세요. 0/30 제어 영역 설정 Kubernetes 버전 선택하세요. 프라이빗 엔드포인트 접근 허용 자원 해당 클러스터의 노드가 아닌 다른 자원에서 프라이빗 엔드포인트로 접근을 허용하려면, 접근이 필요한 자원을</td>
+        <td class="small">button &quot;서비스 생성&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-cluster-list-202609280701/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-cluster-list-202609280701#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>ske-cluster-list</td>
+        <td class="note">&quot;xp&quot; → 입력 조건에 맞지 않습니다.2/30</td>
+        <td class="small">button &quot;v1.36.3&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-cluster-list-202609280701/screenshots/04.jpg">화면</a></td>
+        <td class="mono small">ske-cluster-list-202609280701#4</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>ske-cluster-form</td>
+        <td class="note">&quot;xp&quot; → 입력 조건에 맞지 않습니다.2/30</td>
+        <td class="small">button &quot;v1.36.3&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-cluster-form-202609280647/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-cluster-form-202609280647#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-error</td>
+        <td>ske-cluster-form</td>
+        <td class="note">&quot;xp-0928-1547-de38-xxx&quot; → 입력 조건에 맞지 않습니다.21/30</td>
+        <td class="small">textbox &quot;클러스터명&quot; = &quot;xp-0928-1547-de38-xxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-cluster-form-202609280647/screenshots/16.jpg">화면</a></td>
+        <td class="mono small">ske-cluster-form-202609280647#16</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>ske-cluster-form</td>
+        <td class="note">20개씩 보기 서비스 해지 정확한 클러스터명을 입력하세요. 상세 검색 서비스 생성 노드 수 버전 상태 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요. 서비스 생성</td>
+        <td class="small">button &quot;확인&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-cluster-form-202609280647/screenshots/20.jpg">화면</a></td>
+        <td class="mono small">ske-cluster-form-202609280647#20</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'length')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-authorization-202609280719#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">TypeError: Cannot read properties of undefined (reading 'map')</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-authorization-202609280719#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;My Info.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-authorization-202609280719/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">ske-authorization-202609280719#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-authorization-202609280719#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">Failed to load resource: the server responded with a status of 404 (NOT FOUND)</td>
+        <td class="small">button &quot;알림 목록&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/ske-authorization-202609280719/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">ske-authorization-202609280719#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">console-error</td>
+        <td>ske-authorization</td>
+        <td class="note">AxiosError: Request failed with status code 404</td>
+        <td class="small"></td>
+        <td>검토 전</td>
+        <td></td>
+        <td class="mono small">ske-authorization-202609280719#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sgrp-form</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sgrp-form-202609272339/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">sgrp-form-202609272339#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sgrp-form</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sgrp-form-202609230950/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">sgrp-form-202609230950#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sg-form</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sg-form-202609230952/screenshots/05.jpg">화면</a></td>
+        <td class="mono small">sg-form-202609230952#5</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sg-form</td>
+        <td class="note">255자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Open Security Group명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sg-form-202609230952/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">sg-form-202609230952#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sg-form</td>
+        <td class="note">51/255 255자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;설명&quot; = &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sg-form-202609230952/screenshots/15.jpg">화면</a></td>
+        <td class="mono small">sg-form-202609230952#15</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sg-form</td>
+        <td class="note">한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 현재 입력값을 key로 사용합니다.</td>
+        <td class="small">textbox &quot;한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요.&quot; = &quot;&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sg-form-202609230952/screenshots/17.jpg">화면</a></td>
+        <td class="mono small">sg-form-202609230952#17</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>sg-form</td>
+        <td class="note">2/255 필수값입니다. 255자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Security Group명&quot; = &quot;sg&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/sg-form-202609230952/screenshots/18.jpg">화면</a></td>
+        <td class="mono small">sg-form-202609230952#18</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>rg-form</td>
+        <td class="note">선택하세요. 검색어를 입력하세요. quota:account-quota security-group:address-group aiml-brightix:aimlops-platform billingsystem:anomaly-data apigat</td>
+        <td class="small">button &quot;전체&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/rg-form-202609230955/screenshots/08.jpg">화면</a></td>
+        <td class="mono small">rg-form-202609230955#8</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>rg-form</td>
+        <td class="note">전체 검색어를 입력하세요. 전체 quota:account-quota security-group:address-group aiml-brightix:aimlops-platform billingsystem:anomaly-data api</td>
+        <td class="small">button &quot;선택하세요.&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/rg-form-202609230955/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">rg-form-202609230955#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>lc-form</td>
+        <td class="note">ed로 생성하기 현재 0 10개씩 보기 상세 보기 정확한 Image명을 입력하세요. 상세 검색 Image명 OS 타입 Visibility Image 유형 Availability Zone 생성 일시 상태 데이터가 없습니다. SSD_Provisioned 8GB</td>
+        <td class="small">button &quot;Custom&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/lc-form-202609231109/screenshots/03.jpg">화면</a></td>
+        <td class="mono small">lc-form-202609231109#3</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>lc-form</td>
+        <td class="note">영문, 숫자와 특수문자(-_)를 사용하여 63자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Open Launch Configuration명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/lc-form-202609231109/screenshots/17.jpg">화면</a></td>
+        <td class="mono small">lc-form-202609231109#17</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>lc-form</td>
+        <td class="note">총 0 20개씩 보기 삭제 Launch Configuration명을 입력하세요. Auto-Scaling Group 수 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요.</td>
+        <td class="small">button &quot;확인&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/lc-form-202609231109/screenshots/19.jpg">화면</a></td>
+        <td class="mono small">lc-form-202609231109#19</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>iam-group-form</td>
+        <td class="note">한글, 영문, 숫자와 특수문자(+=,.@-_)를 사용하여 3~24자로 입력하세요.</td>
+        <td class="small">textbox &quot;Open 사용자 그룹명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/iam-group-form-202609231105/screenshots/08.jpg">화면</a></td>
+        <td class="mono small">iam-group-form-202609231105#8</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>iam-group-form</td>
+        <td class="note">1,000자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Open 설명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/iam-group-form-202609231105/screenshots/11.jpg">화면</a></td>
+        <td class="mono small">iam-group-form-202609231105#11</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>bucket-form</td>
+        <td class="note">숫자로 시작하며 소문자, 숫자와 특수문자(-.)를 사용하여 3~63자로 입력하세요. - 마침표가 2개 이상 연속될 수 없습니다. - 마침표와 대시는 인접할 수 없습니다. - 마침표나 대시로 끝날 수 없습니다. - IP 형식을 사용할 수 없습니다. - 'admin'은 사용할 수 없습니다.</td>
+        <td class="small">textbox &quot;버킷명&quot; = &quot;xp-0923-2012-3201&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/bucket-form-202609231112/screenshots/01.jpg">화면</a></td>
+        <td class="mono small">bucket-form-202609231112#1</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>bucket-form</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/bucket-form-202609231112/screenshots/02.jpg">화면</a></td>
+        <td class="mono small">bucket-form-202609231112#2</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>bucket-form</td>
+        <td class="note">총 0 서비스 해지 버킷명을 대소문자 구분하여 입력하세요. 상세 검색 서비스 생성 서비스를 생성하세요. 다양한 서비스가 당신의 업무를 도와드려요. 서비스 생성</td>
+        <td class="small">button &quot;확인&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/bucket-form-202609231112/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">bucket-form-202609231112#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>bucket-form</td>
+        <td class="note">숫자로 시작하며 소문자, 숫자와 특수문자(-.)를 사용하여 3~63자로 입력하세요. - 마침표가 2개 이상 연속될 수 없습니다. - 마침표와 대시는 인접할 수 없습니다. - 마침표나 대시로 끝날 수 없습니다. - IP 형식을 사용할 수 없습니다. - 'admin'은 사용할 수 없습니다.</td>
+        <td class="small">textbox &quot;버킷명&quot; = &quot;xp&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/bucket-form-202609231112/screenshots/07.jpg">화면</a></td>
+        <td class="mono small">bucket-form-202609231112#7</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>addr-form</td>
+        <td class="note">ue 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/128 한글, 영문, 숫자, 공백과 특수문자(_.:/=+@-)를 사용하여 입력하세요. 0/256 49개 태그를 더 추가할 수 있습니다. (최대 50개)</td>
+        <td class="small">button &quot;태그 추가&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/addr-form-202609230953/screenshots/06.jpg">화면</a></td>
+        <td class="mono small">addr-form-202609230953#6</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>addr-form</td>
+        <td class="note">시작하며 영문, 숫자와 특수문자(-또는_)를 사용하여 100자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Open Address Group명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/addr-form-202609230953/screenshots/10.jpg">화면</a></td>
+        <td class="mono small">addr-form-202609230953#10</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>addr-form</td>
+        <td class="note">255자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Open 설명&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/addr-form-202609230953/screenshots/12.jpg">화면</a></td>
+        <td class="mono small">addr-form-202609230953#12</td>
+      </tr>
+<tr class="fd" data-st="검토 전" data-sev="정보">
+        <td><span class="badge info">정보</span></td>
+        <td class="mono small">validation-text</td>
+        <td>addr-form</td>
+        <td class="note">시작하며 영문, 숫자와 특수문자(-또는_)를 사용하여 100자 이내로 입력하세요.</td>
+        <td class="small">textbox &quot;Address Group명&quot; = &quot;sg-0923-1853-e1aa-xxx&quot;</td>
+        <td>검토 전</td>
+        <td><a class="att" href="../recordings/explore/addr-form-202609230953/screenshots/13.jpg">화면</a></td>
+        <td class="mono small">addr-form-202609230953#13</td>
+      </tr></tbody></table></details>
 </section>
 
 <section id="explore">
@@ -2354,12 +3709,108 @@
 </section>
 
 <section id="runs">
-  <h2>실행 기록 <small>최신 60건 / 전체 485건</small></h2>
+  <h2>실행 기록 <small>최신 60건 / 전체 497건</small></h2>
   <div class="filters">보기:
     <button data-st="all" class="on">전체</button><button data-st="pass">통과</button><button data-st="product">제품 결함</button><button data-st="unclassified">미분류</button><button data-st="cleanup">정리 실패</button><button data-st="test">테스트 코드</button><button data-st="flaky">간헐(재시도 통과)</button><button data-st="environment">환경</button>
   </div>
   <table id="runs-t"><thead><tr><th>시작</th><th>spec</th><th>결과</th><th class="num">소요</th><th>스위트</th><th>실패 단계 · 오류 · 첨부</th></tr></thead>
   <tbody><tr class="run pass" data-status="pass">
+        <td>2026-10-06 19:33</td>
+        <td class="mono">networking.private-dns</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">6분 0초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run fail" data-status="unclassified">
+        <td>2026-10-06 19:31</td>
+        <td class="mono">networking.cloud-wan-network</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td class="num">1분 44초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: page.waitForURL: Timeout 20000ms exceeded.</summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: page.waitForURL: Timeout 20000ms exceeded.</details><div><a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run fail" data-status="unclassified">
+        <td>2026-10-06 19:29</td>
+        <td class="mono">networking.cloud-wan-network</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td class="num">1분 41초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: page.waitForURL: Timeout 20000ms exceeded.</summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: page.waitForURL: Timeout 20000ms exceeded.</details><div><a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run fail" data-status="unclassified">
+        <td>2026-10-06 19:29</td>
+        <td class="mono">networking.cloud-wan-network</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td class="num">6초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>SyntaxError: C:\jev\scp-console-tests\tests\regression\networking.cloud-wan-network.spec.ts: Unexpected token, expected &quot;,&quot; (25:32)</summary>SyntaxError: C:\jev\scp-console-tests\tests\regression\networking.cloud-wan-network.spec.ts: Unexpected token, expected &quot;,&quot; (25:32)</details></td>
+      </tr>
+<tr class="run fail" data-status="unclassified">
+        <td>2026-10-06 19:27</td>
+        <td class="mono">networking.cloud-wan-network</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-unclassified">미분류</span></td>
+        <td class="num">1분 46초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: locator.click: Timeout 15000ms exceeded.</summary>[steps[2] 상세에서 설명을 수정하고 태그 qa-tag 를 추가한 뒤 삭제한다] TimeoutError: locator.click: Timeout 15000ms exceeded.</details><div><a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md" title="test-results/artifacts/networking.cloud-wan-network/networking.cloud-wan-netwo-899fb-제-Cloud-WAN-Network-생성-후-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-06 19:27</td>
+        <td class="mono">networking.direct-connect</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">5분 46초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-06 19:24</td>
+        <td class="mono">devops-tools.devops-service</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 44초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run fail" data-status="flaky">
+        <td>2026-10-06 19:22</td>
+        <td class="mono">devops-tools.devops-service</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1분 38초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[2] 동작] TimeoutError: locator.click: Timeout 15000ms exceeded.</summary>[steps[2] 동작] TimeoutError: locator.click: Timeout 15000ms exceeded.</details><div><a class="att" href="../test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/trace.zip" title="test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/error-context.md" title="test-results/artifacts/devops-tools.devops-service/devops-tools.devops-servic-29fb8-vOps-Service-Tenant-생성-후-해지-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run fail" data-status="flaky">
+        <td>2026-10-06 19:20</td>
+        <td class="mono">networking.direct-connect</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">6분 1초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[6] Private NAT pnat-1006-1921-170b 설명 수정·되돌림 + IP 관리에서 NAT IP 192.168.100.10 추가·삭제 (L3)] Error: FAIL_AFTER_NAT_IP=1: NAT IP 예약 직후 의도적</summary>[steps[6] Private NAT pnat-1006-1921-170b 설명 수정·되돌림 + IP 관리에서 NAT IP 192.168.100.10 추가·삭제 (L3)] Error: FAIL_AFTER_NAT_IP=1: NAT IP 예약 직후 의도적 실패</details><div><a class="att" href="../test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/screenshot-networking.direct-connect.png" title="test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/screenshot-networking.direct-connect.png">screenshot-networking.direct-connect.png</a> <a class="att" href="../test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/trace.zip" title="test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/error-context.md" title="test-results/artifacts/networking.direct-connect/networking.direct-connect--27c39-→-Private-NAT-생성·삭제-→-역순-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-06 19:20</td>
+        <td class="mono">iam.saml-provider</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 24초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run fail" data-status="flaky">
+        <td>2026-10-06 19:16</td>
+        <td class="mono">iam.saml-provider</td>
+        <td><span class="badge fail">FAIL(unclassified)</span> <span class="cause c-flaky">간헐(재시도 통과)</span></td>
+        <td class="num">1분 33초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary>[steps[3] 메타데이터를 entityID 가 다른 더미 문서로 교체한다] Error: 첨부한 새 메타데이터 파일이 모달에 보여야 합니다</summary>[steps[3] 메타데이터를 entityID 가 다른 더미 문서로 교체한다] Error: 첨부한 새 메타데이터 파일이 모달에 보여야 합니다</details><div><a class="att" href="../test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/screenshot-simple-crud.ts.png" title="test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/screenshot-simple-crud.ts.png">screenshot-simple-crud.ts.png</a> <a class="att" href="../test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/trace.zip" title="test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/trace.zip">trace.zip</a> <a class="att" href="../test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/error-context.md" title="test-results/artifacts/iam.saml-provider/iam.saml-provider-IAM-자격-증-178a2--IAM-자격-증명-공급자-SAML-생성-후-삭제-regression/error-context.md">error-context.md</a></div></td>
+      </tr>
+<tr class="run pass" data-status="pass">
+        <td>2026-10-06 19:14</td>
+        <td class="mono">iam.saml-provider</td>
+        <td><span class="badge pass">PASS</span></td>
+        <td class="num">1분 15초</td>
+        <td class="mono small"></td>
+        <td class="err"><details><summary></summary></details></td>
+      </tr>
+<tr class="run pass" data-status="pass">
         <td>2026-10-06 16:31</td>
         <td class="mono">networking.private-dns</td>
         <td><span class="badge pass">PASS</span></td>
@@ -2742,102 +4193,6 @@
         <td class="num">20분 5초</td>
         <td class="mono small">S20261006-1401</td>
         <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 15:18</td>
-        <td class="mono">compute.auto-scaling-group</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">14분 54초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 15:14</td>
-        <td class="mono">database.cachestore</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">15분 37초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 15:13</td>
-        <td class="mono">networking.vpc-port</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">15분 54초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 15:05</td>
-        <td class="mono">compute.vm-volume</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">18분 42초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:47</td>
-        <td class="mono">networking.privatelink-service</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">26분 13초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:47</td>
-        <td class="mono">compute.vm-stack</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">26분 42초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:46</td>
-        <td class="mono">networking.load-balancer</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">33분 43초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:45</td>
-        <td class="mono">data-analytics.event-streams</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">19분 7초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:45</td>
-        <td class="mono">networking.cdn</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">33분 7초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:11</td>
-        <td class="mono">container.ske-cluster</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">34분 36초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:11</td>
-        <td class="mono">database.epas</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">33분 25초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
-      </tr>
-<tr class="run pass" data-status="pass">
-        <td>2026-10-06 14:11</td>
-        <td class="mono">database.mariadb</td>
-        <td><span class="badge pass">PASS</span></td>
-        <td class="num">36분 32초</td>
-        <td class="mono small">S20261006-1401</td>
-        <td class="err"><details><summary></summary></details></td>
       </tr></tbody></table>
 </section>
 
@@ -2852,6 +4207,7 @@
       var b = ev.target.closest('button'); if (!b) return;
       box.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
       if (b.dataset.st !== undefined) document.querySelectorAll('#runs-t tr.run').forEach(function (tr) { tr.style.display = b.dataset.st === 'all' || tr.dataset.status === b.dataset.st ? '' : 'none'; });
+      if (b.dataset.fs !== undefined) document.querySelectorAll('#fd-t tr.fd').forEach(function (tr) { tr.style.display = b.dataset.fs === 'all' || tr.dataset.st === b.dataset.fs ? '' : 'none'; });
       if (b.dataset.lv !== undefined) document.querySelectorAll('#res tr.res').forEach(function (tr) { tr.style.display = b.dataset.lv === 'all' || tr.dataset.level === b.dataset.lv ? '' : 'none'; });
     });
   });

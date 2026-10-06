@@ -74,8 +74,8 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Management | servicewatch dashboards · log-groups · log-streams · event-rules · alerts | management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert | ✅ |
 | Management | network-logging storages | management.network-logging (버킷 체인, Firewall Logging 적용·해제) | ✅ |
 | Management | loggingaudit trails (createtrail 201 · stoptrail · deletetrail) | management.trail (버킷 → Trail → 중지 L3 → 삭제 → 버킷 해지, 2026-10-06) | ✅ |
-| Management | iam identity-providers (SAML) | iam.saml-provider (더미 메타데이터, 역할 신뢰 없음, 2026-10-06) | ✅ |
-| DevOps Tools | devopsservice (API createdevopsservice 409) | devops-tools.devops-service (콘솔은 생성·해지 됨, 2026-10-06) | ✅ |
+| Management | iam identity-providers (SAML) | iam.saml-provider (더미 메타데이터, 역할 신뢰 없음, 2026-10-06) · 설명 수정·메타데이터 교체(L3, 10-06) | ✅ |
+| DevOps Tools | devopsservice (API createdevopsservice 409) | devops-tools.devops-service (콘솔은 생성·해지 됨, 2026-10-06) · 태그 추가·삭제(L3, 10-06) | ✅ |
 | Management | organization OU · control-policy (API 403) | — | ⏭ 콘솔도 "권한 없음"(조직 마스터 필요) |
 | Security | secretvault (API 400) · configinspection (API 400) | — | ⏭ 월 예상 요금(₩39,904 · ₩77,400)·계정 인증키 묶임/설정 변경 필요 |
 | Compute | keypairs (UI 생성) | — | ⏭ 콘솔 생성은 .pem 다운로드 필수(가져오기 없음), Edge 종료 위험 |
