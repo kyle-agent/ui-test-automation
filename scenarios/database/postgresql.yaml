@@ -52,6 +52,14 @@ steps:
       not_text: ["{{replica}}"]
       timeout: 1800000
 
+  # 2026-10-07 6차(에이전트 6A): 상세 공통 동작. 코드상 Replica 단계(steps[3]·[4]) 보다 먼저 실행한다(src/console/dbaas.ts ops).
+  # 서비스 상태 동기화 · 재시작 · 백업 켬(Replica 전제) · 유지 관리 기간 켬→끔 · Audit Log 켬→끔 · IP 접근 제어 추가→삭제 ·
+  # Parameter 조회·cpu_tuple_cost 0.01→0.02→0.01 · Archive 조회·보관기간 3→4→3 · 중지→시작. 모두 Running 으로 돌아온다.
+  - goal: "클러스터 {{name}} 상세에서 동기화·재시작·백업·유지 관리 기간·Audit Log·IP 접근 제어·Parameter·Archive·중지/시작을 하고 되돌린다"
+    expect:
+      url: "#/postgresql/postgresql/list"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:

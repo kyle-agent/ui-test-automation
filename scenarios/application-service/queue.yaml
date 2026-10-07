@@ -18,7 +18,8 @@ steps:
     expect:
       url: "#/queueservice/queueservices"
 
-  - goal: "Queue {{name}} 을 기본 유형·기본 설정으로 생성한다"
+  # 2026-10-07 6차: 유형 FIFO(중복 제거 설정은 FIFO 에만 있다). FIFO Queue명은 ".fifo" 로 끝나야 해 실제 이름은 {{name}}.fifo.
+  - goal: "Queue {{name}}.fifo 를 FIFO 유형·기본 설정으로 생성한다"
     vars:
       name: "que-{{run_id}}"
     expect:
@@ -35,6 +36,12 @@ steps:
     expect:
       url: "#/queueservice/queueservices/detail"
       not_text: ["192.0.2.10/32"]
+
+  # 6차(2026-10-07): API updatequeuedescription · updatequeuededuplicationscope · updatequeuededuplication
+  - goal: "설명을 수정하고, 중복 제거 범위를 그룹 단위의 메시지로 바꿨다 되돌리고, 컨텐츠 기반 중복 제거를 켰다 끈다"
+    expect:
+      url: "#/queueservice/queueservices/detail"
+      text: ["scp-console-tests", "대기열 내 메시지"]
 
 teardown:
   - goal: "Queue {{name}} 을 해지한다"

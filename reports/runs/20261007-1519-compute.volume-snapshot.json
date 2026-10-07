@@ -1,0 +1,47 @@
+{
+  "spec": "compute.volume-snapshot",
+  "started": "2026-10-07T06:19:10.855Z",
+  "ended": "2026-10-07T06:23:43.314Z",
+  "seconds": 272,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.volume-snapshot",
+    "run_id": "1007-1519-efa3",
+    "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 22.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Block Storage 볼륨 스냅샷 생성·복구·삭제",
+      "status": "passed",
+      "seconds": 233.6,
+      "annotations": {
+        "scenario": "compute.volume-snapshot",
+        "run_id": "1007-1519-efa3",
+        "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Block Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.5
+        },
+        {
+          "title": "steps[1] snap-1007-1519-efa3 생성",
+          "status": "pass",
+          "seconds": 170.5
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

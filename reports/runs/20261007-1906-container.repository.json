@@ -1,0 +1,72 @@
+{
+  "spec": "container.repository",
+  "started": "2026-10-07T10:06:26.038Z",
+  "ended": "2026-10-07T10:21:55.173Z",
+  "seconds": 929,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.repository",
+    "run_id": "1007-1906-ed1c",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Registry 위에 Repository 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 895.7,
+      "annotations": {
+        "scenario": "container.repository",
+        "run_id": "1007-1906-ed1c",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] Registry cr10071906ed1c 생성",
+          "status": "pass",
+          "seconds": 421.9
+        },
+        {
+          "title": "steps[2] Repository repo-1007-1906-ed1c 생성",
+          "status": "pass",
+          "seconds": 25.7
+        },
+        {
+          "title": "steps[3] 이미지 태그 삭제 정책(Untagged Image 90일 + 삭제 정책 활성화)을 켰다가 끈다",
+          "status": "pass",
+          "seconds": 56.6
+        },
+        {
+          "title": "steps[4] 이미지 잠금 여부를 Lock 으로 바꿨다가 Unlock 으로 되돌린다",
+          "status": "pass",
+          "seconds": 40.3
+        },
+        {
+          "title": "steps[5] 설명을 수정하고 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 40.4
+        },
+        {
+          "title": "steps[6] 이미지 pull 제한(스캔되지 않은 이미지)과 이미지 자동 스캔을 켰다가 끈다",
+          "status": "pass",
+          "seconds": 86.1
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

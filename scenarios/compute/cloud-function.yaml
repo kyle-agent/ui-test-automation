@@ -21,12 +21,37 @@ steps:
     expect:
       url: "#/scf/cloudfunctions"
 
-  - goal: "Function {{name}} 을 새로 작성(Node.js 기본 런타임)으로 생성하고, Cronjob 트리거(매분)를 추가해 실행 로그를 확인한 뒤 트리거를 삭제한다"
+  - goal: "Function {{name}} 을 새로 작성(Node.js 기본 런타임)으로 생성하고, Cronjob 트리거(매분)를 추가해 실행 로그를 확인한 뒤 트리거를 5분마다로 수정하고 삭제한다"
     vars:
       name: "fn-{{run_id}}"
     expect:
       url: "#/scf/cloudfunctions"
       text: ["{{name}}"]
+
+  # 6차(2026-10-07, 에이전트 6D): 상세 "구성" 탭 하위 메뉴(일반 구성 · 함수 URL · 환경 변수 · Private 연결 구성 · 권한)와 "코드" 탭 수정.
+  - goal: "구성 > 일반 구성에서 제한시간을 60초 → 90초로 바꿨다가 60초로 되돌린다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
+
+  - goal: "구성 > 함수 URL 활성화를 사용으로 켰다가 미사용으로 끈다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
+
+  - goal: "구성 > 환경 변수 QA_RUN 을 추가했다가 삭제한다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
+
+  - goal: "코드 탭 인라인 편집기에서 주석 한 줄을 더해 저장하고 코드 탭에 반영됐는지 확인한다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
+
+  - goal: "구성 > 권한에서 리소스 정책(템플릿 API Gateway 허용 목록)을 추가했다가 삭제한다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
+
+  - goal: "구성 > Private 연결 구성에서 PrivateLink Service 를 사용으로 켰다가 미사용으로 끈다"
+    expect:
+      url: "#/scf/cloudfunctions/detail"
 
 teardown:
   - goal: "Function {{name}} 을 해지한다"

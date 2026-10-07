@@ -69,6 +69,25 @@ steps:
       text: ["{{vm}}"]
       timeout: 300000
 
+  # 6차(2026-10-07 6B): API 쓰기 동작 확대 — 서버 동작(오래 걸리는 것)을 이 spec 에 모았다
+  - goal: "서버 {{vm}} 상세에서 Public NAT IP 를 해제하고 Public IP 가 Reserved 로 돌아오는지 확인한다"
+    expect:
+      url: "#/vpc/public-ip/list"
+
+  - goal: "서버 {{vm}} 을 재시작하고 Active 로 돌아오는지 확인한다"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+
+  - goal: "서버 {{vm}} 을 중지하고 기본 포트 IP 를 .50 으로 바꿨다 되돌린 뒤, 서버 타입을 s1v2m4 로 바꾸고 다시 시작한다"
+    expect:
+      url: "#/virtualserver/virtualserver/list"
+      text: ["{{vm}}"]
+
+  - goal: "서버 {{vm}} 상세 더보기 메뉴의 Rebuild 로 같은 Image 로 다시 설치하고 Active 로 돌아오는지 확인한다"
+    expect:
+      text: ["{{vm}}"]
+
 # 정리 순서: 서버를 먼저 해지하면 포트·static NAT 가 함께 사라져 Public IP 가 Reserved 로 돌아온다 → 반납 → IGW → Subnet → VPC → SG.
 teardown:
   - goal: "서버 {{vm}} 을 해지하고 소멸을 기다린다"

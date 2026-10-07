@@ -1,0 +1,100 @@
+{
+  "spec": "security.kms-key",
+  "started": "2026-10-07T06:36:11.117Z",
+  "ended": "2026-10-07T06:39:28.625Z",
+  "seconds": 198,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "security.kms-key",
+    "run_id": "1007-1536-7797",
+    "title": "고객 관리형 키 목록 | Key Management Service | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "KMS 고객 관리형 키 생성 후 즉시 해지",
+      "status": "failed",
+      "seconds": 148,
+      "annotations": {
+        "scenario": "security.kms-key",
+        "run_id": "1007-1536-7797",
+        "title": "고객 관리형 키 목록 | Key Management Service | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] KMS 키 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.6
+        },
+        {
+          "title": "steps[1] kms100715367797 생성",
+          "status": "pass",
+          "seconds": 22
+        },
+        {
+          "title": "steps[2] 키 회전으로 현재 버전이 1 → 2 가 되는지 확인한다",
+          "status": "pass",
+          "seconds": 4.5
+        },
+        {
+          "title": "steps[3] 키를 비활성화(Stop)했다가 다시 활성화(Active)한다",
+          "status": "pass",
+          "seconds": 4
+        },
+        {
+          "title": "steps[4] 설명을 scp-console-tests {{run_id}} 로 수정한다",
+          "status": "pass",
+          "seconds": 10.3
+        },
+        {
+          "title": "steps[5] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 15.2
+        },
+        {
+          "title": "steps[6] 자동 회전 주기를 90일 → 60일 → 90일로 바꿨다가 되돌린다",
+          "status": "fail",
+          "seconds": 71.6
+        }
+      ],
+      "error": "Error: \"다음 회전일\" 값이 60초 안에 바뀌지 않았습니다. 마지막: 90일(2027-01-05 (Asia/Seoul, GMT +09:00))",
+      "attachments": [
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-8.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-3.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-4.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-6.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-2.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-5.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-7.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-1.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/error-context.md",
+        "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "Error: \"다음 회전일\" 값이 60초 안에 바뀌지 않았습니다. 마지막: 90일(2027-01-05 (Asia/Seoul, GMT +09:00))",
+  "attachments": [
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-8.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-3.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-4.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-6.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-2.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-5.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-7.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/test-failed-1.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/error-context.md",
+    "test-results/artifacts/security.kms-key/security.kms-key-KMS-고객-관리-14027--해지-KMS-고객-관리형-키-생성-후-즉시-해지-regression/trace.zip"
+  ]
+}

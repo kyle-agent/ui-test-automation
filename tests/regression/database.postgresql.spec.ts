@@ -15,4 +15,6 @@ defineDbaasSpec({
     { label: 'Database Port번호', value: '5432' },
   ],
   replica: true, // 2026-09-30: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4])
+  // 2026-10-07 6차: 상세 공통 동작(steps[5], Replica 전에 실행)
+  ops: ['backup', 'parameter', 'archive', 'sync', 'restart', 'maintenance', 'audit', 'ipAcl', 'stopStart'],
 });

@@ -26,6 +26,11 @@ steps:
       url: "#/service-watch/dashboard"
       text: ["{{name}}"]
 
+  # 6C(2026-10-07): 상세 "수정" → 편집 화면 위젯 영역 제목 변경 → 저장 (setdashboard)
+  - goal: "대시보드를 수정해 위젯 영역 제목을 qa-{{run_id}} 로 바꿔 저장한다"
+    expect:
+      text: ["qa-{{run_id}}"]
+
 teardown:
   - goal: "대시보드 {{name}} 을 삭제한다"
     expect:

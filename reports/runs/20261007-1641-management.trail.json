@@ -1,0 +1,72 @@
+{
+  "spec": "management.trail",
+  "started": "2026-10-07T07:41:46.691Z",
+  "ended": "2026-10-07T07:44:19.874Z",
+  "seconds": 153,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.trail",
+    "run_id": "1007-1642-0c4b",
+    "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Logging&Audit Trail 생성 → 중지 → 삭제 (버킷 체인)",
+      "status": "passed",
+      "seconds": 127.3,
+      "annotations": {
+        "scenario": "management.trail",
+        "run_id": "1007-1642-0c4b",
+        "title": "Object Storage 목록 | Object Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Trail 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.4
+        },
+        {
+          "title": "steps[1] 버킷 bkt-1007-1642-0c4b 생성",
+          "status": "pass",
+          "seconds": 19.4
+        },
+        {
+          "title": "steps[2] Trail trl-1007-1642-0c4b 생성",
+          "status": "pass",
+          "seconds": 23.4
+        },
+        {
+          "title": "steps[3] Trail trl-1007-1642-0c4b 중지",
+          "status": "pass",
+          "seconds": 7
+        },
+        {
+          "title": "steps[4] Trail trl-1007-1642-0c4b 다시 시작",
+          "status": "pass",
+          "seconds": 7.2
+        },
+        {
+          "title": "steps[5] Trail trl-1007-1642-0c4b 설정 수정",
+          "status": "pass",
+          "seconds": 10.9
+        },
+        {
+          "title": "steps[6] Trail trl-1007-1642-0c4b 삭제",
+          "status": "pass",
+          "seconds": 21.4
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

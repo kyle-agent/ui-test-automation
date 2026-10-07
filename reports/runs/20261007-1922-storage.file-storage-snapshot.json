@@ -1,0 +1,47 @@
+{
+  "spec": "storage.file-storage-snapshot",
+  "started": "2026-10-07T10:22:22.253Z",
+  "ended": "2026-10-07T10:25:59.796Z",
+  "seconds": 218,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "storage.file-storage-snapshot",
+    "run_id": "1007-1922-49cb",
+    "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "File Storage 스냅샷 생성 후 삭제",
+      "status": "passed",
+      "seconds": 189.3,
+      "annotations": {
+        "scenario": "storage.file-storage-snapshot",
+        "run_id": "1007-1922-49cb",
+        "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] File Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.7
+        },
+        {
+          "title": "steps[1] fss_1007192249cb 생성",
+          "status": "pass",
+          "seconds": 141.8
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

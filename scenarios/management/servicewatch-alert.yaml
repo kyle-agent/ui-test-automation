@@ -27,6 +27,19 @@ steps:
       url: "#/service-watch/alert/policy"
       text: ["{{name}}"]
 
+  # 6C(2026-10-07): 상세 설명 연필, 비활성화→활성화, "수정" 화면 임계값 999→998
+  - goal: "경보 정책 설명을 scp-console-tests {{run_id}} 로 수정한다"
+    expect:
+      text: ["scp-console-tests {{run_id}}"]
+
+  - goal: "경보 정책을 비활성화했다가 다시 활성화한다"
+    expect:
+      text: ["비활성화"]
+
+  - goal: "경보 정책 수정 화면에서 임계값을 998 로 바꾼다"
+    expect:
+      text: ["998"]
+
 teardown:
   - goal: "경보 정책 {{name}} 을 삭제한다"
     expect:

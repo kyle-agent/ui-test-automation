@@ -1,0 +1,12 @@
+{
+  "spec": "management.servicewatch-alert",
+  "started": "2026-10-07T07:01:49.759Z",
+  "ended": "2026-10-07T07:02:00.031Z",
+  "seconds": 10,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [],
+  "git_sha": "c4d43e6",
+  "error": "SyntaxError: C:\\jev\\scp-console-tests\\tests\\regression\\management.servicewatch-alert.spec.ts: Invalid regular expression flag. (25:127)"
+}

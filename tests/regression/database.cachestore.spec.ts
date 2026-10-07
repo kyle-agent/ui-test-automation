@@ -13,4 +13,6 @@ defineDbaasSpec({
     { label: 'Redis Port 번호', value: '6379' },
   ],
   uncheck: ['고가용성', '백업', 'ServiceWatch 로그 수집'],
+  // 2026-10-07 6차: 상세 공통 동작(steps[3])
+  ops: ['sync', 'restart', 'backup', 'maintenance', 'ipAcl', 'stopStart'],
 });

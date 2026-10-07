@@ -38,6 +38,16 @@ steps:
     expect:
       text: ["{{name}}"]
 
+  # 6C(2026-10-07): 중지 뒤 다시 시작(starttrail), 상세 설정 수정(settrail)
+  - goal: "Trail {{name}} 을 상세에서 다시 시작한다 (Active)"
+    expect:
+      url: "#/loggingaudit/trail"
+      text: ["{{name}}"]
+
+  - goal: "Trail {{name}} 상세에서 설명을 바꾸고 저장 형식을 CSV 로 바꾼다"
+    expect:
+      text: ["scp-console-tests {{run_id}}", "CSV"]
+
   - goal: "Trail {{name}} 을 상세에서 삭제한다"
     expect:
       url: "#/loggingaudit/trail"

@@ -1,0 +1,104 @@
+{
+  "spec": "compute.cloud-function",
+  "started": "2026-10-07T07:24:31.190Z",
+  "ended": "2026-10-07T07:27:18.331Z",
+  "seconds": 167,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.cloud-function",
+    "run_id": "1007-1625-422b",
+    "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud Function 생성 후 해지",
+      "status": "failed",
+      "seconds": 119,
+      "annotations": {
+        "scenario": "compute.cloud-function",
+        "run_id": "1007-1625-422b",
+        "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Function 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] fn-1007-1625-422b 생성",
+          "status": "pass",
+          "seconds": 20.3
+        },
+        {
+          "title": "steps[2] 구성 > 일반 구성에서 제한시간을 60초 → 90초로 바꿨다가 60초로 되돌린다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[3] 구성 > 함수 URL 활성화를 사용으로 켰다가 미사용으로 끈다",
+          "status": "pass",
+          "seconds": 4.1
+        },
+        {
+          "title": "steps[4] 구성 > 환경 변수 QA_RUN 을 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 4.1
+        },
+        {
+          "title": "steps[5] 코드 탭 인라인 편집기에서 주석 한 줄을 더해 저장하고 코드 탭에 반영됐는지 확인한다",
+          "status": "pass",
+          "seconds": 0
+        },
+        {
+          "title": "steps[6] 구성 > 권한에서 리소스 정책을 추가했다가 삭제한다",
+          "status": "fail",
+          "seconds": 42.6
+        }
+      ],
+      "error": "Error: PROBE 리소스 정책 fn-1007-1625-422b",
+      "attachments": [
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-10.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-8.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-9.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "Error: PROBE 리소스 정책 fn-1007-1625-422b",
+  "attachments": [
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-10.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-8.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-9.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip"
+  ]
+}

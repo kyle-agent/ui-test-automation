@@ -48,6 +48,12 @@ steps:
       url: "#/scr/repository/detail"
       text: ["태그 (0)"]
 
+  # 6차(2026-10-07, 6D): API updaterepositorypullpolicy · updaterepositoryscanpolicy
+  - goal: "이미지 pull 제한(스캔되지 않은 이미지)과 이미지 자동 스캔을 켰다가 끈다"
+    expect:
+      url: "#/scr/repository/detail"
+      text: ["미사용"]
+
 teardown:
   - goal: "Repository {{name}} 을 삭제한다"
     expect:

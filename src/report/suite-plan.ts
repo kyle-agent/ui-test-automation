@@ -20,12 +20,12 @@ export const DEFAULT_PLAN: SpecPlan = { vpc: 0, minutes: 3 };
 export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpc.create-delete': { vpc: 1, minutes: 1 },
   'compute.vm-stack': { vpc: 1, minutes: 27 }, // 09-30 Image·포트·Dump 단계 추가 (에이전트 C), 10-07 상세 수정(L3, 5L) 포함 실측 26분
-  'compute.vm-volume': { vpc: 1, minutes: 16.5 },
-  'compute.vm-stack-net': { vpc: 1, minutes: 14.5 },
+  'compute.vm-volume': { vpc: 1, minutes: 23.5 }, // 10-07 Delete on termination 변경(6B) 포함 실측 23분
+  'compute.vm-stack-net': { vpc: 1, minutes: 27 }, // 10-07 NAT 해제·재시작·IP 변경·타입 변경·Rebuild(6B) 포함 실측 26.5분
   'compute.server-group': { vpc: 0, minutes: 1.5 },
   'security.address-group': { vpc: 0, minutes: 1.5 },
   'storage.object-storage-bucket': { vpc: 0, minutes: 1.5 },
-  'management.resource-group': { vpc: 0, minutes: 1 },
+  'management.resource-group': { vpc: 0, minutes: 3 }, // 6C 2026-10-07 태그 단계 추가 실측 2.8분
   'iam.user-group': { vpc: 0, minutes: 1 },
   'compute.launch-configuration': { vpc: 0, minutes: 1.5 },
   'networking.vpc-port': { vpc: 1, minutes: 15.5 }, // VIP·Port 연결·Public NAT 단계 포함(2026-09-30, IGW·Public IP 도 만든다)
@@ -37,13 +37,13 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'compute.auto-scaling-group': { vpc: 1, minutes: 15 },
   'networking.vpc-peering': { vpc: 2, minutes: 14 }, // 규칙 단계 포함(2026-09-30), VPC 2개
   'container.ske-cluster': { vpc: 1, minutes: 39 }, // 노드 풀 단계 포함(2026-09-30). 10-07 에이전트 SKE: 노드 수 1→2→1·레이블·테인트·ServiceWatch 로그 수집(L4) 포함 실측 38.5분
-  'database.postgresql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분)
+  'database.postgresql': { vpc: 0, shared: true, minutes: 72 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분) · 10-07 상세 동작 9종 추가(6A, 단독 72분)
   'database.mysql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C)
   'database.mariadb': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
   'database.epas': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
-  'database.cachestore': { vpc: 0, shared: true, minutes: 15.5 },
+  'database.cachestore': { vpc: 0, shared: true, minutes: 38 }, // 10-07 상세 동작 6종 추가(6A, 단독 38분)
   // 2026-09-29 커버리지 확장(단독 통과 실측). 나머지(queue·notification-group·cloud-function·certificate)는 기본값 3분
-  'container.repository': { vpc: 0, minutes: 11, lock: 'private-registry' }, // 3C 2026-10-06 L3 단계 포함 실측 10.7분. 프라이빗 레지스트리 쿼터 1 — registry spec 과 동시 실행 불가
+  'container.repository': { vpc: 0, minutes: 16, lock: 'private-registry' }, // 6D 2026-10-07 pull 제한·자동 스캔 켬/끔 포함 실측 15.5분. // 3C 2026-10-06 L3 단계 포함 실측 10.7분. 프라이빗 레지스트리 쿼터 1 — registry spec 과 동시 실행 불가
   'container.container-registry': { vpc: 0, minutes: 14, lock: 'private-registry' }, // 3C 2026-10-06 엔드포인트 변경(Editing 2회) 포함 실측 13.8분
   'iam.role': { vpc: 0, minutes: 4.5 },
   // 에이전트 B(네트워킹): 모두 자기 VPC 1개. load-balancer 는 본 단계 실측 11분, 나머지는 콘솔 프로브 시간으로 추정(아직 SUITE_ORDER 밖)
@@ -53,12 +53,12 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpn': { vpc: 1, minutes: 11 }, // Gateway·Tunnel 수정(L3) 포함 실측 10.5분(2026-10-06)
   'networking.vpc-endpoint': { vpc: 1, minutes: 5 }, // 설명 수정(L3) 포함 실측 4분(2026-10-06)
   'networking.direct-connect': { vpc: 1, minutes: 6.5 }, // Private NAT 단계 포함(2026-09-30)
-  'data-analytics.event-streams': { vpc: 0, shared: true, minutes: 26 }, // defineDbaasSpec → 공유 VPC 채택. 중지·시작(L3) 포함 단독 실측 26분(2026-10-06)
-  'application-service.api-gateway': { vpc: 0, minutes: 9.5 }, // 에이전트 A: API Creating ≈4분, 2026-09-30 JWT·접근 제어·사용량 정책·API Key·함수 트리거 포함. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
+  'data-analytics.event-streams': { vpc: 0, shared: true, minutes: 34 }, // defineDbaasSpec → 공유 VPC 채택. 중지·시작(L3) 포함 단독 실측 26분(2026-10-06), 10-07 동기화·재시작·유지 관리(6B) 포함 34분
+  'application-service.api-gateway': { vpc: 0, minutes: 12.5 }, // 6D 2026-10-07 수정·재배포·배포 변경·삭제 단계 포함 실측 12.1분. // 에이전트 A: API Creating ≈4분, 2026-09-30 JWT·접근 제어·사용량 정책·API Key·함수 트리거 포함. 나머지 A spec(KMS·Secrets·IAM 정책·ServiceWatch 4종·Network Logging·Budget·Message Hub 2종)은 1~2분이라 기본값
   // 에이전트 C (2026-09-29 단독 통과): Cronjob 실행 확인·스냅샷 L3
-  'compute.cloud-function': { vpc: 0, minutes: 4 },
+  'compute.cloud-function': { vpc: 0, minutes: 9 }, // 6D 2026-10-07 구성·코드 수정(재배포 대기) 포함 실측 8.6분
   'storage.file-storage-snapshot': { vpc: 0, minutes: 3.5 }, // 스냅샷 스케줄 포함(2026-09-30)
-  'compute.volume-snapshot': { vpc: 0, minutes: 5 },
+  'compute.volume-snapshot': { vpc: 0, minutes: 5.5 }, // 10-07 볼륨명·QoS·증설·스냅샷 수정(6B) 포함 실측 5분 22초
   // 에이전트 B 2차 (2026-09-30): VPC 1개(+Subnet)
   'networking.privatelink-service': { vpc: 1, minutes: 17 }, // 설명 수정·차단·재연결(L3) 포함 실측 16분(2026-10-06)
   // 에이전트 A 2차 (2026-09-30): VPC 없음. CDN 은 배포·중지 대기로 ≈25분

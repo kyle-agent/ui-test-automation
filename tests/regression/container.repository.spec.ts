@@ -2,6 +2,7 @@
 // Registry → Repository → 역순 삭제. Registry 흐름은 container.container-registry.spec.ts 와 같다(상세 해지, Terminating 대기).
 // 2026-10-06 L3 동작 추가(steps[3]~[5]): 상세 "이미지 태그 삭제" 정책(Untagged 90일 + 활성화) 켜기 → 끄기, "이미지 잠금 여부" Lock → Unlock,
 // 설명 연필 수정 + 태그 추가 → 삭제. (이미지 push 는 docker 가 필요해 하지 않는다. 자동 스캔은 push 때 과금이라 건드리지 않는다)
+// 2026-10-07 6차(에이전트 6D): steps[6] 이미지 pull 제한(스캔되지 않은 이미지) · 이미지 자동 스캔 켬 → 끔.
 // Repository 목록은 제목 옆 레지스트리 드롭다운 + "조회" 로 레지스트리를 골라야 행이 보인다.
 import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
@@ -264,5 +265,26 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await removeTag(page, 'qa-tag', log);
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
+    // 6차(2026-10-07, 에이전트 6D): 이미지 pull 제한 · 이미지 스캔 정책 켬 → 끔 (API updaterepositorypullpolicy · updaterepositoryscanpolicy).
+    // 이미지가 없는 빈 Repository 라 스캔(Push 때 과금)은 일어나지 않는다.
+    await test.step(`steps[6] ${scenario.steps[6]!.goal}`, async () => {
+      await page.getByText('상세정보', { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      for (const on of [true, false]) {
+        await setFirstCheck(page, '이미지 pull 제한', on, '스캔되지 않은 이미지 pull 제한');
+        await setFirstCheck(page, '이미지 스캔', on, '자동 스캔');
+      }
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
   });
 });
+
+/** 수정 모달의 첫 "사용" 체크를 on/off 하고 저장 → 상세 하위 라벨 값(사용/미사용) 확인 */
+async function setFirstCheck(page: Page, label: string, on: boolean, valueLabel: string): Promise<void> {
+  const modal = await openLabelEdit(page, label);
+  const box = modal.locator('.scp-select:visible').first();
+  if ((await isChecked(box)) !== on) await box.click();
+  await expect.poll(() => isChecked(box), { timeout: 3_000 }).toBe(on);
+  await saveModal(page, log);
+  await waitDetailValue(page, valueLabel, (v) => v.startsWith(on ? '사용' : '미사용'), { log, timeoutMs: 60_000 });
+}

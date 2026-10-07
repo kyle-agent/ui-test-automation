@@ -1,6 +1,7 @@
 // 직접 작성 (2026-10-06). 시나리오: scenarios/management/trail.yaml.
 // Object Storage 버킷 → Trail 생성(Active) → 상세에서 중지(L3) → Trail 삭제 → 버킷 해지.
 // 버킷은 "저장된 데이터가 없을 때만" 해지되므로 Trail 을 오래 켜 두지 않는다(생성 → 삭제 수 분).
+// 2026-10-07 6C: 중지 뒤 상세 "시작"(starttrail, POST …/trails/<id>/start) → Active, 상세 설명 연필 · 저장 형식 JSON→CSV(settrail).
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
@@ -18,6 +19,7 @@ import {
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
+import { editDetailText, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 
 const scenario = loadScenario('scenarios/management/trail.yaml');
 const vars = scenarioVars(scenario);
@@ -152,11 +154,30 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       });
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });
-    await test.step(`steps[4] Trail ${vars.name} 삭제`, async () => {
+    await test.step(`steps[4] Trail ${vars.name} 다시 시작`, async () => {
+      await openDetail(page);
+      await page.getByRole('button', { name: '시작', exact: true }).click();
+      await confirmModal(page, /시작/, '확인', { agree: true, resourceName: vars.name });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await gotoRoute(page, ROUTE);
+      await waitForRow(page, ROUTE, vars.name!, { status: /Active/, timeoutMs: 120_000, intervalMs: 10_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] Trail ${vars.name} 설정 수정`, async () => {
+      await openDetail(page);
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id}`, { log });
+      // 저장 형식 JSON → CSV (모달의 토글 버튼)
+      const modal = await openLabelEdit(page, '저장 형식');
+      await modal.getByRole('button', { name: 'CSV', exact: true }).click();
+      await saveModal(page, log);
+      await waitDetailValue(page, '저장 형식', (v) => v === 'CSV', { log, timeoutMs: 60_000 });
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+    });
+    await test.step(`steps[6] Trail ${vars.name} 삭제`, async () => {
       await deleteTrail(page);
       await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
       await settleConsole(page, { appearGraceMs: 800 });
-      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
     });
   });
 });

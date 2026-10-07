@@ -26,15 +26,21 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Compute | servers dump | compute.vm-stack steps[8] (Dump 생성, 파일은 서버 안 — 다운로드 없음) | ✅ |
 | Compute | servers update (서버명·Lock·Security Group)·tags | compute.vm-stack steps[9] (2026-10-07 5L: 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, SG 연결→해제). 서버 타입·IP 변경은 재부팅, ServiceWatch 세부 모니터링은 유료라 ⏭ | ✅ |
 | Compute | volume-transfer | compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭ | ✅ |
+| Compute | volumes update · qos · size, snapshots update (6차) | compute.volume-snapshot (2026-10-07 6B: SSD_Provisioned 볼륨 → 볼륨명 변경→되돌림 · Max IOPS/Throughput 5000/250→6000/300 · 용량 8→16GB 증설 · 스냅샷 행 메뉴 "수정" 설명 변경, 단독 PASS 5분) | ✅ |
+| Compute | servers reboot · server-type · static-nats 해제 · interfaces update · rebuild (6차) | compute.vm-stack-net steps[8]~[11] (2026-10-07 6B: Public NAT IP 해제 · 재시작 · 중지 → 포트 IP .50→되돌림 → 서버 타입 s1v1m2→s1v2m4 → 시작 · 더보기 "Rebuild", 단독 PASS 26.5분) | ✅ |
+| Compute | auto-scaling-groups update · server-count, policies·schedules update (6차) | compute.auto-scaling-group steps[3] (2026-10-07 6B: 서버 수 Max 1→2→1 · 상태 체크 유예 기간 300→600→300 · 정책 Threshold 60→70 · 스케줄 Max 1→2, 단독 PASS 15분). LB 서버 그룹은 LB 필요 ⏭, 알림 ⏭ | ✅ |
+| Compute | servers volumes update (Delete on termination) (6차) | compute.vm-volume steps[6] (2026-10-07 6B: 볼륨 행 선택 → "Delete on termination 수정" 미사용→사용→미사용, 단독 PASS 23분). 연결·분리는 화면이 /servers/{id}/volumes 경로(createservervolume·deleteservervolume) | ✅ |
 | Compute | scf cloud-functions | compute.cloud-function | ✅ |
-| Compute | scf triggers cronjob · apigateway | compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30) | ✅ |
+| Compute | scf triggers cronjob · apigateway | compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30) · 2026-10-07 6D: 크론 트리거 수정, 구성(일반·함수 URL·환경 변수·리소스 정책·PrivateLink Service)·코드 수정 | ✅ |
 | Container | ske clusters | container.ske-cluster (+ ServiceWatch 로그 수집 켬→끔 L4, 2026-10-07 에이전트 SKE) | ✅ |
 | Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제 L3 + 노드 수 1→2→1·레이블·테인트 추가→제거 L4, 2026-10-07 에이전트 SKE) | ✅ |
 | Container | ske cluster upgrade · nodepool upgrade (setclusterupgrade·setnodepoolupgrade) | container.ske-upgrade (주간 전용, run-suite --weekly): v1.35.5 생성 → 상세 Kubernetes 버전 연필로 v1.36.3 업그레이드 → 노드 풀 상세 "업그레이드"(OS Ubuntu 24.04 (Kubernetes)-v1.36.3), 2026-10-07 에이전트 SKE | ✅ |
-| Container | scr container-registries · repositories | container.container-registry (엔드포인트 프라이빗↔프라이빗&퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가 | ✅ |
+| Container | scr container-registries · repositories | container.container-registry (엔드포인트 프라이빗↔프라이빗&퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가 · 2026-10-07 6D: Repository pull 제한·자동 스캔 켬/끔 | ✅ |
 | Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
 | Database | postgresql · mysql · mariadb · epas replicas (읽기 복제본) | database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분) | ✅ |
-| Data Analytics | eventstreams clusters (+ 중지·시작) | data-analytics.event-streams (공유 VPC; 2026-10-06 L3: 상세 중지→Stopped→시작→Running, 단독 PASS 26분) | ✅ |
+| Database | postgresql 상세 동작: syncclusterstate · restartcluster · stop/startcluster · setbackup · set/unsetmaintenance · setauditlog · setsecuritygrouprules(IP 접근 제어) · set/syncparametervalues · set/syncarchiveconfig (6차) | database.postgresql steps[5] (2026-10-07 6A, src/console/dbaas.ts ops, 단독 PASS 72분). upgradekernel·promotereplica·addblockstorages·setblockstoragesize 는 되돌릴 수 없어 불가. mysql·mariadb·epas 는 같은 ops 로 켤 수 있으나 미실행 | ✅ |
+| Database | cachestore 상세 동작: syncclusterstate · restartcluster · stop/startcluster · setbackup · set/unsetmaintenance · setsecuritygrouprules(IP 접근 제어) (6차) | database.cachestore steps[3] (2026-10-07 6A, 단독 PASS 38분). setservertype·synccommands 미시도, setblockstoragesize 불가(확장만) | ✅ |
+| Data Analytics | eventstreams clusters (+ 중지·시작 · 동기화 · 재시작 · 유지 관리) | data-analytics.event-streams (공유 VPC; 2026-10-06 L3: 상세 중지→Stopped→시작→Running. 2026-10-07 6B: 서비스 상태 동기화 · 재시작 · 유지 관리 기간 켬→끔, 단독 PASS 34분). Parameter·서버 타입 변경은 미실시 | ✅ |
 | Networking | vpcs · subnets | networking.vpc.create-delete · 모든 VPC 체인 | ✅ |
 | Networking | internet-gateways · publicips | compute.vm-stack-net · networking.nat-gateway | ✅ |
 | Networking | nat-gateways · vpc-peerings · private-dns · hosted-zones · hosted-zone records | networking.nat-gateway · vpc-peering · private-dns · dns-hosted-zone (A 레코드 추가·삭제 L3, 2026-09-30) | ✅ |
@@ -61,21 +67,22 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Networking | DNS public-domain-name (createpublicdomainname 500) | — | ⏭ 실제 도메인 구매(구매기간·등록인 정보) |
 | Hybrid Cloud | Dedicated Cloud · Private Zone · Oracle Services (API 없음) | — | ⏭ 영업 검토 신청(랙·약정)/ Oracle 은 Organization 소속 + 새 OCI 테넌시 |
 | Storage | filestorage volumes | storage.file-storage | ✅ |
-| Storage | filestorage snapshots · snapshot-schedules | storage.file-storage-snapshot (스냅샷 스케줄 켜기·끄기, 2026-09-30) | ✅ |
+| Storage | filestorage snapshots · snapshot-schedules | storage.file-storage-snapshot (스냅샷 스케줄 켜기·끄기, 2026-09-30) · 2026-10-07 6D: 스케줄 시각 변경 | ✅ |
 | Storage | filestorage replications | — 복제 위치가 kr-east1-a 뿐(리전간 복제, 전송 요금). 정리가 DR 리전에서 일시중지→삭제 + 복제본 볼륨 삭제를 요구해 단일 리전 도구 범위 밖 | ⏭ |
 | Storage | object storage bucket | storage.object-storage-bucket (폴더·파일 업로드→삭제, 버전 관리 사용→미사용, 태그 L3, 2026-10-06 3C) | ✅ |
 | Storage | backup backups | 제외 — 콘솔은 Agent 방식만(OS 안에 NetBackup 클라이언트 설치 필요). API 도 생성 성공 없음(createbackup 500, createbackupagent 404) | ⏭ |
-| Application Service | queueservice queues | application-service.queue (메시지 설정 수정·IP 접근 허용 추가→삭제 L3, 2026-10-06 3C. 메시지 송수신·purge 는 콘솔에 없음) | ✅ |
-| Application Service | apigateway apis · resources · methods · stages · auths · access-controls · usage-plans · api-keys | application-service.api-gateway (리소스·메서드·스테이지 배포 L3, JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제 L3 2026-09-30) | ✅ |
+| Application Service | queueservice queues | application-service.queue (메시지 설정 수정·IP 접근 허용 추가→삭제 L3, 2026-10-06 3C. 메시지 송수신·purge 는 콘솔에 없음. 2026-10-07 6D: FIFO 로 바꿔 설명·중복 제거 범위·컨텐츠 기반 중복 제거 수정) | ✅ |
+| Application Service | apigateway apis · resources · methods · stages · auths · access-controls · usage-plans · api-keys | application-service.api-gateway (리소스·메서드·스테이지 배포 L3, JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제 L3 2026-09-30) · 2026-10-07 6D: API·메서드·스테이지·사용량 정책 수정, 재배포·배포 변경, 메서드·스테이지 삭제 | ✅ |
 | Application Service | messagehub domains · emails | application-service.messagehub-domain · messagehub-email (소유 확인·인증 메일 발송은 하지 않음) | ✅ |
 | Application Service | messagehub phones | — | ⏭ SMS 인증 필요 |
 | Management | iam groups · roles | iam.user-group · iam.role (역할: 정책 연결·해제, 수행 주체 추가·제거, 세션 시간, 태그 L3, 2026-10-06 3C) | ✅ |
-| Management | iam policies · group policy-bindings | iam.policy (그룹 연결·해제 L3) | ✅ |
-| Management | resource-groups | management.resource-group (그룹 정의 태그 조건 추가·제거, 그룹 태그 L3, 2026-10-06 3C) | ✅ |
+| Management | iam policies · group policy-bindings | iam.policy (그룹 연결·해제 L3; 2026-10-07 6C: 정책·그룹 설명 수정, 정책 상세 연결 대상에서 그룹 연결·해제 = setpolicygroupbinding. 콘솔 요청 실측으로 삭제는 deletepolicies·/groups/bulk) | ✅ |
+| Management | iam users · group members · user policy-bindings · access-key OTP · resource-policies | — | ⏭ 사용자 = 실제 로그인 자격 증명(생성 금지, 계정 사용자 0명) · OTP 실제 발송 · 리소스 기반 정책 화면 없음 (6C 10-07) |
+| Management | resource-groups | management.resource-group (그룹 정의 태그 조건 추가·제거, 그룹 태그 L3, 2026-10-06 3C; 10-07 6C: 태그 값 수정·2개 중 1개 삭제 — 콘솔은 단건 태그 API 없이 …/bulk 전체 교체만 부른다) | ✅ |
 | Management | notification groups | management.notification-group (설명·외부 수신자 example.com 저장→비움 L3, 2026-10-06 3C) | ✅ |
-| Management | servicewatch dashboards · log-groups · log-streams · event-rules · alerts | management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert | ✅ |
+| Management | servicewatch dashboards · log-groups · log-streams · event-rules · alerts | management.servicewatch-dashboard · -log-group(+스트림) · -event-rule · -alert (10-07 6C: 경보 설명·비활성화→활성화·임계값 수정, 대시보드 수정 저장, 로그 보관 정책 1→3일. 사용자 정의 로그·지표 넣기는 OpenAPI 전용 ⏭) | ✅ |
 | Management | network-logging storages | management.network-logging (버킷 체인, Firewall Logging 적용·해제) | ✅ |
-| Management | loggingaudit trails (createtrail 201 · stoptrail · deletetrail) | management.trail (버킷 → Trail → 중지 L3 → 삭제 → 버킷 해지, 2026-10-06) | ✅ |
+| Management | loggingaudit trails (createtrail 201 · stoptrail · deletetrail) | management.trail (버킷 → Trail → 중지 L3 → 삭제 → 버킷 해지, 2026-10-06; 10-07 6C: 다시 시작·설명·저장 형식 CSV) | ✅ |
 | Management | iam identity-providers (SAML) | iam.saml-provider (더미 메타데이터, 역할 신뢰 없음, 2026-10-06) · 설명 수정·메타데이터 교체(L3, 10-06) | ✅ |
 | DevOps Tools | devopsservice (API createdevopsservice 409) | devops-tools.devops-service (콘솔은 생성·해지 됨, 2026-10-06) · 태그 추가·삭제(L3, 10-06) | ✅ |
 | Management | organization OU · control-policy (API 403) | — | ⏭ 콘솔도 "권한 없음"(조직 마스터 필요) |
@@ -83,5 +90,5 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Compute | keypairs (UI 생성) | — | ⏭ 콘솔 생성은 .pem 다운로드 필수(가져오기 없음), Edge 종료 위험 |
 | Financial Management | budgets account | financial-management.budget (금액 수정 L3) | ✅ |
 | Security | certificatemanager self-sign | security.certificate (태그 L3, 2026-10-06 3C. 갱신 버튼 없음, 만료 알림은 실제 메일이라 ⏭) | ✅ |
-| Security | kms keys | security.kms-key (키 회전·비활성화→활성화·설명·태그 L3, 2026-10-06 3C) | ✅ |
-| Security | secretsmanager secrets | security.secrets-manager (해지는 7일 예약, 해지 취소 L3) | ✅ |
+| Security | kms keys | security.kms-key (키 회전·비활성화→활성화·설명·태그 L3, 2026-10-06 3C; 10-07 6C: 자동 회전 주기 90→60→90일. 암·복호화·서명 등 데이터 API 는 OpenAPI 전용 ⏭) | ✅ |
+| Security | secretsmanager secrets | security.secrets-manager (해지는 7일 예약, 해지 취소 L3; 10-07 6C: 설명·퍼블릭 IP 추가·고객 KMS 키로 암호화 키 변경→되돌림. 값 보기/수정은 비밀번호 확인 필요, 프라이빗 접근은 허용 리소스 필요 ⏭) | ✅ |

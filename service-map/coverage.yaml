@@ -83,8 +83,8 @@ resources:
     route: /cachestore/cachestore/list
     level: 4
     specs: [smoke.cachestore-dbaas, database.cachestore]
-    last_pass: "2026-09-28"
-    note: "Redis Sentinel 단일(고가용성 끔), DATA 64GB 이상·8GB 배수, Redis Port/비밀번호. 공유 VPC 병렬 PASS 15.4분"
+    last_pass: "2026-10-07"
+    note: "2026-10-07 6차: 상세 공통 동작 steps[3] (상태 동기화 · 재시작 · 백업 켬 · 유지 관리 기간 켬→끔 · IP 접근 제어 추가→삭제 · 중지→시작) 단독 PASS 38분. Redis Sentinel 단일(고가용성 끔), DATA 64GB 이상·8GB 배수, Redis Port/비밀번호. 공유 VPC 병렬 PASS 15.4분"
   - key: cdn
     service: "Global CDN"
     category: "Networking"
@@ -171,8 +171,8 @@ resources:
     route: /eventstreams/eventstreams/list
     level: 3
     specs: [smoke.event-streams, data-analytics.event-streams]
-    last_pass: "2026-10-06"
-    note: "Broker 1·최소 사양 생성 → 상세 중지(Stopping ≈1분)→Stopped→시작→Running(L3) → 해지. 단독(자기 VPC) PASS 26분 (2026-10-06)"
+    last_pass: "2026-10-07"
+    note: "Broker 1·최소 사양 생성 → 상세 중지(Stopping ≈1분)→Stopped→시작→Running(L3) → 해지. 2026-10-07(6B): 서비스 상태 동기화 · 재시작 · 유지 관리 기간 켬→끔 (dbaas.ts ops). 단독(자기 VPC) PASS 34분"
   - key: volume@file-storage
     service: "File Storage"
     category: "Storage"
@@ -180,7 +180,7 @@ resources:
     level: 3
     specs: [smoke.file-storage, storage.file-storage, storage.file-storage-snapshot]
     last_pass: "2026-09-30"
-    note: "NFS·Single-AZ·HDD 볼륨 생성(이름 뒤에 6자리 UUID 가 붙는다) → 행 선택·서비스 해지. 용량 과금이라 짧게. 상세 스냅샷 생성(자동 이름)·삭제 (storage.file-storage-snapshot, 2026-09-29) + 스냅샷 스케줄 켜기·끄기(2026-09-30). 복제는 kr-east1 리전간이라 미구현"
+    note: "NFS·Single-AZ·HDD 볼륨 생성(이름 뒤에 6자리 UUID 가 붙는다) → 행 선택·서비스 해지. 용량 과금이라 짧게. 상세 스냅샷 생성(자동 이름)·삭제 (storage.file-storage-snapshot, 2026-09-29) + 스냅샷 스케줄 켜기·끄기(2026-09-30). 복제는 kr-east1 리전간이라 미구현 / 2026-10-07 6차(6D): 스케줄 시각 23:00→22:00 변경. 스냅샷 행 끝 메뉴 '복구 볼륨 생성' 은 신규 볼륨 생성이라 넣지 않음, 연결 자원(서버 필요)·파일 단위 복구 설정 없음"
   - key: firewall
     service: "Firewall"
     category: "Networking"
@@ -243,8 +243,8 @@ resources:
     route: /iam/group/list
     level: 3
     specs: [smoke.iam, iam.user-group, iam.policy]
-    last_pass: "2026-09-29"
-    note: "사용자 그룹 생성(이름·설명만) → 목록 확인 → 삭제. Global 화면, 무과금. iam.policy: 상세 정책 탭 '정책 연결'·'연결 해제'(L3)"
+    last_pass: "2026-10-07"
+    note: "사용자 그룹 생성(이름·설명만) → 목록 확인 → 삭제. Global 화면, 무과금. iam.policy: 상세 정책 탭 '정책 연결'·'연결 해제'(L3) / 2026-10-07 6C: 그룹 설명 연필(setgroup) — iam.policy"
   - key: saml-provider
     service: "IAM"
     category: "Management"
@@ -259,8 +259,8 @@ resources:
     route: /iam/policy/list
     level: 3
     specs: [smoke.iam, iam.policy]
-    last_pass: "2026-09-29"
-    note: "3단계 마법사, 권한은 '정책 불러오기'(BillingplanReadOnlyAccess) → 생성 → 테스트 그룹에 연결·해제(L3) → 그룹·정책 삭제. Global, 무과금"
+    last_pass: "2026-10-07"
+    note: "3단계 마법사, 권한은 '정책 불러오기'(BillingplanReadOnlyAccess) → 생성 → 테스트 그룹에 연결·해제(L3) → 그룹·정책 삭제. Global, 무과금 / 2026-10-07 6C: 정책 설명 연필(setpolicy), 정책 상세 연결 대상 → 사용자 그룹 연결·해제(PUT …/policies/{id}/bindings), 그룹 설명 연필. 콘솔 요청 실측: 목록 삭제는 /policies/bulk·/groups/bulk. PASS 3.3분"
   - key: user@iam
     service: "IAM"
     category: "Management"
@@ -299,8 +299,8 @@ resources:
     route: /kms/kms/list
     level: 3
     specs: [smoke.key-management-service, security.kms-key]
-    last_pass: "2026-10-06"
-    note: "키명 영문 소문자·숫자만(kms<run_id_compact>), 퍼블릭 접근 허용 IP 필수(192.0.2.10/32), 프라이빗 접근 제어 끔. 해지 모달 기본 '즉시 해지' → 바로 사라짐 / 2026-10-06 L3(3C): 키 회전(버전 1→2), 키 비활성화(Stop)→활성화(Active), 설명 수정, 태그 추가→삭제. PASS 1.5분"
+    last_pass: "2026-10-07"
+    note: "키명 영문 소문자·숫자만(kms<run_id_compact>), 퍼블릭 접근 허용 IP 필수(192.0.2.10/32), 프라이빗 접근 제어 끔. 해지 모달 기본 '즉시 해지' → 바로 사라짐 / 2026-10-06 L3(3C): 키 회전(버전 1→2), 키 비활성화(Stop)→활성화(Active), 설명 수정, 태그 추가→삭제. PASS 1.5분 / 2026-10-07 6C: 자동 회전 주기 90→60→90일(changerotateinfo). PASS 1.8분"
   - key: managed-kms
     service: "Key Management Service"
     category: "Security"
@@ -395,16 +395,16 @@ resources:
     route: /postgresql/postgresql/list
     level: 4
     specs: [smoke.postgresql-dbaas, database.postgresql]
-    last_pass: "2026-09-30"
-    note: "2026-09-30: 읽기 복제본 추가(상세 더보기 Replica 구성, Running ≈10분)·해지 (steps[3]·[4], 백업은 켠 채 생성 — 꺼져 있으면 Replica 요청 500). VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지"
+    last_pass: "2026-10-07"
+    note: "2026-10-07 6차: 상세 공통 동작 steps[5] (백업 켬 · Parameter cpu_tuple_cost 0.01→0.02→0.01 · Archive 보관기간 3→4→3일 · 상태 동기화 · 재시작 · 유지 관리 기간 켬→끔 · Audit Log 켬→끔 · IP 접근 제어 추가→삭제 · 중지→시작), Replica 포함 단독 PASS 72분. 2026-09-30: 읽기 복제본 추가(상세 더보기 Replica 구성, Running ≈10분)·해지 (steps[3]·[4], 백업은 켠 채 생성 — 꺼져 있으면 Replica 요청 500). VPC·Subnet 위에 단일 서버(db1v2m4, 이중화 끔, Audit·ServiceWatch 끔): 클러스터명은 영문만, DATA 디스크 GB 필수(0 이면 생성 비활성). Running ≈8분, 해지는 상세에서. 시간 과금이라 즉시 해지"
   - key: resource-group
     service: "Resource Groups"
     category: "Management"
     route: /resourcegroups/resource-group/list
     level: 3
     specs: [smoke.resource-groups, management.resource-group]
-    last_pass: "2026-10-06"
-    note: "생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금 / 2026-10-06 L3(3C): 그룹 자원 수정(…/update) 정의 태그 조건 qa2 추가→제거, 그룹 태그 추가→삭제. 실제 자원 편입은 다른 자원 태그 필요라 안 함. PASS 2.1분"
+    last_pass: "2026-10-07"
+    note: "생성(그룹 정의 태그 1개) → 목록 확인 → 삭제. 무과금 / 2026-10-06 L3(3C): 그룹 자원 수정(…/update) 정의 태그 조건 qa2 추가→제거, 그룹 태그 추가→삭제. 실제 자원 편입은 다른 자원 태그 필요라 안 함. PASS 2.1분 / 2026-10-07 6C: 태그 2개 → 값 수정 → 1개씩 삭제(콘솔은 단건 태그 API 없이 …/bulk 전체 교체만 부름 실측). PASS 2.8분"
   - key: lastmile
     service: "SASE"
     category: "Networking"
@@ -427,8 +427,8 @@ resources:
     route: /secretsmanager/secretsmanager/list
     level: 3
     specs: [smoke.secrets-manager, security.secrets-manager]
-    last_pass: "2026-09-29"
-    note: "기본 관리형 키 scp/secretsmanager, 퍼블릭 IP 필수. 즉시 삭제 없음: 해지 대기 7~30일 → 7일 예약(To be terminated) → 상세 '해지 취소'(L3) → 다시 7일 예약"
+    last_pass: "2026-10-07"
+    note: "기본 관리형 키 scp/secretsmanager, 퍼블릭 IP 필수. 즉시 삭제 없음: 해지 대기 7~30일 → 7일 예약(To be terminated) → 상세 '해지 취소'(L3) → 다시 7일 예약 / 2026-10-07 6C: 해지 취소 뒤 설명·퍼블릭 IP 추가, 고객 KMS 키 생성 → 암호화 키 변경 → 되돌림(setkmsid) → 키 즉시 해지. 값 보기는 비밀번호 확인 필요라 안 함. PASS 3분"
   - key: secretvault
     service: "Secret Vault"
     category: "Security"
@@ -483,16 +483,16 @@ resources:
     route: /virtualserver/auto-scaling-group/list
     level: 4
     specs: [smoke.virtual-server, compute.auto-scaling-group]
-    last_pass: "2026-09-29"
-    note: "VPC·Subnet·SG·LC 위에서 Min 0/Desired 0/Max 1 로 생성(In Service, 서버 없음 → 무과금) → 상세 정책(Scale Out)·스케줄(0/0/1) 추가·삭제(L3, 2026-09-29) → 상세 Auto-Scaling Group 삭제. 알림은 수신자 후보(Account 멤버)가 없어 제외"
+    last_pass: "2026-10-07"
+    note: "VPC·Subnet·SG·LC 위에서 Min 0/Desired 0/Max 1 로 생성(In Service, 서버 없음 → 무과금) → 상세 정책(Scale Out)·스케줄(0/0/1) 추가·삭제(L3, 2026-09-29) → 상세 Auto-Scaling Group 삭제. 알림은 수신자 후보(Account 멤버)가 없어 제외. 2026-10-07(6B): 서버 수 Max 1→2→1 · 상태 체크 유예 기간 300→600→300 · 정책 Threshold 60→70 · 스케줄 Max 1→2 (PASS 15분)"
   - key: volume@virtual-server
     service: "Virtual Server"
     category: "Compute"
     route: /virtualserver/block-storage/list
     level: 3
     specs: [compute.vm-volume, compute.volume-snapshot]
-    last_pass: "2026-09-30"
-    note: "서버에 연결/분리. 서버 없이 스냅샷 생성·복구(Reverting→Available)·삭제 (compute.volume-snapshot, 2026-09-29). 볼륨 이전 신청→Awaiting Transfer→취소 (2026-09-30, 받기는 다른 Account 필요)"
+    last_pass: "2026-10-07"
+    note: "서버에 연결/분리. 서버 없이 스냅샷 생성·복구(Reverting→Available)·삭제 (compute.volume-snapshot, 2026-09-29). 볼륨 이전 신청→Awaiting Transfer→취소 (2026-09-30, 받기는 다른 Account 필요). 2026-10-07(6B): SSD_Provisioned 로 만들어 볼륨명 변경→되돌림 · Max IOPS/Throughput 수정 · 용량 8→16GB 증설 · 스냅샷 설명 수정 (volume-snapshot PASS 5분). compute.vm-volume steps[6]: 서버 상세 Delete on termination 미사용→사용→미사용 (PASS 23분)"
   - key: image@virtual-server
     service: "Virtual Server"
     category: "Compute"
@@ -532,7 +532,7 @@ resources:
     level: 4
     specs: [compute.vm-stack, compute.vm-volume, compute.vm-stack-net]
     last_pass: "2026-10-07"
-    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28). 2026-09-30: 네트워크 포트 추가·삭제, Dump 생성, 커스텀 Image (compute.vm-stack steps[6~8]). 2026-10-07(5L): 상세 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, Security Group 연결→해제 (steps[9]; 설명 항목 없음, 서버 타입·IP 수정은 재부팅이라 제외). PASS 26분"
+    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28). 2026-09-30: 네트워크 포트 추가·삭제, Dump 생성, 커스텀 Image (compute.vm-stack steps[6~8]). 2026-10-07(5L): 상세 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, Security Group 연결→해제 (steps[9]; 설명 항목 없음, 서버 타입·IP 수정은 재부팅이라 제외). PASS 26분. 2026-10-07(6B, compute.vm-stack-net steps[8~11]): Public NAT IP 해제 · 재시작 · 중지→포트 IP 변경·되돌림 → 서버 타입 s1v1m2→s1v2m4 → 시작 · Rebuild (PASS 26.5분)"
   - key: internet-gateway
     service: "VPC"
     category: "Networking"
@@ -651,8 +651,8 @@ resources:
     route: /apigateway/api
     level: 3
     specs: [smoke.api-gateway, application-service.api-gateway]
-    last_pass: "2026-09-30"
-    note: "Region API(Creating ≈4분) → 리소스 /items → GET 메서드(HTTP) → 새 스테이지 배포(L3) → JWT 인증·접근 제어(스테이지 연결)·사용량 정책+API Key 생성·삭제(L3, 2026-09-30) → 목록 행 '서비스 해지'(스테이지·리소스 함께 삭제). PASS 9분"
+    last_pass: "2026-10-07"
+    note: "Region API(Creating ≈4분) → 리소스 /items → GET 메서드(HTTP) → 새 스테이지 배포(L3) → JWT 인증·접근 제어(스테이지 연결)·사용량 정책+API Key 생성·삭제(L3, 2026-09-30) → 목록 행 '서비스 해지'(스테이지·리소스 함께 삭제). PASS 9분 / 2026-10-07 6차(6D): 사용량 정책 설명·할당량(100→200) 수정, API 설명 수정, 메서드 엔드포인트 URL 수정(모달), 스테이지 설명 수정, 같은 스테이지 재배포 → 배포 변경(첫 배포 다시 활성), 메서드 삭제 → 스테이지 삭제. 리소스 삭제 버튼은 메서드·스테이지를 지워도 비활성. JWT·접근 제어·API Key 는 수정 화면 없음. PASS 12.1분"
   - key: connection
     service: "Cloud Fabric Connect"
     category: "Networking"
@@ -779,8 +779,8 @@ resources:
     route: /iam/role
     level: 3
     specs: [smoke.iam, iam.role]
-    last_pass: "2026-10-06"
-    note: "Global. 수행 주체 현재 Account(Value 자동), 정책 없이 생성 → 삭제. 수행 주체 '추가' 는 빈 행을 만들어 생성이 비활성이 된다 / 2026-10-06 L3(3C): 정책 CostNavigatorReadOnlyAccess 연결→해제, 수행 주체 서비스(cloudscope) 추가→제거, 최대 세션 1→2시간, 태그 추가→삭제. PASS 2.1분"
+    last_pass: "2026-10-07"
+    note: "Global. 수행 주체 현재 Account(Value 자동), 정책 없이 생성 → 삭제. 수행 주체 '추가' 는 빈 행을 만들어 생성이 비활성이 된다 / 2026-10-06 L3(3C): 정책 CostNavigatorReadOnlyAccess 연결→해제, 수행 주체 서비스(cloudscope) 추가→제거, 최대 세션 1→2시간, 태그 추가→삭제. PASS 2.1분 / 2026-10-07 6C: 콘솔 요청 실측(삭제 /roles/bulk, 정책 해제 DELETE …/policy-bindings, 태그 /tags/global/iam/role/…)"
   - key: account
     service: "ID Center"
     category: "Management"
@@ -795,8 +795,8 @@ resources:
     route: /loggingaudit/trail
     level: 3
     specs: [smoke.logging-audit, management.trail]
-    last_pass: "2026-10-06"
-    note: "버킷 → Trail(Active) → 상세 중지(Stopped, L3) → 상세 Trail 삭제 → 버킷 해지. 수 분 안에 지우면 버킷에 로그가 안 쌓여 해지됨"
+    last_pass: "2026-10-07"
+    note: "버킷 → Trail(Active) → 상세 중지(Stopped, L3) → 상세 Trail 삭제 → 버킷 해지. 수 분 안에 지우면 버킷에 로그가 안 쌓여 해지됨 / 2026-10-07 6C: 중지 → 시작(starttrail), 설명·저장 형식 CSV(settrail). PASS 2.4분"
   - key: phone
     service: "Message Hub"
     category: "Application Service"
@@ -859,8 +859,8 @@ resources:
     route: /queueservice/queueservices
     level: 3
     specs: [smoke.queue-service, application-service.queue]
-    last_pass: "2026-10-06"
-    note: "생성(기본 유형, 기본 설정) → 목록 확인 → 목록 상단 서비스 해지. Queue명은 소문자로 시작, 소문자·숫자·- 3~64자. 선행 리소스 없음 / 2026-10-06 L3(3C): 상세 메시지 설정 보존 기간 4→5일 수정, IP 접근 허용 목록 추가→삭제. 메시지 송수신·purge 는 콘솔에 없음. PASS 1.4분"
+    last_pass: "2026-10-07"
+    note: "생성(기본 유형, 기본 설정) → 목록 확인 → 목록 상단 서비스 해지. Queue명은 소문자로 시작, 소문자·숫자·- 3~64자. 선행 리소스 없음 / 2026-10-06 L3(3C): 상세 메시지 설정 보존 기간 4→5일 수정, IP 접근 허용 목록 추가→삭제. 메시지 송수신·purge 는 콘솔에 없음. PASS 1.4분 / 2026-10-07 6차(6D): 유형 FIFO 로 변경(이름 <name>.fifo 필수), 설명 수정 · 중복 제거 범위(대기열↔그룹) · 컨텐츠 기반 중복 제거 켬/끔. PASS 2.6분"
   - key: sase
     service: "SASE"
     category: "Networking"
@@ -875,8 +875,8 @@ resources:
     route: /scf/cloudfunctions
     level: 3
     specs: [smoke.cloud-functions, compute.cloud-function, application-service.api-gateway]
-    last_pass: "2026-09-30"
-    note: "새로 작성(Node.js 24 기본) 생성 → 약 1분 뒤 Ready → 상세 Cronjob 트리거(매분) 추가 → 로그 탭에서 크론 호출 기동 로그 확인(L3) → 트리거 삭제 → 해지. 호출 과금. API Gateway 트리거(API·스테이지 선택 → 메서드 7종 트리거)는 application-service.api-gateway steps[8] (2026-09-30)"
+    last_pass: "2026-10-07"
+    note: "새로 작성(Node.js 24 기본) 생성 → 약 1분 뒤 Ready → 상세 Cronjob 트리거(매분) 추가 → 로그 탭에서 크론 호출 기동 로그 확인(L3) → 트리거 삭제 → 해지. 호출 과금. API Gateway 트리거(API·스테이지 선택 → 메서드 7종 트리거)는 application-service.api-gateway steps[8] (2026-09-30) / 2026-10-07 6차(6D): 크론 트리거 수정(5분마다), 구성 탭 일반 구성(제한시간 90↔60) · 함수 URL 켬/끔 · 환경 변수 추가/삭제 · 리소스 정책(API Gateway 허용 목록) 추가/삭제 · PrivateLink Service 켬(Active)/끔, 코드 탭 인라인 편집 저장. 수정마다 재배포(Ready) 대기. PLS 가 켜져 있으면 해지가 조용히 무시됨. PrivateLink Endpoint 는 자기 Service ID 로 추가 안 됨. PASS 8.6분"
   - key: container-registry
     service: "Container Registry"
     category: "Container"
@@ -891,8 +891,8 @@ resources:
     route: /scr/repository
     level: 3
     specs: [smoke.container-registry, container.repository]
-    last_pass: "2026-10-06"
-    note: "선행 Registry(약 2.5분) → Repository(레지스트리 드롭다운 + 리포지토리명, 스캔 끔) 생성 → Active → 상세 'Repository 삭제' → Registry 해지. 목록은 제목 옆 레지스트리 드롭다운 + 조회로 골라야 보인다 / 2026-10-06 L3(3C): 이미지 태그 삭제 정책(Untagged 90일 + 활성화) 켜기→끄기, 이미지 잠금 Lock→Unlock, 설명 수정, 태그 추가→삭제. 이미지 push(docker)·자동 스캔(과금)은 안 함. PASS 10.7분"
+    last_pass: "2026-10-07"
+    note: "선행 Registry(약 2.5분) → Repository(레지스트리 드롭다운 + 리포지토리명, 스캔 끔) 생성 → Active → 상세 'Repository 삭제' → Registry 해지. 목록은 제목 옆 레지스트리 드롭다운 + 조회로 골라야 보인다 / 2026-10-06 L3(3C): 이미지 태그 삭제 정책(Untagged 90일 + 활성화) 켜기→끄기, 이미지 잠금 Lock→Unlock, 설명 수정, 태그 추가→삭제. 이미지 push(docker)·자동 스캔(과금)은 안 함. PASS 10.7분 / 2026-10-07 6차(6D): 이미지 pull 제한(스캔되지 않은 이미지)·이미지 자동 스캔 켬→끔(빈 Repository 라 스캔 없음). Registry 프라이빗 엔드포인트 접근 제어 연필은 열리지 않음. PASS 15.5분"
   - key: cluster
     service: "Kubernetes Engine"
     category: "Container"

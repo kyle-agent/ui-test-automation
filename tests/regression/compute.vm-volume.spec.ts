@@ -4,6 +4,9 @@ import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { settleConsole } from '../../src/console/overlays';
+import { expect } from '@playwright/test';
+import { logModal, saveModal } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
 import {
   below,
   confirmModal,
@@ -71,6 +74,32 @@ async function openVmDetail(page: Page): Promise<void> {
   await settleConsole(page, { appearGraceMs: 800 });
   // 같은 텍스트가 숨은 내비게이션(div.com-nav-name)에도 있어 보이는 것만 기다린다.
   await page.locator(':text-is("Block Storage"):visible').first().waitFor({ timeout: 15_000 });
+}
+
+/** 서버 상세 Block Storage 표의 이 볼륨 행 텍스트(공백 정리) */
+async function volumeRowText(page: Page): Promise<string> {
+  await openVmDetail(page);
+  return ((await volumeRowInVm(page).innerText({ timeout: 10_000 }).catch(() => '')) || '').replace(/\s+/g, ' ').trim();
+}
+
+/** "Delete on termination 수정" → 모달에서 이 볼륨 행의 선택(체크)을 뒤집고 저장. 바꾸기 전 행 텍스트를 돌려준다 */
+async function toggleDeleteOnTermination(page: Page): Promise<string> {
+  const before = await volumeRowText(page);
+  log(`  볼륨 행(전): ${before}`);
+  // 버튼은 표에서 볼륨 행을 선택해야 활성화된다(10-07 1차 실행: 선택 없이 aria-disabled)
+  await volumeRowInVm(page).locator('i.table-select, .scp-select').first().click();
+  await page.waitForTimeout(800);
+  await page.getByRole('button', { name: /Delete on termination 수정/ }).first().click();
+  const modal = visibleModal(page);
+  await modal.waitFor({ timeout: 10_000 });
+  await logModal(page, log, 'Delete on termination 수정');
+  const r = modal.locator('tr').filter({ hasText: vars.volume! }).first();
+  const target = (await r.count()) ? r : modal;
+  const box = target.locator('.scp-select:visible, i.table-select:visible, .scp-switch:visible, input[type=checkbox]:visible, [role=switch]:visible').first();
+  await box.click();
+  await page.waitForTimeout(500);
+  await saveModal(page, log);
+  return before;
 }
 
 /** 서버 상세의 Block Storage 표에서 볼륨명이 든 행 */
@@ -270,6 +299,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     });
 
     await test.step(`steps[5] 서버 ${vars.vm} 에 볼륨 ${vars.volume} 연결`, async () => {
+      await logWriteRequests(page, log); // 연결·분리가 어느 API 인지(createservervolume vs attachvolumetovirtualserver) 로그로 남긴다
       await openVmDetail(page);
       await dump(page, 'vm-detail-storage');
       // 서버 상세 하단 "Block Storage" 섹션의 "추가" 버튼 → 모달 (구조는 첫 실행 덤프로 확인)
@@ -326,6 +356,17 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         log,
       });
       await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), stepCtx(5));
+    });
+
+    // 6차(2026-10-07 6B): updateservervolume — 서버 상세 Block Storage 절 "Delete on termination 수정" 으로 연결 볼륨의 값을 바꿨다가 되돌린다
+    await test.step(`steps[6] 서버 ${vars.vm} 의 볼륨 ${vars.volume} Delete on termination 변경 → 되돌림`, async () => {
+      const before = await toggleDeleteOnTermination(page);
+      const changed = await volumeRowText(page);
+      if (changed === before) throw new Error(`Delete on termination 변경이 반영되지 않았습니다: ${changed}`);
+      const back = await toggleDeleteOnTermination(page);
+      log(`  변경 전: ${before} / 변경 뒤: ${back}`);
+      await expect.poll(() => volumeRowText(page), { timeout: 120_000, intervals: [5_000] }).toBe(before);
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), stepCtx(6));
     });
   });
 });

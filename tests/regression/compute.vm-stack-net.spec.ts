@@ -1,9 +1,14 @@
 // 직접 작성 (2026-09-22). 시나리오: scenarios/compute/vm-stack-net.yaml.
 // 콘솔 사실: docs/service-facts/compute-vm-stack.md, docs/service-facts/networking-sg-publicip.md, src/console/ui.ts 머리말.
+// 2026-10-07 6B(6차): steps[8] Public NAT IP 해제 · [9] 재시작 · [10] 중지 → 포트 IP 수정·되돌림 → 서버 타입 변경 → 시작 · [11] Rebuild. 쓰기 요청 경로는 [API] 로그(src/console/api-log.ts).
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { settleConsole } from '../../src/console/overlays';
+import { detailValue, logDetail, logModal, openLabelEdit, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
+import { fillStable } from '../../src/console/ui';
+import { logWriteRequests } from '../../src/console/api-log';
+import { setPublicNatIp } from '../../src/console/networking';
 import {
   confirmModal,
   dismissModalIfAny,
@@ -384,5 +389,151 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await waitForRow(page, ROUTES.pip, vars.vm!, { timeoutMs: 300_000, intervalMs: 10_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), stepCtx(7));
     });
+
+    // ── 6차(2026-10-07 6B): API 쓰기 동작 확대. 오래 걸리는 서버 동작(재시작·타입 변경·OS 재설치)을 이 spec 에 모은다 ──
+    await test.step(`steps[8] 서버 ${vars.vm} Public NAT IP 해제 (deleteserverinterfacenat) · 포트 IP 수정 프로브`, async () => {
+      await openServerDetail(page);
+      await logWriteRequests(page, log);
+      await logDetail(page, log, '서버 상세');
+      await probeEdits(page, log, '서버 상세');
+      await openServerDetail(page);
+      await setPublicNatIp(page, null, log);
+      await waitForRow(page, ROUTES.pip, publicIp!, { status: /Reserved/i, timeoutMs: 300_000, intervalMs: 10_000, log });
+      await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), stepCtx(8));
+    });
+
+    await test.step(`steps[9] 서버 ${vars.vm} 재시작 (rebootvirtualserver)`, async () => {
+      await openServerDetail(page);
+      await pressTop(page, /^재시작$/);
+      await waitServer(page, /Active|Running/i, 600_000, /Reboot|Restart|재시작/i);
+      await expectStep(page, resolveExpectation(scenario.steps[9]!.expect, vars), stepCtx(9));
+    });
+
+    await test.step(`steps[10] 서버 ${vars.vm} 중지 → 포트 IP 수정·되돌림(updateserverinterface) → 서버 타입 s1v1m2 → s1v2m4 (setvirtualservertype) → 시작`, async () => {
+      // 타입 변경은 중지된 서버에서 한다(API 자동화 _note: SCP 콘솔은 Stopped 필요)
+      await openServerDetail(page);
+      await pressTop(page, /^(중지|정지)$/);
+      await waitServer(page, /Stopped|Shutoff/i, 600_000);
+      await openServerDetail(page);
+      // 포트 IP 수정(updateserverinterface): 중지된 동안 기본 포트 IP 를 .50 으로 바꿨다가 원래대로
+      const ipBefore = (await detailValue(page, 'IP')).split(' ')[0]!;
+      const ipNew = ipBefore.replace(/\.\d+$/, '.50');
+      for (const ip of [ipNew, ipBefore]) {
+        const ipModal = await openLabelEdit(page, 'IP');
+        await logModal(page, log, `IP 수정(${ip})`);
+        await fillStable(page, ipModal.locator('input[type=text]:visible').first(), ip, '포트 IP');
+        await saveModal(page, log);
+        await waitDetailValue(page, 'IP', (v) => v.split(' ')[0] === ip, { log, timeoutMs: 300_000 });
+      }
+      await logDetail(page, log, '중지된 서버 상세');
+      const modal = await openLabelEdit(page, /^\s*서버 타입\s*$/);
+      await logModal(page, log, '서버 타입 수정');
+      const dds = modal.locator('.scp-dropdown:visible');
+      const dd = dds.nth((await dds.count()) > 1 ? 1 : 0);
+      await dd.click();
+      const menu = page.locator('.scp-menu:visible').last();
+      await menu.waitFor({ timeout: 10_000 });
+      log(`    서버 타입 항목: ${JSON.stringify((await menu.locator('.scp-menu-item').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim()).slice(0, 12))}`);
+      await menu.locator('.scp-menu-item').filter({ hasText: /s1v2m4/ }).first().click();
+      await saveModal(page, log);
+      await waitDetailValue(page, /^\s*서버 타입\s*$/, (v) => v.includes('s1v2m4'), { log, timeoutMs: 900_000 });
+      // 타입 변경 뒤 Resize Finish → Verify Resize → Stopped(또는 Active). Stopped 로 보여도 잠시 "시작" 이 비활성이다(10-07 2차 실행)
+      // → 15초마다 상세를 다시 열어 Active 면 끝, "시작" 이 활성이면 누른다(최대 15분)
+      for (const start = Date.now(); ; ) {
+        await openServerDetail(page);
+        await gotoRoute(page, ROUTES.vm);
+        const status = (await row(page, vars.vm!).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
+        if (/Active|Running/i.test(status) && !/Resize|Powering/i.test(status)) break;
+        await openServerDetail(page);
+        const startBtn = page.getByRole('button', { name: /^시작$/ }).first();
+        if (/Stopped|Shutoff/i.test(status) && (await startBtn.getAttribute('aria-disabled')) !== 'true') {
+          await pressTop(page, /^시작$/);
+          await waitServer(page, /Active|Running/i, 600_000);
+          break;
+        }
+        if (Date.now() - start > 900_000) throw new Error(`타입 변경 뒤 서버가 15분 안에 안정되지 않았습니다: ${status}`);
+        log(`    타입 변경 뒤 대기: ${status.slice(0, 120)}`);
+        await page.waitForTimeout(15_000);
+      }
+      await expectStep(page, resolveExpectation(scenario.steps[10]!.expect, vars), stepCtx(10));
+    });
+
+    await test.step(`steps[11] 서버 ${vars.vm} Rebuild (rebuildvirtualserver)`, async () => {
+      // 상세 상단 더보기(⋮) 메뉴: "Rebuild" · "연결 해제" (2026-10-07 6B 실측)
+      await openServerDetail(page);
+      const items = await moreMenuItems(page);
+      log(`    상세 더보기 메뉴: ${JSON.stringify(items)}`);
+      await pickMore(page, /^\s*Rebuild\s*$/);
+      await settleConsole(page, { appearGraceMs: 1_000 });
+      const modal = visibleModal(page);
+      if (await modal.isVisible().catch(() => false)) {
+        await logModal(page, log, 'Rebuild');
+        await saveModal(page, log, 120_000);
+      } else {
+        // 모달이 아니라 화면(폼)으로 가면 그 화면을 남기고 "완료"/"확인"
+        await logDetail(page, log, 'Rebuild 화면');
+        await page.getByRole('button', { name: /^(완료|확인|Rebuild)$/ }).last().click();
+        await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: vars.vm });
+        for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      }
+      await waitServer(page, /Active|Running/i, 1_200_000, /Rebuild/i);
+      await expectStep(page, resolveExpectation(scenario.steps[11]!.expect, vars), stepCtx(11));
+    });
   });
+
+  async function openServerDetail(page: Page) {
+    await gotoRoute(page, ROUTES.vm);
+    await row(page, vars.vm!).getByText(vars.vm!, { exact: true }).first().click();
+    await settleConsole(page, { appearGraceMs: 800 });
+    await page.getByRole('button', { name: 'Dump 생성', exact: true }).waitFor({ timeout: 30_000 });
+  }
+
+  /** 상세 상단 버튼 → "…하시겠습니까?" 확인 */
+  async function pressTop(page: Page, re: RegExp) {
+    const b = page.getByRole('button', { name: re }).first();
+    if (!(await b.count())) throw new Error(`상세에 ${re} 버튼이 없습니다: ${JSON.stringify(await page.evaluate(VISIBLE_BUTTONS))}`);
+    await b.click();
+    await confirmModal(page, /하시겠습니까/, '확인', { agree: true, resourceName: vars.vm });
+    for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+  }
+
+  /** 목록 상태: (선택) 중간 상태를 한 번 본 뒤 목표 상태까지 */
+  async function waitServer(page: Page, want: RegExp, timeoutMs: number, transit?: RegExp) {
+    if (transit)
+      await waitForRow(page, ROUTES.vm, vars.vm!, { status: transit, timeoutMs: 120_000, intervalMs: 3_000, log }).catch(() =>
+        log(`    중간 상태 ${transit} 는 못 봄(빨리 끝났을 수 있음)`),
+      );
+    await waitForRow(page, ROUTES.vm, vars.vm!, { status: want, timeoutMs, intervalMs: 15_000, log });
+  }
+
+  /** 상세 상단 더보기(⋮) 메뉴에서 항목을 누른다 */
+  async function pickMore(page: Page, item: RegExp) {
+    const toggles = page.locator('[id^="menu-"] button:visible');
+    const n = await toggles.count();
+    for (let i = 0; i < n; i++) {
+      await toggles.nth(i).click();
+      const entry = page.locator('.scp-menu:visible .scp-menu-item').filter({ hasText: item });
+      if (await entry.first().waitFor({ timeout: 3_000 }).then(() => true, () => false)) {
+        await entry.first().click();
+        return;
+      }
+      await page.keyboard.press('Escape').catch(() => undefined);
+    }
+    throw new Error(`상세 더보기 메뉴에 ${item} 항목이 없습니다`);
+  }
+
+  /** 상세 상단 더보기(⋮) 메뉴 항목 */
+  async function moreMenuItems(page: Page): Promise<string[]> {
+    const toggles = page.locator('[id^="menu-"] button:visible');
+    const n = await toggles.count();
+    const out: string[] = [];
+    for (let i = 0; i < n; i++) {
+      await toggles.nth(i).click().catch(() => undefined);
+      await page.waitForTimeout(800);
+      out.push(...(await page.locator('.scp-menu:visible .scp-menu-item').allInnerTexts()).map((t) => t.trim()));
+      await page.keyboard.press('Escape').catch(() => undefined);
+    }
+    if (!n) out.push(`(menu- 버튼 없음) 버튼: ${JSON.stringify(await page.evaluate(VISIBLE_BUTTONS))}`);
+    return out;
+  }
 });

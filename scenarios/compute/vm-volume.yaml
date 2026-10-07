@@ -62,6 +62,11 @@ steps:
       text: ["{{volume}}"]
       timeout: 300000
 
+  # 6차(2026-10-07 6B): updateservervolume — 서버 상세 Block Storage 절 "Delete on termination 수정"
+  - goal: "서버 {{vm}} 상세에서 볼륨 {{volume}} 의 Delete on termination 을 바꿨다가 되돌린다"
+    expect:
+      text: ["{{volume}}"]
+
 teardown:
   - goal: "서버 {{vm}} 상세에서 볼륨 {{volume}} 을 분리하고 볼륨이 Available 로 돌아오면 삭제한다"
     expect:

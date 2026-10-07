@@ -1,0 +1,82 @@
+{
+  "spec": "compute.cloud-function",
+  "started": "2026-10-07T06:53:37.511Z",
+  "ended": "2026-10-07T06:59:41.012Z",
+  "seconds": 364,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.cloud-function",
+    "run_id": "1007-1554-8b6b",
+    "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud Function 생성 후 해지",
+      "status": "failed",
+      "seconds": 295,
+      "annotations": {
+        "scenario": "compute.cloud-function",
+        "run_id": "1007-1554-8b6b",
+        "title": "Function 목록 | Cloud Functions | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Function 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.5
+        },
+        {
+          "title": "steps[1] fn-1007-1554-8b6b 생성",
+          "status": "pass",
+          "seconds": 185.8
+        },
+        {
+          "title": "steps[2] 구성 > 일반 구성에서 제한시간을 60초 → 90초로 바꿨다가 60초로 되돌린다",
+          "status": "fail",
+          "seconds": 61.2
+        }
+      ],
+      "error": "Error: \"60초\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+      "attachments": [
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-8.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-9.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "Error: \"60초\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+  "attachments": [
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-8.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/test-failed-9.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/compute.cloud-function/compute.cloud-function-Clo-9b19b-후-해지-Cloud-Function-생성-후-해지-regression/trace.zip"
+  ]
+}

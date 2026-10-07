@@ -27,6 +27,11 @@ steps:
       url: "#/service-watch/log/group"
       text: ["{{name}}"]
 
+  # 6C(2026-10-07): 상세 "로그 보관 정책" 연필 → 3일 (setloggroup)
+  - goal: "로그 보관 정책을 1일 → 3일로 바꾼다"
+    expect:
+      text: ["3일"]
+
 teardown:
   - goal: "로그 그룹 {{name}} 을 삭제한다"
     expect:

@@ -1,6 +1,8 @@
 // 직접 작성 (2026-09-29). 시나리오: scenarios/application-service/api-gateway.yaml.
 // API(Region) → 리소스 /items → GET 메서드(HTTP) → 새 스테이지로 배포(L3) → JWT 인증·접근 제어·사용량 정책+API Key 생성·삭제(L3, 2026-09-30)
 // → API 해지(스테이지·리소스 함께 삭제).
+// 2026-10-07 6차(에이전트 6D): 사용량 정책 설명·할당량 수정(steps[7]), API 설명(steps[9]), 메서드 엔드포인트 수정(steps[10]),
+// 스테이지 설명 수정 + 같은 스테이지 재배포 → 배포 변경(steps[11]), 메서드 → 스테이지 삭제(steps[12]).
 import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
@@ -22,6 +24,7 @@ import {
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
+import { detailValue, editDetailText, logModal, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 
 const scenario = loadScenario('scenarios/application-service/api-gateway.yaml');
 const vars = scenarioVars(scenario);
@@ -30,6 +33,7 @@ const RESOURCE_ROUTE = '#/apigateway/resource';
 const STAGE_ROUTE = '#/apigateway/stage';
 const RESOURCE = 'items';
 const ENDPOINT = 'https://example.com';
+const ENDPOINT_EDITED = 'https://example.org';
 const CONSOLE_CHECKS = process.env.CONSOLE_BASE_PATH === undefined;
 const log = (line: string) => console.log(line);
 const ctx = (step: number) => ({
@@ -118,6 +122,13 @@ async function waitListRow(page: Page, route: string, name: string) {
     if (Date.now() - start > 120_000) throw new Error(`${route} 에 ${name} 행이 120초 안에 나타나지 않았습니다`);
     await page.waitForTimeout(5_000);
   }
+}
+
+/** 스테이지 화면에서 우리 API 를 고르고 트리의 스테이지를 누른다 */
+async function openStage(page: Page) {
+  await selectApi(page, STAGE_ROUTE);
+  await page.getByText(vars.stage!, { exact: true }).first().click();
+  await settleConsole(page, { appearGraceMs: 800 });
 }
 
 async function deleteListRow(page: Page, route: string, name: string) {
@@ -284,6 +295,12 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       const keyRow = row(page, vars.key!);
       await expect(keyRow.first(), `연결된 API Key 에 ${vars.key}`).toBeVisible({ timeout: 60_000 });
       await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
+      // 6차: 사용량 정책 설명 · 할당량 수정 (API setusageplandescription · setusageplanquota)
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id}`, { log });
+      const quota = await openLabelEdit(page, '할당량');
+      await fillStable(page, quota.locator('input[type=text]:visible').first(), '200', '할당량');
+      await saveModal(page, log);
+      await waitDetailValue(page, '할당량', (v) => v === '매일 200', { log, timeoutMs: 60_000 });
       // API Key 삭제: "연결된 API Key" 표에서 행 선택 → 표 위 "삭제"
       await selectRow(page, vars.key!);
       await topButton(page, '삭제').click();
@@ -367,6 +384,104 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await confirmModal(page, /트리거를 삭제하시겠습니까/, '확인', { agree: true });
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await expect(page.getByText(/^트리거 \(0\)$/).first(), '트리거 삭제 뒤 개수 0').toBeVisible({ timeout: 30_000 });
+    });
+    // ── 6차(2026-10-07, 에이전트 6D): 수정·삭제 동작 ──
+    await test.step(`steps[9] ${scenario.steps[9]!.goal}`, async () => {
+      // API setapidescription: API 상세 "설명" 연필
+      await gotoRoute(page, ROUTE);
+      await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await editDetailText(page, '설명', `qa ${vars.run_id}`, { log });
+      await expectStep(page, resolveExpectation(scenario.steps[9]!.expect, vars), ctx(9));
+    });
+    await test.step(`steps[10] ${scenario.steps[10]!.goal}`, async () => {
+      // API setmethod: 메서드 상세 "수정"
+      await selectApi(page, RESOURCE_ROUTE);
+      await page.getByText(`/${RESOURCE}`, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      // 트리에는 steps[8] 트리거가 만든 /<함수명> 리소스의 GET(Cloud Function 통합)도 있다 → /items 리소스 상세 주소에서 메서드 상세 주소를 만든다
+      await page.waitForURL(/resource\/detail\?/, { timeout: 15_000 });
+      await page.goto(page.url().replace('/resource/detail?', '/resource/method/detail?') + '&methodType=GET');
+      await settleConsole(page, { appearGraceMs: 800 });
+      await expect(page.getByText(ENDPOINT, { exact: true }).first(), '/items GET 메서드 상세(엔드포인트 URL)').toBeVisible({ timeout: 30_000 });
+      await page.getByRole('button', { name: '수정', exact: true }).last().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      const modal = visibleModal(page);
+      const inModal = await modal.waitFor({ timeout: 5_000 }).then(() => true, () => false);
+      const scope = inModal ? modal : page.locator('body');
+      if (inModal) await logModal(page, log, '메서드 수정');
+      else log(`  메서드 수정 화면: ${page.url().split('#')[1]}`);
+      const inputs = scope.locator('input[type=text]:visible');
+      let idx = -1;
+      for (let i = 0; i < (await inputs.count()); i++) if ((await inputs.nth(i).inputValue()) === ENDPOINT) idx = i;
+      if (idx < 0) throw new Error('메서드 수정에 엔드포인트 URL 입력칸이 없습니다');
+      await fillStable(page, inputs.nth(idx), ENDPOINT_EDITED, '엔드포인트 URL');
+      await saveModal(page, log);
+      await waitDetailValue(page, '엔드포인트 URL', (v) => v === ENDPOINT_EDITED, { log, timeoutMs: 60_000 });
+      await expectStep(page, resolveExpectation(scenario.steps[10]!.expect, vars), ctx(10));
+    });
+    await test.step(`steps[11] ${scenario.steps[11]!.goal}`, async () => {
+      // API setstageconfiguration: 스테이지 "수정"
+      await openStage(page);
+      await page.getByRole('button', { name: '수정', exact: true }).last().click();
+      const modal = visibleModal(page);
+      await modal.waitFor({ timeout: 10_000 });
+      await logModal(page, log, '스테이지 수정');
+      const ta = modal.locator('textarea:visible').first();
+      await fillStable(page, (await ta.count()) ? ta : modal.locator('input[type=text]:visible').last(), `qa ${vars.run_id}`, '스테이지 설명');
+      await saveModal(page, log);
+      await waitDetailValue(page, '스테이지 설명', (v) => v.includes(`qa ${vars.run_id}`), { log, timeoutMs: 60_000 });
+      // API setstageactivedeployment: 같은 스테이지로 다시 배포(배포 2개) → 이전 배포 선택 → "배포 변경"
+      const firstDeployment = await detailValue(page, '배포 ID');
+      await selectApi(page, RESOURCE_ROUTE);
+      await page.getByRole('button', { name: 'API 배포', exact: true }).first().click();
+      const dm = visibleModal(page);
+      await dm.getByText('스테이지명').first().waitFor({ timeout: 10_000 });
+      await dm.locator('.scp-dropdown:visible').first().click();
+      const menu = page.locator('.scp-menu:visible').last();
+      await menu.waitFor({ timeout: 5_000 });
+      await menu.locator('.scp-menu-item').filter({ hasText: vars.stage! }).first().click();
+      await menu.waitFor({ state: 'hidden', timeout: 5_000 }).catch(() => undefined);
+      await logModal(page, log, 'API 재배포');
+      await dm.getByRole('button', { name: '배포', exact: true }).click();
+      await confirmModal(page, /배포하시겠습니까/, '확인');
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await openStage(page);
+      await waitDetailValue(page, '배포 ID', (v) => v !== firstDeployment && v.length > 0, { log, timeoutMs: 60_000 });
+      const old = page.locator('tr.scp-body-row:visible').filter({ hasText: firstDeployment }).first();
+      await old.locator('i.table-select').first().click();
+      await page.getByRole('button', { name: '배포 변경', exact: true }).click();
+      if (await visibleModal(page).waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
+        await logModal(page, log, '배포 변경');
+        await saveModal(page, log);
+      }
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await openStage(page);
+      await waitDetailValue(page, '배포 ID', (v) => v === firstDeployment, { log, timeoutMs: 60_000 });
+      log('  배포 변경: 첫 배포가 다시 활성');
+      await expectStep(page, resolveExpectation(scenario.steps[11]!.expect, vars), ctx(11));
+    });
+    await test.step(`steps[12] ${scenario.steps[12]!.goal}`, async () => {
+      // API deletemethod: 리소스 상세 메서드 표 행 "삭제"
+      await selectApi(page, RESOURCE_ROUTE);
+      await page.getByText(`/${RESOURCE}`, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      const getRow = page.locator('tr.scp-body-row:visible').filter({ hasText: 'GET' }).first();
+      await getRow.getByRole('button', { name: '삭제', exact: true }).click();
+      await confirmModal(page, /삭제/, '확인', { agree: true });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await expect(page.locator('tr.scp-body-row:visible').filter({ hasText: 'GET' }), 'GET 메서드 행이 사라져야 합니다').toHaveCount(0, { timeout: 60_000 });
+      log('  메서드 GET 삭제');
+      // API deletestage: 스테이지 화면 상단 "삭제"
+      await openStage(page);
+      await page.getByRole('button', { name: '삭제', exact: true }).first().click();
+      await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: vars.stage });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await selectApi(page, STAGE_ROUTE);
+      await expect(page.getByText(vars.stage!, { exact: true }), `스테이지 ${vars.stage} 가 사라져야 합니다`).toHaveCount(0, { timeout: 60_000 });
+      log(`  스테이지 ${vars.stage} 삭제`);
+      // deleteresource 는 하지 않는다: 메서드·스테이지를 모두 지운 뒤에도 리소스 상세의 "삭제" 버튼이 비활성이었다(2026-10-07). 리소스는 teardown 의 API 해지로 함께 지워진다.
+      await expectStep(page, resolveExpectation(scenario.steps[12]!.expect, vars), ctx(12));
     });
   });
 });

@@ -1,0 +1,97 @@
+{
+  "spec": "compute.vm-stack-net",
+  "started": "2026-10-07T07:15:29.895Z",
+  "ended": "2026-10-07T07:38:47.210Z",
+  "seconds": 1397,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-stack-net",
+    "run_id": "1007-1615-7328",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "SG·IGW·Public IP 를 포함한 VPC → Subnet → Virtual Server 스택 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 1346.7,
+      "annotations": {
+        "scenario": "compute.vm-stack-net",
+        "run_id": "1007-1615-7328",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 확인",
+          "status": "pass",
+          "seconds": 5.9
+        },
+        {
+          "title": "steps[1] Security Group sg-1007-1615-7328 생성",
+          "status": "pass",
+          "seconds": 30.8
+        },
+        {
+          "title": "steps[2] VPC vpc-1007-1615-7328 생성",
+          "status": "pass",
+          "seconds": 25.7
+        },
+        {
+          "title": "steps[3] Internet Gateway 생성",
+          "status": "pass",
+          "seconds": 48.5
+        },
+        {
+          "title": "steps[4] Subnet sub-1007-1615-7328 생성",
+          "status": "pass",
+          "seconds": 239
+        },
+        {
+          "title": "steps[5] Public IP 예약",
+          "status": "pass",
+          "seconds": 20.9
+        },
+        {
+          "title": "steps[6] Virtual Server vm-1007-1615-7328 생성 (SG sg-1007-1615-7328)",
+          "status": "pass",
+          "seconds": 147.1
+        },
+        {
+          "title": "steps[7] 서버 vm-1007-1615-7328 에 Public IP 123.41.34.24 연결",
+          "status": "pass",
+          "seconds": 48.7
+        },
+        {
+          "title": "steps[8] 서버 vm-1007-1615-7328 Public NAT IP 해제 (deleteserverinterfacenat) · 포트 IP 수정 프로브",
+          "status": "pass",
+          "seconds": 96.1
+        },
+        {
+          "title": "steps[9] 서버 vm-1007-1615-7328 재시작 (rebootvirtualserver)",
+          "status": "pass",
+          "seconds": 39.5
+        },
+        {
+          "title": "steps[10] 서버 vm-1007-1615-7328 서버 타입 변경 s1v1m2 → s1v2m4 (setvirtualservertype)",
+          "status": "pass",
+          "seconds": 216.8
+        },
+        {
+          "title": "steps[11] 서버 vm-1007-1615-7328 OS 재설치 (rebuildvirtualserver) 프로브",
+          "status": "pass",
+          "seconds": 13.2
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

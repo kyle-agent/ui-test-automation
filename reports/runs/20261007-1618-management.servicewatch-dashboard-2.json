@@ -1,0 +1,52 @@
+{
+  "spec": "management.servicewatch-dashboard",
+  "started": "2026-10-07T07:18:49.500Z",
+  "ended": "2026-10-07T07:20:45.238Z",
+  "seconds": 116,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-dashboard",
+    "run_id": "1007-1619-164c",
+    "title": "대시보드 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 사용자 대시보드 생성 후 삭제",
+      "status": "passed",
+      "seconds": 85.2,
+      "annotations": {
+        "scenario": "management.servicewatch-dashboard",
+        "run_id": "1007-1619-164c",
+        "title": "대시보드 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 대시보드 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.4
+        },
+        {
+          "title": "steps[1] swd-1007-1619-164c 생성",
+          "status": "pass",
+          "seconds": 31.5
+        },
+        {
+          "title": "steps[2] 대시보드를 수정해 위젯 영역 제목을 qa-{{run_id}} 로 바꿔 저장한다",
+          "status": "pass",
+          "seconds": 15.1
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

@@ -1,0 +1,67 @@
+{
+  "spec": "database.postgresql",
+  "started": "2026-10-07T08:27:26.175Z",
+  "ended": "2026-10-07T09:39:40.518Z",
+  "seconds": 4334,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.postgresql",
+    "run_id": "1007-1727-170f",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PostgreSQL(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 4256.9,
+      "annotations": {
+        "scenario": "database.postgresql",
+        "run_id": "1007-1727-170f",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.2
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 258.9
+        },
+        {
+          "title": "steps[2] pgcbaahbhchbhaf 생성",
+          "status": "pass",
+          "seconds": 679.4
+        },
+        {
+          "title": "steps[5] pgcbaahbhchbhaf 상세 동작: backup · parameter · archive · sync · restart · maintenance · audit · ipAcl · stopStart",
+          "status": "pass",
+          "seconds": 1747.1
+        },
+        {
+          "title": "steps[3] Replica rep10071727170f 추가 → Running",
+          "status": "pass",
+          "seconds": 658
+        },
+        {
+          "title": "steps[4] Replica rep10071727170f 해지",
+          "status": "pass",
+          "seconds": 268.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

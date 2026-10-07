@@ -467,3 +467,14 @@
   Private NAT 정리 전에 예약 IP 를 반납(`releasePrivateNatIps`, 강제 실패로 검증). Cloud LAN-DC 는 실패 시 하위 자원부터 정리.
 - **결함 후보(사람 판단 필요, known-issues 미등록)**: Cloud LAN-DC vDevice 가 입력 오류 없이 Failed (10-06 09:25 vRouter 생성, 09:48 vSwitch 삭제), 같은 순서 재실행은 정상.
 - 대시보드 2단계: 탐색 발견 사항 목록(data/findings.yaml 로 검토 상태), 커버리지 추세(coverage.yaml git 이력).
+
+### 9.21 동작 단위 커버리지 · 상품별 판단표 · 6차 확대 (2026-10-07)
+
+- 지표: API 카탈로그의 쓰기 동작(POST/PUT/PATCH/DELETE, 읽기 동사 제외)을 상품별 모수로, 화면 시나리오가 한 동작을 data/ui-operations.yaml 에 기록(통과 기록 있는 spec 만 셈).
+  불가 동작은 같은 파일에 `# 불가: <동작> — <이유>`. 모수 제외 상품은 data/population-exclusions.yaml(Vertica). 판단은 data/coverage-decisions.yaml.
+- 6차(에이전트 5개): 화면 쓰기 동작 245 → 326/881 (API 485/881). 6A DBaaS(PostgreSQL·CacheStore 상세 동작, MySQL·MariaDB·EPAS 는 옵션만 준비),
+  6B VM·Block Storage·ASG·Event Streams 19개, 6C IAM·ServiceWatch·Trail·KMS·Secrets 19개, 6D Queue·Functions·API GW·Repository·File Storage 26개.
+  6E(네트워킹·SKE 나머지)는 권한 판단으로 점검·실행 명령이 거부되어 미착수(사용자 결정 대기).
+- 동작 대응은 추측 대신 화면이 보내는 요청 경로로 확인(`src/console/api-log.ts` logWriteRequests). IAM 삭제는 bulk API, VM 볼륨 연결은 /servers/{id}/volumes.
+- 알게 된 위험: Cloud Functions 는 PrivateLink Service 가 켜져 있으면 해지가 조용히 무시된다. DBaaS 동작 PASS 는 DBAAS_SOFT=1 로 확인(실패 0) — 다음 회귀에서 기본 모드 확인 필요.
+- SKE: 주간 spec container.ske-upgrade(--weekly), ske-cluster 에 노드 수·레이블·테인트·로깅. 네임스페이스는 클러스터 드롭다운 위치 문제로 미완.

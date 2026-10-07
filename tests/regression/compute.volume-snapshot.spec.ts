@@ -1,9 +1,13 @@
 // 직접 작성 (2026-09-29, 에이전트 C). 시나리오: scenarios/compute/volume-snapshot.yaml. 공용 팩토리: src/console/simple-crud.ts
 // 볼륨(서버 없이) → 상세 "스냅샷 생성" → "스냅샷 복구"(Reverting → Available, L3) → 스냅샷 삭제 → 볼륨 삭제.
+// 2026-10-07 6B(6차): 볼륨 SSD_Provisioned · 스냅샷 설명 수정(행 메뉴 "수정") · steps[2] 볼륨명 변경→되돌림 · [3] Max IOPS/Throughput 수정 · [4] 용량 증설.
 import { expect, type Page } from '@playwright/test';
 import { defineSimpleCrudSpec } from '../../src/console/simple-crud';
 import { gotoRoute } from '../../src/console/expect';
 import { settleConsole } from '../../src/console/overlays';
+import { editDetailText, logDetail, logModal, openLabelEdit, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
+import { fillStable } from '../../src/console/ui';
 import {
   confirmModal,
   dismissModalIfAny,
@@ -109,6 +113,40 @@ async function volumeTransferRoundTrip(page: Page, name: string) {
   log('  볼륨 이전 신청 → Awaiting Transfer → 이전 취소 → Available');
 }
 
+/** 스냅샷 탭 행 끝 메뉴 → "수정" → 설명 입력 → 저장 → 행에 설명이 보인다 */
+async function updateSnapshotDescription(page: Page, snapshot: string, desc: string) {
+  const r = page.locator('tr.scp-body-row').filter({ hasText: snapshot }).first();
+  await r.locator('i.menu-icon').first().click();
+  const items = page.locator('.scp-menu:visible .scp-menu-item, [role=menuitem]:visible');
+  await items.first().waitFor({ timeout: 10_000 });
+  log(`  스냅샷 행 메뉴: ${JSON.stringify((await items.allInnerTexts()).map((t) => t.trim()))}`);
+  await items.filter({ hasText: /수정/ }).first().click();
+  const modal = visibleModal(page);
+  await modal.waitFor({ timeout: 10_000 });
+  await logModal(page, log, '스냅샷 수정');
+  const inputs = modal.locator('input[type=text]:visible, textarea:visible');
+  await fillStable(page, inputs.nth((await inputs.count()) > 1 ? 1 : 0), desc, '스냅샷 설명');
+  await saveModal(page, log);
+  await expect(page.locator('tr.scp-body-row').filter({ hasText: snapshot }).first(), '스냅샷 행에 바뀐 설명').toContainText(desc, {
+    timeout: 60_000,
+  });
+  log(`  스냅샷 설명 수정 반영: ${desc}`);
+}
+
+/** 볼륨 상세의 "Max IOPS" · "Max Throughput" 라벨 연필 → 모달 입력칸 하나 → 저장 → 상세 반영. 입력칸은 천 단위 쉼표로 다시 그린다(6000 → "6,000") */
+async function setQos(page: Page, log: (l: string) => void, iops: string, throughput: string) {
+  for (const [name, value] of [['Max IOPS', iops], ['Max Throughput', throughput]] as const) {
+    const modal = await openLabelEdit(page, name);
+    await logModal(page, log, `${name} 수정`);
+    const input = modal.locator('input[type=text]:visible').first();
+    await input.fill(value);
+    await input.press('Tab');
+    await expect.poll(async () => (await input.inputValue()).replace(/,/g, ''), { message: `${name} 입력값` }).toBe(value);
+    await saveModal(page, log);
+    await waitDetailValue(page, name, (v) => v.replace(/,/g, '').includes(value), { log, timeoutMs: 300_000 });
+  }
+}
+
 defineSimpleCrudSpec({
   scenario: 'scenarios/compute/volume-snapshot.yaml',
   route: ROUTE,
@@ -117,13 +155,17 @@ defineSimpleCrudSpec({
     { label: '볼륨명', value: '{{name}}' },
     { label: '용량', value: '1' }, // Units(8GB 단위)
   ],
-  dropdowns: [{ label: '디스크 유형', option: 'SSD' }],
+  // 2026-10-07 6B: SSD → SSD_Provisioned (setvolumeqos 를 하려고). Max IOPS 5000~20000 · Max Throughput 250~1000 MB/s 는 최솟값(5,000·250)이 미리 채워져 있다
+  dropdowns: [{ label: '디스크 유형', option: /^\s*SSD_Provisioned\s*$/ }],
   confirmText: /생성/,
   createdStatus: /Available/,
   afterCreate: async (page, vars) => {
     const name = vars.name!;
     const snapshot = vars.snapshot!;
     await openVolumeDetail(page, name);
+    await logDetail(page, log, '볼륨 상세');
+    await probeEdits(page, log, '볼륨 상세');
+    await logWriteRequests(page, log);
     try {
       // 1) 스냅샷 생성
       await page.getByRole('button', { name: '스냅샷 생성', exact: true }).click();
@@ -144,6 +186,8 @@ defineSimpleCrudSpec({
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await openSnapshotTab(page);
       log(`  스냅샷: ${await waitSnapshot(page, snapshot, 'Available', (t) => /Available/.test(t))}`);
+      // 1-1) 스냅샷 설명 수정 (updatesnapshot, 2026-10-07 6B): 행 끝 메뉴 아이콘(i.menu-icon) → 메뉴 "수정" → 모달(스냅샷명·설명)
+      await updateSnapshotDescription(page, snapshot, `qa-desc-${vars.run_id}`);
 
       // 2) 스냅샷 복구(최신 스냅샷으로 되돌림): Reverting → Available
       await page.getByRole('button', { name: '스냅샷 복구', exact: true }).click();
@@ -166,6 +210,26 @@ defineSimpleCrudSpec({
     await volumeTransferRoundTrip(page, name);
     await gotoRoute(page, ROUTE);
   },
+  actions: [
+    // steps[2] 볼륨명 변경 → 되돌림 (updatevolume)
+    async (page, vars, log) => {
+      await openVolumeDetail(page, vars.name!);
+      await editDetailText(page, '볼륨명', `${vars.name}-r`, { log, expectShown: (v) => v === `${vars.name}-r` });
+      await editDetailText(page, '볼륨명', vars.name!, { log, expectShown: (v) => v === vars.name });
+    },
+    // steps[3] Max IOPS·Throughput 변경 (setvolumeqos): 5000/250 → 6000/300
+    async (page, vars, log) => {
+      await openVolumeDetail(page, vars.name!);
+      await setQos(page, log, '6000', '300');
+    },
+    // steps[4] 용량 증설 1 → 2 Units (extendvolume): 8GB → 16GB. 증설 뒤엔 예전 스냅샷 복구가 막히므로 스냅샷 단계 뒤에 한다
+    async (page, vars, log) => {
+      await openVolumeDetail(page, vars.name!);
+      await editDetailText(page, '용량', '2', { log, expectShown: (v) => /16\s*GB/.test(v) });
+      await waitForRow(page, ROUTE, vars.name!, { status: /Available/, timeoutMs: 300_000, intervalMs: 10_000, log });
+      await expect(row(page, vars.name!).first()).toContainText('16GB');
+    },
+  ],
   deleteButton: '삭제',
   deleteConfirmText: /삭제/,
   tags: ['@light', '@action'],

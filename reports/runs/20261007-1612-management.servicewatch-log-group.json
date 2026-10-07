@@ -1,0 +1,52 @@
+{
+  "spec": "management.servicewatch-log-group",
+  "started": "2026-10-07T07:12:39.202Z",
+  "ended": "2026-10-07T07:14:24.575Z",
+  "seconds": 105,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-log-group",
+    "run_id": "1007-1613-1939",
+    "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 로그 그룹 생성 → 로그 스트림 생성·삭제 → 로그 그룹 삭제",
+      "status": "passed",
+      "seconds": 75.3,
+      "annotations": {
+        "scenario": "management.servicewatch-log-group",
+        "run_id": "1007-1613-1939",
+        "title": "로그 그룹 목록 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 로그 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.7
+        },
+        {
+          "title": "steps[1] swl-1007-1613-1939 생성",
+          "status": "pass",
+          "seconds": 31
+        },
+        {
+          "title": "steps[2] 로그 보관 정책을 1일 → 3일로 바꾼다",
+          "status": "pass",
+          "seconds": 8.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6"
+}

@@ -45,6 +45,12 @@ steps:
       url: "#/eventstreams/eventstreams/list"
       text: ["{{name}}"]
 
+  # 6차(2026-10-07 6B): 상세 공통 동작(src/console/dbaas.ts ops)
+  - goal: "상세에서 클러스터 {{name}} 의 서비스 상태 동기화 · 재시작 · 유지 관리 기간 켬→끔 을 하고 Running 으로 돌아오는지 확인한다"
+    expect:
+      url: "#/eventstreams/eventstreams/list"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:

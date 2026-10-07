@@ -44,6 +44,19 @@ steps:
     expect:
       not_text: ["{{name}}"]
 
+  # 6C(2026-10-07): 정책 상세 설명 연필(setpolicy), 정책 상세 "연결 대상" 탭에서 그룹 연결·해제, 그룹 상세 설명 연필(setgroup).
+  - goal: "정책 {{name}} 설명을 수정한다"
+    expect:
+      text: ["scp-console-tests {{run_id}} edited"]
+
+  - goal: "정책 상세 연결 대상 탭에서 그룹 {{group}} 을 연결했다가 해제한다"
+    expect:
+      text: ["연결 대상 (0)"]
+
+  - goal: "사용자 그룹 {{group}} 설명을 수정한다"
+    expect:
+      text: ["scp-console-tests {{run_id}} edited"]
+
 teardown:
   - goal: "사용자 그룹 {{group}} 을 삭제한다"
     expect:

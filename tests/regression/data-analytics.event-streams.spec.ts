@@ -19,4 +19,7 @@ defineDbaasSpec({
   passwordInputs: 4, // Zookeeper 비밀번호·확인, Broker 비밀번호·확인
   uncheck: ['Zookeeper 별도 설치', 'AKHQ', '유지 관리 기간', 'ServiceWatch 로그 수집'],
   stopStart: true, // steps[3] 중지 → 시작 (L3, 2026-10-06)
+  // steps[4] 6차(2026-10-07 6B): 서비스 상태 동기화(eventstreamssyncclusterstate) · 재시작(eventstreamsrestartcluster) ·
+  // 유지 관리 기간 켬→끔(eventstreamssetmaintenance → eventstreamsunsetmaintenance). 공용 구현: dbaas.ts ops
+  ops: ['sync', 'restart', 'maintenance'],
 });

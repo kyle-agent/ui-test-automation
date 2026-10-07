@@ -33,6 +33,12 @@ steps:
       url: "#/cachestore/cachestore/list"
       text: ["{{name}}"]
 
+  # 2026-10-07 6차(에이전트 6A): 상세 공통 동작(src/console/dbaas.ts ops, 순서는 spec 의 ops).
+  - goal: "클러스터 {{name}} 상세에서 동기화·재시작·백업·유지 관리 기간·IP 접근 제어·중지/시작을 하고 되돌린다"
+    expect:
+      url: "#/cachestore/cachestore/list"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:

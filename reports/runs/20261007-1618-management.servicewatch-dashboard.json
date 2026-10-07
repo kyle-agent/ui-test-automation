@@ -1,0 +1,12 @@
+{
+  "spec": "management.servicewatch-dashboard",
+  "started": "2026-10-07T07:18:00.819Z",
+  "ended": "2026-10-07T07:18:12.199Z",
+  "seconds": 11,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {},
+  "tests": [],
+  "git_sha": "c4d43e6",
+  "error": "SyntaxError: C:\\jev\\scp-console-tests\\tests\\regression\\management.servicewatch-dashboard.spec.ts: Unexpected token, expected \",\" (39:73)"
+}

@@ -1,0 +1,89 @@
+{
+  "spec": "compute.volume-snapshot",
+  "started": "2026-10-07T06:41:54.138Z",
+  "ended": "2026-10-07T06:47:44.031Z",
+  "seconds": 350,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "compute.volume-snapshot",
+    "run_id": "1007-1542-ec3f",
+    "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Block Storage 볼륨 스냅샷 생성·복구·삭제",
+      "status": "failed",
+      "seconds": 292.2,
+      "annotations": {
+        "scenario": "compute.volume-snapshot",
+        "run_id": "1007-1542-ec3f",
+        "title": "Block Storage 목록 | Virtual Server | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Block Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.3
+        },
+        {
+          "title": "steps[1] snap-1007-1542-ec3f 생성",
+          "status": "pass",
+          "seconds": 195.3
+        },
+        {
+          "title": "steps[2] 볼륨 상세에서 볼륨명을 {{name}}-r 로 바꿨다가 되돌린다",
+          "status": "pass",
+          "seconds": 31.4
+        },
+        {
+          "title": "steps[3] 볼륨 상세에서 Max IOPS·Throughput 을 6000·300 으로 바꾼다",
+          "status": "fail",
+          "seconds": 21.5
+        }
+      ],
+      "error": "Error: Max IOPS 값이 남아 있어야 합니다",
+      "attachments": [
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-9.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-4.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-6.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-5.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-2.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-3.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-7.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-1.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-8.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-12.png",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/error-context.md",
+        "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "Error: Max IOPS 값이 남아 있어야 합니다",
+  "attachments": [
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-9.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-4.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-6.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-5.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-2.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-3.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-7.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-1.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-8.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/test-failed-12.png",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/error-context.md",
+    "test-results/artifacts/compute.volume-snapshot/compute.volume-snapshot-Bl-9ef75-ock-Storage-볼륨-스냅샷-생성·복구·삭제-regression/trace.zip"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "spec": "storage.file-storage-snapshot",
+  "started": "2026-10-07T09:27:25.149Z",
+  "ended": "2026-10-07T09:29:30.201Z",
+  "seconds": 125,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "storage.file-storage-snapshot",
+    "run_id": "1007-1827-9e18",
+    "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "File Storage 스냅샷 생성 후 삭제",
+      "status": "failed",
+      "seconds": 87,
+      "annotations": {
+        "scenario": "storage.file-storage-snapshot",
+        "run_id": "1007-1827-9e18",
+        "title": "File Storage 목록 | File Storage | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] File Storage 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.2
+        },
+        {
+          "title": "steps[1] fss_100718279e18 생성",
+          "status": "fail",
+          "seconds": 44.5
+        }
+      ],
+      "error": "Error: 스냅샷 복구 버튼을 찾지 못했습니다",
+      "attachments": [
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-14.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-10.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-7.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-6.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-9.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-8.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-11.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-13.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-12.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/error-context.md",
+        "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "Error: 스냅샷 복구 버튼을 찾지 못했습니다",
+  "attachments": [
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-14.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-10.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-7.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-6.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-9.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-8.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-11.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-13.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/test-failed-12.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/error-context.md",
+    "test-results/artifacts/storage.file-storage-snapshot/storage.file-storage-snaps-eb047-삭제-File-Storage-스냅샷-생성-후-삭제-regression/trace.zip"
+  ]
+}

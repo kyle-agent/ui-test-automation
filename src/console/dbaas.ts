@@ -6,13 +6,14 @@
 import type { Page } from '@playwright/test';
 import { test } from '../fixtures/test';
 import { expectStep, gotoRoute } from './expect';
-import { logDetail } from './detail-edit';
+import { detailValue, logDetail, logModal, openDetail, openLabelEdit, saveModal, waitDetailValue } from './detail-edit';
 import { settleConsole } from './overlays';
 import { ROUTES } from './inventory';
 import { deleteNetwork, ensureNetwork, type SharedNetwork } from './shared';
 import {
   confirmModal,
   dismissModalIfAny,
+  fillStable,
   fillField,
   isChecked,
   openCreateForm,
@@ -20,6 +21,7 @@ import {
   row,
   submitForm,
   topButton,
+  visibleModal,
   waitForRow,
 } from './ui';
 import { loadScenario, resolveExpectation, scenarioVars, type Scenario } from '../scenario/schema';
@@ -60,8 +62,19 @@ export interface DbaasConfig {
   replica?: boolean;
   /** 생성 뒤 상세 "중지" → Stopped → "시작" → Running 단계(L3)를 켠다. 시나리오에 steps[3] 이 있어야 한다 (replica 와 함께 쓰지 않는다) */
   stopStart?: boolean;
+  /**
+   * 6차(2026-10-07) 상세 공통 동작 단계. 시나리오의 **마지막** step 이 이 단계다(Replica 단계보다 먼저 실행). 순서대로 한다.
+   * 모두 바꿈 → 반영 확인 → 되돌림(백업은 켠 채 둔다: Replica 의 전제). 환경 변수 DBAAS_SOFT=1 이면 동작별 실패를 로그만 남기고 계속한다(프로브용).
+   */
+  ops?: DbaasOp[];
+  /** ops 'parameter' 가 바꿀 동적 파라미터 후보 이름(화면에 있는 첫 것)과 후보 값 2개(지금 값이 아닌 쪽으로 바꿨다가 되돌린다; 없으면 정수 +1). 기본 cpu_tuple_cost 0.01/0.02 (PostgreSQL·EPAS) */
+  parameter?: { names: string[]; values?: [string, string] };
   tags?: string[];
 }
+
+/** restart 재시작 · sync 서비스 상태 동기화 · stopStart 중지→시작 · maintenance 유지 관리 기간 켬→끔 · backup 백업 켬 · audit Audit Log 켬→끔 ·
+ *  ipAcl IP 접근 제어 추가→삭제 · parameter Parameter 조회·값 변경→되돌림 · archive Archive 설정 조회·보관기간 변경→되돌림 */
+export type DbaasOp = 'restart' | 'sync' | 'stopStart' | 'maintenance' | 'backup' | 'audit' | 'ipAcl' | 'parameter' | 'archive';
 
 const fillVars = (s: string, vars: Record<string, string>) =>
   s.replace(/\{\{(\w+)\}\}/g, (_, k: string) => vars[k] ?? '');
@@ -148,6 +161,262 @@ export function defineDbaasSpec(config: DbaasConfig): void {
       await page.keyboard.press('Escape').catch(() => undefined);
     }
     throw new Error(`상세 더보기 메뉴에 ${item} 항목이 없습니다 (메뉴 버튼 ${n}개)`);
+  }
+
+  // ── 6차 상세 동작 (2026-10-07 에이전트 6A, PostgreSQL 프로브 기준) ──
+  // 상세(#/<engine>/<engine>/detail/info?clusterId=…) 상단 버튼: 시작 · 중지 · 재시작 · 서비스 상태 동기화 · 백업 이력 · Database 복구 · [더보기] · 서비스 해지 · Disk 추가.
+  // 연필 라벨: Image 버전 · 유지 관리 기간 · 백업 · Audit Log 설정 · ServiceWatch 로그 수집 · IP 접근 제어.
+  // 더보기 화면(Parameter 관리·DB 사용자 관리·DB 접근 제어 설정·Archive 설정 관리·Block Storage 사용량 관리)은 별도 주소이고
+  // 모두 하단 "조회"(DB 서버와 동기화)를 먼저 해야 "수정"·"추가" 가 켜진다.
+
+  async function waitRunning(page: Page) {
+    await waitForRow(page, config.route, vars.name!, { status: running, timeoutMs: 1_800_000, intervalMs: 20_000, log });
+  }
+
+  /** 동작 요청 뒤 상태가 바뀌기 시작할 틈을 주고 Running 으로 돌아올 때까지 */
+  async function settleRunning(page: Page) {
+    await page.waitForTimeout(20_000);
+    await waitRunning(page);
+    log(`    행: ${(await row(page, vars.name!).first().innerText()).replace(/\s+/g, ' ').slice(0, 120)}`);
+  }
+
+  /** 보이는 버튼 중 innerText 가 정확히 같은 것 (topButton 이 상세 버튼을 못 잡는 경우가 있다, 2026-10-06) */
+  async function clickExact(page: Page, text: string, timeoutMs = 15_000) {
+    const buttons = page.locator('button:visible');
+    const texts = (await buttons.allInnerTexts()).map((t) => t.trim());
+    const idx = texts.lastIndexOf(text);
+    if (idx < 0) throw new Error(`"${text}" 버튼이 없습니다: ${JSON.stringify(texts.filter(Boolean).slice(0, 30))}`);
+    // 비활성 버튼이 켜질 때까지 기다리는 동안 목록이 다시 그려져도 같은 버튼을 잡도록 텍스트로 다시 찾는다
+    const esc = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    await page
+      .locator('button:visible')
+      .filter({ hasText: new RegExp(`^\\s*${esc}\\s*$`) })
+      .last()
+      .click({ timeout: timeoutMs });
+  }
+
+  /** 확인 모달("…하시겠습니까?")이 뜨면 문구를 남기고 확인(동의·이름 입력 포함), 이어지는 안내 모달도 닫는다 */
+  async function confirmIfAny(page: Page, what: string) {
+    const modal = visibleModal(page);
+    if (!(await modal.waitFor({ timeout: 8_000 }).then(() => true, () => false))) return;
+    log(`    ${what} 모달: ${((await modal.innerText().catch(() => '')) || '').replace(/\s+/g, ' ').slice(0, 200)}`);
+    await confirmModal(page, undefined, '확인', { agree: true, resourceName: vars.name });
+    for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+  }
+
+  /** 상세 상단 버튼(재시작 · 서비스 상태 동기화) → 확인 → Running */
+  async function detailAction(page: Page, button: string) {
+    await openDetail(page, config.route, vars.name!);
+    await clickExact(page, button);
+    await confirmIfAny(page, button);
+    await settleRunning(page);
+  }
+
+  /** 연필 → 모달의 "사용" 체크를 on/off → 저장 → 상세 값이 미사용/사용으로 → Running */
+  async function toggleLabel(page: Page, label: string, on: boolean) {
+    await openDetail(page, config.route, vars.name!);
+    const modal = await openLabelEdit(page, label);
+    await page.waitForTimeout(1_000);
+    await logModal(page, log, `${label} 수정(${on ? '켬' : '끔'}) 전`);
+    const box = modal.locator('.scp-select:visible').first();
+    if ((await isChecked(box)) !== on) await box.click();
+    await page.waitForTimeout(1_000);
+    await logModal(page, log, `${label} 수정(${on ? '켬' : '끔'}) 후`);
+    await saveModal(page, log);
+    await waitDetailValue(page, label, (v) => (on ? v !== '' && !/^미사용/.test(v) : /^미사용/.test(v)), { log, timeoutMs: 900_000 });
+    await settleRunning(page);
+  }
+
+  /** 더보기 메뉴 화면을 열고 하단 "조회"(DB 서버 정보 동기화)를 누른다 */
+  async function openMenuPage(page: Page, item: RegExp) {
+    // 직전 동작(Parameter 저장 등) 뒤엔 행이 Running 이어도 상세 버튼이 잠시 모두 비활성이었다(2026-10-07) → 메뉴 화면이 안 열리면 30초 쉬고 다시(최대 6회)
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await openDetail(page, config.route, vars.name!);
+        await pickMoreMenu(page, item);
+        await settleConsole(page, { appearGraceMs: 1_500 });
+        // 앞서 연 메뉴 화면이 DOM 에 숨은 채 남아 getByRole(…).last() 는 숨은 "조회" 를 잡았다(2026-10-07 두 번째 Parameter 화면) → 보이는 것만
+        await page.locator('button:visible').filter({ hasText: /^\s*조회\s*$/ }).first().waitFor({ timeout: 30_000 });
+        break;
+      } catch (err) {
+        if (attempt >= 6) throw err;
+        log(`    메뉴 화면 ${item} 열기 재시도 ${attempt}/6: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
+        await page.keyboard.press('Escape').catch(() => undefined);
+        await page.waitForTimeout(30_000);
+      }
+    }
+    await clickExact(page, '조회');
+    await confirmIfAny(page, '조회');
+    await settleConsole(page, { appearGraceMs: 1_500 });
+    await page.waitForTimeout(3_000);
+    // "수정" 이 있는 화면(Parameter·Archive)은 조회가 끝나야 켜진다 → 켜질 때까지(최대 10분) 기다린 뒤 값을 읽는다
+    const edit = page.locator('button:visible').filter({ hasText: /^\s*수정\s*$/ }).last();
+    for (const start = Date.now(); (await edit.count()) && (await edit.isDisabled().catch(() => false)); ) {
+      if (Date.now() - start > 600_000) throw new Error('조회 뒤 10분이 지나도 "수정" 이 켜지지 않습니다');
+      await page.waitForTimeout(5_000);
+    }
+  }
+
+  /** 바꿀 동적 파라미터(재시작 불필요). 후보 이름 중 화면에 있는 첫 것 (PostgreSQL·EPAS: cpu_tuple_cost, 기본 0.01) */
+  let PARAM = config.parameter?.names[0] ?? 'cpu_tuple_cost';
+
+  /** Parameter 표에서 이름이 정확히 같은 행. 첫 페이지에 없으면 "Parameter명을 입력하세요." 검색칸으로 거른다 */
+  async function paramRow(page: Page, name: string) {
+    const exact = () => page.locator('tr.scp-body-row:visible').filter({ has: page.getByText(name, { exact: true }) }).first();
+    if (await exact().count()) return exact();
+    const search = page.getByPlaceholder(/Parameter명을 입력/).first();
+    if (await search.count()) {
+      await search.fill(name);
+      await search.press('Enter');
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.waitForTimeout(1_000);
+    }
+    return exact();
+  }
+
+  async function setParameter(page: Page, value: string) {
+    await openMenuPage(page, /^\s*Parameter 관리\s*$/);
+    // "수정" 은 "조회"(DB 서버에서 읽기, 몇 분)가 끝나야 켜진다(2026-10-07 두 번째 실행에서 15초 초과) → 최대 10분 기다린다
+    await clickExact(page, '수정', 600_000);
+    await settleConsole(page, { appearGraceMs: 800 });
+    await page.waitForTimeout(1_500);
+    const r = await paramRow(page, PARAM);
+    log(`    ${PARAM} 행(수정 모드): ${(await r.innerText().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160)}`);
+    const input = r.locator('input:visible').first();
+    if (!(await input.count())) {
+      log(`    버튼: ${JSON.stringify((await page.locator('button:visible').allInnerTexts()).map((t) => t.trim()).filter(Boolean))}`);
+      throw new Error(`${PARAM} 행에 입력칸이 없습니다`);
+    }
+    await fillStable(page, input, value, `${PARAM} 사용자 정의값`);
+    log(`    버튼(입력 후): ${JSON.stringify((await page.locator('button:visible').allInnerTexts()).map((t) => t.trim()).filter(Boolean))}`);
+    const save = page.locator('button:visible:not(tr button)').filter({ hasText: /^\s*(저장|완료|적용)\s*$/ }).last();
+    await save.click();
+    await confirmIfAny(page, 'Parameter 저장');
+    await settleRunning(page);
+    // 반영 확인: 다시 조회 → 현재 설정값
+    await openMenuPage(page, /^\s*Parameter 관리\s*$/);
+    const text = (await (await paramRow(page, PARAM)).innerText()).replace(/\s+/g, ' ');
+    log(`    ${PARAM} 행(조회): ${text.slice(0, 160)}`);
+    if (!text.includes(value)) throw new Error(`${PARAM} 가 ${value} 로 바뀌지 않았습니다: ${text.slice(0, 120)}`);
+  }
+
+  /** Archive 설정 관리 → 조회 → 수정(별도 화면 …/archive-config/edit: "Archive Log 보관기간") → 저장 → 확인 → 다시 조회해 반영 확인 */
+  async function setArchiveDays(page: Page, days: string) {
+    await openMenuPage(page, /^\s*Archive 설정 관리\s*$/);
+    // "수정" 은 "조회"(DB 서버에서 읽기, 몇 분)가 끝나야 켜진다(2026-10-07 두 번째 실행에서 15초 초과) → 최대 10분 기다린다
+    await clickExact(page, '수정', 600_000);
+    await page.waitForURL(/archive-config\/edit/, { timeout: 30_000 });
+    await settleConsole(page, { appearGraceMs: 1_000 });
+    await page.waitForTimeout(1_500);
+    const field = page
+      .locator('.scp-form-group-label:visible')
+      .filter({ hasText: /Archive Log 보관기간/ })
+      .first()
+      .locator('xpath=following-sibling::*[1]');
+    const input = field.locator('input:visible').first();
+    if (await input.count()) await fillStable(page, input, days, 'Archive Log 보관기간');
+    else {
+      await field.locator('.scp-dropdown').first().click();
+      await page
+        .locator('.scp-menu:visible .scp-menu-item')
+        .filter({ hasText: new RegExp(`^\\s*${days}\\s*(일)?\\s*$`) })
+        .first()
+        .click();
+    }
+    await page.waitForTimeout(800);
+    log(`    Archive 수정 화면: ${(await field.innerText().catch(() => '')).replace(/\s+/g, ' ').slice(0, 80)} · input ${await input.count()}`);
+    await submitForm(page, '저장');
+    await confirmIfAny(page, 'Archive 저장');
+    await settleRunning(page);
+    await openMenuPage(page, /^\s*Archive 설정 관리\s*$/);
+    const body = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    const m = body.match(/보관기간\s*(\d+)\s*일\)/);
+    log(`    Archive 화면: ${m?.[0] ?? body.slice(0, 200)}`);
+    if (m?.[1] !== days) throw new Error(`Archive 보관기간이 ${days}일로 바뀌지 않았습니다 (${m?.[1] ?? '?'})`);
+  }
+
+  const ACL_IP = '10.250.250.0/24';
+
+  async function ipAcl(page: Page, add: boolean) {
+    await openDetail(page, config.route, vars.name!);
+    const modal = await openLabelEdit(page, 'IP 접근 제어');
+    await page.waitForTimeout(1_000);
+    await logModal(page, log, `IP 접근 제어 ${add ? '추가' : '삭제'} 전`);
+    if (add) {
+      const input = modal.locator('input[type=text]:visible').first();
+      await fillStable(page, input, ACL_IP, 'IP 접근 제어 CIDR');
+      const addBtn = modal.getByRole('button', { name: /^\s*추가\s*$/ }).first();
+      if (await addBtn.count()) await addBtn.click();
+    } else {
+      const r = modal.locator('tr:visible, li:visible, .scp-tag:visible, [class*=chip]:visible').filter({ hasText: ACL_IP }).first();
+      await r.locator('button, i').last().click();
+    }
+    await page.waitForTimeout(800);
+    await logModal(page, log, `IP 접근 제어 ${add ? '추가' : '삭제'} 후`);
+    await saveModal(page, log);
+    const ip = ACL_IP.split('/')[0]!;
+    await waitDetailValue(page, 'IP 접근 제어', (v) => (add ? v.includes(ip) : !v.includes(ip)), { log, timeoutMs: 900_000 });
+    await settleRunning(page);
+  }
+
+  async function stopStartOp(page: Page) {
+    for (const [button, want] of [
+      ['중지', /Stopped/i],
+      ['시작', running],
+    ] as const) {
+      await openDetail(page, config.route, vars.name!);
+      await clickExact(page, button);
+      await confirmModal(page, new RegExp(button), '확인', { agree: true, resourceName: vars.name });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await page.waitForTimeout(15_000);
+      await waitForRow(page, config.route, vars.name!, { status: want, timeoutMs: 1_800_000, intervalMs: 20_000, log });
+    }
+  }
+
+  async function runOp(page: Page, op: DbaasOp) {
+    switch (op) {
+      case 'restart':
+        return detailAction(page, '재시작');
+      case 'sync':
+        return detailAction(page, '서비스 상태 동기화');
+      case 'stopStart':
+        return stopStartOp(page);
+      case 'maintenance': {
+        // 지금 상태의 반대로 바꿨다가 되돌린다 (CacheStore 는 생성 폼에서 끄지 않아 켜져 있을 수 있다)
+        await openDetail(page, config.route, vars.name!);
+        const on = !/^미사용/.test(await detailValue(page, '유지 관리 기간'));
+        await toggleLabel(page, '유지 관리 기간', !on);
+        return toggleLabel(page, '유지 관리 기간', on);
+      }
+      case 'backup':
+        return toggleLabel(page, '백업', true);
+      case 'audit':
+        await toggleLabel(page, 'Audit Log 설정', true);
+        return toggleLabel(page, 'Audit Log 설정', false);
+      case 'ipAcl':
+        await ipAcl(page, true);
+        return ipAcl(page, false);
+      case 'parameter': {
+        // 지금 값(조회 후 "현재 설정값" 열)을 읽어 다른 후보 값으로 바꾼 뒤 원래 값으로 되돌린다
+        await openMenuPage(page, /^\s*Parameter 관리\s*$/);
+        for (const name of config.parameter?.names ?? [PARAM]) {
+          PARAM = name;
+          if (await (await paramRow(page, name)).count()) break;
+          log(`    파라미터 ${name} 없음`);
+        }
+        const current = ((await (await paramRow(page, PARAM)).locator('td').nth(2).innerText().catch(() => '')) || '').trim();
+        const values = config.parameter?.values;
+        // 후보 값이 없으면 정수 현재값 + 1
+        const target = values ? (values.find((v) => v !== current) ?? values[0]) : /^\d+$/.test(current) ? String(Number(current) + 1) : '0.02';
+        log(`    ${PARAM} 현재 ${current} → ${target} → ${current}`);
+        if (!current || current === '-') throw new Error(`${PARAM} 현재 설정값을 읽지 못했습니다`);
+        await setParameter(page, target);
+        return setParameter(page, current);
+      }
+      case 'archive':
+        await setArchiveDays(page, '4');
+        return setArchiveDays(page, '3');
+    }
   }
 
   test.describe(
@@ -296,6 +565,38 @@ export function defineDbaasSpec(config: DbaasConfig): void {
           await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
         });
 
+        if (config.ops?.length) {
+          const opsIdx = scenario.steps.length - 1;
+          await test.step(`steps[${opsIdx}] ${vars.name} 상세 동작: ${config.ops.join(' · ')}`, async () => {
+            const soft = process.env.DBAAS_SOFT === '1';
+            const failedOps: string[] = [];
+            for (const op of config.ops!) {
+              log(`  ── 동작 ${op}`);
+              try {
+                await waitRunning(page);
+                await runOp(page, op);
+                log(`  OP OK ${op}`);
+              } catch (err) {
+                const msg = err instanceof Error ? err.message.split('\n')[0] : String(err);
+                log(`  OP FAIL ${op}: ${msg}`);
+                await logModal(page, log, `${op} 실패 시 모달`).catch(() => undefined);
+                await logDetail(page, log, `${op} 실패 시 화면`).catch(() => undefined);
+                if (!soft) throw err;
+                failedOps.push(op);
+                await page.keyboard.press('Escape').catch(() => undefined);
+                for (let i = 0; i < 3; i++) {
+                  const cancel = visibleModal(page).getByRole('button', { name: /^(취소|닫기|확인)$/ }).first();
+                  if (!(await cancel.count())) break;
+                  await cancel.click({ timeout: 5_000 }).catch(() => undefined);
+                  await page.waitForTimeout(500);
+                }
+              }
+            }
+            await gotoRoute(page, config.route);
+            await expectStep(page, resolveExpectation(scenario.steps[opsIdx]!.expect, vars), ctx(opsIdx));
+            if (failedOps.length) log(`  (soft) 실패한 동작: ${failedOps.join(', ')}`);
+          });
+        }
         if (config.stopStart)
           // 상세 상단 "중지" → Stopping → Stopped → "시작" → Running (L3, 2026-10-06 에이전트 3D). 시나리오 steps[3] 필요
           await test.step(`steps[3] ${vars.name} 중지 → Stopped → 시작 → Running (L3)`, async () => {

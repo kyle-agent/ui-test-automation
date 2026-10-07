@@ -47,6 +47,12 @@ steps:
       url: "#/kms/kms/detail"
       text: ["태그 (0)"]
 
+  # 6C(2026-10-07): 자동 회전 연필 → 회전 주기 변경 → 되돌림 (changerotateinfo)
+  - goal: "자동 회전 주기를 90일 → 60일 → 90일로 바꿨다가 되돌린다"
+    expect:
+      url: "#/kms/kms/detail"
+      text: ["90일"]
+
 teardown:
   - goal: "키 {{name}} 을 즉시 해지한다"
     expect:

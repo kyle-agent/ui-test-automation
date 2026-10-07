@@ -83,6 +83,31 @@ defineSimpleCrudSpec({
       await addTag(page, 'qa-tag', vars.run_id!, log);
       await removeTag(page, 'qa-tag', log);
     },
+    // steps[5] 태그 2개 → 한 태그 값만 수정 → 2개 중 1개 삭제 → 나머지 삭제 (6C: 단건·일괄 태그 API 중 어느 것을 부르는지 관찰)
+    async (page, vars, log) => {
+      await addTag(page, 'qa-a', vars.run_id!, log);
+      await addTag(page, 'qa-b', vars.run_id!, log);
+      await page.getByRole('button', { name: '태그 수정', exact: true }).click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.waitForURL(/\/tag\/edit/, { timeout: 15_000 });
+      const inputs = page.locator(TAG_INPUT);
+      await expect(inputs).toHaveCount(4, { timeout: 15_000 });
+      const values = await inputs.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value));
+      const idx = values.findIndex((v, i) => i % 2 === 0 && v === 'qa-a');
+      if (idx < 0) throw new Error(`태그 수정 화면에 qa-a 가 없습니다: ${JSON.stringify(values)}`);
+      await fillStable(page, inputs.nth(idx + 1), `${vars.run_id}-v2`, '태그 Value 수정');
+      await submitForm(page, '저장');
+      await confirmModal(page, /하시겠습니까/, '확인');
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await page.waitForURL((u) => !u.hash.includes('/tag/edit'), { timeout: 20_000 });
+      await settleConsole(page, { appearGraceMs: 800 });
+      await expect(page.locator('tr.scp-body-row:visible').filter({ hasText: 'qa-a' }).filter({ hasText: `${vars.run_id}-v2` })).toHaveCount(1, {
+        timeout: 20_000,
+      });
+      log(`    태그 qa-a 값 → ${vars.run_id}-v2 확인`);
+      await removeTag(page, 'qa-a', log);
+      await removeTag(page, 'qa-b', log);
+    },
   ],
   deleteButton: '삭제',
   tags: ['@light', '@action'],

@@ -1,10 +1,14 @@
 // 직접 작성 (2026-09-28). 시나리오: scenarios/compute/auto-scaling-group.yaml. 콘솔 사실은 yaml 머리 주석.
 // 2026-09-29 L3(에이전트 C): steps[3] 상세 정책·스케줄 추가 → Active → 삭제. 알림은 수신자 후보(Account 멤버)가 없어 제외.
+// 2026-10-07 6B(6차): steps[3] 에 서버 수 Max 1→2→1(server-count) · 상태 체크 유예 기간 300→600→300(PUT ASG) · 정책 Threshold 60→70 · 스케줄 Max 1→2 (행 메뉴 "수정") 추가. LB 서버 그룹·알림은 불가.
 import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
+import { logDetail, logModal, openLabelEdit, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
+import { fillStable } from '../../src/console/ui';
 import {
   below,
   confirmModal,
@@ -42,6 +46,7 @@ async function addAndDeleteInTab(
   tab: '정책' | '스케줄',
   name: string,
   fillModal: (modal: ReturnType<typeof visibleModal>) => Promise<void>,
+  edit?: { fill: (modal: ReturnType<typeof visibleModal>) => Promise<void>; shown: string | RegExp },
 ) {
   await page
     .getByText(new RegExp(`^${tab} \\(\\d+\\)$`))
@@ -65,6 +70,26 @@ async function addAndDeleteInTab(
   const r = page.locator('tr.scp-body-row').filter({ hasText: name }).first();
   await expect(r, `${tab} ${name} 행이 Active 여야 합니다`).toContainText('Active', { timeout: 60_000 });
   log(`  ${tab} 행: ${(await r.innerText()).replace(/\s+/g, ' ')}`);
+  if (edit) {
+    // 행 끝 메뉴 아이콘(i.menu-icon) → "수정" → 추가 때와 같은 모달 (6차 2026-10-07 6B)
+    await r.locator('i.menu-icon').first().click();
+    const items = page.locator('.scp-menu:visible .scp-menu-item, [role=menuitem]:visible');
+    await items.first().waitFor({ timeout: 10_000 });
+    log(`  ${tab} 행 메뉴: ${JSON.stringify((await items.allInnerTexts()).map((t) => t.trim()))}`);
+    await items.filter({ hasText: /수정/ }).first().click();
+    const em = visibleModal(page);
+    await em.waitFor({ timeout: 10_000 });
+    await logModal(page, log, `${tab} 수정`);
+    await edit.fill(em);
+    await saveModal(page, log);
+    // 행 innerText 는 칸 사이 공백이 없다("…002매일") → 칸 텍스트를 " | " 로 이어 비교
+    const cells = async () =>
+      (await page.locator('tr.scp-body-row').filter({ hasText: name }).first().locator('td').allInnerTexts())
+        .map((t) => t.replace(/\s+/g, ' ').trim())
+        .join(' | ');
+    await expect.poll(cells, { message: `${tab} 수정 반영`, timeout: 60_000, intervals: [3_000] }).toMatch(edit.shown);
+    log(`  ${tab} 수정 뒤 행: ${await cells()}`);
+  }
   await r.locator('i.table-select').first().click();
   await topButton(page, '삭제').click();
   await confirmModal(page, new RegExp(`${tab} 1개를 삭제하시겠습니까`), '확인', { agree: true });
@@ -310,19 +335,54 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       );
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
     });
-    await test.step(`steps[3] 정책 ${vars.policy} · 스케줄 ${vars.schedule} 추가·삭제`, async () => {
+    await test.step(`steps[3] 서버 수·상태 체크 수정, 정책 ${vars.policy} · 스케줄 ${vars.schedule} 추가·수정·삭제`, async () => {
       await gotoRoute(page, ASG);
       await row(page, vars.name!).getByText(vars.name!).first().click(); // 이름 셀 링크 (exact 는 안 맞는다)
       await settleConsole(page, { appearGraceMs: 800 });
       await expect(page).toHaveURL(/auto-scaling-group\/detail/, { timeout: 30_000 });
+      await logWriteRequests(page, log);
+      await logDetail(page, log, 'ASG 상세');
+      await probeEdits(page, log, 'ASG 상세');
+      // 6차(2026-10-07 6B): 서버 수 Max 1 → 2 → 1 (updateautoscalinggroupservercount 로 봄 — [API] 로그로 확인),
+      // 상태 체크 유예 기간 300 → 600 → 300초 (updateautoscalinggroup: state_check_delay_time)
+      for (const max of ['2', '1']) {
+        const modal = await openLabelEdit(page, '서버 수');
+        await fillStable(page, modal.locator('input[type=text]:visible').nth(2), max, 'Max');
+        await saveModal(page, log);
+        await waitDetailValue(page, '서버 수', (v) => new RegExp(`Max ${max}대`).test(v), { log });
+      }
+      for (const sec of ['600', '300']) {
+        const modal = await openLabelEdit(page, '상태 체크');
+        await fillStable(page, modal.locator('input[type=text]:visible').first(), sec, '유예 기간');
+        await saveModal(page, log);
+        await waitDetailValue(page, '상태 체크', (v) => v.includes(`유예 기간 ${sec}초`), { log });
+      }
       // 정책: Scale Out, 이름만 넣고 나머지는 기본값(Average CPU Usage >= 60% 5분, 1대 증가, 쿨다운 300초). 서버 0대라 발동하지 않는다
       await addAndDeleteInTab(page, '정책', vars.policy!, async (modal) => {
         await modal.getByRole('button', { name: 'Scale Out', exact: true }).click();
         await typeInputs(page, modal, [vars.policy!]);
+      }, {
+        // 정책 수정(updateautoscalinggrouppolicy): Threshold 60 → 70 (%)
+        fill: async (modal) => {
+          const th = modal.locator('input[type=text]:visible').filter({ hasNot: page.locator('[disabled]') });
+          const vals = await th.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value));
+          log(`    정책 수정 입력칸 값: ${JSON.stringify(vals)}`);
+          await fillStable(page, th.nth(vals.indexOf('60')), '70', 'Threshold');
+        },
+        shown: />=\s*70\s*%/,
       });
       // 스케줄: 이름 + Min 0 / Desired 0 / Max 1 (수행돼도 변화 없음), 주기 기본 매일
       await addAndDeleteInTab(page, '스케줄', vars.schedule!, async (modal) => {
         await typeInputs(page, modal, [vars.schedule!, '0', '0', '1']);
+      }, {
+        // 스케줄 수정(updateautoscalinggroupschedule): Max 1 → 2
+        fill: async (modal) => {
+          const inputs = modal.locator('input[type=text]:visible');
+          const vals = await inputs.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value));
+          log(`    스케줄 수정 입력칸 값: ${JSON.stringify(vals)}`);
+          await fillStable(page, inputs.nth(vals.indexOf(vars.schedule!) + 3), '2', 'Max');
+        },
+        shown: /\| 0 \| 0 \| 2 \|/,
       });
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });

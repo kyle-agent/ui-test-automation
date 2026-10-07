@@ -22,7 +22,7 @@ steps:
     expect:
       url: "#/filestorage/filestorage/list"
 
-  - goal: "File Storage 볼륨 {{name}} 을 NFS 로 생성하고, 상세에서 스냅샷을 만들어 Available 을 확인한 뒤 스냅샷을 삭제한다"
+  - goal: "File Storage 볼륨 {{name}} 을 NFS 로 생성하고, 상세에서 스냅샷을 만들어 Available 을 확인한 뒤 스냅샷을 삭제하고, 스냅샷 스케줄을 켜고(23:00) 시각을 22:00 으로 바꾼 뒤 끈다"
     vars:
       # 소문자·숫자·_ 3~21자. 정리 종류 fss (fss_ + run_id 숫자·hex 12자 = 16자, 콘솔이 "_xxxxxx" 를 붙인다)
       name: "fss_{{run_id_compact}}"

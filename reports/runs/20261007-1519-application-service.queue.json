@@ -1,0 +1,75 @@
+{
+  "spec": "application-service.queue",
+  "started": "2026-10-07T06:19:56.910Z",
+  "ended": "2026-10-07T06:21:10.912Z",
+  "seconds": 74,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "application-service.queue",
+    "run_id": "1007-1520-df84",
+    "title": "Queue 목록 | Queue Service | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 21.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Queue 생성 후 해지",
+      "status": "failed",
+      "seconds": 35.9,
+      "annotations": {
+        "scenario": "application-service.queue",
+        "run_id": "1007-1520-df84",
+        "title": "Queue 목록 | Queue Service | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Queue 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[1] que-1007-1520-df84 생성",
+          "status": "fail",
+          "seconds": 26.7
+        }
+      ],
+      "error": "TimeoutError: locator.waitFor: Timeout 10000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-8.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "c4d43e6",
+  "error": "TimeoutError: locator.waitFor: Timeout 10000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-8.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/application-service.queue/application-service.queue-Queue-생성-후-해지-Queue-생성-후-해지-regression/trace.zip"
+  ]
+}

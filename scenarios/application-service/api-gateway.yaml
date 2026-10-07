@@ -78,6 +78,26 @@ steps:
     expect:
       text: ["{{fn}}"]
 
+  # 6차(2026-10-07, 에이전트 6D): 수정·삭제 동작. API setapidescription · setmethod · setstageconfiguration · setstageactivedeployment · deletemethod · deletestage
+  - goal: "API 상세 설명을 수정한다"
+    expect:
+      url: "#/apigateway/api/detail"
+      text: ["qa {{run_id}}"]
+
+  - goal: "GET 메서드의 엔드포인트 URL 을 https://example.org 로 수정한다"
+    expect:
+      url: "#/apigateway/resource/method/detail"
+      text: ["https://example.org"]
+
+  - goal: "스테이지 {{stage}} 설명을 수정하고, 같은 스테이지로 다시 배포한 뒤 배포 변경으로 첫 배포를 활성으로 되돌린다"
+    expect:
+      url: "#/apigateway/stage"
+
+  - goal: "GET 메서드 → 스테이지 {{stage}} 순서로 삭제한다"
+    expect:
+      url: "#/apigateway/stage"
+      not_text: ["{{stage}}"]
+
 teardown:
   - goal: "API {{name}} 을 해지한다"
     expect:

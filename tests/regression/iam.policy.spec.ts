@@ -17,6 +17,7 @@ import {
   waitForRow,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
+import { editDetailText, logDetail, logModal, openDetail } from '../../src/console/detail-edit';
 
 const scenario = loadScenario('scenarios/iam/policy.yaml');
 const vars = scenarioVars(scenario);
@@ -164,6 +165,50 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await settleConsole(page, { appearGraceMs: 800 });
       await page.getByText('정책 (0)', { exact: true }).first().waitFor({ timeout: 15_000 });
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    await test.step(`steps[5] 정책 ${vars.name} 설명 수정`, async () => {
+      await openDetail(page, POLICY_ROUTE, vars.name!, /\/iam\/policy\/detail\//);
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+    });
+    await test.step(`steps[6] 정책 상세 연결 대상에서 그룹 ${vars.group} 연결 → 해제`, async () => {
+      await page.getByText(/^\s*연결 대상\s*\(\d+\)\s*$/).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByRole('button', { name: '사용자 그룹 연결', exact: true }).click();
+      await settleConsole(page, { appearGraceMs: 1_000 });
+      await logDetail(page, log, '사용자 그룹 연결');
+      await logModal(page, log, '사용자 그룹 연결');
+      const search = page.locator('input[placeholder*="그룹명"]:visible').last();
+      await search.fill(vars.group!);
+      await search.press('Enter');
+      await settleConsole(page, { appearGraceMs: 800 });
+      await row(page, vars.group!).first().waitFor({ timeout: 15_000 });
+      await row(page, vars.group!).last().locator('i.table-select').first().click();
+      const done = page.getByRole('button', { name: /^(완료|확인|연결)$/ }).last();
+      await done.click();
+      await confirmModal(page, /연결하시겠습니까/, '확인');
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByText(/^\s*연결 대상\s*\(1\)\s*$/).first().waitFor({ timeout: 30_000 });
+      log(`    연결 대상 (1): 그룹 ${vars.group}`);
+      await selectRow(page, vars.group!);
+      // 연결 해제 버튼은 사용자·사용자 그룹·역할 표마다 하나씩 → 그룹 표의 것(두 번째)
+      await page.getByRole('button', { name: '연결 해제', exact: true }).nth(1).click();
+      await confirmModal(page, /해제하시겠습니까/, '확인');
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+      await settleConsole(page, { appearGraceMs: 800 });
+      await page.getByText(/^\s*연결 대상\s*\(0\)\s*$/).first().waitFor({ timeout: 30_000 });
+      log('    연결 대상 (0) 확인');
+      await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
+    await test.step(`steps[7] 그룹 ${vars.group} 설명 수정`, async () => {
+      await gotoRoute(page, GROUP_ROUTE);
+      await row(page, vars.group!).locator(`span[role=button]:text-is("${vars.group}")`).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await logDetail(page, log, '그룹 상세');
+      await editDetailText(page, '설명', `scp-console-tests ${vars.run_id} edited`, { log });
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
     });
   });
 });

@@ -121,7 +121,7 @@ const TEST_EXTRA: Partial<Record<Kind, RegExp>> = {
   mhe: /^mhe\*+@\*+\.com$/,
   // 에이전트 C: File Storage 스냅샷용 볼륨 fss_<compact>_xxxxxx(콘솔이 붙임), 볼륨 스냅샷용 Block Storage 볼륨 snap-<run_id>, Event Streams 클러스터 es<run_id_alpha>
   fss: /^fss_\d{8}[0-9a-f]{4}(_[a-z0-9]{6})?$/,
-  snap: /^snap-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  snap: /^snap-\d{4}-\d{4}-[0-9a-f]{4}(-r)?$/, // -r: compute.volume-snapshot 볼륨명 변경 도중 실패한 경우 (6B 10-07)
   es: /^es[a-j]{12}$/,
   // 에이전트 C 2차: Image img-<run_id>, 읽기 복제본 rep<run_id_compact> (Replica 명은 소문자 시작 3~19자)
   img: /^img-\d{4}-\d{4}-[0-9a-f]{4}$/,
@@ -148,6 +148,8 @@ const TEST_EXTRA: Partial<Record<Kind, RegExp>> = {
   cldc: /^cldc-\d{4}-\d{4}-[0-9a-f]{4}$/,
   cldv: /^cld[rs]-\d{4}-\d{4}-[0-9a-f]{4}$/,
   cld: /^cld-\d{4}-\d{4}-[0-9a-f]{4}$/,
+  // 에이전트 6D (2026-10-07): Queue 를 FIFO 로 만들며 이름이 que-<run_id>.fifo (FIFO 는 ".fifo" 접미사 필수)
+  que: /^que-\d{4}-\d{4}-[0-9a-f]{4}(\.fifo)?$/,
 };
 
 export interface Leftover {

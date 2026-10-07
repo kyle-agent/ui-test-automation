@@ -41,6 +41,12 @@ steps:
       url: "#/resourcegroups/resource-group/detail/"
       text: ["태그 (0)"]
 
+  # 6C(2026-10-07): 태그 2개 → 한 개 값 수정 → 하나씩 삭제 (태그 API 단건/일괄 관찰)
+  - goal: "태그 qa-a·qa-b 를 추가하고 qa-a 값을 바꾼 뒤 하나씩 삭제한다"
+    expect:
+      url: "#/resourcegroups/resource-group/detail/"
+      text: ["태그 (0)"]
+
 teardown:
   - goal: "Resource Group {{name}} 을 삭제한다"
     expect:
