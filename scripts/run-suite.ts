@@ -4,6 +4,7 @@
  *   npm run test:suite                          SUITE_ORDER 전부
  *   npm run test:suite -- --only a,b --max 6    일부만 / 동시 탭 수
  *   npm run test:suite -- --dry-run             계획만 출력
+ *   npm run test:suite -- --weekly              주간 spec(suite-plan weekly: true, 예: SKE 업그레이드)도 포함. 기본은 제외(--only 로 이름을 주면 포함)
  *
  * 스케줄 규칙 (api-test-automation 의 shared-infra + VPC 세마포어와 같은 생각):
  *  - 계정 VPC 한도 5 에서 실행 전에 이미 있는 VPC 수를 빼고, 공유 VPC 가 살아 있는 동안 1 을 더 뺀 만큼만 VPC 를 쓰는 spec 을 동시에 띄운다
@@ -30,6 +31,7 @@ const { flags } = parseArgs(process.argv.slice(2));
 const only = typeof flags.only === 'string' ? flags.only.split(',').map((s) => s.trim()).filter(Boolean) : null;
 const maxTabs = typeof flags.max === 'string' ? Number(flags.max) : 5;
 const dryRun = flags['dry-run'] === true;
+const weekly = flags.weekly === true;
 const staggerMs = (typeof flags.stagger === 'string' ? Number(flags.stagger) : 20) * 1000;
 // 실행 묶음 id 와 시도 차수: 실행 기록(reports/runs)과 스위트 요약(reports/suites)에 남는다. 실패만 다시 돌릴 때는
 // --suite-id <처음 id> --attempt 2 로 같은 묶음에 붙인다(대시보드의 "첫 시도 / 최종" 계산).
@@ -69,7 +71,8 @@ function runOne(spec: string, env: NodeJS.ProcessEnv): Promise<Result> {
 }
 
 async function main(): Promise<void> {
-  const specs = (only ? SUITE_ORDER.filter((s) => only.some((o) => s === o || s.endsWith(o))) : [...SUITE_ORDER]).sort(
+  // 주간 spec 은 --weekly 일 때만(--only 로 직접 고른 것은 그대로)
+  const specs = (only ? SUITE_ORDER.filter((s) => only.some((o) => s === o || s.endsWith(o))) : SUITE_ORDER.filter((s) => weekly || !planFor(s).weekly)).sort(
     (a, b) => planFor(b).minutes - planFor(a).minutes,
   );
   if (!specs.length) throw new Error('실행할 spec 이 없습니다');

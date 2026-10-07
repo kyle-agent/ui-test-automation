@@ -28,8 +28,9 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Compute | volume-transfer | compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭ | ✅ |
 | Compute | scf cloud-functions | compute.cloud-function | ✅ |
 | Compute | scf triggers cronjob · apigateway | compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30) | ✅ |
-| Container | ske clusters | container.ske-cluster | ✅ |
-| Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제, L3) | ✅ |
+| Container | ske clusters | container.ske-cluster (+ ServiceWatch 로그 수집 켬→끔 L4, 2026-10-07 에이전트 SKE) | ✅ |
+| Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제 L3 + 노드 수 1→2→1·레이블·테인트 추가→제거 L4, 2026-10-07 에이전트 SKE) | ✅ |
+| Container | ske cluster upgrade · nodepool upgrade (setclusterupgrade·setnodepoolupgrade) | container.ske-upgrade (주간 전용, run-suite --weekly): v1.35.5 생성 → 상세 Kubernetes 버전 연필로 v1.36.3 업그레이드 → 노드 풀 상세 "업그레이드"(OS Ubuntu 24.04 (Kubernetes)-v1.36.3), 2026-10-07 에이전트 SKE | ✅ |
 | Container | scr container-registries · repositories | container.container-registry (엔드포인트 프라이빗↔프라이빗&퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가 | ✅ |
 | Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
 | Database | postgresql · mysql · mariadb · epas replicas (읽기 복제본) | database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분) | ✅ |

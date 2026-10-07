@@ -2,6 +2,7 @@
 // 실측(프로브 3회): "생성" 은 StorageClass 설정의 "NFS 볼륨 — 사용" 체크(기본 켜짐, 볼륨 미선택)를 끄기 전엔 활성화되지 않는다.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logDetail, logModal, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
@@ -10,6 +11,7 @@ import {
   confirmModal,
   dismissModalIfAny,
   fillField,
+  fillStable,
   openCreateForm,
   pickOption,
   row,
@@ -34,6 +36,55 @@ const ctx = (step: number) => ({
   testInfo: test.info(),
 });
 const SKE = ROUTES.ske;
+const flat = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+/** 노드 풀 목록 행이 조건(예: /2 \/ 2 Running/)을 만족할 때까지 (행 텍스트 "… v1.36.3 1 / 1 Running") */
+async function waitPoolRow(page: Page, pools: string, want: RegExp, timeoutMs = 1_200_000): Promise<string> {
+  const started = Date.now();
+  for (;;) {
+    await gotoRoute(page, pools);
+    await settleConsole(page, { appearGraceMs: 800 });
+    const now = flat(await row(page, vars.nodepool!).first().innerText().catch(() => ''));
+    log(`  [${Math.round((Date.now() - started) / 1000)}s] 노드 풀 ${want} 대기… ${now.slice(-60)}`);
+    if (want.test(now)) return now;
+    if (Date.now() - started > timeoutMs) throw new Error(`노드 풀이 ${timeoutMs / 1000}초 안에 ${want} 가 되지 않았습니다. 마지막: ${now}`);
+    await page.waitForTimeout(20_000);
+  }
+}
+
+/** 노드 풀 상세(#/ske/cluster/detail/nodepool/detail/info) 로 */
+async function openPoolDetail(page: Page, pools: string): Promise<void> {
+  await gotoRoute(page, pools);
+  await settleConsole(page, { appearGraceMs: 800 });
+  await row(page, vars.nodepool!).getByText(vars.nodepool!, { exact: true }).first().click();
+  await page.waitForURL(/nodepool\/detail/, { timeout: 30_000 }).catch(() => undefined);
+  await settleConsole(page, { appearGraceMs: 1_500 });
+}
+
+/**
+ * 노드 풀 상세 "레이블"/"테인트" 연필 → 수정 모달. add 가 있으면 "추가" 로 행을 만들고 [키, 값] 입력(테인트 효과는 기본 NoSchedule),
+ * 없으면 기존 행을 모두 지운다. 2026-10-07 프로브: 모달 버튼 "추가·취소·확인", 레이블 행 = 입력 2개(키·값), 테인트 행 = 효과 드롭다운 + 입력 2개.
+ */
+async function editPoolKv(page: Page, label: '레이블' | '테인트', add: { key: string; value: string } | null): Promise<void> {
+  const modal = await openLabelEdit(page, label);
+  if (add) {
+    await modal.getByRole('button', { name: '추가', exact: true }).click();
+    await page.waitForTimeout(800);
+    const inputs = modal.locator('input[type=text]:visible');
+    await fillStable(page, inputs.nth(0), add.key, `${label} 키`);
+    await fillStable(page, inputs.nth(1), add.value, `${label} 값`);
+  } else {
+    // 행마다 오른쪽 삭제 아이콘 i.i-btn-del (2026-10-07 실측; 머리글의 닫기 아이콘은 i.i-del-s). 지우면 "확인" 이 활성화된다
+    for (let i = 0; i < 5 && (await modal.locator('input[type=text]:visible').count()); i++) {
+      const del = modal.locator('i.i-btn-del:visible').first();
+      if (!(await del.count())) throw new Error(`${label} 수정 모달에서 행 삭제 아이콘(i.i-btn-del)을 찾지 못했습니다`);
+      await del.click();
+      await page.waitForTimeout(600);
+    }
+  }
+  await logModal(page, log, `${label} 수정`);
+  await saveModal(page, log);
+}
 
 async function pickSecurityGroup(page: Page, name: string) {
   // "Security Group 정보" 의 "선택" 모달 (두 번째 "선택"; 첫 번째는 추가 Subnet)
@@ -91,6 +142,22 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
           intervalMs: 30_000,
           log,
         });
+        // 노드 풀 단계가 중간에 실패해 노드 풀이 남았으면 먼저 지운다(2026-10-07 노드 수·레이블 단계 추가와 함께)
+        await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 1_500 });
+        await page.getByText(/^노드 풀 \(\d+\)$/).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+        if (await row(page, vars.nodepool!).count()) {
+          const pools = '#' + page.url().split('#')[1]!;
+          await waitPoolRow(page, pools, /Running|Failed|Error/i, 1_800_000);
+          await selectRow(page, vars.nodepool!);
+          await page.getByRole('button', { name: '노드 풀 삭제' }).first().click();
+          await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: vars.nodepool });
+          for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+          await waitForRow(page, pools, vars.nodepool!, { gone: true, timeoutMs: 1_200_000, intervalMs: 30_000, log });
+        }
+        await gotoRoute(page, SKE);
+        await waitForRow(page, SKE, vars.name!, { status: /Active|Running/i, timeoutMs: 1_200_000, intervalMs: 30_000, log });
         await selectRow(page, vars.name!);
         await topButton(page, '서비스 해지').click();
         await confirmModal(page, /해지/, '확인', { agree: true, resourceName: vars.name });
@@ -210,8 +277,8 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     // 노드 풀(L3). API 자동화의 콘솔-미러 조합: kr-west1-b · s1v1m2 · SSD 13 Units(=104GB) · 노드 1 · 자동 확장 끔 · Keypair 필요.
     // 에이전트 C 프로브(2026-09-29): 폼은 별도 화면 #/ske/cluster/detail/nodepool/request, Block Storage 기본 SSD_Provisioned(IOPS 필수) → SSD 로 바꾼다,
     // 확인 모달 "노드 풀을 추가하시겠습니까?" 뒤 "0 / 1 Scaling Up". 노드 1대 시간 과금. SKE_NODEPOOL=0 이면 건너뛴다.
-    if (process.env.SKE_NODEPOOL === '0') return;
-    await test.step(`steps[3] 노드 풀 ${vars.nodepool} 추가 → Running → 삭제`, async () => {
+    if (process.env.SKE_NODEPOOL !== '0')
+    await test.step(`steps[3] 노드 풀 ${vars.nodepool} 추가 → Running → 노드 수·레이블·테인트 → 삭제`, async () => {
       const openPools = async () => {
         await gotoRoute(page, SKE);
         await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
@@ -276,6 +343,46 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await waitForRow(page, pools, vars.nodepool!, { status: /Running|Active/i, timeoutMs: 1_800_000, intervalMs: 30_000, log });
       log(`  노드 풀 행: ${(await row(page, vars.nodepool!).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+      // L4 동작(2026-10-07 에이전트 SKE). 노드 풀 상세 버튼: "노드 목록 · 업그레이드 · 노드 수 조정 · 서비스 해지", 연필: 우선 IP 지정 · Keypair · 레이블 · 테인트 · 노드 풀 연결 자원.
+      // 노드 수 조정 모달: 자동 확장/축소(미사용) · 노드 수 · 최소 · 최대 · 자동 복구 — 첫 text 입력이 노드 수. 노드 1대 더 시간 과금 → 확인 즉시 1로 되돌린다.
+      if (process.env.SKE_SCALE !== '0')
+        await test.step('steps[3].a 노드 수 1 → 2 (Running 2/2) → 1', async () => {
+          for (const [n, want] of [
+            ['2', /\b2 \/ 2 Running/],
+            ['1', /\b1 \/ 1 Running/],
+          ] as const) {
+            await openPoolDetail(page, pools);
+            await page.getByRole('button', { name: '노드 수 조정', exact: true }).click();
+            const modal = visibleModal(page);
+            await modal.waitFor({ timeout: 10_000 });
+            await fillStable(page, modal.locator('input[type=text]:visible').first(), n, '노드 수');
+            await logModal(page, log, `노드 수 ${n}`);
+            await saveModal(page, log);
+            log(`  노드 수 ${n}: ${await waitPoolRow(page, pools, want, 1_500_000)}`);
+          }
+        });
+      if (process.env.SKE_LABELS !== '0')
+        await test.step('steps[3].b 레이블·테인트 추가 → 상세 반영 → 제거', async () => {
+          const label = { key: 'qa-run', value: vars.run_id! };
+          const taint = { key: 'qa-taint', value: vars.run_id! };
+          for (const [what, kv] of [
+            ['레이블', label],
+            ['테인트', taint],
+          ] as const) {
+            await openPoolDetail(page, pools);
+            await editPoolKv(page, what, kv);
+            await waitDetailValue(page, what, (v) => v.includes(kv.key), { log, timeoutMs: 300_000 });
+            await waitPoolRow(page, pools, /\bRunning/, 900_000);
+          }
+          await openPoolDetail(page, pools);
+          await logDetail(page, log, '노드 풀 상세(레이블·테인트 추가 후)');
+          for (const what of ['레이블', '테인트'] as const) {
+            await openPoolDetail(page, pools);
+            await editPoolKv(page, what, null);
+            await waitDetailValue(page, what, (v) => !v.includes('qa-'), { log, timeoutMs: 300_000 });
+            await waitPoolRow(page, pools, /\bRunning/, 900_000);
+          }
+        });
       // 1차 실측(2026-09-30): 삭제 확인 뒤 30분간 1 / 1 Running 그대로 — 요청이 조용히 무시된 것으로 보인다(VM·VPC 해지와 같은 증상)
       // → 모달 문구·버튼 상태를 남기고, 10분 안에 상태가 안 바뀌면 최대 3회 다시 누른다.
       for (let attempt = 1; ; attempt++) {
@@ -302,5 +409,23 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         }
       }
     });
+    // 클러스터 설정 변경(L4, 2026-10-07 에이전트 SKE): 상세 "ServiceWatch 로그 수집" 연필 → 모달 체크 "사용" → 확인. 미사용 → 사용 → 미사용 으로 되돌린다.
+    // 로그 그룹은 5GB 까지 무료. Deletion Protection 은 되돌리기 실패 시 정리가 막히므로 쓰지 않는다. SKE_SETTING=0 이면 건너뛴다.
+    if (process.env.SKE_SETTING !== '0')
+      await test.step('steps[4] 클러스터 ServiceWatch 로그 수집 켬 → 반영 → 끔', async () => {
+        for (const on of [true, false]) {
+          await waitForRow(page, SKE, vars.name!, { status: /Running/i, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+          await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+          await settleConsole(page, { appearGraceMs: 1_500 });
+          const modal = await openLabelEdit(page, 'ServiceWatch 로그 수집');
+          const box = modal.locator('.scp-select:visible').first();
+          if (((await box.getAttribute('class')) ?? '').includes('scp-select-checked') !== on) await box.click();
+          await logModal(page, log, `ServiceWatch 로그 수집 ${on ? '켬' : '끔'}`);
+          await saveModal(page, log);
+          await waitDetailValue(page, 'ServiceWatch 로그 수집', (v) => (on ? /^사용/.test(v) : /미사용/.test(v)), { log, timeoutMs: 600_000 });
+        }
+        await gotoRoute(page, SKE);
+        await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+      });
   });
 });

@@ -11,13 +11,15 @@ export interface SpecPlan {
   minutes: number;
   /** 같은 lock 을 가진 spec 은 동시에 띄우지 않는다(계정 쿼터 등). 예: 프라이빗 레지스트리 1개 */
   lock?: string;
+  /** true 면 매일 스위트에서 빼고 run-suite --weekly 일 때만 띄운다(오래 걸리고 되돌릴 수 없는 동작, 예: SKE 업그레이드) */
+  weekly?: boolean;
 }
 
 export const DEFAULT_PLAN: SpecPlan = { vpc: 0, minutes: 3 };
 
 export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpc.create-delete': { vpc: 1, minutes: 1 },
-  'compute.vm-stack': { vpc: 1, minutes: 18 }, // 09-30 Image·포트·Dump 단계 추가 (에이전트 C)
+  'compute.vm-stack': { vpc: 1, minutes: 27 }, // 09-30 Image·포트·Dump 단계 추가 (에이전트 C), 10-07 상세 수정(L3, 5L) 포함 실측 26분
   'compute.vm-volume': { vpc: 1, minutes: 16.5 },
   'compute.vm-stack-net': { vpc: 1, minutes: 14.5 },
   'compute.server-group': { vpc: 0, minutes: 1.5 },
@@ -34,7 +36,7 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.nat-gateway': { vpc: 1, minutes: 11.5 },
   'compute.auto-scaling-group': { vpc: 1, minutes: 15 },
   'networking.vpc-peering': { vpc: 2, minutes: 14 }, // 규칙 단계 포함(2026-09-30), VPC 2개
-  'container.ske-cluster': { vpc: 1, minutes: 30 }, // 노드 풀 단계 포함(2026-09-30)
+  'container.ske-cluster': { vpc: 1, minutes: 39 }, // 노드 풀 단계 포함(2026-09-30). 10-07 에이전트 SKE: 노드 수 1→2→1·레이블·테인트·ServiceWatch 로그 수집(L4) 포함 실측 38.5분
   'database.postgresql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분)
   'database.mysql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C)
   'database.mariadb': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
@@ -64,6 +66,8 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.gslb': { vpc: 0, minutes: 2 },
   // 에이전트 3B (2026-10-06): VPC 없음. Cloud LAN-DC 는 vDevice 2개 Creating·Deleting 으로 ≈8분 (Failed 재시도 시 더)
   'networking.cloud-lan-data-center': { vpc: 0, minutes: 9 },
+  'networking.cloud-fabric-connect': { vpc: 0, minutes: 4.5 }, // 5L 2026-10-07 상세 설명·태그(L3) 3개 포함 실측 4분
+  'container.ske-upgrade': { vpc: 1, minutes: 42, weekly: true }, // 에이전트 SKE 2026-10-07 단독 실측 44분·39분(클러스터 업그레이드 ≈2분, 노드 풀 ≈5.5분). 주간 전용(run-suite --weekly)
 };
 
 export function planFor(spec: string): SpecPlan {

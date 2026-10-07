@@ -1,0 +1,60 @@
+id: container.ske-upgrade
+title: VPC → Subnet → SG → SKE 클러스터(낮은 버전) → 노드 풀 → 클러스터·노드 풀 업그레이드 → 역순 해지
+service: Kubernetes Engine
+category: Container
+tags: [regression, destructive, crud, stack, heavy, weekly]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 주간 실행용(suite-plan weekly: true → run-suite 는 --weekly 일 때만). 시간 과금(클러스터 + 노드 1대), 업그레이드는 되돌릴 수 없어 1회용 클러스터에서만.
+# 콘솔(2026-10-07 프로브): 생성 폼 "Kubernetes 버전" 드롭다운 = v1.36.3(기본) · v1.35.5 · v1.34.3 · v1.33.5 · v1.32.8 · v1.31.8(2026-10-28 지원 종료) — 6개.
+# API 자동화와 같은 방식: 목록의 두 번째(최신 바로 아래)로 만들고 첫 번째(최신)로 올린다 → 버전이 바뀌어도 그대로 돈다(SKE_FROM_VERSION 으로 바꿀 수 있음).
+# API 참고(setclusterupgrade/setnodepoolupgrade _note): 노드 풀 업그레이드는 클러스터 버전을 따라가고 OS 이미지 버전을 고른다(v1.35.5 이상은 ubuntu 24.04 뿐).
+steps:
+  - goal: "VPC 목록으로 이동한다"
+    goto: "#/vpc/vpc/list"
+    expect:
+      url: "#/vpc/vpc/list"
+
+  - goal: "VPC {{vpc}}, Subnet {{subnet}}, Security Group {{sg}} 를 만든다"
+    vars:
+      vpc: "vpc-{{run_id}}"
+      subnet: "sub-{{run_id}}"
+      sg: "sg-{{run_id}}"
+    expect:
+      url: "#/securitygroup/securitygroup/list"
+      text: ["{{sg}}"]
+
+  - goal: "클러스터 {{name}} 을 최신 바로 아래 버전으로 생성하고 Running 을 기다린다"
+    vars:
+      name: "ske-{{run_id}}"
+    expect:
+      url: "#/ske/cluster"
+      text: ["{{name}}"]
+
+  - goal: "노드 풀 {{nodepool}} 을 노드 1대(s1v1m2, SSD, 공유 Keypair)로 추가하고 Running 을 기다린다"
+    vars:
+      nodepool: "np-{{run_id}}"
+    expect:
+      url: "#/ske/cluster"
+
+  - goal: "클러스터를 최신 버전으로 업그레이드하고 완료(Running + 새 버전)를 기다린다"
+    expect:
+      url: "#/ske/cluster"
+
+  - goal: "노드 풀을 클러스터 버전으로 업그레이드하고 완료(Running + 새 버전)를 기다린 뒤 노드 풀을 삭제한다"
+    expect:
+      url: "#/ske/cluster"
+
+teardown:
+  - goal: "남은 노드 풀을 지우고 클러스터 {{name}} 을 해지해 목록에서 사라질 때까지 기다린다"
+    expect:
+      not_text: ["{{name}}"]
+      timeout: 1800000
+  - goal: "SG, Subnet, VPC 를 역순으로 지운다"
+    expect:
+      not_text: ["{{vpc}}"]
+      timeout: 1200000

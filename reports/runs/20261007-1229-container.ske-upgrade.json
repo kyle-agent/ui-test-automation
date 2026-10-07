@@ -1,0 +1,69 @@
+{
+  "spec": "container.ske-upgrade",
+  "started": "2026-10-07T03:29:23.568Z",
+  "ended": "2026-10-07T04:08:52.235Z",
+  "seconds": 2369,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.ske-upgrade",
+    "run_id": "1007-1229-93ca",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "k8s_version": "v1.35.5 → v1.36.3",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → SKE 클러스터(낮은 버전) → 노드 풀 → 클러스터·노드 풀 업그레이드 → 역순 해지",
+      "status": "passed",
+      "seconds": 2337.1,
+      "annotations": {
+        "scenario": "container.ske-upgrade",
+        "run_id": "1007-1229-93ca",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "k8s_version": "v1.35.5 → v1.36.3",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.1
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG 생성",
+          "status": "pass",
+          "seconds": 281.9
+        },
+        {
+          "title": "steps[2] 클러스터 ske-1007-1229-93ca 생성 (최신 바로 아래 버전)",
+          "status": "pass",
+          "seconds": 494.8
+        },
+        {
+          "title": "steps[3] 노드 풀 np-1007-1229-93ca 추가 → Running",
+          "status": "pass",
+          "seconds": 200.6
+        },
+        {
+          "title": "steps[4] 클러스터 업그레이드 → 완료 대기",
+          "status": "pass",
+          "seconds": 151.6
+        },
+        {
+          "title": "steps[5] 노드 풀 np-1007-1229-93ca 업그레이드 → 완료 대기 → 삭제",
+          "status": "pass",
+          "seconds": 760.7
+        }
+      ]
+    }
+  ],
+  "git_sha": "f76d1bb"
+}

@@ -35,9 +35,15 @@ steps:
       url: "#/ske/cluster"
       text: ["{{name}}"]
 
-  - goal: "노드 풀 {{nodepool}} 을 노드 1대(s1v1m2, SSD, kr-west1-b, 공유 Keypair)로 추가해 Running 을 확인하고 삭제한다 (L3, SKE_NODEPOOL=0 이면 건너뜀)"
+  # 2026-10-07 에이전트 SKE: 노드 풀 상세 "노드 수 조정" 1→2→1(SKE_SCALE=0 이면 생략), "레이블"·"테인트" 연필 모달 추가→반영→제거(SKE_LABELS=0 이면 생략)
+  - goal: "노드 풀 {{nodepool}} 을 노드 1대(s1v1m2, SSD, kr-west1-b, 공유 Keypair)로 추가해 Running 을 확인하고, 노드 수 1→2(Running 2/2)→1, 레이블·테인트 추가→상세 반영→제거 후 삭제한다 (L4, SKE_NODEPOOL=0 이면 건너뜀)"
     vars:
       nodepool: "np-{{run_id}}"
+    expect:
+      url: "#/ske/cluster"
+
+  # 2026-10-07 에이전트 SKE: 상세 "ServiceWatch 로그 수집" 연필 → 모달 체크 "사용" → 확인 (SKE_SETTING=0 이면 생략)
+  - goal: "클러스터 {{name}} 의 ServiceWatch 로그 수집을 켜 상세에 사용으로 반영되는지 확인하고 다시 끈다 (L4)"
     expect:
       url: "#/ske/cluster"
 

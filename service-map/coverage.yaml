@@ -898,6 +898,6 @@ resources:
     category: "Container"
     route: /ske/cluster
     level: 4
-    specs: [smoke.kubernetes-engine, container.ske-cluster]
-    last_pass: "2026-09-30"
-    note: "VPC·Subnet·SG 위에 제어 영역 생성 + 노드 풀(s1v1m2 1대) 추가·Running·삭제(L3, SKE_NODEPOOL=0 이면 생략). 제어 영역: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지"
+    specs: [smoke.kubernetes-engine, container.ske-cluster, container.ske-upgrade]
+    last_pass: "2026-10-07"
+    note: "VPC·Subnet·SG 위에 제어 영역 생성 + 노드 풀(s1v1m2 1대) 추가·Running·삭제(L3, SKE_NODEPOOL=0 이면 생략). 제어 영역: NFS 볼륨 사용 체크(기본 켜짐)를 꺼야 생성 활성. Running ≈7분, 해지 ≈12분. 시간 과금이라 즉시 해지 / 2026-10-07 에이전트 SKE(L4): 노드 풀 상세 '노드 수 조정' 1→2(2 / 2 Running ≈2분)→1, 레이블·테인트 연필 모달 추가→상세 반영→제거(행 삭제 아이콘 i.i-btn-del), 클러스터 ServiceWatch 로그 수집 켬→끔 — PASS 38.5분. 주간 spec container.ske-upgrade: 버전 선택지 6개(v1.36.3~v1.31.8) 중 두 번째(v1.35.5)로 생성 → 상세 Kubernetes 버전 연필 → 클러스터 업그레이드(≈2분) → 노드 풀 상세 업그레이드(서지 노드, ≈5.5분) — PASS 44분"

@@ -109,6 +109,10 @@ ske:
   deletenodepool: container.ske-cluster, container.ske-upgrade
   setclusterupgrade: container.ske-upgrade
   setnodepoolupgrade: container.ske-upgrade
+  setnodepool: container.ske-cluster # 노드 수 1→2→1 (2026-10-07)
+  setnodepoollabels: container.ske-cluster # 레이블 추가→제거
+  setnodepooltaints: container.ske-cluster # 테인트 추가→제거
+  setclusterservicewatchlogging: container.ske-cluster # ServiceWatch 로그 수집 켬→끔 # 확인 필요(setclusterlogging 일 수도)
   # 네임스페이스 오브젝트 생성·삭제는 Kubernetes API(카탈로그 밖)라 대응 없음
 
 # ── Data Analytics ──

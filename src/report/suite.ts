@@ -64,4 +64,5 @@ export const SUITE_ORDER: readonly string[] = [
   'iam.saml-provider', // 에이전트 3A: SAML 자격 증명 공급자(더미 메타데이터) 생성·삭제. Global
   'management.trail', // 에이전트 3A: 버킷 → Trail 생성 → 중지(L3) → 삭제 → 버킷 해지. ≈2분
   'devops-tools.devops-service', // 에이전트 3A: DevOps Service Tenant 생성 → 상세 해지
+  'container.ske-upgrade', // 에이전트 SKE: 클러스터(최신 바로 아래 버전)+노드 풀 → 클러스터·노드 풀 업그레이드 → 역순. 주간(suite-plan weekly)
 ];
