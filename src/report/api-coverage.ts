@@ -10,12 +10,21 @@ import type { CoverageEntry } from './coverage';
 
 export const API_COVERAGE_FILE = path.resolve(process.cwd(), 'data', 'api-coverage.json');
 
+/** API 카탈로그의 동작 하나: 카탈로그 이름(예 createcluster)·HTTP 메서드·검증 여부. 본문·경로는 넣지 않는다 */
+export interface ApiOp {
+  name: string;
+  method: string;
+  verified: boolean;
+}
+
 export interface ApiServiceCoverage {
   category: string;
   service: string;
   total: number;
   verified: number;
   ok2xx: number;
+  /** 동작 목록(2026-10-07 부터). 예전 스냅샷에는 없다 */
+  ops?: ApiOp[];
 }
 
 export interface ApiCoverageSnapshot {
@@ -109,6 +118,16 @@ export const API_SERVICE: Record<string, string | null> = {
   filestorage: 'File Storage',
   'parallel-filestorage': 'Parallel File Storage',
 };
+
+/** 스냅샷 JSON: 들여쓰기 2칸, 동작(ops) 항목은 한 줄에 하나 (diff 를 읽기 쉽게) */
+export function formatApiCoverageJson(snapshot: ApiCoverageSnapshot): string {
+  return (
+    JSON.stringify(snapshot, null, 2).replace(
+      /\{\s*"name": ("[^"]*"),\s*"method": ("[^"]*"),\s*"verified": (true|false)\s*\}/g,
+      '{ "name": $1, "method": $2, "verified": $3 }',
+    ) + '\n'
+  );
+}
 
 export function readApiCoverage(file = API_COVERAGE_FILE): ApiCoverageSnapshot | null {
   if (!fs.existsSync(file)) return null;

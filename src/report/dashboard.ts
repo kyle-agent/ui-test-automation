@@ -29,6 +29,7 @@ import {
   type Finding,
 } from './insights';
 import type { ApiCoverageSnapshot, CategoryRow, ProductRow } from './api-coverage';
+import { operationsByCategory, type OperationsSummary, type ProductOperations } from './operations';
 import type { ProductMatrix } from './product-matrix';
 import type { RunRecord } from './run-record';
 
@@ -108,6 +109,8 @@ export interface DashboardInput {
   apiSnapshot?: ApiCoverageSnapshot | null;
   /** 상품별 화면 판단표(src/report/product-matrix.ts) */
   matrix?: readonly ProductMatrix[];
+  /** 상품별 쓰기 동작 커버리지(src/report/operations.ts productOperations) */
+  operations?: OperationsSummary;
 }
 
 const esc = (s: unknown): string =>
@@ -353,8 +356,19 @@ function dualBar(uiPct: number | null, apiPct: number | null): string {
 function productsBlock(
   data: { products: readonly ProductRow[]; categories: readonly CategoryRow[] } | undefined,
   api: ApiCoverageSnapshot | null,
+  operations?: OperationsSummary,
 ): string {
   if (!data) return '<p class="muted">자료 없음</p>';
+  const opsByCat = operationsByCategory(operations?.products ?? []);
+  const opsByProduct = new Map((operations?.products ?? []).map((o) => [o.product, o]));
+  const opsCell = (o: { opsTotal: number; apiVerified: number; uiCovered: number } | undefined) =>
+    o && o.opsTotal
+      ? `<td class="num" title="쓰기 동작: 화면 ${o.uiCovered} · API ${o.apiVerified} / ${o.opsTotal}">${o.uiCovered}/${o.opsTotal} <span class="muted">(${pct(o.uiCovered, o.opsTotal)}%)</span></td>`
+      : '<td class="num muted">—</td>';
+  const opsTot = [...opsByCat.values()].reduce(
+    (n, c) => ({ opsTotal: n.opsTotal + c.opsTotal, apiVerified: n.apiVerified + c.apiVerified, uiCovered: n.uiCovered + c.uiCovered }),
+    { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
+  );
   const uiCell = (u: { resources: number; l2: number; l3: number } | null) =>
     u && u.resources
       ? `<td class="num">${u.l2}/${u.resources} <span class="muted">(${pct(u.l2, u.resources)}%)</span></td><td class="num">${u.l3} <span class="muted">(${pct(u.l3, u.resources)}%)</span></td>`
@@ -376,7 +390,7 @@ function productsBlock(
     .map(
       (c) => `<tr>
         <td><a href="#cat-${esc(c.category)}">${esc(c.category)}</a></td>
-        ${uiCell(c.ui)}${apiCell(c.api)}${gap(c.ui, c.api)}
+        ${uiCell(c.ui)}${opsCell(opsByCat.get(c.category))}${apiCell(c.api)}${gap(c.ui, c.api)}
         <td class="barcell">${dualBar(c.ui.resources ? pct(c.ui.l2, c.ui.resources) : null, c.api.total ? pct(c.api.verified, c.api.total) : null)}</td>
       </tr>`,
     )
@@ -386,12 +400,12 @@ function productsBlock(
   const prodRows = [...byCat]
     .map(
       ([cat, list]) =>
-        `<tr class="cathead" id="cat-${esc(cat)}"><td colspan="6">${esc(cat)}</td></tr>` +
+        `<tr class="cathead" id="cat-${esc(cat)}"><td colspan="7">${esc(cat)}</td></tr>` +
         list
           .map(
             (p) => `<tr>
         <td>${esc(p.product)}${p.api && p.api.services.length ? ` <span class="muted small mono">${esc(p.api.services.join(', '))}</span>` : ''}</td>
-        ${uiCell(p.ui)}${apiCell(p.api)}${gap(p.ui, p.api)}
+        ${uiCell(p.ui)}${opsCell(opsByProduct.get(p.product))}${apiCell(p.api)}${gap(p.ui, p.api)}
         <td class="barcell">${dualBar(p.ui && p.ui.resources ? pct(p.ui.l2, p.ui.resources) : null, p.api && p.api.total ? pct(p.api.verified, p.api.total) : null)}</td>
       </tr>`,
           )
@@ -400,15 +414,47 @@ function productsBlock(
     .join('\n');
   return `${api ? '' : '<p class="warn">data/api-coverage.json 없음 — npx tsx scripts/import-api-coverage.ts --repo &lt;api 저장소&gt;</p>'}
     <div class="legend"><span><i style="background:var(--l2)"></i>화면 L2+ 비율</span><span><i style="background:#f59e0b"></i>API 검증 비율</span><span class="muted">차이 = 화면 L2+% − API%. 화면이 20%p 이상 낮으면 빨강</span></div>
-    <table><thead><tr><th>카테고리</th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead>
-    <tbody>${catRows}<tr class="total"><td>전체</td>${uiCell({ resources: tot.r, l2: tot.l2, l3: tot.l3 })}${apiCell({ total: tot.t, verified: tot.v })}${gap({ resources: tot.r, l2: tot.l2 }, { total: tot.t, verified: tot.v })}<td class="barcell">${dualBar(pct(tot.l2, tot.r), pct(tot.v, tot.t))}</td></tr></tbody></table>
+    <table><thead><tr><th>카테고리</th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num" title="API 쓰기 동작 중 화면 회귀 시나리오가 하는 것 (data/ui-operations.yaml)">동작(UI)</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead>
+    <tbody>${catRows}<tr class="total"><td>전체</td>${uiCell({ resources: tot.r, l2: tot.l2, l3: tot.l3 })}${opsCell(opsTot)}${apiCell({ total: tot.t, verified: tot.v })}${gap({ resources: tot.r, l2: tot.l2 }, { total: tot.t, verified: tot.v })}<td class="barcell">${dualBar(pct(tot.l2, tot.r), pct(tot.v, tot.t))}</td></tr></tbody></table>
     <details open><summary>상품별 (${data.products.length})</summary>
-    <table id="prod-t"><thead><tr><th>상품 <span class="muted small">(API 서비스)</span></th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead><tbody>${prodRows}</tbody></table>
-    <p class="muted small">— = 그쪽 장부에 없음. 화면 장부는 리소스 키가 있는 목록 화면만 센다(하위 화면·설정 화면은 빠짐). "(API) …" 는 화면 장부에 대응 상품이 없는 API 서비스.</p></details>`;
+    <table id="prod-t"><thead><tr><th>상품 <span class="muted small">(API 서비스)</span></th><th class="num">화면 L2+</th><th class="num">화면 L3+</th><th class="num">동작(UI)</th><th class="num">API 검증</th><th class="num">차이</th><th></th></tr></thead><tbody>${prodRows}</tbody></table>
+    <p class="muted small">— = 그쪽 장부에 없음. 화면 장부는 리소스 키가 있는 목록 화면만 센다(하위 화면·설정 화면은 빠짐). "(API) …" 는 화면 장부에 대응 상품이 없는 API 서비스. 동작(UI) = API 쓰기 동작(POST·PUT·PATCH·DELETE, 읽기 동사 제외) 중 회귀 시나리오가 하는 것(data/ui-operations.yaml). API 검증 열은 읽기 포함 엔드포인트 전체 기준.</p></details>`;
 }
 
-function matrixBlock(matrix: readonly ProductMatrix[], products: readonly ProductRow[]): string {
+const opsLine = (o: { opsTotal: number; apiVerified: number; uiCovered: number }): string =>
+  `동작 UI ${o.uiCovered}/${o.opsTotal} · API ${o.apiVerified}/${o.opsTotal}`;
+
+/** 상품 하나의 쓰기 동작 표: API ✓/· · UI ✓/· · 그 동작을 하는 spec */
+function opsTable(o: ProductOperations): string {
+  const mark = (v: boolean) => (v ? '<span class="good">✓</span>' : '<span class="muted">·</span>');
+  const spec = (x: string) => `<span class="mono">${esc(x)}</span>`;
+  const specs = (ids: string[]) =>
+    ids.length > 3
+      ? `${ids.slice(0, 3).map(spec).join(', ')} <span class="muted" title="${esc(ids.slice(3).join(', '))}">외 ${ids.length - 3}</span>`
+      : ids.map(spec).join(', ');
+  const rows = o.ops
+    .map(
+      (r) => `<tr${r.ui.length ? '' : ' class="op-gap"'}><td class="mono small">${esc(r.name)}${o.services.length > 1 ? ` <span class="muted">${esc(r.service)}</span>` : ''}</td><td class="small muted">${esc(r.method)}</td><td>${mark(r.api)}</td><td>${mark(r.ui.length > 0)}${r.uncertain ? ' <span class="tag warn" title="data/ui-operations.yaml: 확인 필요">?</span>' : ''}</td><td class="small">${specs(r.ui)}</td></tr>`,
+    )
+    .join('');
+  return `<details class="ops"><summary>쓰기 동작 ${o.opsTotal} — UI ${o.uiCovered} (${pct(o.uiCovered, o.opsTotal)}%) · API ${o.apiVerified} (${pct(o.apiVerified, o.opsTotal)}%)</summary>
+    <table class="mx ops-t"><thead><tr><th>동작 <span class="muted small">(API 카탈로그)</span></th><th>메서드</th><th>API</th><th>UI</th><th>spec</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+}
+
+function matrixBlock(matrix: readonly ProductMatrix[], products: readonly ProductRow[], operations?: OperationsSummary): string {
   if (!matrix.length) return '<p class="muted">서비스 맵 없음</p>';
+  const opsOf = (svc: string) => operations?.products.find((p) => p.product === svc);
+  const opsAll = (operations?.products ?? []).reduce(
+    (n, c) => ({ opsTotal: n.opsTotal + c.opsTotal, apiVerified: n.apiVerified + c.apiVerified, uiCovered: n.uiCovered + c.uiCovered }),
+    { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
+  );
+  const opsWarn = operations
+    ? [
+        ...operations.unknown.map((x) => `카탈로그에 없거나 읽기 동작: ${x}`),
+        ...operations.unknownServices.map((x) => `스냅샷에 없는 서비스: ${x}`),
+        ...operations.unknownSpecs.map((x) => `없는 spec: ${x}`),
+      ]
+    : [];
   const stateCls: Record<string, string> = { 시나리오: 'st-ok', 스모크만: 'st-smoke', 제외: 'st-ex', 홈: 'st-home' };
   const apiOf = (svc: string) => products.find((p) => p.product === svc)?.api ?? null;
   const all = matrix.flatMap((m) => m.screens);
@@ -423,6 +469,7 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
           const c = (st: string) => m.screens.filter((r) => r.state === st).length;
           const gaps = c('스모크만');
           const api = apiOf(m.service);
+          const ops = opsOf(m.service);
           const dec = m.screens.filter((r) => r.decision);
           const rows = m.screens
             .map(
@@ -443,8 +490,9 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
             .join('');
           return `<details class="prod" data-gap="${gaps ? 1 : 0}" data-dec="${dec.length ? 1 : 0}"><summary><b>${esc(m.service)}</b>
               <span class="muted">화면 ${m.screens.length} · </span><span class="st st-ok">시나리오 ${c('시나리오')}</span> <span class="st st-smoke">스모크만 ${gaps}</span> <span class="st st-ex">제외 ${c('제외')}</span>
-              <span class="muted"> · spec ${m.specs.length}${api && api.total ? ` · API ${api.verified}/${api.total} (${pct(api.verified, api.total)}%)` : ''}${dec.length ? ` · 판단 ${dec.length}` : ''}</span></summary>
+              <span class="muted"> · spec ${m.specs.length}${api && api.total ? ` · API ${api.verified}/${api.total} (${pct(api.verified, api.total)}%)` : ''}${dec.length ? ` · 판단 ${dec.length}` : ''}</span>${ops ? ` <span class="opsum">${opsLine(ops)}</span>` : ''}</summary>
               <table class="mx"><thead><tr><th>화면</th><th>route</th><th>상태</th><th>시나리오(단계 수·최근)</th><th>제외 사유</th><th>판단</th></tr></thead><tbody>${rows}</tbody></table>
+              ${ops ? opsTable(ops) : ''}
               ${scen ? `<div class="scen"><b>시나리오</b><ul>${scen}</ul></div>` : '<p class="muted small">이 상품을 다루는 회귀 시나리오 없음</p>'}
             </details>`;
         })
@@ -452,8 +500,8 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
       return `<h3 class="cat">${esc(cat)}</h3>${prods}`;
     })
     .join('');
-  return `<p class="muted">상품 ${matrix.length} · 화면 ${all.length}: <span class="st st-ok">시나리오 ${count('시나리오')}</span> <span class="st st-smoke">스모크만 ${count('스모크만')}</span> <span class="st st-ex">제외 ${count('제외')}</span> <span class="st st-home">홈 ${count('홈')}</span> · 판단 기록 ${decided}</p>
-    <p class="muted small">시나리오 = 회귀 spec 의 단계가 그 화면(목록·상세·생성)을 지남 · 스모크만 = 진입 확인뿐(판단 필요) · 제외 = 장부 메모의 사유 · 홈 = Service Home</p>
+  return `<p class="muted">상품 ${matrix.length} · 화면 ${all.length}: <span class="st st-ok">시나리오 ${count('시나리오')}</span> <span class="st st-smoke">스모크만 ${count('스모크만')}</span> <span class="st st-ex">제외 ${count('제외')}</span> <span class="st st-home">홈 ${count('홈')}</span> · 판단 기록 ${decided}${opsAll.opsTotal ? ` · <b>${opsLine(opsAll)}</b>` : ''}</p>
+    <p class="muted small">시나리오 = 회귀 spec 의 단계가 그 화면(목록·상세·생성)을 지남 · 스모크만 = 진입 확인뿐(판단 필요) · 제외 = 장부 메모의 사유 · 홈 = Service Home · 동작 UI x/m · API y/m = API 카탈로그의 쓰기 동작 m 개(POST·PUT·PATCH·DELETE 중 list·show·check·get·query·validate·detail·download 로 시작하는 것 제외) 가운데 화면 회귀 시나리오가 하는 것 x(data/ui-operations.yaml, ? = 확인 필요) · API 자동화가 검증한 것 y</p>${opsWarn.length ? `<p class="warn small">data/ui-operations.yaml 점검: ${opsWarn.map(esc).join(' · ')}</p>` : ''}
     <div class="filters">보기: <button data-mx="all" class="on">전체</button><button data-mx="gap">스모크만 화면이 있는 상품</button><button data-mx="dec">판단 기록 있는 상품</button></div>
     <div id="mx">${body}</div>`;
 }
@@ -624,7 +672,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   .badge.info { background:#64748b }
   .st { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; font-weight:600 } .st-ok { background:#dcfce7; color:#166534 } .st-smoke { background:#fef3c7; color:#92400e } .st-ex { background:#e5e7eb; color:#374151 } .st-home { background:#f3f4f6; color:#9ca3af }
   details.prod { border:1px solid var(--line); border-radius:6px; padding:4px 10px; margin:4px 0 } details.prod summary { color:var(--ink); margin:4px 0 } h3.cat { font-size:13px; margin:14px 0 4px; color:#374151 }
-  table.mx td, table.mx th { padding:4px 6px } .scen ul { margin:4px 0 8px; padding-left:18px } ol.steps { margin:2px 0 6px; padding-left:20px; font-size:12px; color:#374151 } ol.steps li.td { color:#6b7280 }
+  table.mx td, table.mx th { padding:4px 6px } .opsum { font-size:12px; color:#1d4ed8; margin-left:4px } details.ops { margin:6px 0 } details.ops summary { font-size:12px } table.ops-t { width:auto; min-width:520px } tr.op-gap td { color:#6b7280 } .scen ul { margin:4px 0 8px; padding-left:18px } ol.steps { margin:2px 0 6px; padding-left:20px; font-size:12px; color:#374151 } ol.steps li.td { color:#6b7280 }
   .dual { display:flex; flex-direction:column; gap:2px; min-width:140px } .pb { height:7px; background:#eef2f7; border-radius:4px; overflow:hidden } .pb.none { background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#fff 4px,#fff 8px) } .pb span { display:block; height:100% } .pb .ui { background:var(--l2) } .pb .api { background:#f59e0b }
   tr.cathead td { background:#f3f4f6; font-weight:600; font-size:12px } tr.total td { font-weight:600; border-top:2px solid var(--line) } .good { color:var(--pass) }
   .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
@@ -698,12 +746,12 @@ export function renderDashboardHtml(input: DashboardInput): string {
 
 <section id="matrix">
   <h2>상품별 판단표 — 화면·시나리오·제외 사유 <small>서비스 맵의 상품·화면 전체 기준. 판단은 data/coverage-decisions.yaml 에 "&lt;route&gt;: 해라|제외|보류 | 메모"</small></h2>
-  ${matrixBlock(input.matrix ?? [], input.products?.products ?? [])}
+  ${matrixBlock(input.matrix ?? [], input.products?.products ?? [], input.operations)}
 </section>
 
 <section id="products">
   <h2>상품·카테고리별 커버리지 — 화면 vs API <small>화면 = 목록 화면 리소스(coverage.yaml) L2+·L3+ 비율 · API = 엔드포인트 검증 비율(data/api-coverage.json${input.apiSnapshot ? ` · ${esc(input.apiSnapshot.source_commit)} · ${esc(input.apiSnapshot.source_date)}` : ''}). 단위가 달라 비율끼리만 비교</small></h2>
-  ${productsBlock(input.products, input.apiSnapshot ?? null)}
+  ${productsBlock(input.products, input.apiSnapshot ?? null, input.operations)}
 </section>
 
 <section id="parity">

@@ -1,0 +1,337 @@
+# 화면 회귀 시나리오 ↔ API 동작 대응표 (동작 단위 커버리지, 대시보드 "동작 UI x/m · API y/m")
+#
+# 모수(m): API 자동화 카탈로그(data/api-coverage.json services[].ops)의 "쓰기 동작"만.
+#   쓰기 동작 = HTTP 메서드가 POST·PUT·PATCH·DELETE 이고, 이름(서비스 접두어를 뗀 것, 예 mysqllistclusters → listclusters)이
+#   읽기 동사 list·show·check·get·query·validate·detail·download 로 시작하지 않는 것. GET 은 모두 읽기.
+#   (코드: src/report/operations.ts isWriteOp · READ_VERB). 읽기 동작은 여기 적지 않는다(적어도 세지 않고 "모르는 동작" 경고).
+# UI(x): 아래에 적힌 동작 = 회귀 spec(tests/regression/<id>.spec.ts)의 시나리오 단계가 화면에서 그 동작을 한다.
+# API(y): API 저장소 verified_endpoints.json 에 있는 동작.
+#
+# 형식(줄 단위, 사람이 고친다):
+#   <API 서비스 slug>:
+#     <카탈로그 동작 이름>: <spec id>, <spec id>   # 확인 필요   ← 화면 동작과 API 동작의 대응이 확실치 않으면 이 주석
+# 서비스 slug·동작 이름은 API 카탈로그 그대로(data/api-coverage.json). 상품 이름은 코드가 붙인다(API_SERVICE + OPS_PRODUCT_EXTRA).
+# 기준: 2026-10-07 시나리오 단계 목표(goal) 문구. 조건부 단계(환경 변수로 건너뛸 수 있는 것)도 포함했다.
+# 태그 탭 추가·삭제는 Resource Groups(resourcemanager)의 태그 API 로 보았다(확인 필요).
+
+# ── Application Service ──
+apigateway:
+  createapi: application-service.api-gateway
+  createresource: application-service.api-gateway
+  createmethod: application-service.api-gateway
+  createapideployment: application-service.api-gateway
+  createstage: application-service.api-gateway  # 확인 필요 — "새 스테이지로 배포" 가 스테이지 생성 API 를 따로 부르는지
+  createauth: application-service.api-gateway
+  deleteauth: application-service.api-gateway
+  createaccesscontrols: application-service.api-gateway
+  deleteaccesscontrol: application-service.api-gateway
+  createusageplan: application-service.api-gateway
+  deleteusageplan: application-service.api-gateway
+  createapikey: application-service.api-gateway
+  deleteapikey: application-service.api-gateway
+  deleteapi: application-service.api-gateway
+
+messagehub:
+  createdomain: application-service.messagehub-domain
+  deletedomain: application-service.messagehub-domain
+  createemail: application-service.messagehub-email
+  deleteemail: application-service.messagehub-email
+
+queueservice:
+  createqueue: application-service.queue
+  updatequeueconfig: application-service.queue  # 확인 필요 — 메시지 설정(보존 기간) 수정
+  setacl: application-service.queue
+  deleteacl: application-service.queue
+  deletequeue: application-service.queue
+
+# ── Compute ──
+scf:
+  createcloudfunction: compute.cloud-function
+  createcloudfunctioncronjobtrigger: compute.cloud-function
+  createcloudfunctionapigatewaytrigger: application-service.api-gateway
+  deletecloudfunctiontrigger: compute.cloud-function, application-service.api-gateway
+  deletecloudfunction: compute.cloud-function
+
+virtualserver:
+  createkeypair: compute.vm-stack  # 확인 필요 — 공유 Keypair 가 없을 때만 생성
+  deletekeypair: compute.vm-stack  # 확인 필요 — 이 실행에서 만든 경우만
+  createvirtualserver: compute.vm-stack, compute.vm-stack-net, compute.vm-volume
+  deletevirtualserver: compute.vm-stack, compute.vm-stack-net, compute.vm-volume
+  stopvirtualserver: compute.vm-stack
+  startvirtualserver: compute.vm-stack
+  updatevirtualserver: compute.vm-stack  # 확인 필요 — 서버명 변경
+  lockvirtualserver: compute.vm-stack
+  unlockvirtualserver: compute.vm-stack
+  attachvirtualserversecuritygroup: compute.vm-stack
+  detachvirtualserversecuritygroup: compute.vm-stack  # 확인 필요 — "해제 가능하면 해제"
+  createvirtualservercustomimage: compute.vm-stack
+  updateimage: compute.vm-stack  # 확인 필요 — Visibility 를 Shared 로 변경(createsharingimage 일 수도)
+  deleteimage: compute.vm-stack
+  createserverinterface: compute.vm-stack
+  deleteserverinterface: compute.vm-stack
+  createvirtualserverdump: compute.vm-stack
+  createserverinterfacenat: compute.vm-stack-net  # 확인 필요 — 서버 상세에서 예약 Public IP 연결
+  createvolume: compute.vm-volume, compute.volume-snapshot
+  deletevolume: compute.vm-volume, compute.volume-snapshot
+  attachvolumetovirtualserver: compute.vm-volume
+  detachvolumefromvirtualserver: compute.vm-volume
+  createsnapshot: compute.volume-snapshot
+  revertvolumetosnapshot: compute.volume-snapshot
+  deletesnapshot: compute.volume-snapshot
+  createvolumetransfer: compute.volume-snapshot
+  deletevolumetransfer: compute.volume-snapshot  # 확인 필요 — 볼륨 이전 신청 취소
+  createservergroup: compute.server-group
+  deleteservergroup: compute.server-group
+  createlaunchconfiguration: compute.launch-configuration, compute.auto-scaling-group
+  deletelaunchconfiguration: compute.launch-configuration, compute.auto-scaling-group
+  createautoscalinggroup: compute.auto-scaling-group
+  deleteautoscalinggroup: compute.auto-scaling-group
+  createautoscalinggrouppolicy: compute.auto-scaling-group
+  deleteautoscalinggrouppolicy: compute.auto-scaling-group
+  createautoscalinggroupschedule: compute.auto-scaling-group
+  deleteautoscalinggroupschedule: compute.auto-scaling-group
+
+# ── Container ──
+scr:
+  createregistry: container.container-registry, container.repository
+  deleteregistry: container.container-registry, container.repository
+  updatepublicendpointenabled: container.container-registry  # 확인 필요 — 엔드포인트 프라이빗 ↔ 프라이빗&퍼블릭
+  createrepository: container.repository
+  deleterepository: container.repository
+  updaterepositorylifecyclepolicy: container.repository  # 확인 필요 — 이미지 태그 삭제 정책 켜기·끄기
+  updaterepositorylockpolicy: container.repository
+  updaterepositorydescription: container.repository
+
+ske:
+  createcluster: container.ske-cluster, container.ske-upgrade
+  deletecluster: container.ske-cluster, container.ske-upgrade
+  createnodepool: container.ske-cluster, container.ske-upgrade
+  deletenodepool: container.ske-cluster, container.ske-upgrade
+  setclusterupgrade: container.ske-upgrade
+  setnodepoolupgrade: container.ske-upgrade
+  # 네임스페이스 오브젝트 생성·삭제는 Kubernetes API(카탈로그 밖)라 대응 없음
+
+# ── Data Analytics ──
+eventstreams:
+  eventstreamscreatecluster: data-analytics.event-streams
+  eventstreamsstopcluster: data-analytics.event-streams
+  eventstreamsstartcluster: data-analytics.event-streams
+  eventstreamsdeletecluster: data-analytics.event-streams
+
+# ── Database ──
+cachestore:
+  cachestorecreatecluster: database.cachestore
+  cachestoredeletecluster: database.cachestore
+
+epas:
+  epascreatecluster: database.epas
+  epascreatereplica: database.epas
+  epasdeletecluster: database.epas  # 복제본 해지도 클러스터 해지와 같은 동작으로 봄
+
+mariadb:
+  mariadbcreatecluster: database.mariadb
+  mariadbcreatereplica: database.mariadb
+  mariadbdeletecluster: database.mariadb
+
+mysql:
+  mysqlcreatecluster: database.mysql
+  mysqlcreatereplica: database.mysql
+  mysqldeletecluster: database.mysql
+
+postgresql:
+  postgresqlcreatecluster: database.postgresql
+  postgresqlcreatereplica: database.postgresql
+  postgresqldeletecluster: database.postgresql
+
+# ── DevOps Tools ──
+devopsservice:
+  createdevopsservice: devops-tools.devops-service
+  deletedevopsservice: devops-tools.devops-service
+
+# ── Financial Management ──
+budget:
+  createaccountbudget: financial-management.budget
+  setaccountbudget: financial-management.budget
+  deleteaccountbudget: financial-management.budget
+
+# ── Management ──
+iam:
+  createrole: iam.role
+  deleterole: iam.role  # 확인 필요 — deletebulkrole 일 수도
+  addrolepolicybindings: iam.role
+  removerolepolicybinding: iam.role  # 확인 필요 — removebulkrolepolicybindings 일 수도
+  setroletrustpolicy: iam.role  # 확인 필요 — 수행 주체 서비스 추가·제거
+  setrole: iam.role  # 확인 필요 — 최대 세션 지속 시간 수정
+  createpolicy: iam.policy
+  deletepolicy: iam.policy  # 확인 필요 — deletepolicies 일 수도
+  creategroup: iam.policy, iam.user-group
+  deletegroup: iam.policy, iam.user-group
+  addgrouppolicybinding: iam.policy
+  removegrouppolicybinding: iam.policy
+  createsamlprovider: iam.saml-provider
+  setsamlprovider: iam.saml-provider
+  deletesamlproviders: iam.saml-provider
+
+loggingaudit:
+  createtrail: management.trail
+  stoptrail: management.trail
+  deletetrail: management.trail
+
+network-logging:
+  createnetworkloggingstorage: management.network-logging  # 확인 필요 — Firewall 로그 저장소 버킷 설정
+  deletenetworkloggingstorage: management.network-logging  # 확인 필요 — 저장소 미사용으로 되돌림
+
+resourcemanager:
+  createresourcegroup: management.resource-group
+  setresourcegroup: management.resource-group
+  deleteresourcegroup: management.resource-group  # 확인 필요 — deleteresourcegroups 일 수도
+  updateresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, iam.role, security.certificate, security.kms-key  # 확인 필요 — 상세 태그 탭
+  deleteresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, iam.role, security.certificate, security.kms-key  # 확인 필요 — 상세 태그 탭
+
+servicewatch:
+  createalert: management.servicewatch-alert
+  deletebulkalerts: management.servicewatch-alert
+  createdashboard: management.servicewatch-dashboard
+  deletebulkdashboards: management.servicewatch-dashboard
+  createeventrule: management.servicewatch-event-rule
+  seteventrule: management.servicewatch-event-rule  # 확인 필요 — 이벤트 규칙 비활성화
+  deleteeventrules: management.servicewatch-event-rule
+  createloggroup: management.servicewatch-log-group
+  createloggrouplogstream: management.servicewatch-log-group
+  deleteloggrouplogstreams: management.servicewatch-log-group
+  deleteloggroups: management.servicewatch-log-group
+
+# ── Networking ──
+cdn:
+  createcdnservice: networking.cdn
+  updatecdnservice: networking.cdn
+  stopcdnservice: networking.cdn  # 확인 필요 — 해지 전 "필요하면" 중지
+  deletecdnservice: networking.cdn
+
+direct-connect:
+  createdirectconnect: networking.direct-connect
+  createroutingrule: networking.direct-connect
+  deleteroutingrule: networking.direct-connect
+  deletedirectconnect: networking.direct-connect
+
+dns:
+  createprivatedns: networking.private-dns, networking.dns-hosted-zone
+  deleteprivatedns: networking.private-dns, networking.dns-hosted-zone
+  createhostedzone: networking.dns-hosted-zone
+  deletehostedzone: networking.dns-hosted-zone
+  createhostedzonerecord: networking.dns-hosted-zone
+  deletehostedzonerecord: networking.dns-hosted-zone
+
+firewall:
+  createfirewallrule: networking.firewall
+  deletefirewallrule: networking.firewall  # 확인 필요 — 규칙 수정 화면에서 삭제(setfirewallrule 일 수도)
+
+gslb:
+  creategslb: networking.gslb
+  setgslbregionalroutingcontrol: networking.gslb
+  setgslbresources: networking.gslb  # 확인 필요 — 연결 대상 Weight·설명 수정
+  deletegslb: networking.gslb
+
+loadbalancer:
+  createloadbalancer: networking.load-balancer
+  deleteloadbalancer: networking.load-balancer
+  createlbhealthcheck: networking.load-balancer
+  setlbhealthcheck: networking.load-balancer
+  deletelbhealthcheck: networking.load-balancer
+  createlbservergroup: networking.load-balancer
+  setlbservergroup: networking.load-balancer
+  deletelbservergroup: networking.load-balancer
+  createlblistener: networking.load-balancer
+  setlblistener: networking.load-balancer
+  deletelblistener: networking.load-balancer
+  createloadbalancerpublicnatip: networking.load-balancer
+  deleteloadbalancerpublicnatip: networking.load-balancer
+
+security-group:
+  createsecuritygroup: security.security-group-rule, compute.vm-stack, compute.vm-stack-net, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade
+  deletesecuritygroup: security.security-group-rule, compute.vm-stack, compute.vm-stack-net, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade
+  createsecuritygrouprule: security.security-group-rule
+  deletesecuritygrouprule: security.security-group-rule
+  createaddressgroup: security.address-group
+  deleteaddressgroup: security.address-group
+
+vpc:
+  createvpc: networking.vpc.create-delete, networking.vpc-port, networking.vpc-peering, networking.transit-gateway, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.firewall, networking.direct-connect, networking.vpn, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
+  deletevpc: networking.vpc.create-delete, networking.vpc-port, networking.vpc-peering, networking.transit-gateway, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.firewall, networking.direct-connect, networking.vpn, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
+  createsubnet: networking.vpc-port, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
+  deletesubnet: networking.vpc-port, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
+  createinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
+  deleteinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
+  createpublicip: networking.nat-gateway, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
+  deletepublicip: networking.nat-gateway, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
+  createnatgateway: networking.nat-gateway
+  deletenatgateway: networking.nat-gateway
+  createport: networking.vpc-port
+  deleteport: networking.vpc-port
+  createsubnetvip: networking.vpc-port
+  deletesubnetvip: networking.vpc-port
+  createsubnetvipport: networking.vpc-port
+  deletesubnetvipconnectedport: networking.vpc-port
+  createsubnetvipnatip: networking.vpc-port
+  deletesubnetvipnatip: networking.vpc-port
+  createvpcpeering: networking.vpc-peering
+  deletevpcpeering: networking.vpc-peering
+  createvpcpeeringrule: networking.vpc-peering
+  deletevpcpeeringrule: networking.vpc-peering
+  createtransitgateway: networking.transit-gateway
+  deletetransitgateway: networking.transit-gateway
+  createtransitgatewayvpcconnection: networking.transit-gateway
+  deletetransitgatewayvpcconnection: networking.transit-gateway
+  createtransitgatewayrule: networking.transit-gateway
+  deletetransitgatewayrule: networking.transit-gateway
+  createprivatelinkservice: networking.privatelink-service
+  setprivatelinkservice: networking.privatelink-service
+  deleteprivatelinkservice: networking.privatelink-service
+  createprivatelinkendpoint: networking.privatelink-service
+  setprivatelinkendpoint: networking.privatelink-service
+  deleteprivatelinkendpoint: networking.privatelink-service
+  approveprivatelinkendpoint: networking.privatelink-service
+  connectprivatelinkendpoint: networking.privatelink-service  # 확인 필요 — 차단 뒤 재연결
+  createvpcendpoint: networking.vpc-endpoint
+  setvpcendpoint: networking.vpc-endpoint
+  deletevpcendpoint: networking.vpc-endpoint
+  createprivatenat: networking.direct-connect
+  setprivatenat: networking.direct-connect
+  deleteprivatenat: networking.direct-connect
+  createprivatenatip: networking.direct-connect
+  deleteprivatenatip: networking.direct-connect
+
+vpn:
+  createvpngateway: networking.vpn
+  setvpngateway: networking.vpn
+  deletevpngateway: networking.vpn
+  createvpntunnel: networking.vpn
+  setvpntunnel: networking.vpn
+  deletevpntunnel: networking.vpn
+
+# ── Security ──
+certificatemanager:
+  selfsigncert: security.certificate  # 확인 필요 — 자체 발급 인증서 생성(createcertificate 일 수도)
+  deletecertificate: security.certificate
+
+kms:
+  createkey: security.kms-key
+  rotatekey: security.kms-key
+  changestatekey: security.kms-key
+  updatedescription: security.kms-key
+  deletekey: security.kms-key
+
+secretsmanager:
+  createsecretsmanager: security.secrets-manager
+  deletesecretsmanager: security.secrets-manager  # 확인 필요 — 7일 대기 해지 예약
+  restoresecretsmanager: security.secrets-manager  # 확인 필요 — 해지 취소
+
+# ── Storage ──
+filestorage:
+  createvolume: storage.file-storage, storage.file-storage-snapshot
+  deletevolume: storage.file-storage, storage.file-storage-snapshot
+  createsnapshot: storage.file-storage-snapshot
+  deletesnapshot: storage.file-storage-snapshot
+
+# 대응 API 서비스가 없는 화면 spec(동작 지표 밖): Cloud Fabric Connect, Cloud LAN-Data Center, Cloud WAN, Notification Manager,
+# Object Storage(버킷·폴더·업로드·버전 관리) — API 카탈로그에 해당 서비스가 없다.

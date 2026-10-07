@@ -17,6 +17,7 @@ import {
   validateCoverage,
 } from '../src/report/coverage';
 import { productComparison, readApiCoverage } from '../src/report/api-coverage';
+import { productOperations, readUiOperations } from '../src/report/operations';
 import { buildProductMatrix, readDecisions } from '../src/report/product-matrix';
 import { readScenarioCatalog } from '../src/report/scenario-catalog';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
@@ -76,6 +77,9 @@ function main(): void {
   fs.mkdirSync(path.dirname(RESULTS_MD), { recursive: true });
   fs.writeFileSync(RESULTS_MD, out.join('\n'));
   const explores = readExploreSummaries();
+  const apiSnapshot = readApiCoverage();
+  const catalog = readScenarioCatalog(records);
+  const operations = productOperations(apiSnapshot, readUiOperations(), new Set(collectSpecIds()), new Set(records.filter((r) => r.status === 'pass').map((r) => r.spec)));
   fs.writeFileSync(
     DASHBOARD_HTML,
     renderDashboardHtml({
@@ -91,15 +95,18 @@ function main(): void {
       parity: readParity(),
       findings: readFindings(),
       coverageHistory: coverageHistory(),
-      products: productComparison(ledger.resources, readApiCoverage()),
-      apiSnapshot: readApiCoverage(),
-      matrix: buildProductMatrix(map, ledger.resources, readScenarioCatalog(records), readDecisions()),
+      products: productComparison(ledger.resources, apiSnapshot),
+      apiSnapshot,
+      matrix: buildProductMatrix(map, ledger.resources, catalog, readDecisions()),
+      operations,
     }),
   );
   console.log(
     `${path.relative(process.cwd(), RESULTS_MD)} 갱신: 실행 기록 ${records.length}건 (${path.relative(process.cwd(), RUNS_DIR)}), 커버리지 ${errors.length ? '검증 실패' : 'OK'}`,
   );
   console.log(`${path.relative(process.cwd(), DASHBOARD_HTML)} 갱신: 탐색 보고서 ${explores.length}건`);
+  const opsWarn = [...operations.unknown, ...operations.unknownServices, ...operations.unknownSpecs];
+  if (opsWarn.length) console.log(`(경고) data/ui-operations.yaml 에 모르는 동작·서비스·spec: ${opsWarn.join(', ')}`);
   if (process.argv.includes('--open')) {
     const cmd =
       process.platform === 'win32'

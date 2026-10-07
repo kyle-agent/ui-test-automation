@@ -2,12 +2,12 @@
  * API 자동화 저장소에서 서비스별 엔드포인트 커버리지 숫자만 가져와 data/api-coverage.json 으로 저장한다.
  *   npx tsx scripts/import-api-coverage.ts --repo <api-test-automation 경로>
  * "검증됨" = data/verified_endpoints.json 에 있는 엔드포인트. 2xx = endpoint_status.json 의 마지막 응답이 2xx.
- * 엔드포인트 이름·본문은 저장하지 않는다(서비스별 숫자만).
+ * 응답 본문·경로는 저장하지 않는다. 서비스별 숫자와 동작 목록(카탈로그 이름·HTTP 메서드·검증 여부)만 — 동작 단위 지표(src/report/operations.ts)의 모수.
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { API_COVERAGE_FILE, API_SERVICE, type ApiCoverageSnapshot } from '../src/report/api-coverage';
+import { API_COVERAGE_FILE, API_SERVICE, formatApiCoverageJson, type ApiCoverageSnapshot, type ApiOp, type ApiServiceCoverage } from '../src/report/api-coverage';
 import { parseArgs } from '../src/service-map/io';
 
 const { flags } = parseArgs(process.argv.slice(2));
@@ -17,20 +17,22 @@ if (!repo) {
   process.exit(1);
 }
 const read = (p: string) => JSON.parse(fs.readFileSync(path.join(repo, p), 'utf8'));
-const catalog = read('data/api_catalog.json') as { key: string; category: string; service: string }[];
+const catalog = read('data/api_catalog.json') as { key: string; category: string; service: string; name: string; method: string }[];
 const verified = new Set<string>(read('data/verified_endpoints.json').verified);
 const status = read('data/endpoint_status.json').status as Record<string, [number, ...unknown[]]>;
 
-const agg = new Map<string, { category: string; service: string; total: number; verified: number; ok2xx: number }>();
+const agg = new Map<string, ApiServiceCoverage & { ops: ApiOp[] }>();
 for (const e of catalog) {
   const k = `${e.category}/${e.service}`;
-  const a = agg.get(k) ?? { category: e.category, service: e.service, total: 0, verified: 0, ok2xx: 0 };
+  const a = agg.get(k) ?? { category: e.category, service: e.service, total: 0, verified: 0, ok2xx: 0, ops: [] };
   a.total++;
   if (verified.has(e.key)) a.verified++;
   const s = status[e.key]?.[0];
   if (typeof s === 'number' && s >= 200 && s < 300) a.ok2xx++;
+  a.ops.push({ name: e.name, method: e.method, verified: verified.has(e.key) });
   agg.set(k, a);
 }
+for (const a of agg.values()) a.ops.sort((x, y) => x.name.localeCompare(y.name));
 const unmapped = [...agg.values()].filter((s) => !(s.service in API_SERVICE)).map((s) => s.service);
 const git = (args: string[]) => spawnSync('git', ['-C', repo, ...args], { encoding: 'utf8' }).stdout.trim();
 const snapshot: ApiCoverageSnapshot = {
@@ -41,7 +43,7 @@ const snapshot: ApiCoverageSnapshot = {
   services: [...agg.values()].sort((a, b) => a.category.localeCompare(b.category) || a.service.localeCompare(b.service)),
 };
 fs.mkdirSync(path.dirname(API_COVERAGE_FILE), { recursive: true });
-fs.writeFileSync(API_COVERAGE_FILE, JSON.stringify(snapshot, null, 2) + '\n');
+fs.writeFileSync(API_COVERAGE_FILE, formatApiCoverageJson(snapshot));
 const t = snapshot.services.reduce((n, s) => n + s.total, 0);
 const v = snapshot.services.reduce((n, s) => n + s.verified, 0);
 console.log(`${path.relative(process.cwd(), API_COVERAGE_FILE)}: 서비스 ${snapshot.services.length}개, 엔드포인트 검증 ${v}/${t} (${snapshot.source_commit}, ${snapshot.source_date})`);
