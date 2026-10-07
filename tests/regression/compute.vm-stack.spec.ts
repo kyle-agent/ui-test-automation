@@ -14,6 +14,7 @@ import {
   pickOption,
   row,
   selectRow,
+  setCheckbox,
   submitForm,
   topButton,
   waitForRow,
@@ -22,6 +23,8 @@ import {
   terminateServer,
 } from '../../src/console/ui';
 import { loadScenario, resolveExpectation, scenarioVars } from '../../src/scenario/schema';
+import { editDetailText, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
+import { addTag, removeTag } from '../../src/console/tags';
 
 const scenario = loadScenario('scenarios/compute/vm-stack.yaml');
 const CONSOLE_CHECKS = process.env.CONSOLE_BASE_PATH === undefined;
@@ -33,6 +36,7 @@ const ROUTES = {
   subnet: '#/vpc/subnet/list',
   vm: '#/virtualserver/virtualserver/list',
   image: '#/virtualserver/image/list',
+  sg: '#/securitygroup/securitygroup/list',
 };
 
 const log = (line: string) => console.log(line);
@@ -75,12 +79,29 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     });
 
     await attempt('서버 해지', async () => {
-      await gotoRoute(page, ROUTES.vm);
-      if ((await row(page, vars.vm!).count()) === 0) return;
-      await test.step('teardown[0] 서버 해지', async () => {
-        // Virtual Server 목록은 행에 버튼이 없다. 행 선택 → 상단 "서비스 해지" → "Virtual Server 1대를 해지하시겠습니까?" → 확인. 소멸까지 ≈40초 실측.
-        await terminateServer(page, ROUTES.vm, vars.vm!, log);
-        await expectStep(page, resolveExpectation(scenario.teardown[0]!.expect, vars), stepCtx(0));
+      // steps[9] 서버명 되돌림이 실패했으면 바뀐 이름(vm_renamed)으로 남아 있다
+      for (const name of [vars.vm!, vars.vm_renamed!]) {
+        await gotoRoute(page, ROUTES.vm);
+        if ((await row(page, name).count()) === 0) continue;
+        await test.step(`teardown[0] 서버 ${name} 해지`, async () => {
+          // Virtual Server 목록은 행에 버튼이 없다. 행 선택 → 상단 "서비스 해지" → "Virtual Server 1대를 해지하시겠습니까?" → 확인. 소멸까지 ≈40초 실측.
+          await terminateServer(page, ROUTES.vm, name, log);
+          await expectStep(page, resolveExpectation(scenario.teardown[0]!.expect, vars), stepCtx(0));
+        });
+      }
+    });
+
+    await attempt('Security Group 해지', async () => {
+      // steps[9] 에서 만든 SG. 서버 해지 뒤라 연결이 남아 있어도 지울 수 있다
+      await gotoRoute(page, ROUTES.sg);
+      if ((await row(page, vars.sg!).count()) === 0) return;
+      await test.step(`teardown[5] Security Group ${vars.sg} 해지`, async () => {
+        await row(page, vars.sg!).getByText(vars.sg!, { exact: true }).first().click();
+        await settleConsole(page, { appearGraceMs: 800 });
+        await topButton(page, '서비스 해지').click();
+        await confirmModal(page, /해지하시겠습니까/);
+        await waitForRow(page, ROUTES.sg, vars.sg!, { gone: true, timeoutMs: 120_000, log });
+        await expectStep(page, resolveExpectation(scenario.teardown[5]!.expect, vars), stepCtx(5));
       });
     });
 
@@ -345,6 +366,68 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await expect(page.getByText(/Dump 생성이 성공하였습니다/).first()).toBeVisible({ timeout: 30_000 });
       await waitForRow(page, ROUTES.vm, vars.vm!, { status: /Active/, timeoutMs: 300_000, intervalMs: 15_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), stepCtx(8));
+    });
+
+    // 2026-10-07 추가(5L, L3): 상세의 되돌릴 수 있는 수정. 프로브(PROBE_EDITS=1) 결과 서버 상세 연필 항목은
+    // 서버명·서버 타입·Lock·Keypair명(모달 안 열림)·ServiceWatch(유료)·네트워크·IP(재부팅)·Public/Private NAT IP·Security Group명(일반·로컬 Subnet). 설명 항목은 없다.
+    // 여기서는 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, Security Group 연결→해제(되면) 를 한다. 서버 타입·IP 는 재부팅이라 제외.
+    await test.step(`steps[9] 서버 ${vars.vm} 태그·서버명·Lock·Security Group 수정 → 되돌림`, async () => {
+      // Security Group(선택 모달에 고를 SG 가 있어야 한다): 기본 설정으로 하나 만든다
+      await openCreateForm(page, ROUTES.sg, '서비스 생성');
+      await fillField(page, 'Security Group명', vars.sg!);
+      await setCheckbox(page, '로그 저장 여부', false);
+      await submitForm(page, '생성');
+      await confirmModal(page, /진행하시겠습니까/);
+      await confirmModal(page, /생성하시겠습니까/);
+      await waitForRow(page, ROUTES.sg, vars.sg!, { timeoutMs: 60_000, log });
+
+      await openServerDetail(page);
+      await addTag(page, 'qa-tag', vars.run_id!, log);
+      await removeTag(page, 'qa-tag', log);
+
+      // 서버명: 모달 text input 하나(63자). "콘솔 정보만 바뀌고 OS Hostname 은 안 바뀐다" 안내. 바꾼 뒤 원래 이름으로 되돌린다
+      await openServerDetail(page);
+      await editDetailText(page, '서버명', vars.vm_renamed!, { log, expectShown: (v) => v === vars.vm_renamed });
+      await editDetailText(page, '서버명', vars.vm!, { log, expectShown: (v) => v === vars.vm });
+
+      // Lock: 모달 체크 "사용" 하나. 켠 채로 두면 해지가 막힐 수 있어 바로 끈다
+      for (const [on, shown] of [[true, '사용'], [false, '미사용']] as const) {
+        const modal = await openLabelEdit(page, 'Lock');
+        const box = modal.locator('.scp-select').first();
+        const checked = async () => /checked|selected|active/.test((await box.getAttribute('class')) ?? '') || (await box.locator('i.i-check-on, .checked, [class*=checked]').count()) > 0;
+        log(`    Lock 모달 체크 상태(전): ${await checked()} → ${on}`);
+        await box.click();
+        await saveModal(page, log);
+        await waitDetailValue(page, 'Lock', (v) => v === shown, { log });
+      }
+
+      // Security Group 연결: 선택 모달(검색 → 행 체크 → 확인) → 상세 값에 보이는지
+      const sgModal = async () => {
+        const modal = await openLabelEdit(page, 'Security Group명');
+        const search = modal.locator('input[type=text]:visible').first();
+        await search.fill(vars.sg!);
+        await search.press('Enter');
+        await page.waitForTimeout(1_500);
+        return modal;
+      };
+      let modal = await sgModal();
+      await modal.locator('tr').filter({ hasText: vars.sg! }).first().locator('i.table-select, .scp-select, input[type=checkbox]').first().click();
+      await saveModal(page, log);
+      await waitDetailValue(page, 'Security Group명', (v) => v.includes(vars.sg!), { log });
+      // 해제: 같은 행 체크를 풀고 확인. 0개가 허용되지 않으면(확인 비활성) 연결된 채 두고, 정리에서 서버 해지 뒤 SG 를 지운다
+      modal = await sgModal();
+      await modal.locator('tr').filter({ hasText: vars.sg! }).first().locator('i.table-select, .scp-select, input[type=checkbox]').first().click();
+      await page.waitForTimeout(800);
+      const ok = modal.getByRole('button', { name: '확인', exact: true }).last();
+      if ((await ok.getAttribute('aria-disabled')) === 'true' || (await ok.isDisabled())) {
+        log(`    Security Group 0개로 해제는 막힘(확인 비활성) → 취소. 모달: ${((await modal.innerText()) || '').replace(/\s+/g, ' ').slice(-160)}`);
+        await modal.getByRole('button', { name: '취소', exact: true }).last().click();
+        await dismissModalIfAny(page);
+      } else {
+        await saveModal(page, log);
+        await waitDetailValue(page, 'Security Group명', (v) => !v.includes(vars.sg!), { log });
+      }
+      await expectStep(page, resolveExpectation(scenario.steps[9]!.expect, vars), stepCtx(9));
     });
   });
 

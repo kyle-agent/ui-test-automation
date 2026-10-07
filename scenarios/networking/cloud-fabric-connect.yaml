@@ -28,15 +28,21 @@ steps:
       url: "#/cfc/fabric"
       text: ["{{name}}"]
 
-  - goal: "Fabric {{name}} 에 Policy {{policy}} 를 만들고 목록 확인 뒤 삭제한다"
+  - goal: "Fabric {{name}} 에 Policy {{policy}} 를 만들고 상세 설명 수정·태그 추가·삭제 뒤 삭제한다"
     expect:
       url: "#/cfc/policy"
       not_text: ["{{policy}}"]
 
-  - goal: "Fabric {{name}} 에 Connection {{connection}}(구성 방식 기본값)을 만들고 목록 확인 뒤 삭제한다"
+  - goal: "Fabric {{name}} 에 Connection {{connection}}(구성 방식 기본값)을 만들고 상세 설명 수정·태그 추가·삭제 뒤 삭제한다"
     expect:
       url: "#/cfc/connection"
       not_text: ["{{connection}}"]
+
+  # 상세(2026-10-07 5L): 수정 가능 항목은 설명뿐(50자). 상세 주소 #/cfc/fabric/<id>?name=…
+  - goal: "Fabric {{name}} 상세에서 설명을 수정하고 태그를 추가·삭제한다"
+    expect:
+      url: "#/cfc/fabric/"
+      not_text: ["qa-tag"]
 
 teardown:
   - goal: "Fabric {{name}} 을 해지한다"

@@ -24,6 +24,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Compute | servers interfaces · static-nats | compute.vm-stack steps[7] (같은 Subnet 신규 네트워크 포트 추가·삭제, 2026-09-30). static NAT 는 compute.vm-stack-net 의 Public NAT IP 연결 | ✅ |
 | Compute | images (서버 커스텀 Image · updateimage) | compute.vm-stack steps[6] (Image 생성 → Visibility Shared → 삭제, 2026-09-30). 멤버 추가(createimagemember)는 공유 대상 Account 가 없어 ⏭, 공유용 Image(createsharingimage)는 Snapshot-Based 이미지만 가능해 ⏭ | ✅ |
 | Compute | servers dump | compute.vm-stack steps[8] (Dump 생성, 파일은 서버 안 — 다운로드 없음) | ✅ |
+| Compute | servers update (서버명·Lock·Security Group)·tags | compute.vm-stack steps[9] (2026-10-07 5L: 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, SG 연결→해제). 서버 타입·IP 변경은 재부팅, ServiceWatch 세부 모니터링은 유료라 ⏭ | ✅ |
 | Compute | volume-transfer | compute.volume-snapshot (이전 신청 → Awaiting Transfer → 취소, 2026-09-30). 받기(accept)는 다른 Account 필요 ⏭ | ✅ |
 | Compute | scf cloud-functions | compute.cloud-function | ✅ |
 | Compute | scf triggers cronjob · apigateway | compute.cloud-function (Cronjob 트리거 + 실행 로그 L3) · application-service.api-gateway steps[8] (API Gateway 트리거: API·스테이지 선택 → 메서드 7종 트리거 확인·삭제, 2026-09-30) | ✅ |
@@ -52,8 +53,8 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Networking | privatelink-services (+ endpoints: API 는 404) | networking.privatelink-service (IP 연결 Service → 같은 계정 Endpoint 요청 → 승인 L3 → 설명 수정 · 연결 차단→Disconnected→재연결 L3(2026-10-06) → 역순, PASS 16분. Endpoint 도 콘솔에선 생성됨) | ✅ |
 | Networking | private-nats (createprivatenat 202) | networking.direct-connect steps[5~7] (이 spec 의 DC 를 연결 자원으로 Private NAT 생성 → 설명 수정 · Private NAT IP 예약·반납(createprivatenatip, 2026-10-06 L3) → 삭제, PASS 6.5분) | ✅ |
 | Networking | gslbs regional-routing-control (setgslbregionalroutingcontrol 202) | networking.gslb steps[2] (RRC 목록에서 위치 행 중지 → 사용 복귀 L3, 2026-10-06 에이전트 3B) | ✅ |
-| Networking | Cloud WAN network (API 없음) | networking.cloud-wan-network (2026-10-06 3B). Segment 는 월 ₩356,240 → ⏭, Attachment·Site VPN 은 Segment 필요 → ⏭ | ✅ |
-| Networking | Cloud Fabric Connect fabric · policy · connection (API 없음) | networking.cloud-fabric-connect (2026-10-06 3B). Port 는 1G/10G 물리 포트 → ⏭ | ✅ |
+| Networking | Cloud WAN network (API 없음) | networking.cloud-wan-network (2026-10-06 3B; 2026-10-07 5L 상세 설명 수정·태그 L3 — 상세 주소는 #/cwan/network/<id>). Segment 는 월 ₩356,240 → ⏭, Attachment·Site VPN 은 Segment 필요 → ⏭ | ✅ |
+| Networking | Cloud Fabric Connect fabric · policy · connection (API 없음) | networking.cloud-fabric-connect (2026-10-06 3B; 2026-10-07 5L 셋 다 상세 설명 수정·태그 L3, 수정 가능 항목은 설명뿐). Port 는 1G/10G 물리 포트 → ⏭ | ✅ |
 | Networking | Cloud LAN-Data Center network · vDevice · vCable (API 없음) | networking.cloud-lan-data-center (2026-10-06 3B). Interface 는 1G-T/1G-F 물리 인터페이스·약정 → ⏭ | ✅ |
 | Networking | Cloud Secured SD-LAN · SASE(+Lastmile) · Cloud Last Mile(+Circuit and Edge) (API 없음) | — | ⏭ 계약 기간(4~7년)·약정·설치 주소/요청일(회선 설치) 필수 |
 | Networking | DNS public-domain-name (createpublicdomainname 500) | — | ⏭ 실제 도메인 구매(구매기간·등록인 정보) |

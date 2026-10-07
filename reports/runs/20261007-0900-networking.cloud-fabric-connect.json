@@ -1,0 +1,92 @@
+{
+  "spec": "networking.cloud-fabric-connect",
+  "started": "2026-10-07T00:00:53.851Z",
+  "ended": "2026-10-07T00:05:55.294Z",
+  "seconds": 301,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.cloud-fabric-connect",
+    "run_id": "1007-0901-746f",
+    "title": "Fabric 목록 | Cloud Fabric Connect | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud Fabric Connect Fabric·Policy·Connection 생성 후 해지",
+      "status": "failed",
+      "seconds": 252.1,
+      "annotations": {
+        "scenario": "networking.cloud-fabric-connect",
+        "run_id": "1007-0901-746f",
+        "title": "Fabric 목록 | Cloud Fabric Connect | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Fabric 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.9
+        },
+        {
+          "title": "steps[1] cfc10070901746f 생성",
+          "status": "pass",
+          "seconds": 18.9
+        },
+        {
+          "title": "steps[2] Fabric {{name}} 에 Policy {{policy}} 를 만들고 상세 설명을 수정한 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 72.5
+        },
+        {
+          "title": "steps[3] Fabric {{name}} 에 Connection {{connection}}(구성 방식 기본값)을 만들고 상세 설명을 수정한 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 75.3
+        },
+        {
+          "title": "steps[4] Fabric {{name}} 상세에서 설명을 수정하고 반영을 확인한다",
+          "status": "fail",
+          "seconds": 47
+        }
+      ],
+      "error": "Error: \"qa 1007-0901-746f\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+      "attachments": [
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-6.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-8.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-7.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-5.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-9.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "0c9e2ca",
+  "error": "Error: \"qa 1007-0901-746f\" 텍스트가 보여야 합니다 (모든 프레임 검사)",
+  "attachments": [
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-6.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-8.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-7.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-5.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/test-failed-9.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/screenshot-simple-crud.ts.png",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/networking.cloud-fabric-connect/networking.cloud-fabric-co-b2665-c·Policy·Connection-생성-후-해지-regression/trace.zip"
+  ]
+}

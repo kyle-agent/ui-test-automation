@@ -531,8 +531,8 @@ resources:
     route: /virtualserver/virtualserver/list
     level: 4
     specs: [compute.vm-stack, compute.vm-volume, compute.vm-stack-net]
-    last_pass: "2026-09-30"
-    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28). 2026-09-30: 네트워크 포트 추가·삭제, Dump 생성, 커스텀 Image (compute.vm-stack steps[6~8])"
+    last_pass: "2026-10-07"
+    note: "상세 중지→시작(Powering Off→Stopped→Powering On→Active) 동작 포함 (compute.vm-stack, 2026-09-28). 2026-09-30: 네트워크 포트 추가·삭제, Dump 생성, 커스텀 Image (compute.vm-stack steps[6~8]). 2026-10-07(5L): 상세 태그 추가·삭제, 서버명 변경→되돌림, Lock 사용→미사용, Security Group 연결→해제 (steps[9]; 설명 항목 없음, 서버 타입·IP 수정은 재부팅이라 제외). PASS 26분"
   - key: internet-gateway
     service: "VPC"
     category: "Networking"
@@ -657,26 +657,26 @@ resources:
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/connection
-    level: 2
+    level: 3
     specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
-    last_pass: "2026-10-06"
-    note: "에이전트 3B. Fabric명 + Connection명, 구성 방식 기본 L2 → Active → 행 끝 삭제 (cloud-fabric-connect steps[3])"
+    last_pass: "2026-10-07"
+    note: "에이전트 3B. Fabric명 + Connection명, 구성 방식 기본 L2 → Active → 상세(#/cfc/connection/<id>) 설명 수정·태그 추가·삭제(L3, 2026-10-07 5L; 수정 가능 항목은 설명뿐) → 행 끝 삭제 (cloud-fabric-connect steps[3])"
   - key: fabric
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/fabric
-    level: 2
+    level: 3
     specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
-    last_pass: "2026-10-06"
-    note: "에이전트 3B. Global, Location Gasan → 즉시 Active → 하위 Policy·Connection 생성·삭제 → 행 끝 서비스 해지. PASS 2.5분"
+    last_pass: "2026-10-07"
+    note: "에이전트 3B. Global, Location Gasan → 즉시 Active → 하위 Policy·Connection 생성·삭제 → 상세(#/cfc/fabric/<id>) 설명 수정·태그 추가·삭제(L3, 2026-10-07 5L, steps[4]) → 행 끝 서비스 해지. PASS 4분"
   - key: policy@cloud-fabric-connect
     service: "Cloud Fabric Connect"
     category: "Networking"
     route: /cfc/policy
-    level: 2
+    level: 3
     specs: [smoke.cloud-fabric-connect, networking.cloud-fabric-connect]
-    last_pass: "2026-10-06"
-    note: "에이전트 3B. Fabric명 + Policy명만 → Active → 행 끝 삭제 (cloud-fabric-connect steps[2])"
+    last_pass: "2026-10-07"
+    note: "에이전트 3B. Fabric명 + Policy명만 → Active → 상세(#/cfc/policy/<id>/info) 설명 수정·태그 추가·삭제(L3, 2026-10-07 5L) → 행 끝 삭제 (cloud-fabric-connect steps[2])"
   - key: port@cloud-fabric-connect
     service: "Cloud Fabric Connect"
     category: "Networking"
@@ -737,10 +737,10 @@ resources:
     service: "Cloud WAN"
     category: "Networking"
     route: /cwan/network
-    level: 2
+    level: 3
     specs: [smoke.cloud-wan, networking.cloud-wan-network]
-    last_pass: "2026-10-06"
-    note: "에이전트 3B. Global, 이름 영문·숫자 3~20자 → 즉시 Active → 행 끝 서비스 해지. 계정당 1개. PASS 1.5분"
+    last_pass: "2026-10-07"
+    note: "에이전트 3B. Global, 이름 영문·숫자 3~20자 → 즉시 Active → 행 끝 서비스 해지. 계정당 1개. 상세(#/cwan/network/<id>, …/detail 아님) 설명 수정·태그 추가·삭제(L3, 2026-10-07 5L, steps[2]; 수정 가능 항목은 설명뿐). PASS 2분"
   - key: segment
     service: "Cloud WAN"
     category: "Networking"

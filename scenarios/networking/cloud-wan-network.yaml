@@ -26,6 +26,12 @@ steps:
       url: "#/cwan/network"
       text: ["{{name}}"]
 
+  # 상세(2026-10-07 5L): 주소 #/cwan/network/<id>. 수정 가능 항목은 설명(50자)뿐, 태그 탭 있음
+  - goal: "Cloud WAN Network {{name}} 상세에서 설명을 수정하고 태그를 추가·삭제한다"
+    expect:
+      url: "#/cwan/network/"
+      not_text: ["qa-tag"]
+
 teardown:
   - goal: "Cloud WAN Network {{name}} 을 삭제한다"
     expect:

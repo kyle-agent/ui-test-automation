@@ -1,0 +1,57 @@
+{
+  "spec": "networking.cloud-fabric-connect",
+  "started": "2026-10-06T23:56:30.733Z",
+  "ended": "2026-10-06T23:59:26.575Z",
+  "seconds": 176,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.cloud-fabric-connect",
+    "run_id": "1007-0856-2d0f",
+    "title": "Fabric 목록 | Cloud Fabric Connect | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud Fabric Connect Fabric·Policy·Connection 생성 후 해지",
+      "status": "passed",
+      "seconds": 149.3,
+      "annotations": {
+        "scenario": "networking.cloud-fabric-connect",
+        "run_id": "1007-0856-2d0f",
+        "title": "Fabric 목록 | Cloud Fabric Connect | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Fabric 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.4
+        },
+        {
+          "title": "steps[1] cfc100708562d0f 생성",
+          "status": "pass",
+          "seconds": 17.2
+        },
+        {
+          "title": "steps[2] Fabric {{name}} 에 Policy {{policy}} 를 만들고 목록 확인 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 52.1
+        },
+        {
+          "title": "steps[3] Fabric {{name}} 에 Connection {{connection}}(구성 방식 기본값)을 만들고 목록 확인 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 47
+        }
+      ]
+    }
+  ],
+  "git_sha": "7bd1c24"
+}

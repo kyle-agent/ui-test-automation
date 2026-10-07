@@ -167,13 +167,18 @@ export async function editDetailText(
   await waitDetailValue(page, name, opts.expectShown ?? ((v) => v.includes(value)), { log: opts.log });
 }
 
-/** 목록 → 이름 링크로 상세를 연다 (주소가 detail 로 바뀔 때까지 다시 누른다) */
-export async function openDetail(page: Page, route: string, name: string): Promise<void> {
+/**
+ * 목록 → 이름 링크로 상세를 연다 (주소가 detail 로 바뀔 때까지 다시 누른다).
+ * detailUrl: 상세 주소가 …/detail 이 아닌 서비스용 (2026-10-07 5L: Cloud Fabric Connect 는 #/cfc/fabric/<id>?name=…, #/cfc/policy/<id>/info)
+ */
+export async function openDetail(page: Page, route: string, name: string, detailUrl: RegExp = /\/detail/): Promise<void> {
   await gotoRoute(page, route);
   for (let attempt = 1; ; attempt++) {
+    // 이미 상세로 넘어갔는데 판정만 늦었으면(재시도 시) 목록 행이 없다 → 다시 목록으로
+    if (attempt > 1 && !(await row(page, name).count())) await gotoRoute(page, route);
     await row(page, name).getByText(name, { exact: true }).first().click();
     await settleConsole(page, { appearGraceMs: 800 });
-    if (/\/detail/.test(page.url())) return;
+    if (detailUrl.test(page.url())) return;
     if (attempt >= 3) throw new Error(`${name} 상세로 이동하지 못했습니다 (${page.url()})`);
     await page.waitForTimeout(1_500);
   }
