@@ -123,6 +123,8 @@ export interface ProductOperations {
   opsTotal: number;
   apiVerified: number;
   uiCovered: number;
+  /** 모수 제외 사유 */
+  excluded?: string;
 }
 
 export interface OperationsSummary {
@@ -142,6 +144,7 @@ export function productOperations(
   specIds?: ReadonlySet<string>,
   /** 한 번이라도 통과한 spec. 주면 통과 기록이 없는 spec 은 UI 커버로 세지 않는다(작성만 된 spec 이 숫자를 부풀리지 않게) */
   passedSpecs?: ReadonlySet<string>,
+  exclusions: ReadonlyMap<string, string> = new Map(),
 ): OperationsSummary {
   const byProduct = new Map<string, ProductOperations>();
   const unknown: string[] = [];
@@ -166,6 +169,7 @@ export function productOperations(
     p.uiCovered = p.ops.filter((o) => o.ui.length).length;
     byProduct.set(product, p);
   }
+  for (const p of byProduct.values()) if (exclusions.has(p.product)) p.excluded = exclusions.get(p.product);
   const unknownServices = [...mapping.keys()].filter((s) => !known.has(s));
   const products = [...byProduct.values()].sort(
     (a, b) => a.category.localeCompare(b.category, 'en') || a.product.localeCompare(b.product, 'en'),
@@ -180,6 +184,7 @@ export function productOperations(
 export function operationsByCategory(products: readonly ProductOperations[]): Map<string, { opsTotal: number; apiVerified: number; uiCovered: number }> {
   const m = new Map<string, { opsTotal: number; apiVerified: number; uiCovered: number }>();
   for (const p of products) {
+    if (p.excluded) continue;
     const c = m.get(p.category) ?? { opsTotal: 0, apiVerified: 0, uiCovered: 0 };
     c.opsTotal += p.opsTotal;
     c.apiVerified += p.apiVerified;

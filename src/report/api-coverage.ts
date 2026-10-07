@@ -144,6 +144,8 @@ export interface ProductRow {
   product: string;
   ui: { resources: number; l2: number; l3: number } | null;
   api: { services: string[]; total: number; verified: number } | null;
+  /** 모수 제외 사유(있으면 합계에서 빠진다) */
+  excluded?: string;
 }
 
 export interface CategoryRow {
@@ -156,6 +158,7 @@ export interface CategoryRow {
 export function productComparison(
   entries: readonly CoverageEntry[],
   api: ApiCoverageSnapshot | null,
+  exclusions: ReadonlyMap<string, string> = new Map(),
 ): { products: ProductRow[]; categories: CategoryRow[] } {
   const rows = new Map<string, ProductRow>();
   for (const e of entries) {
@@ -181,7 +184,9 @@ export function productComparison(
     (a, b) => a.category.localeCompare(b.category, 'en') || a.product.localeCompare(b.product, 'en'),
   );
   const cats = new Map<string, CategoryRow>();
+  for (const p of products) if (exclusions.has(p.product)) p.excluded = exclusions.get(p.product);
   for (const p of products) {
+    if (p.excluded) continue;
     const c = cats.get(p.category) ?? { category: p.category, ui: { resources: 0, l2: 0, l3: 0 }, api: { total: 0, verified: 0 } };
     if (p.ui) {
       c.ui.resources += p.ui.resources;

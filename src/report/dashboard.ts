@@ -403,8 +403,8 @@ function productsBlock(
         `<tr class="cathead" id="cat-${esc(cat)}"><td colspan="7">${esc(cat)}</td></tr>` +
         list
           .map(
-            (p) => `<tr>
-        <td>${esc(p.product)}${p.api && p.api.services.length ? ` <span class="muted small mono">${esc(p.api.services.join(', '))}</span>` : ''}</td>
+            (p) => `<tr${p.excluded ? ' class="excl"' : ''}>
+        <td>${esc(p.product)}${p.excluded ? ` <span class="st st-excl" title="${esc(p.excluded)}">모수 제외</span>` : ''}${p.api && p.api.services.length ? ` <span class="muted small mono">${esc(p.api.services.join(', '))}</span>` : ''}</td>
         ${uiCell(p.ui)}${opsCell(opsByProduct.get(p.product))}${apiCell(p.api)}${gap(p.ui, p.api)}
         <td class="barcell">${dualBar(p.ui && p.ui.resources ? pct(p.ui.l2, p.ui.resources) : null, p.api && p.api.total ? pct(p.api.verified, p.api.total) : null)}</td>
       </tr>`,
@@ -444,7 +444,7 @@ function opsTable(o: ProductOperations): string {
 function matrixBlock(matrix: readonly ProductMatrix[], products: readonly ProductRow[], operations?: OperationsSummary): string {
   if (!matrix.length) return '<p class="muted">서비스 맵 없음</p>';
   const opsOf = (svc: string) => operations?.products.find((p) => p.product === svc);
-  const opsAll = (operations?.products ?? []).reduce(
+  const opsAll = (operations?.products ?? []).filter((p) => !p.excluded).reduce(
     (n, c) => ({ opsTotal: n.opsTotal + c.opsTotal, apiVerified: n.apiVerified + c.apiVerified, uiCovered: n.uiCovered + c.uiCovered }),
     { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
   );
@@ -488,7 +488,7 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
                 <ol class="steps">${sp.steps.map((st) => `<li class="${st.teardown ? 'td' : ''}">${st.teardown ? '<span class="muted">[정리]</span> ' : ''}${esc(st.goal)}${st.route ? ` <span class="muted mono small">${esc(st.route)}</span>` : ''}</li>`).join('')}</ol></li>`,
             )
             .join('');
-          return `<details class="prod" data-gap="${gaps ? 1 : 0}" data-dec="${dec.length ? 1 : 0}"><summary><b>${esc(m.service)}</b>
+          return `<details class="prod${m.excluded ? ' excl' : ''}" data-gap="${gaps && !m.excluded ? 1 : 0}" data-dec="${dec.length ? 1 : 0}"><summary><b>${esc(m.service)}</b>${m.excluded ? ` <span class="st st-excl" title="${esc(m.excluded)}">모수 제외</span> <span class="muted small">${esc(m.excluded)}</span>` : ''}
               <span class="muted">화면 ${m.screens.length} · </span><span class="st st-ok">시나리오 ${c('시나리오')}</span> <span class="st st-smoke">스모크만 ${gaps}</span> <span class="st st-ex">제외 ${c('제외')}</span>
               <span class="muted"> · spec ${m.specs.length}${api && api.total ? ` · API ${api.verified}/${api.total} (${pct(api.verified, api.total)}%)` : ''}${dec.length ? ` · 판단 ${dec.length}` : ''}</span>${ops ? ` <span class="opsum">${opsLine(ops)}</span>` : ''}</summary>
               <table class="mx"><thead><tr><th>화면</th><th>route</th><th>상태</th><th>시나리오(단계 수·최근)</th><th>제외 사유</th><th>판단</th></tr></thead><tbody>${rows}</tbody></table>
@@ -670,6 +670,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   .causes span { margin-right:10px; white-space:nowrap }
   a.att { font-size:11px; margin-right:6px }
   .badge.info { background:#64748b }
+  .st-excl { background:#e5e7eb; color:#6b7280; border:1px dashed #9ca3af } tr.excl td, details.prod.excl { color:#9ca3af; background:#f9fafb } tr.excl td .pb span, details.prod.excl .st:not(.st-excl) { filter:grayscale(1); opacity:.5 }
   .st { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; font-weight:600 } .st-ok { background:#dcfce7; color:#166534 } .st-smoke { background:#fef3c7; color:#92400e } .st-ex { background:#e5e7eb; color:#374151 } .st-home { background:#f3f4f6; color:#9ca3af }
   details.prod { border:1px solid var(--line); border-radius:6px; padding:4px 10px; margin:4px 0 } details.prod summary { color:var(--ink); margin:4px 0 } h3.cat { font-size:13px; margin:14px 0 4px; color:#374151 }
   table.mx td, table.mx th { padding:4px 6px } .opsum { font-size:12px; color:#1d4ed8; margin-left:4px } details.ops { margin:6px 0 } details.ops summary { font-size:12px } table.ops-t { width:auto; min-width:520px } tr.op-gap td { color:#6b7280 } .scen ul { margin:4px 0 8px; padding-left:18px } ol.steps { margin:2px 0 6px; padding-left:20px; font-size:12px; color:#374151 } ol.steps li.td { color:#6b7280 }
@@ -738,7 +739,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
 
 <section id="coverage">
   <h2>커버리지 <small>service-map/coverage.yaml · level 0 없음 · 1 진입 · 2 CRUD · 3 동작 · 4 통합</small></h2>
-  ${c ? `<div class="cards">${kpi('리소스(모집단)', String(c.resources), `서비스 ${c.totals.services} · 화면 ${c.totals.screens} · 스모크 진입 ${c.totals.smoke_entries}`)}${kpi('L2+ (CRUD 이상)', `${c.at_least_2} <span class="s">/ ${c.resources} · ${pct(c.at_least_2, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${c.levels[l]}`).join(' · '))}${kpi('L3+ (동작·통합)', `${c.at_least_3} <span class="s">/ ${c.resources} · ${pct(c.at_least_3, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${LEVEL_LABEL[l]}`).join(' · '))}</div>` : ''}
+  ${c ? `<div class="cards">${kpi('리소스(모집단)', String(c.resources), `서비스 ${c.totals.services} · 화면 ${c.totals.screens} · 스모크 진입 ${c.totals.smoke_entries}${c.excluded?.length ? ` · <span class="st st-excl">모수 제외 ${c.excluded.map((x) => `${esc(x.service)} ${x.resources}`).join(', ')}</span>` : ''}`)}${kpi('L2+ (CRUD 이상)', `${c.at_least_2} <span class="s">/ ${c.resources} · ${pct(c.at_least_2, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${c.levels[l]}`).join(' · '))}${kpi('L3+ (동작·통합)', `${c.at_least_3} <span class="s">/ ${c.resources} · ${pct(c.at_least_3, c.resources)}%</span>`, LEVELS.map((l) => `L${l} ${LEVEL_LABEL[l]}`).join(' · '))}</div>` : ''}
   <div class="legend">${LEVELS.map((l) => `<span><i class="l${l}"></i>L${l} ${LEVEL_LABEL[l]}</span>`).join('')}</div>
   ${trendBlock(input.coverageHistory ?? [])}
   ${coverageBlock(input)}

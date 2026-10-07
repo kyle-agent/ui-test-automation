@@ -83,6 +83,8 @@ export interface CoverageSummary {
   at_least_2: number;
   at_least_3: number;
   categories: CategorySummary[];
+  /** 모수에서 뺀 리소스(data/population-exclusions.yaml) */
+  excluded?: { service: string; resources: number; reason: string }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -279,10 +281,20 @@ function emptyLevels(): Record<CoverageLevel, number> {
   return { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
 }
 
-export function summarizeCoverage(ledger: CoverageLedger, map: ScreenMap): CoverageSummary {
+export function summarizeCoverage(
+  ledger: CoverageLedger,
+  map: ScreenMap,
+  exclusions: ReadonlyMap<string, string> = new Map(),
+): CoverageSummary {
   const levels = emptyLevels();
   const cats = new Map<string, CategorySummary>();
-  for (const e of ledger.resources) {
+  const kept = ledger.resources.filter((e) => !exclusions.has(e.service));
+  const excluded = [...exclusions].map(([service, reason]) => ({
+    service,
+    reason,
+    resources: ledger.resources.filter((e) => e.service === service).length,
+  }));
+  for (const e of kept) {
     levels[e.level]++;
     const c = cats.get(e.category) ?? { category: e.category, resources: 0, levels: emptyLevels() };
     c.resources++;
@@ -291,11 +303,12 @@ export function summarizeCoverage(ledger: CoverageLedger, map: ScreenMap): Cover
   }
   return {
     totals: mapTotals(map),
-    resources: ledger.resources.length,
+    resources: kept.length,
     levels,
     at_least_2: levels[2] + levels[3] + levels[4],
     at_least_3: levels[3] + levels[4],
     categories: [...cats.values()].sort((a, b) => a.category.localeCompare(b.category, 'en')),
+    excluded: excluded.filter((x) => x.resources > 0),
   };
 }
 

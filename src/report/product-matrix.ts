@@ -31,6 +31,8 @@ export interface ProductMatrix {
   service: string;
   screens: ScreenRow[];
   specs: CatalogSpec[];
+  /** 모수 제외 사유 */
+  excluded?: string;
 }
 
 export const DECISIONS_FILE = path.resolve(process.cwd(), 'data', 'coverage-decisions.yaml');
@@ -62,6 +64,7 @@ export function buildProductMatrix(
   entries: readonly CoverageEntry[],
   catalog: readonly CatalogSpec[],
   decisions: Map<string, { decision: Decision; note?: string }>,
+  exclusions: ReadonlyMap<string, string> = new Map(),
 ): ProductMatrix[] {
   const byRoute = new Map(entries.map((e) => [e.route, e]));
   const out: ProductMatrix[] = [];
@@ -82,7 +85,7 @@ export function buildProductMatrix(
       return { name: sc.name, route: sc.route, state, level: entry?.level, specs, reason, decision: decisions.get(sc.route) };
     });
     const specs = catalog.filter((c) => c.service === svc.name || rows.some((r) => r.specs.some((s) => s.spec === c.spec)));
-    out.push({ category: svc.category, service: svc.name, screens: rows, specs });
+    out.push({ category: svc.category, service: svc.name, screens: rows, specs, excluded: exclusions.get(svc.name) });
   }
   return out.sort((a, b) => a.category.localeCompare(b.category, 'en') || a.service.localeCompare(b.service, 'en'));
 }

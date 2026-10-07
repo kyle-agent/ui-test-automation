@@ -14,6 +14,7 @@ import {
   summarizeCoverage,
   validateCoverage,
 } from '../src/report/coverage';
+import { readExclusions } from '../src/report/population';
 import { parseArgs } from '../src/service-map/io';
 
 const { flags } = parseArgs(process.argv.slice(2));
@@ -28,7 +29,7 @@ function main(): void {
     process.exitCode = 1;
     return;
   }
-  const summary = summarizeCoverage(ledger, map);
+  const summary = summarizeCoverage(ledger, map, readExclusions());
   process.stdout.write(flags.md ? formatCoverageMarkdown(summary) : formatCoverageText(summary));
 }
 

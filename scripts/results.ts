@@ -18,6 +18,7 @@ import {
 } from '../src/report/coverage';
 import { productComparison, readApiCoverage } from '../src/report/api-coverage';
 import { productOperations, readUiOperations } from '../src/report/operations';
+import { readExclusions } from '../src/report/population';
 import { buildProductMatrix, readDecisions } from '../src/report/product-matrix';
 import { readScenarioCatalog } from '../src/report/scenario-catalog';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
@@ -41,7 +42,7 @@ function main(): void {
         `coverage.yaml 검증 실패 ${errors.length}건 (npm run coverage 로 확인)`,
         ...errors.map((e) => `- ${e}`),
       ]
-    : formatCoverageMarkdown(summarizeCoverage(ledger, map)).trimEnd().split('\n');
+    : formatCoverageMarkdown(summarizeCoverage(ledger, map, readExclusions())).trimEnd().split('\n');
 
   const out: string[] = [];
   out.push('# 회귀 결과 정리');
@@ -79,14 +80,14 @@ function main(): void {
   const explores = readExploreSummaries();
   const apiSnapshot = readApiCoverage();
   const catalog = readScenarioCatalog(records);
-  const operations = productOperations(apiSnapshot, readUiOperations(), new Set(collectSpecIds()), new Set(records.filter((r) => r.status === 'pass').map((r) => r.spec)));
+  const operations = productOperations(apiSnapshot, readUiOperations(), new Set(collectSpecIds()), new Set(records.filter((r) => r.status === 'pass').map((r) => r.spec)), readExclusions());
   fs.writeFileSync(
     DASHBOARD_HTML,
     renderDashboardHtml({
       generated: fmtTime(new Date().toISOString()),
       records,
       suiteOrder: SUITE_ORDER,
-      coverage: errors.length ? null : summarizeCoverage(ledger, map),
+      coverage: errors.length ? null : summarizeCoverage(ledger, map, readExclusions()),
       coverageErrors: errors,
       entries: ledger.resources,
       issues,
@@ -95,9 +96,9 @@ function main(): void {
       parity: readParity(),
       findings: readFindings(),
       coverageHistory: coverageHistory(),
-      products: productComparison(ledger.resources, apiSnapshot),
+      products: productComparison(ledger.resources, apiSnapshot, readExclusions()),
       apiSnapshot,
-      matrix: buildProductMatrix(map, ledger.resources, catalog, readDecisions()),
+      matrix: buildProductMatrix(map, ledger.resources, catalog, readDecisions(), readExclusions()),
       operations,
     }),
   );
