@@ -1,0 +1,49 @@
+{
+  "spec": "networking.private-dns",
+  "started": "2026-10-07T00:03:22.198Z",
+  "ended": "2026-10-07T00:09:23.884Z",
+  "seconds": 362,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.private-dns",
+    "run_id": "1007-0903-fe90",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS 생성 후 해지",
+      "status": "passed",
+      "seconds": 328.7,
+      "annotations": {
+        "scenario": "networking.private-dns",
+        "run_id": "1007-0903-fe90",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.8
+        },
+        {
+          "title": "steps[1] pdns-1007-0903-fe90 생성",
+          "status": "pass",
+          "seconds": 217.4
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261007-0849",
+  "attempt": 1,
+  "git_sha": "0c9e2ca"
+}

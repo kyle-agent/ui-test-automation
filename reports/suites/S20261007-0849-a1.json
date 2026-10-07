@@ -1,0 +1,27 @@
+{
+  "suite_id": "S20261007-0849",
+  "attempt": 1,
+  "started": "2026-10-06T23:54:16.502Z",
+  "ended": "2026-10-07T00:14:10.282Z",
+  "wall_minutes": 20,
+  "serial_minutes": 25,
+  "max_tabs": 3,
+  "results": [
+    {
+      "spec": "networking.private-dns",
+      "status": "pass",
+      "seconds": 366
+    },
+    {
+      "spec": "networking.dns-hosted-zone",
+      "status": "pass",
+      "seconds": 523
+    },
+    {
+      "spec": "networking.cloud-lan-data-center",
+      "status": "pass",
+      "seconds": 492
+    }
+  ],
+  "leftovers_end": []
+}

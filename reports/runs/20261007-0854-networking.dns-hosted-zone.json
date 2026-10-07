@@ -1,0 +1,64 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-06T23:54:38.512Z",
+  "ended": "2026-10-07T00:03:17.650Z",
+  "seconds": 519,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1007-0855-284e",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 487.6,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1007-0855-284e",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.4
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1007-0855-284e 생성",
+          "status": "pass",
+          "seconds": 227.1
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1007-0855-284e.com 생성",
+          "status": "pass",
+          "seconds": 34.6
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1007-0855-284e.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 45.2
+        },
+        {
+          "title": "steps[4] 레코드 www 삭제",
+          "status": "pass",
+          "seconds": 30.8
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261007-0849",
+  "attempt": 1,
+  "git_sha": "7bd1c24"
+}
