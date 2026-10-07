@@ -1,0 +1,5 @@
+# 상품별 판단표(대시보드 "상품별 판단표")에서 사람이 화면마다 내린 판단.
+# 한 줄에 하나: <화면 route>: 해라|제외|보류 | 메모
+# 예)
+#   /ske/namespace: 해라 | 네임스페이스·Deployment 생성·삭제까지
+#   /gpuserver/gpuserver/list: 제외 | GPU 비용

@@ -29,6 +29,7 @@ import {
   type Finding,
 } from './insights';
 import type { ApiCoverageSnapshot, CategoryRow, ProductRow } from './api-coverage';
+import type { ProductMatrix } from './product-matrix';
 import type { RunRecord } from './run-record';
 
 export const EXPLORE_DIR = path.resolve(process.cwd(), 'recordings', 'explore');
@@ -105,6 +106,8 @@ export interface DashboardInput {
   /** 상품·카테고리별 화면 vs API (src/report/api-coverage.ts productComparison) */
   products?: { products: readonly ProductRow[]; categories: readonly CategoryRow[] };
   apiSnapshot?: ApiCoverageSnapshot | null;
+  /** 상품별 화면 판단표(src/report/product-matrix.ts) */
+  matrix?: readonly ProductMatrix[];
 }
 
 const esc = (s: unknown): string =>
@@ -404,6 +407,57 @@ function productsBlock(
     <p class="muted small">— = 그쪽 장부에 없음. 화면 장부는 리소스 키가 있는 목록 화면만 센다(하위 화면·설정 화면은 빠짐). "(API) …" 는 화면 장부에 대응 상품이 없는 API 서비스.</p></details>`;
 }
 
+function matrixBlock(matrix: readonly ProductMatrix[], products: readonly ProductRow[]): string {
+  if (!matrix.length) return '<p class="muted">서비스 맵 없음</p>';
+  const stateCls: Record<string, string> = { 시나리오: 'st-ok', 스모크만: 'st-smoke', 제외: 'st-ex', 홈: 'st-home' };
+  const apiOf = (svc: string) => products.find((p) => p.product === svc)?.api ?? null;
+  const all = matrix.flatMap((m) => m.screens);
+  const count = (st: string) => all.filter((r) => r.state === st).length;
+  const decided = all.filter((r) => r.decision).length;
+  const byCat = new Map<string, ProductMatrix[]>();
+  for (const m of matrix) byCat.set(m.category, [...(byCat.get(m.category) ?? []), m]);
+  const body = [...byCat]
+    .map(([cat, list]) => {
+      const prods = list
+        .map((m) => {
+          const c = (st: string) => m.screens.filter((r) => r.state === st).length;
+          const gaps = c('스모크만');
+          const api = apiOf(m.service);
+          const dec = m.screens.filter((r) => r.decision);
+          const rows = m.screens
+            .map(
+              (r) => `<tr>
+              <td>${esc(r.name)}</td><td class="mono small">${esc(r.route)}</td>
+              <td><span class="st ${stateCls[r.state] ?? ''}">${esc(r.state)}</span>${r.level !== undefined ? ` <span class="lv l${r.level}">L${r.level}</span>` : ''}</td>
+              <td class="small">${r.specs.map((x) => `<span class="mono">${esc(x.spec)}</span> <span class="muted">${x.steps}단계</span>${x.status ? ` <span class="badge ${x.status}">${x.status === 'pass' ? 'PASS' : 'FAIL'}</span>` : ''}`).join('<br>')}</td>
+              <td class="note">${esc(r.reason ?? '')}</td>
+              <td>${r.decision ? `<b>${esc(r.decision.decision)}</b>${r.decision.note ? ` <span class="muted small">${esc(r.decision.note)}</span>` : ''}` : ''}</td>
+            </tr>`,
+            )
+            .join('');
+          const scen = m.specs
+            .map(
+              (sp) => `<li><span class="mono">${esc(sp.spec)}</span> — ${esc(sp.title)} ${sp.last ? `<span class="badge ${sp.last.status}">${sp.last.status === 'pass' ? 'PASS' : 'FAIL'}</span> <span class="muted small">${esc(fmtTime(sp.last.started))} · ${sp.passes}/${sp.runs}</span>` : '<span class="muted small">기록 없음</span>'}
+                <ol class="steps">${sp.steps.map((st) => `<li class="${st.teardown ? 'td' : ''}">${st.teardown ? '<span class="muted">[정리]</span> ' : ''}${esc(st.goal)}${st.route ? ` <span class="muted mono small">${esc(st.route)}</span>` : ''}</li>`).join('')}</ol></li>`,
+            )
+            .join('');
+          return `<details class="prod" data-gap="${gaps ? 1 : 0}" data-dec="${dec.length ? 1 : 0}"><summary><b>${esc(m.service)}</b>
+              <span class="muted">화면 ${m.screens.length} · </span><span class="st st-ok">시나리오 ${c('시나리오')}</span> <span class="st st-smoke">스모크만 ${gaps}</span> <span class="st st-ex">제외 ${c('제외')}</span>
+              <span class="muted"> · spec ${m.specs.length}${api && api.total ? ` · API ${api.verified}/${api.total} (${pct(api.verified, api.total)}%)` : ''}${dec.length ? ` · 판단 ${dec.length}` : ''}</span></summary>
+              <table class="mx"><thead><tr><th>화면</th><th>route</th><th>상태</th><th>시나리오(단계 수·최근)</th><th>제외 사유</th><th>판단</th></tr></thead><tbody>${rows}</tbody></table>
+              ${scen ? `<div class="scen"><b>시나리오</b><ul>${scen}</ul></div>` : '<p class="muted small">이 상품을 다루는 회귀 시나리오 없음</p>'}
+            </details>`;
+        })
+        .join('');
+      return `<h3 class="cat">${esc(cat)}</h3>${prods}`;
+    })
+    .join('');
+  return `<p class="muted">상품 ${matrix.length} · 화면 ${all.length}: <span class="st st-ok">시나리오 ${count('시나리오')}</span> <span class="st st-smoke">스모크만 ${count('스모크만')}</span> <span class="st st-ex">제외 ${count('제외')}</span> <span class="st st-home">홈 ${count('홈')}</span> · 판단 기록 ${decided}</p>
+    <p class="muted small">시나리오 = 회귀 spec 의 단계가 그 화면(목록·상세·생성)을 지남 · 스모크만 = 진입 확인뿐(판단 필요) · 제외 = 장부 메모의 사유 · 홈 = Service Home</p>
+    <div class="filters">보기: <button data-mx="all" class="on">전체</button><button data-mx="gap">스모크만 화면이 있는 상품</button><button data-mx="dec">판단 기록 있는 상품</button></div>
+    <div id="mx">${body}</div>`;
+}
+
 export function renderDashboardHtml(input: DashboardInput): string {
   const now = input.now ?? new Date();
   const records = input.records;
@@ -568,6 +622,9 @@ export function renderDashboardHtml(input: DashboardInput): string {
   .causes span { margin-right:10px; white-space:nowrap }
   a.att { font-size:11px; margin-right:6px }
   .badge.info { background:#64748b }
+  .st { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; font-weight:600 } .st-ok { background:#dcfce7; color:#166534 } .st-smoke { background:#fef3c7; color:#92400e } .st-ex { background:#e5e7eb; color:#374151 } .st-home { background:#f3f4f6; color:#9ca3af }
+  details.prod { border:1px solid var(--line); border-radius:6px; padding:4px 10px; margin:4px 0 } details.prod summary { color:var(--ink); margin:4px 0 } h3.cat { font-size:13px; margin:14px 0 4px; color:#374151 }
+  table.mx td, table.mx th { padding:4px 6px } .scen ul { margin:4px 0 8px; padding-left:18px } ol.steps { margin:2px 0 6px; padding-left:20px; font-size:12px; color:#374151 } ol.steps li.td { color:#6b7280 }
   .dual { display:flex; flex-direction:column; gap:2px; min-width:140px } .pb { height:7px; background:#eef2f7; border-radius:4px; overflow:hidden } .pb.none { background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#fff 4px,#fff 8px) } .pb span { display:block; height:100% } .pb .ui { background:var(--l2) } .pb .api { background:#f59e0b }
   tr.cathead td { background:#f3f4f6; font-weight:600; font-size:12px } tr.total td { font-weight:600; border-top:2px solid var(--line) } .good { color:var(--pass) }
   .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
@@ -581,7 +638,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
     <h1>SCP 콘솔 회귀 대시보드</h1>
     <span class="muted">${lastSuite ? `마지막 스위트 ${esc(lastSuite.suite_id)} · ${esc(fmtTime(lastSuite.started))} · ${lastSuite.specs} spec · 탭 ${lastSuite.max_tabs} · ${lastSuite.wall_minutes}분` : '스위트 요약 없음'} · 마지막 실행 ${lastRun ? esc(fmtTime(lastRun.started)) + ' ' + esc(lastRun.spec) : '없음'} · 생성 ${esc(input.generated)}</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#products">상품별</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#matrix">상품별 판단표</a><a href="#products">화면 vs API</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
 <section id="summary">
@@ -639,6 +696,11 @@ export function renderDashboardHtml(input: DashboardInput): string {
   ${coverageBlock(input)}
 </section>
 
+<section id="matrix">
+  <h2>상품별 판단표 — 화면·시나리오·제외 사유 <small>서비스 맵의 상품·화면 전체 기준. 판단은 data/coverage-decisions.yaml 에 "&lt;route&gt;: 해라|제외|보류 | 메모"</small></h2>
+  ${matrixBlock(input.matrix ?? [], input.products?.products ?? [])}
+</section>
+
 <section id="products">
   <h2>상품·카테고리별 커버리지 — 화면 vs API <small>화면 = 목록 화면 리소스(coverage.yaml) L2+·L3+ 비율 · API = 엔드포인트 검증 비율(data/api-coverage.json${input.apiSnapshot ? ` · ${esc(input.apiSnapshot.source_commit)} · ${esc(input.apiSnapshot.source_date)}` : ''}). 단위가 달라 비율끼리만 비교</small></h2>
   ${productsBlock(input.products, input.apiSnapshot ?? null)}
@@ -680,6 +742,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
       box.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
       if (b.dataset.st !== undefined) document.querySelectorAll('#runs-t tr.run').forEach(function (tr) { tr.style.display = b.dataset.st === 'all' || tr.dataset.status === b.dataset.st ? '' : 'none'; });
       if (b.dataset.fs !== undefined) document.querySelectorAll('#fd-t tr.fd').forEach(function (tr) { tr.style.display = b.dataset.fs === 'all' || tr.dataset.st === b.dataset.fs ? '' : 'none'; });
+      if (b.dataset.mx !== undefined) document.querySelectorAll('#mx details.prod').forEach(function (d) { d.style.display = b.dataset.mx === 'all' || (b.dataset.mx === 'gap' && d.dataset.gap === '1') || (b.dataset.mx === 'dec' && d.dataset.dec === '1') ? '' : 'none'; });
       if (b.dataset.lv !== undefined) document.querySelectorAll('#res tr.res').forEach(function (tr) { tr.style.display = b.dataset.lv === 'all' || tr.dataset.level === b.dataset.lv ? '' : 'none'; });
     });
   });

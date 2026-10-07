@@ -36,7 +36,7 @@ resources:
     level: 1
     specs: [smoke.archive-storage]
     last_pass: null
-    note: ""
+    note: "제외: 전용 콘솔 인증키 미발급(API 도 기능 테스트 제외)"
   - key: backup-agent
     service: "Backup"
     category: "Storage"
@@ -44,7 +44,7 @@ resources:
     level: 1
     specs: [smoke.backup]
     last_pass: null
-    note: ""
+    note: "제외: Agent 방식 — OS 안에 NetBackup 클라이언트 설치 필요(사용자 확인 09-30). API 생성도 실패(404)"
   - key: backup
     service: "Backup"
     category: "Storage"
@@ -52,7 +52,7 @@ resources:
     level: 1
     specs: [smoke.backup]
     last_pass: null
-    note: ""
+    note: "제외: Backup Agent 필요(OS 안 설치). API createbackup 500"
   - key: volume@block-storage-bm
     service: "Block Storage(BM)"
     category: "Storage"
@@ -60,7 +60,7 @@ resources:
     level: 1
     specs: [smoke.block-storage-bm]
     last_pass: null
-    note: ""
+    note: "제외: Bare Metal 서버 의존 — 물리 자원 없음"
   - key: volume-group
     service: "Block Storage(BM)"
     category: "Storage"
@@ -68,7 +68,7 @@ resources:
     level: 1
     specs: [smoke.block-storage-bm]
     last_pass: null
-    note: ""
+    note: "제외: Bare Metal 서버 의존 — 물리 자원 없음"
   - key: baremetal
     service: "Bare Metal Server"
     category: "Compute"
@@ -76,7 +76,7 @@ resources:
     level: 1
     specs: [smoke.bare-metal-server]
     last_pass: null
-    note: ""
+    note: "제외: 물리 서버 — 자원 없음(API 도 접근성만)"
   - key: cache-store
     service: "CacheStore(DBaaS)"
     category: "Database"
@@ -108,7 +108,7 @@ resources:
     level: 1
     specs: [smoke.cloud-last-mile]
     last_pass: null
-    note: ""
+    note: "제외: 물리 회선(설치 주소·2개월 뒤 설치·계약 1~7년), 10-06 프로브"
   - key: cloud-lastmile
     service: "Cloud Last Mile"
     category: "Networking"
@@ -116,7 +116,7 @@ resources:
     level: 1
     specs: [smoke.cloud-last-mile]
     last_pass: null
-    note: ""
+    note: "제외: 물리 회선(설치 주소·계약 1~7년), 10-06 프로브"
   - key: config-inspection
     service: "Config Inspection"
     category: "Security"
@@ -156,7 +156,7 @@ resources:
     level: 1
     specs: [smoke.dns]
     last_pass: null
-    note: ""
+    note: "제외: 실제 도메인 구매(등록인 정보 필수), 10-06 프로브. API 생성 500"
   - key: epas
     service: "EPAS(DBaaS)"
     category: "Database"
@@ -196,7 +196,7 @@ resources:
     level: 1
     specs: [smoke.gpu-server]
     last_pass: null
-    note: ""
+    note: "제외: GPU 서버 의존 — GPU 비용"
   - key: gpu-server
     service: "GPU Server"
     category: "Compute"
@@ -204,7 +204,7 @@ resources:
     level: 1
     specs: [smoke.gpu-server]
     last_pass: null
-    note: ""
+    note: "제외: GPU 서버 — 비용"
   - key: image@gpu-server
     service: "GPU Server"
     category: "Compute"
@@ -212,7 +212,7 @@ resources:
     level: 1
     specs: [smoke.gpu-server]
     last_pass: null
-    note: ""
+    note: "제외: GPU 서버 의존 — GPU 비용"
   - key: keypair@gpu-server
     service: "GPU Server"
     category: "Compute"
@@ -220,7 +220,7 @@ resources:
     level: 1
     specs: [smoke.gpu-server]
     last_pass: null
-    note: ""
+    note: "제외: Keypair 생성은 .pem 다운로드 필수(CDP Edge 가 죽음)"
   - key: gslb
     service: "GSLB"
     category: "Networking"
@@ -268,7 +268,7 @@ resources:
     level: 1
     specs: [smoke.iam]
     last_pass: null
-    note: ""
+    note: "제외: 실제 로그인 자격 증명을 만듦(원칙)"
   - key: group@id-center
     service: "ID Center"
     category: "Management"
@@ -276,7 +276,7 @@ resources:
     level: 1
     specs: [smoke.id-center]
     last_pass: null
-    note: ""
+    note: "제외: IAM Identity Center entitlement 미보유(API 도 접근성만)"
   - key: permission-set
     service: "ID Center"
     category: "Management"
@@ -284,7 +284,7 @@ resources:
     level: 1
     specs: [smoke.id-center]
     last_pass: null
-    note: ""
+    note: "제외: IAM Identity Center entitlement 미보유"
   - key: user@id-center
     service: "ID Center"
     category: "Management"
@@ -292,7 +292,7 @@ resources:
     level: 1
     specs: [smoke.id-center]
     last_pass: null
-    note: ""
+    note: "제외: IAM Identity Center entitlement 미보유"
   - key: kms
     service: "Key Management Service"
     category: "Security"
@@ -348,7 +348,7 @@ resources:
     level: 1
     specs: [smoke.multi-node-gpu-cluster]
     last_pass: null
-    note: ""
+    note: "제외: GPU 클러스터 — 자원 없음"
   - key: gpu-node
     service: "Multi-node GPU Cluster"
     category: "Compute"
@@ -356,7 +356,7 @@ resources:
     level: 1
     specs: [smoke.multi-node-gpu-cluster]
     last_pass: null
-    note: ""
+    note: "제외: GPU 클러스터 — 자원 없음"
   - key: mysql
     service: "MySQL(DBaaS)"
     category: "Database"
@@ -380,7 +380,7 @@ resources:
     level: 1
     specs: [smoke.parallel-file-storage]
     last_pass: null
-    note: ""
+    note: "제외: PFS 자원 미프로비저닝(API 도 접근성만)"
   - key: planned-compute
     service: "Planned Compute"
     category: "Financial Management"
@@ -388,7 +388,7 @@ resources:
     level: 1
     specs: [smoke.planned-compute]
     last_pass: null
-    note: ""
+    note: "제외: 예약 구매(약정·과금 확정) 성격 — 검토 필요"
   - key: postgresql
     service: "PostgreSQL(DBaaS)"
     category: "Database"
@@ -412,7 +412,7 @@ resources:
     level: 1
     specs: [smoke.sase]
     last_pass: null
-    note: ""
+    note: "제외: SASE 구독(약정) 전제, 10-06 프로브"
   - key: search-engine
     service: "Search Engine"
     category: "Data Analytics"
@@ -420,7 +420,7 @@ resources:
     level: 1
     specs: [smoke.search-engine]
     last_pass: null
-    note: ""
+    note: "제외: admin credential/라이선스 미보유(API 도 접근성만)"
   - key: secret
     service: "Secrets Manager"
     category: "Security"
@@ -460,7 +460,7 @@ resources:
     level: 1
     specs: [smoke.singleid]
     last_pass: null
-    note: ""
+    note: "제외: 외부 인증(SSO) 연동 상품 — 검토 필요"
   - key: sqlserver
     service: "Microsoft SQL Server(DBaaS)"
     category: "Database"
@@ -468,7 +468,7 @@ resources:
     level: 1
     specs: [smoke.microsoft-sql-server-dbaas]
     last_pass: null
-    note: ""
+    note: "제외: 라이선스 없음(API 도 접근성만)"
   - key: vertica
     service: "Vertica(DBaaS)"
     category: "Data Analytics"
@@ -476,7 +476,7 @@ resources:
     level: 1
     specs: [smoke.vertica-dbaas]
     last_pass: null
-    note: ""
+    note: "제외: 라이선스 없음(API 도 접근성만)"
   - key: auto-scaling-group
     service: "Virtual Server"
     category: "Compute"
@@ -684,7 +684,7 @@ resources:
     level: 1
     specs: [smoke.cloud-fabric-connect]
     last_pass: null
-    note: ""
+    note: "제외: 1G/10G 물리 포트(회선), 10-06 프로브"
   - key: vcable
     service: "Cloud LAN-Data Center"
     category: "Networking"
@@ -708,7 +708,7 @@ resources:
     level: 1
     specs: [smoke.cloud-lan-data-center]
     last_pass: null
-    note: ""
+    note: "제외: 물리 인터페이스 + 약정, 10-06 프로브"
   - key: cloud-lan-network
     service: "Cloud LAN-Data Center"
     category: "Networking"
@@ -724,7 +724,7 @@ resources:
     level: 1
     specs: [smoke.cloud-secured-sd-lan]
     last_pass: null
-    note: ""
+    note: "제외: 계약 4~7년 필수, 10-06 프로브"
   - key: attachment
     service: "Cloud WAN"
     category: "Networking"
@@ -732,7 +732,7 @@ resources:
     level: 1
     specs: [smoke.cloud-wan]
     last_pass: null
-    note: ""
+    note: "제외: Segment 필요(Segment 월 ₩356,240), 10-06 프로브"
   - key: network
     service: "Cloud WAN"
     category: "Networking"
@@ -748,7 +748,7 @@ resources:
     level: 1
     specs: [smoke.cloud-wan]
     last_pass: null
-    note: ""
+    note: "제외: 최저 옵션도 월 ₩356,240, 10-06 프로브"
   - key: cloudwan-sitevpn
     service: "Cloud WAN"
     category: "Networking"
@@ -756,7 +756,7 @@ resources:
     level: 1
     specs: [smoke.cloud-wan]
     last_pass: null
-    note: ""
+    note: "제외: Segment + 고객 장비(Peer GW) 필요, 10-06 프로브"
   - key: connected
     service: "Dedicated Cloud"
     category: "Hybrid Cloud"
@@ -764,7 +764,7 @@ resources:
     level: 1
     specs: [smoke.dedicated-cloud]
     last_pass: null
-    note: ""
+    note: "제외: 영업 검토 신청(랙·약정 1~5년), 10-06 프로브"
   - key: devops-service
     service: "DevOps Service"
     category: "DevOps Tools"
@@ -788,7 +788,7 @@ resources:
     level: 1
     specs: [smoke.id-center]
     last_pass: null
-    note: ""
+    note: "제외: 조직·Identity Center 권한 필요"
   - key: trail
     service: "Logging&Audit"
     category: "Management"
@@ -804,7 +804,7 @@ resources:
     level: 1
     specs: [smoke.message-hub]
     last_pass: null
-    note: ""
+    note: "제외: SMS 인증 필요"
   - key: push-application
     service: "Message Hub"
     category: "Application Service"
@@ -812,7 +812,7 @@ resources:
     level: 1
     specs: [smoke.message-hub]
     last_pass: null
-    note: ""
+    note: "제외: 푸시 서비스 자격 증명 필요"
   - key: receiver-group
     service: "Notification Manager"
     category: "Management"
@@ -828,7 +828,7 @@ resources:
     level: 1
     specs: [smoke.oracle-services]
     last_pass: null
-    note: ""
+    note: "제외: Organization 소속 필요·새 OCI 테넌시(다른 계정), 10-06 프로브"
   - key: service-control-policy
     service: "Organization"
     category: "Management"
@@ -852,7 +852,7 @@ resources:
     level: 1
     specs: [smoke.private-zone]
     last_pass: null
-    note: ""
+    note: "제외: 영업 검토 신청(약정), 10-06 프로브"
   - key: queue
     service: "Queue Service"
     category: "Application Service"
@@ -868,7 +868,7 @@ resources:
     level: 1
     specs: [smoke.sase]
     last_pass: null
-    note: ""
+    note: "제외: 약정·서비스 레벨 구독 상품, 10-06 프로브"
   - key: cloud-function
     service: "Cloud Functions"
     category: "Compute"

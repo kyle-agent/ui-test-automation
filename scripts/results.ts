@@ -17,6 +17,8 @@ import {
   validateCoverage,
 } from '../src/report/coverage';
 import { productComparison, readApiCoverage } from '../src/report/api-coverage';
+import { buildProductMatrix, readDecisions } from '../src/report/product-matrix';
+import { readScenarioCatalog } from '../src/report/scenario-catalog';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
 import { coverageHistory, readFindings, readParity, readSuiteSummaries, suiteViews } from '../src/report/insights';
 import { loadKnownIssues } from '../src/report/known-issues';
@@ -91,6 +93,7 @@ function main(): void {
       coverageHistory: coverageHistory(),
       products: productComparison(ledger.resources, readApiCoverage()),
       apiSnapshot: readApiCoverage(),
+      matrix: buildProductMatrix(map, ledger.resources, readScenarioCatalog(records), readDecisions()),
     }),
   );
   console.log(

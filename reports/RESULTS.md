@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-07 08:57, 실행 기록 499건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-07 09:03, 실행 기록 501건.
 
 ## 1. spec 별 최근 상태
 
@@ -62,8 +62,8 @@
 | networking.gslb | 2026-10-06 16:17 | PASS | 4분 20초 | FFFPP | 2분 41초 |
 | networking.privatelink-service | 2026-10-06 14:47 | PASS | 26분 13초 | PFFPP | 18분 52초 |
 | networking.cloud-wan-network | 2026-10-06 19:31 | FAIL(unclassified) | 1분 44초 | PFFFF | 1분 33초 |
-| networking.cloud-fabric-connect | 2026-10-07 08:54 | FAIL(unclassified) | 1분 50초 | PPPFF | 2분 19초 |
-| networking.cloud-lan-data-center | 2026-10-06 15:51 | PASS | 8분 32초 | FPFPP | 6분 35초 |
+| networking.cloud-fabric-connect | 2026-10-07 08:56 | PASS | 2분 56초 | PPFFP | 2분 26초 |
+| networking.cloud-lan-data-center | 2026-10-07 08:54 | PASS | 8분 9초 | PFPPP | 6분 54초 |
 | iam.saml-provider | 2026-10-06 19:20 | PASS | 1분 24초 | PPPFP | 1분 20초 |
 | management.trail | 2026-10-06 16:15 | PASS | 2분 57초 | FPP | 2분 35초 |
 | devops-tools.devops-service | 2026-10-06 19:24 | PASS | 1분 44초 | PPFP | 1분 33초 |
