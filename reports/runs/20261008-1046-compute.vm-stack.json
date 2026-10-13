@@ -1,0 +1,89 @@
+{
+  "spec": "compute.vm-stack",
+  "started": "2026-10-08T01:46:39.891Z",
+  "ended": "2026-10-08T02:12:11.072Z",
+  "seconds": 1531,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-stack",
+    "run_id": "1008-1047-58c1",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Virtual Server 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 1472.9,
+      "annotations": {
+        "scenario": "compute.vm-stack",
+        "run_id": "1008-1047-58c1",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 목록으로 이동",
+          "status": "pass",
+          "seconds": 6.9
+        },
+        {
+          "title": "steps[1] Keypair qa-shared-keypair 준비 (있으면 재사용, 없으면 생성)",
+          "status": "pass",
+          "seconds": 1
+        },
+        {
+          "title": "steps[2] VPC vpc-1008-1047-58c1 생성",
+          "status": "pass",
+          "seconds": 27.1
+        },
+        {
+          "title": "steps[3] Subnet sub-1008-1047-58c1 생성",
+          "status": "pass",
+          "seconds": 246.6
+        },
+        {
+          "title": "steps[4] Virtual Server vm-1008-1047-58c1 생성",
+          "status": "pass",
+          "seconds": 98.2
+        },
+        {
+          "title": "steps[5] 서버 vm-1008-1047-58c1 정지 → 시작",
+          "status": "pass",
+          "seconds": 92.9
+        },
+        {
+          "title": "steps[6] 서버 vm-1008-1047-58c1 로 커스텀 Image img-1008-1047-58c1 생성 → Visibility Shared → 삭제",
+          "status": "pass",
+          "seconds": 137.9
+        },
+        {
+          "title": "steps[7] 서버 vm-1008-1047-58c1 에 네트워크 포트(10.250.0.200) 추가 → 삭제",
+          "status": "pass",
+          "seconds": 105.6
+        },
+        {
+          "title": "steps[8] 서버 vm-1008-1047-58c1 Dump 생성",
+          "status": "pass",
+          "seconds": 17.7
+        },
+        {
+          "title": "steps[9] 서버 vm-1008-1047-58c1 태그·서버명·Lock·Security Group 수정 → 되돌림",
+          "status": "pass",
+          "seconds": 200.5
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

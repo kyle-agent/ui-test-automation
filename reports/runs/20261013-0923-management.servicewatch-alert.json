@@ -1,0 +1,64 @@
+{
+  "spec": "management.servicewatch-alert",
+  "started": "2026-10-13T00:23:22.451Z",
+  "ended": "2026-10-13T00:26:19.693Z",
+  "seconds": 177,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.servicewatch-alert",
+    "run_id": "1013-0923-5f17",
+    "title": "경보 정책 목록 | 경보 | ServiceWatch | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "ServiceWatch 경보 정책 생성 후 삭제",
+      "status": "passed",
+      "seconds": 133.2,
+      "annotations": {
+        "scenario": "management.servicewatch-alert",
+        "run_id": "1013-0923-5f17",
+        "title": "경보 정책 목록 | 경보 | ServiceWatch | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 경보 정책 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.5
+        },
+        {
+          "title": "steps[1] swa-1013-0923-5f17 생성",
+          "status": "pass",
+          "seconds": 44.8
+        },
+        {
+          "title": "steps[2] 경보 정책 설명을 scp-console-tests {{run_id}} 로 수정한다",
+          "status": "pass",
+          "seconds": 16.6
+        },
+        {
+          "title": "steps[3] 경보 정책을 비활성화했다가 다시 활성화한다",
+          "status": "pass",
+          "seconds": 16.7
+        },
+        {
+          "title": "steps[4] 경보 정책 수정 화면에서 임계값을 998 로 바꾼다",
+          "status": "pass",
+          "seconds": 17.1
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

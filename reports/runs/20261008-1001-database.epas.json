@@ -1,0 +1,64 @@
+{
+  "spec": "database.epas",
+  "started": "2026-10-08T01:01:16.955Z",
+  "ended": "2026-10-08T01:35:08.699Z",
+  "seconds": 2032,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.epas",
+    "run_id": "1008-1001-71c9",
+    "title": "EPAS(DBaaS) 목록 | EPAS(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → EPAS(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 1961.4,
+      "annotations": {
+        "scenario": "database.epas",
+        "run_id": "1008-1001-71c9",
+        "title": "EPAS(DBaaS) 목록 | EPAS(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 11.7
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.4
+        },
+        {
+          "title": "steps[2] epcbaaibaabhbcj 생성",
+          "status": "pass",
+          "seconds": 577.1
+        },
+        {
+          "title": "steps[3] Replica rep1008100171c9 추가 → Running",
+          "status": "pass",
+          "seconds": 637.2
+        },
+        {
+          "title": "steps[4] Replica rep1008100171c9 해지",
+          "status": "pass",
+          "seconds": 394.4
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

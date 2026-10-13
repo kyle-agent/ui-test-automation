@@ -1,0 +1,64 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-13T00:05:59.214Z",
+  "ended": "2026-10-13T00:14:46.831Z",
+  "seconds": 528,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1013-0906-7abd",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 494.4,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1013-0906-7abd",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1013-0906-7abd 생성",
+          "status": "pass",
+          "seconds": 230.7
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1013-0906-7abd.com 생성",
+          "status": "pass",
+          "seconds": 31.8
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1013-0906-7abd.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 43.3
+        },
+        {
+          "title": "steps[4] 레코드 www 삭제",
+          "status": "pass",
+          "seconds": 31.6
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

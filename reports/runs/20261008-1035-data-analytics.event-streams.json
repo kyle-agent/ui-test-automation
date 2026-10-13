@@ -1,0 +1,64 @@
+{
+  "spec": "data-analytics.event-streams",
+  "started": "2026-10-08T01:35:15.057Z",
+  "ended": "2026-10-08T02:00:07.867Z",
+  "seconds": 1493,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "data-analytics.event-streams",
+    "run_id": "1008-1035-ca79",
+    "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Event Streams(Kafka) Broker 1대 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 1420.9,
+      "annotations": {
+        "scenario": "data-analytics.event-streams",
+        "run_id": "1008-1035-ca79",
+        "title": "Event Streams 목록 | Event Streams | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.5
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 2.1
+        },
+        {
+          "title": "steps[2] esbaaibadfcahj 생성",
+          "status": "pass",
+          "seconds": 599.5
+        },
+        {
+          "title": "steps[4] esbaaibadfcahj 상세 동작: sync · restart · maintenance",
+          "status": "pass",
+          "seconds": 302
+        },
+        {
+          "title": "steps[3] esbaaibadfcahj 중지 → Stopped → 시작 → Running (L3)",
+          "status": "pass",
+          "seconds": 235.6
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

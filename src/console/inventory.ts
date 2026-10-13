@@ -7,7 +7,7 @@ import type { Page } from '@playwright/test';
 import { openDetail } from './detail-edit';
 import { gotoRoute } from './expect';
 import { settleConsole } from './overlays';
-import { confirmModal, row, selectRow, showAllRows, terminateServer, topButton, waitForRow } from './ui';
+import { confirmModal, dismissModalIfAny, refreshList, row, selectRow, showAllRows, terminateServer, topButton, waitForRow } from './ui';
 
 export const ROUTES = {
   ske: '#/ske/cluster',
@@ -805,13 +805,17 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
     case 'cld':
     case 'cfp':
     case 'cfn':
-    case 'cldc':
-    case 'cldv':
       await row(page, item.name)
         .getByRole('button', { name: ['cwn', 'cfc', 'cld'].includes(item.kind) ? '서비스 해지' : '삭제', exact: true })
         .click();
       await confirmModal(page, /삭제|해지/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
+      return;
+    case 'cldc':
+    case 'cldv':
+      // Cloud LAN vCable·vDevice 삭제는 가끔 Failed 로 끝나고(2026-10-08 vRouter) 그 동안 Network 해지가 막힌다.
+      // 회귀 spec 과 같이 Failed 행은 "삭제" 를 다시 누른다(최대 3회, ≈45초 만에 지워진 실측).
+      await deleteCloudLanRow(page, route, item.name, log);
       return;
     case 'es':
       // Event Streams: 목록에 해지가 없고 상세의 "서비스 해지" (에이전트 C, PostgreSQL 과 같은 절차)
@@ -828,6 +832,36 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 1_800_000, intervalMs: 30_000, log });
       return;
   }
+}
+
+/** Cloud LAN vCable·vDevice: 행 끝 "삭제" → 확인 → 소멸 또는 Failed. Failed 면 다시 삭제(최대 3회). tests/regression/networking.cloud-lan-data-center.spec.ts 의 deleteRow 와 같다. */
+async function deleteCloudLanRow(page: Page, route: string, name: string, log: (line: string) => void): Promise<void> {
+  for (let attempt = 1; ; attempt++) {
+    await row(page, name).getByRole('button', { name: '삭제', exact: true }).click();
+    await confirmModal(page, /삭제/, '확인', { agree: true, resourceName: name });
+    for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+    let state = '';
+    for (const start = Date.now(); Date.now() - start < 300_000; ) {
+      await page.waitForTimeout(10_000);
+      await refreshList(page);
+      const r = row(page, name);
+      if ((await r.count()) === 0) {
+        state = 'gone';
+        break;
+      }
+      const t = (await r.first().innerText().catch(() => '')).replace(/\s+/g, ' ');
+      if (/Failed/.test(t)) {
+        state = 'failed';
+        break;
+      }
+      log(`  [${Math.round((Date.now() - start) / 1000)}s] ${name} 삭제 대기… ${t.slice(0, 100)}`);
+    }
+    if (state === 'gone') break;
+    if (state === '') throw new Error(`${name} 삭제 대기 300초 초과`);
+    if (attempt >= 3) throw new Error(`${name} 삭제가 ${attempt}회 Failed`);
+    log(`  ${name} 삭제 → Failed, 다시 삭제 (${attempt}/3)`);
+  }
+  await waitForRow(page, route, name, { gone: true, timeoutMs: 120_000, log });
 }
 
 /** LB 상세 "연결된 자원" 탭의 Listener 를 모두 지운다 (테스트 LB 의 것만 불린다). */

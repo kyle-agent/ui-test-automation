@@ -1,72 +1,72 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-07 19:32, 실행 기록 592건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-13 09:43, 실행 기록 653건.
 
 ## 1. spec 별 최근 상태
 
 | spec | 마지막 실행 | 결과 | 소요 | 최근 5회 | 통과 평균 |
 | --- | --- | --- | ---: | --- | ---: |
-| networking.vpc.create-delete | 2026-10-06 16:20 | PASS | 1분 7초 | PPPPP | 54초 |
-| compute.vm-stack | 2026-10-07 09:43 | PASS | 26분 13초 | PPPPP | 18분 39초 |
-| compute.vm-volume | 2026-10-07 18:58 | PASS | 23분 19초 | PPPFP | 18분 15초 |
-| compute.vm-stack-net | 2026-10-07 18:09 | PASS | 26분 35초 | PPPFP | 21분 25초 |
-| compute.server-group | 2026-10-06 16:17 | PASS | 2분 13초 | PPPPP | 1분 40초 |
-| security.address-group | 2026-10-06 16:18 | PASS | 2분 13초 | FPPPP | 2분 3초 |
-| storage.object-storage-bucket | 2026-10-06 16:18 | PASS | 3분 18초 | FFPPP | 2분 1초 |
-| management.resource-group | 2026-10-07 15:58 | PASS | 2분 59초 | PPPPP | 1분 38초 |
-| iam.user-group | 2026-10-06 16:21 | PASS | 1분 22초 | FPPPP | 1분 3초 |
-| compute.launch-configuration | 2026-10-06 16:19 | PASS | 1분 48초 | PPPPP | 1분 39초 |
-| networking.vpc-port | 2026-10-06 15:13 | PASS | 15분 54초 | FPPPP | 13분 24초 |
-| networking.private-dns | 2026-10-07 09:03 | PASS | 6분 2초 | PFPPP | 6분 16초 |
-| storage.file-storage | 2026-10-07 17:26 | PASS | 5분 34초 | PPPPP | 3분 16초 |
-| networking.dns-hosted-zone | 2026-10-07 08:54 | PASS | 8분 39초 | FPPPP | 7분 25초 |
-| security.security-group-rule | 2026-10-06 16:16 | PASS | 2분 20초 | PPPPP | 3분 10초 |
-| networking.nat-gateway | 2026-10-06 15:36 | PASS | 13분 35초 | PPPPP | 14분 47초 |
-| compute.auto-scaling-group | 2026-10-07 17:54 | PASS | 15분 4초 | PPPFP | 14분 32초 |
-| networking.vpc-peering | 2026-10-06 15:35 | PASS | 15분 49초 | FFPPP | 13분 8초 |
-| container.ske-cluster | 2026-10-07 11:49 | PASS | 38분 37초 | PPFFP | 27분 11초 |
-| database.postgresql | 2026-10-07 17:27 | PASS | 72분 14초 | PFFFP | 31분 22초 |
-| database.mysql | 2026-10-06 14:10 | PASS | 36분 7초 | PFPPP | 25분 18초 |
-| database.mariadb | 2026-10-06 14:11 | PASS | 36분 32초 | PPPPP | 24분 22초 |
-| database.epas | 2026-10-06 14:11 | PASS | 33분 25초 | PPPPP | 24분 13초 |
-| database.cachestore | 2026-10-07 18:40 | PASS | 38분 2초 | PPPPP | 19분 23초 |
-| application-service.queue | 2026-10-07 15:26 | PASS | 2분 36초 | FFFFP | 2분 3초 |
-| management.notification-group | 2026-10-06 16:06 | PASS | 2분 15초 | PPPPP | 1분 42초 |
-| compute.cloud-function | 2026-10-07 17:05 | PASS | 8분 37초 | FFFFP | 4분 1초 |
-| container.container-registry | 2026-10-06 15:24 | PASS | 15분 15초 | FPFPP | 9분 1초 |
-| iam.role | 2026-10-07 15:51 | PASS | 2분 6초 | PPPPP | 2분 15초 |
-| security.certificate | 2026-10-06 16:07 | PASS | 1분 54초 | PPFPP | 1분 42초 |
-| container.repository | 2026-10-07 19:06 | PASS | 15분 29초 | FPPFP | 9분 37초 |
-| security.kms-key | 2026-10-07 15:44 | PASS | 1분 56초 | PPFFP | 2분 56초 |
-| security.secrets-manager | 2026-10-07 16:53 | PASS | 2분 57초 | FFPPP | 2분 13초 |
-| iam.policy | 2026-10-07 15:47 | PASS | 3분 31초 | PPPPP | 3분 13초 |
-| storage.file-storage-snapshot | 2026-10-07 19:22 | PASS | 3분 38초 | PPFPP | 3분 26초 |
-| management.servicewatch-dashboard | 2026-10-07 16:18 | PASS | 1분 56초 | PPPFP | 1분 51초 |
-| management.servicewatch-log-group | 2026-10-07 16:12 | PASS | 1분 45초 | FFPPP | 1분 41초 |
-| management.servicewatch-event-rule | 2026-10-06 16:10 | PASS | 1분 49초 | PPPP | 1분 41초 |
-| management.servicewatch-alert | 2026-10-07 16:09 | PASS | 2분 4초 | FFPFP | 2분 4초 |
-| compute.volume-snapshot | 2026-10-07 15:48 | PASS | 5분 22초 | PPFFP | 4분 11초 |
-| management.network-logging | 2026-10-06 16:11 | PASS | 3분 0초 | FFPPP | 2분 24초 |
-| networking.load-balancer | 2026-10-06 14:46 | PASS | 33분 43초 | PPFPP | 22분 28초 |
-| financial-management.budget | 2026-10-06 16:12 | PASS | 2분 42초 | PFPPP | 2분 19초 |
-| application-service.api-gateway | 2026-10-07 18:54 | PASS | 12분 6초 | FFFFP | 8분 52초 |
-| application-service.messagehub-domain | 2026-10-06 16:12 | PASS | 1분 44초 | PFPPP | 1분 21초 |
-| application-service.messagehub-email | 2026-10-06 16:13 | PASS | 2분 4초 | FPPPP | 2분 3초 |
-| networking.firewall | 2026-10-06 16:00 | PASS | 5분 58초 | PFPPP | 5분 25초 |
-| networking.transit-gateway | 2026-10-06 15:36 | PASS | 15분 49초 | PFPPP | 12분 34초 |
-| networking.vpn | 2026-10-06 15:40 | PASS | 11분 43초 | PFPPP | 9분 19초 |
-| networking.vpc-endpoint | 2026-10-06 16:00 | PASS | 5분 37초 | FPPPP | 4분 52초 |
-| networking.direct-connect | 2026-10-06 19:27 | PASS | 5분 46초 | FPPFP | 5분 58초 |
-| data-analytics.event-streams | 2026-10-07 16:39 | PASS | 34분 2초 | FFPPP | 20분 33초 |
-| networking.cdn | 2026-10-06 14:45 | PASS | 33분 7초 | PPFPP | 28분 38초 |
-| networking.gslb | 2026-10-06 16:17 | PASS | 4분 20초 | FFFPP | 2분 41초 |
-| networking.privatelink-service | 2026-10-06 14:47 | PASS | 26분 13초 | PFFPP | 18분 52초 |
-| networking.cloud-wan-network | 2026-10-07 09:15 | PASS | 2분 13초 | FFPPP | 1분 43초 |
-| networking.cloud-fabric-connect | 2026-10-07 09:06 | PASS | 4분 11초 | FFPFP | 2분 44초 |
-| networking.cloud-lan-data-center | 2026-10-07 08:54 | PASS | 8분 9초 | PFPPP | 6분 54초 |
-| iam.saml-provider | 2026-10-06 19:20 | PASS | 1분 24초 | PPPFP | 1분 20초 |
-| management.trail | 2026-10-07 16:41 | PASS | 2분 33초 | FPPPP | 2분 45초 |
-| devops-tools.devops-service | 2026-10-06 19:24 | PASS | 1분 44초 | PPFP | 1분 33초 |
+| networking.vpc.create-delete | 2026-10-13 09:31 | PASS | 53초 | PPPPP | 54초 |
+| compute.vm-stack | 2026-10-08 10:46 | PASS | 25분 31초 | PPPPP | 19분 16초 |
+| compute.vm-volume | 2026-10-08 11:11 | PASS | 18분 52초 | PPFPP | 18분 20초 |
+| compute.vm-stack-net | 2026-10-08 11:00 | PASS | 27분 24초 | PPFPP | 22분 10초 |
+| compute.server-group | 2026-10-13 09:29 | PASS | 2분 13초 | PPPPP | 1분 44초 |
+| security.address-group | 2026-10-13 09:29 | PASS | 2분 8초 | PPPPP | 2분 4초 |
+| storage.object-storage-bucket | 2026-10-13 09:30 | PASS | 2분 56초 | FPPPP | 2분 6초 |
+| management.resource-group | 2026-10-13 09:15 | PASS | 3분 30초 | PPPPP | 1분 49초 |
+| iam.user-group | 2026-10-13 09:31 | PASS | 1분 16초 | PPPPP | 1분 5초 |
+| compute.launch-configuration | 2026-10-13 09:30 | PASS | 1분 12초 | PPPPP | 1분 35초 |
+| networking.vpc-port | 2026-10-08 11:25 | PASS | 19분 1초 | PPPPP | 14분 6초 |
+| networking.private-dns | 2026-10-13 09:16 | PASS | 6분 17초 | FPPPP | 6분 16초 |
+| storage.file-storage | 2026-10-13 09:27 | PASS | 1분 44초 | PPPPP | 3분 6초 |
+| networking.dns-hosted-zone | 2026-10-13 09:05 | PASS | 8분 48초 | PPPPP | 7분 34초 |
+| security.security-group-rule | 2026-10-13 09:28 | PASS | 2분 22초 | PPPPP | 3분 3초 |
+| networking.nat-gateway | 2026-10-13 08:56 | PASS | 13분 24초 | PPPPP | 14분 33초 |
+| compute.auto-scaling-group | 2026-10-08 11:27 | PASS | 19분 49초 | PPFPP | 15분 0초 |
+| networking.vpc-peering | 2026-10-08 11:33 | PASS | 14분 11초 | FPPPP | 13분 16초 |
+| container.ske-cluster | 2026-10-08 10:01 | PASS | 44분 58초 | PFFPP | 29분 9초 |
+| database.postgresql | 2026-10-08 10:00 | PASS | 63분 27초 | FFFPP | 34분 34초 |
+| database.mysql | 2026-10-08 10:00 | PASS | 35분 12초 | FPPPP | 26분 43초 |
+| database.mariadb | 2026-10-08 10:00 | PASS | 33분 25초 | PPPPP | 25분 40초 |
+| database.epas | 2026-10-08 10:01 | PASS | 33분 52초 | PPPPP | 25분 36초 |
+| database.cachestore | 2026-10-08 10:34 | PASS | 32분 6초 | PPPPP | 21분 12초 |
+| application-service.queue | 2026-10-13 09:15 | PASS | 2분 18초 | FFFPP | 2분 4초 |
+| management.notification-group | 2026-10-13 09:17 | PASS | 1분 49초 | PPPPP | 1분 43초 |
+| compute.cloud-function | 2026-10-13 08:57 | PASS | 8분 18초 | FFFPP | 4분 27초 |
+| container.container-registry | 2026-10-08 11:30 | PASS | 12분 14초 | PFPPP | 9분 28초 |
+| iam.role | 2026-10-13 09:13 | PASS | 2분 59초 | PPPPP | 2분 21초 |
+| security.certificate | 2026-10-13 09:18 | PASS | 2분 26초 | PFPPP | 1분 48초 |
+| container.repository | 2026-10-08 11:12 | PASS | 12분 47초 | PPFPP | 9분 58초 |
+| security.kms-key | 2026-10-13 09:19 | PASS | 2분 50초 | PFFPP | 2분 55초 |
+| security.secrets-manager | 2026-10-13 09:19 | PASS | 3분 34초 | FPPPP | 2분 23초 |
+| iam.policy | 2026-10-13 09:19 | PASS | 3분 51초 | PPPPP | 3분 19초 |
+| storage.file-storage-snapshot | 2026-10-13 09:14 | PASS | 3분 59초 | PFPPP | 3분 30초 |
+| management.servicewatch-dashboard | 2026-10-13 09:21 | PASS | 2분 58초 | PPFPP | 2분 1초 |
+| management.servicewatch-log-group | 2026-10-13 09:21 | PASS | 2분 2초 | FPPPP | 1분 44초 |
+| management.servicewatch-event-rule | 2026-10-13 09:23 | PASS | 1분 54초 | PPPPP | 1분 44초 |
+| management.servicewatch-alert | 2026-10-13 09:23 | PASS | 2분 57초 | FPFPP | 2분 12초 |
+| compute.volume-snapshot | 2026-10-13 09:08 | PASS | 5분 40초 | PFFPP | 4분 21초 |
+| management.network-logging | 2026-10-13 09:23 | PASS | 2분 56초 | FPPPP | 2분 31초 |
+| networking.load-balancer | 2026-10-08 11:03 | PASS | 30분 22초 | PFPPP | 23분 35초 |
+| financial-management.budget | 2026-10-13 09:24 | PASS | 2분 38초 | FPPPP | 2분 23초 |
+| application-service.api-gateway | 2026-10-08 11:34 | PASS | 12분 14초 | FFFPP | 9분 15초 |
+| application-service.messagehub-domain | 2026-10-13 09:24 | PASS | 1분 28초 | FPPPP | 1분 23초 |
+| application-service.messagehub-email | 2026-10-13 09:25 | PASS | 1분 43초 | PPPPP | 1분 59초 |
+| networking.firewall | 2026-10-13 09:09 | PASS | 5분 31초 | FPPPP | 5분 26초 |
+| networking.transit-gateway | 2026-10-13 08:56 | PASS | 12분 27초 | FPPPP | 12분 33초 |
+| networking.vpn | 2026-10-13 08:57 | PASS | 11분 2초 | FPPPP | 9분 33초 |
+| networking.vpc-endpoint | 2026-10-13 09:10 | PASS | 4분 35초 | PPPPP | 4분 49초 |
+| networking.direct-connect | 2026-10-13 09:07 | PASS | 6분 31초 | PPFPP | 6분 2초 |
+| data-analytics.event-streams | 2026-10-08 10:35 | PASS | 24분 53초 | FPPPP | 21분 10초 |
+| networking.cdn | 2026-10-08 10:35 | PASS | 31분 16초 | PFPPP | 29분 10초 |
+| networking.gslb | 2026-10-13 09:28 | PASS | 3분 46초 | FFPPP | 2분 48초 |
+| networking.privatelink-service | 2026-10-08 11:11 | PASS | 21분 37초 | FFPPP | 19분 25초 |
+| networking.cloud-wan-network | 2026-10-13 09:26 | PASS | 2분 35초 | FPPPP | 1분 50초 |
+| networking.cloud-fabric-connect | 2026-10-13 09:14 | PASS | 5분 2초 | FPFPP | 3분 4초 |
+| networking.cloud-lan-data-center | 2026-10-13 08:57 | PASS | 9분 8초 | FPPPP | 7분 16초 |
+| iam.saml-provider | 2026-10-13 09:26 | PASS | 1분 36초 | PPFPP | 1분 23초 |
+| management.trail | 2026-10-13 09:26 | PASS | 3분 8초 | PPPPP | 2분 50초 |
+| devops-tools.devops-service | 2026-10-13 09:27 | PASS | 2분 17초 | PPFPP | 1분 44초 |
 | container.ske-upgrade | 2026-10-07 12:29 | PASS | 39분 29초 | FFPP | 41분 46초 |
 | database.searchengine | 2026-09-28 16:04 | FAIL(unclassified) | 1분 20초 | F | - |
 

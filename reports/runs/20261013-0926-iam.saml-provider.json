@@ -1,0 +1,59 @@
+{
+  "spec": "iam.saml-provider",
+  "started": "2026-10-13T00:26:26.294Z",
+  "ended": "2026-10-13T00:28:01.915Z",
+  "seconds": 96,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.saml-provider",
+    "run_id": "1013-0926-b73e",
+    "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 자격 증명 공급자(SAML) 생성 후 삭제",
+      "status": "passed",
+      "seconds": 61.5,
+      "annotations": {
+        "scenario": "iam.saml-provider",
+        "run_id": "1013-0926-b73e",
+        "title": "자격 증명 공급자 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 자격 증명 공급자 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] saml-1013-0926-b73e 생성",
+          "status": "pass",
+          "seconds": 14.7
+        },
+        {
+          "title": "steps[2] 상세에서 설명을 edited {{run_id}} 로 수정한다",
+          "status": "pass",
+          "seconds": 11.4
+        },
+        {
+          "title": "steps[3] 메타데이터를 entityID 가 다른 더미 문서로 교체한다",
+          "status": "pass",
+          "seconds": 4.9
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

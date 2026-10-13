@@ -1,0 +1,59 @@
+{
+  "spec": "management.notification-group",
+  "started": "2026-10-13T00:17:49.438Z",
+  "ended": "2026-10-13T00:19:38.812Z",
+  "seconds": 109,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "management.notification-group",
+    "run_id": "1013-0918-b357",
+    "title": "알림 그룹 목록 | Notification Manager | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "알림 그룹 생성 후 삭제",
+      "status": "passed",
+      "seconds": 80.3,
+      "annotations": {
+        "scenario": "management.notification-group",
+        "run_id": "1013-0918-b357",
+        "title": "알림 그룹 목록 | Notification Manager | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 알림 그룹 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.8
+        },
+        {
+          "title": "steps[1] ntg-1013-0918-b357 생성",
+          "status": "pass",
+          "seconds": 19.6
+        },
+        {
+          "title": "steps[2] 상세 수정에서 설명과 외부 수신자 qa-{{run_id}}@example.com 을 저장하고 상세에 반영됐는지 확인한다",
+          "status": "pass",
+          "seconds": 12.2
+        },
+        {
+          "title": "steps[3] 외부 수신자를 비워 저장하고 0건으로 돌아갔는지 확인한다",
+          "status": "pass",
+          "seconds": 8.1
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

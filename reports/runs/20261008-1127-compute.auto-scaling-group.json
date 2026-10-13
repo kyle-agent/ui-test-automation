@@ -1,0 +1,59 @@
+{
+  "spec": "compute.auto-scaling-group",
+  "started": "2026-10-08T02:27:40.140Z",
+  "ended": "2026-10-08T02:47:29.024Z",
+  "seconds": 1189,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.auto-scaling-group",
+    "run_id": "1008-1128-dfbc",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Launch Configuration → Auto-Scaling Group(0대) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 1148.5,
+      "annotations": {
+        "scenario": "compute.auto-scaling-group",
+        "run_id": "1008-1128-dfbc",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG · LC 생성",
+          "status": "pass",
+          "seconds": 483.3
+        },
+        {
+          "title": "steps[2] Auto-Scaling Group asg-1008-1128-dfbc 생성",
+          "status": "pass",
+          "seconds": 47.5
+        },
+        {
+          "title": "steps[3] 서버 수·상태 체크 수정, 정책 pol-1008-1128-dfbc · 스케줄 sch-1008-1128-dfbc 추가·수정·삭제",
+          "status": "pass",
+          "seconds": 112.2
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

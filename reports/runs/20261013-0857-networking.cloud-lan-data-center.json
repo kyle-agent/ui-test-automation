@@ -1,0 +1,64 @@
+{
+  "spec": "networking.cloud-lan-data-center",
+  "started": "2026-10-12T23:57:58.187Z",
+  "ended": "2026-10-13T00:07:06.220Z",
+  "seconds": 548,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.cloud-lan-data-center",
+    "run_id": "1013-0858-ed50",
+    "title": "Cloud LAN Network 목록 | Cloud LAN-Data Center | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Cloud LAN-Data Center Network·vDevice·vCable 생성 후 해지",
+      "status": "passed",
+      "seconds": 509.7,
+      "annotations": {
+        "scenario": "networking.cloud-lan-data-center",
+        "run_id": "1013-0858-ed50",
+        "title": "Cloud LAN Network 목록 | Cloud LAN-Data Center | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Cloud LAN Network 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.6
+        },
+        {
+          "title": "steps[1] cld-1013-0858-ed50 생성",
+          "status": "pass",
+          "seconds": 20.4
+        },
+        {
+          "title": "steps[2] vDevice {{router}}(vRouter)·{{switch}}(vSwitch) 를 만든다",
+          "status": "pass",
+          "seconds": 128
+        },
+        {
+          "title": "steps[3] vCable {{cable}}(Static, {{router}} ↔ {{switch}}) 을 만들고 목록 확인 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 132.5
+        },
+        {
+          "title": "steps[4] vDevice 2개를 삭제한다",
+          "status": "pass",
+          "seconds": 187.3
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

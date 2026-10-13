@@ -1,0 +1,99 @@
+{
+  "spec": "compute.vm-stack-net",
+  "started": "2026-10-08T02:00:12.568Z",
+  "ended": "2026-10-08T02:27:36.592Z",
+  "seconds": 1644,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "compute.vm-stack-net",
+    "run_id": "1008-1100-3d63",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 20.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "SG·IGW·Public IP 를 포함한 VPC → Subnet → Virtual Server 스택 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 1574,
+      "annotations": {
+        "scenario": "compute.vm-stack-net",
+        "run_id": "1008-1100-3d63",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Keypair 확인",
+          "status": "pass",
+          "seconds": 7.5
+        },
+        {
+          "title": "steps[1] Security Group sg-1008-1100-3d63 생성",
+          "status": "pass",
+          "seconds": 31.2
+        },
+        {
+          "title": "steps[2] VPC vpc-1008-1100-3d63 생성",
+          "status": "pass",
+          "seconds": 29.3
+        },
+        {
+          "title": "steps[3] Internet Gateway 생성",
+          "status": "pass",
+          "seconds": 43.6
+        },
+        {
+          "title": "steps[4] Subnet sub-1008-1100-3d63 생성",
+          "status": "pass",
+          "seconds": 290.2
+        },
+        {
+          "title": "steps[5] Public IP 예약",
+          "status": "pass",
+          "seconds": 18.8
+        },
+        {
+          "title": "steps[6] Virtual Server vm-1008-1100-3d63 생성 (SG sg-1008-1100-3d63)",
+          "status": "pass",
+          "seconds": 100.7
+        },
+        {
+          "title": "steps[7] 서버 vm-1008-1100-3d63 에 Public IP 123.41.34.246 연결",
+          "status": "pass",
+          "seconds": 48.7
+        },
+        {
+          "title": "steps[8] 서버 vm-1008-1100-3d63 Public NAT IP 해제 (deleteserverinterfacenat) · 포트 IP 수정 프로브",
+          "status": "pass",
+          "seconds": 64
+        },
+        {
+          "title": "steps[9] 서버 vm-1008-1100-3d63 재시작 (rebootvirtualserver)",
+          "status": "pass",
+          "seconds": 39.4
+        },
+        {
+          "title": "steps[10] 서버 vm-1008-1100-3d63 중지 → 포트 IP 수정·되돌림(updateserverinterface) → 서버 타입 s1v1m2 → s1v2m4 (setvirtualservertype) → 시작",
+          "status": "pass",
+          "seconds": 370.4
+        },
+        {
+          "title": "steps[11] 서버 vm-1008-1100-3d63 Rebuild (rebuildvirtualserver)",
+          "status": "pass",
+          "seconds": 85.5
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

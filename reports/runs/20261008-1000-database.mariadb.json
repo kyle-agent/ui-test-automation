@@ -1,0 +1,64 @@
+{
+  "spec": "database.mariadb",
+  "started": "2026-10-08T01:00:56.641Z",
+  "ended": "2026-10-08T01:34:21.865Z",
+  "seconds": 2005,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.mariadb",
+    "run_id": "1008-1001-78e3",
+    "title": "MariaDB(DBaaS) 목록 | MariaDB(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → MariaDB(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 1939.1,
+      "annotations": {
+        "scenario": "database.mariadb",
+        "run_id": "1008-1001-78e3",
+        "title": "MariaDB(DBaaS) 목록 | MariaDB(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9.7
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[2] macbaaibaabhied 생성",
+          "status": "pass",
+          "seconds": 616.5
+        },
+        {
+          "title": "steps[3] Replica rep1008100178e3 추가 → Running",
+          "status": "pass",
+          "seconds": 760.7
+        },
+        {
+          "title": "steps[4] Replica rep1008100178e3 해지",
+          "status": "pass",
+          "seconds": 271.1
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

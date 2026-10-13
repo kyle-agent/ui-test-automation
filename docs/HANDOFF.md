@@ -466,6 +466,8 @@
 - 불안정 spec: Private DNS 실패 2회 모두 dns-hosted-zone 이 자기 Private DNS 를 Creating 중일 때 겹침(계정에서 동시 생성 거부로 추정) → suite-plan lock 'private-dns'.
   Private NAT 정리 전에 예약 IP 를 반납(`releasePrivateNatIps`, 강제 실패로 검증). Cloud LAN-DC 는 실패 시 하위 자원부터 정리.
 - **결함 후보(사람 판단 필요, known-issues 미등록)**: Cloud LAN-DC vDevice 가 입력 오류 없이 Failed (10-06 09:25 vRouter 생성, 09:48 vSwitch 삭제), 같은 순서 재실행은 정상.
+  3번째 관측 10-08 11:50: 스위트가 2시간 한도로 끊긴 뒤 cleanup 이 vRouter cldr-1008-1148-af1e 를 삭제 → Failed. Failed vRouter 가 남으면 Network 해지가 조용히 안 되어(Active 유지) cleanup 이 300초 초과로 실패.
+  → inventory 의 cldc/cldv 삭제에 spec 과 같은 "Failed 면 다시 삭제(3회)" 를 넣음(`deleteCloudLanRow`, 10-13). 10-13 08:40 기준 cldr-1008-1148-af1e(Failed)·cld-1008-1148-af1e 2건이 남아 있음 — 다음 cleanup 에서 재시도 확인.
 - 대시보드 2단계: 탐색 발견 사항 목록(data/findings.yaml 로 검토 상태), 커버리지 추세(coverage.yaml git 이력).
 
 ### 9.21 동작 단위 커버리지 · 상품별 판단표 · 6차 확대 (2026-10-07)

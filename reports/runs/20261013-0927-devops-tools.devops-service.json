@@ -1,0 +1,54 @@
+{
+  "spec": "devops-tools.devops-service",
+  "started": "2026-10-13T00:27:05.603Z",
+  "ended": "2026-10-13T00:29:22.113Z",
+  "seconds": 137,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "devops-tools.devops-service",
+    "run_id": "1013-0927-b273",
+    "title": "DevOps Service 목록 | DevOps Service | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "DevOps Service(Tenant) 생성 후 해지",
+      "status": "passed",
+      "seconds": 105.8,
+      "annotations": {
+        "scenario": "devops-tools.devops-service",
+        "run_id": "1013-0927-b273",
+        "title": "DevOps Service 목록 | DevOps Service | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] DevOps Service 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.6
+        },
+        {
+          "title": "steps[1] dev-1013-0927-b273 생성",
+          "status": "pass",
+          "seconds": 34.8
+        },
+        {
+          "title": "steps[2] 상세 태그 탭에서 qa-tag 를 추가한 뒤 삭제한다",
+          "status": "pass",
+          "seconds": 31.7
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 2,
+  "git_sha": "4909a6e"
+}

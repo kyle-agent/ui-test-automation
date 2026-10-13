@@ -1,0 +1,99 @@
+{
+  "spec": "networking.load-balancer",
+  "started": "2026-10-08T02:03:47.983Z",
+  "ended": "2026-10-08T02:34:10.082Z",
+  "seconds": 1822,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.load-balancer",
+    "run_id": "1008-1104-2fc3",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener → Public NAT IP 연결·해제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1760.7,
+      "annotations": {
+        "scenario": "networking.load-balancer",
+        "run_id": "1008-1104-2fc3",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Load Balancer 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] VPC · Subnet 준비",
+          "status": "pass",
+          "seconds": 406.3
+        },
+        {
+          "title": "steps[2] Load Balancer lb-1008-1104-2fc3 생성",
+          "status": "pass",
+          "seconds": 111.1
+        },
+        {
+          "title": "steps[3] LB 헬스 체크 lbhc-1008-1104-2fc3 생성",
+          "status": "pass",
+          "seconds": 34.2
+        },
+        {
+          "title": "steps[4] LB 서버 그룹 lbsg-1008-1104-2fc3 생성",
+          "status": "pass",
+          "seconds": 34
+        },
+        {
+          "title": "steps[5] Listener lbls-1008-1104-2fc3 생성 (TCP 80)",
+          "status": "pass",
+          "seconds": 42.3
+        },
+        {
+          "title": "steps[6] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 67.3
+        },
+        {
+          "title": "steps[7] Public NAT IP 123.41.32.227 연결",
+          "status": "pass",
+          "seconds": 32.6
+        },
+        {
+          "title": "steps[8] Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 26.5
+        },
+        {
+          "title": "steps[9] LB 헬스 체크 lbhc-1008-1104-2fc3 탐지 횟수 3→5·설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 107.4
+        },
+        {
+          "title": "steps[10] LB 서버 그룹 lbsg-1008-1104-2fc3 설정 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 83.6
+        },
+        {
+          "title": "steps[11] Listener lbls-1008-1104-2fc3 설정 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 109.9
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}

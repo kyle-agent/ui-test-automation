@@ -1,0 +1,64 @@
+{
+  "spec": "database.mysql",
+  "started": "2026-10-08T01:00:36.399Z",
+  "ended": "2026-10-08T01:35:48.321Z",
+  "seconds": 2112,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "database.mysql",
+    "run_id": "1008-1001-0b2c",
+    "title": "MySQL(DBaaS) 목록 | MySQL(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → MySQL(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 2047.9,
+      "annotations": {
+        "scenario": "database.mysql",
+        "run_id": "1008-1001-0b2c",
+        "title": "MySQL(DBaaS) 목록 | MySQL(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.9
+        },
+        {
+          "title": "steps[2] mycbaaibaababcc 생성",
+          "status": "pass",
+          "seconds": 669.5
+        },
+        {
+          "title": "steps[3] Replica rep100810010b2c 추가 → Running",
+          "status": "pass",
+          "seconds": 818.1
+        },
+        {
+          "title": "steps[4] Replica rep100810010b2c 해지",
+          "status": "pass",
+          "seconds": 271.8
+        }
+      ]
+    }
+  ],
+  "suite_id": "S20261008-0951",
+  "attempt": 1,
+  "git_sha": "4909a6e"
+}
