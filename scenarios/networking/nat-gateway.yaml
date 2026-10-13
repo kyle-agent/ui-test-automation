@@ -38,6 +38,12 @@ steps:
       url: "#/vpc/nat-gateway/list"
       text: ["{{subnet}}"]
 
+  # 동작(L3, 2026-10-13 6E, API setnatgateway): NAT Gateway 상세 "설명" 연필 → 반영 → 되돌림
+  - goal: "NAT Gateway 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/nat-gateway/detail"
+      text: ["{{subnet}}"]
+
 teardown:
   - goal: "NAT Gateway 를 삭제한다"
     expect:

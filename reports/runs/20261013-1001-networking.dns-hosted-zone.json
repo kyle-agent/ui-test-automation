@@ -1,0 +1,82 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-13T01:01:41.789Z",
+  "ended": "2026-10-13T01:19:22.062Z",
+  "seconds": 1060,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1013-1002-8b07",
+    "title": "Hosted Zone 상세 | hz-1013-1002-8b07.com | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 958,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1013-1002-8b07",
+        "title": "Hosted Zone 상세 | hz-1013-1002-8b07.com | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 10.2
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1013-1002-8b07 생성",
+          "status": "pass",
+          "seconds": 229.1
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1013-1002-8b07.com 생성",
+          "status": "pass",
+          "seconds": 32.2
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1013-1002-8b07.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 45.7
+        },
+        {
+          "title": "steps[4] 레코드 www TTL 300 → 600 수정 (L3)",
+          "status": "fail",
+          "seconds": 0.7
+        }
+      ],
+      "error": "Error: 레코드 탭에 수정 버튼이 없습니다: [\"Hosted Zone 삭제\",\"삭제\",\"상세 검색\",\"레코드 추가\"]",
+      "attachments": [
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "74a6f59",
+  "error": "Error: 레코드 탭에 수정 버튼이 없습니다: [\"Hosted Zone 삭제\",\"삭제\",\"상세 검색\",\"레코드 추가\"]",
+  "attachments": [
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

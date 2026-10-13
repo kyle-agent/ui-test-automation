@@ -3,7 +3,8 @@
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
-import { detailValue, editDetailText, logDetail, logModal, openDetail, probeEdits, saveModal } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
+import { detailValue, editDescriptionRoundTrip, editDetailText, logDetail, logModal, openDetail, probeEdits, saveModal } from '../../src/console/detail-edit';
 import { releasePrivateNatIps, ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
 import { confirmUntil, createVpcOnly, openDetailTab, pickLate } from '../../src/console/networking';
@@ -219,6 +220,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     await test.step(`steps[7] Private NAT ${vars.pnat} 삭제`, async () => {
       await deletePrivateNat(page);
       await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
+    });
+    // 동작(L3, 2026-10-13 6E, API setdirectconnect): 상세 설명 수정 → 반영 → 되돌림
+    await test.step(`steps[8] Direct Connect ${vars.name} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await logWriteRequests(page, log);
+      await openDetail(page, ROUTES.dc, vars.name!);
+      await logDetail(page, log, 'Direct Connect 상세');
+      await probeEdits(page, log, 'Direct Connect');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), ctx(8));
     });
   });
 });

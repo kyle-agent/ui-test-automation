@@ -94,7 +94,7 @@ export type Kind = keyof typeof ROUTES;
 
 /** 시나리오가 붙이는 이름: vm-0923-0925-3b2e, sub-…, vpc-…, vol-…, sg-… / IGW_vpc-… / Public IP 는 이름이 없어 "Reserved + 미연결" 로 본다 */
 const TEST_NAME =
-  /^(ske|asg|vm|sub|vpc|vpcb|vol|sg|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol|fn|que|ntg|role|cert|lb|lbsg|lbhc|tgw|vpce|dc|sube)-\d{4}-\d{4}-[0-9a-f]{4}$/;
+  /^(ske|asg|vm|sub|vpc|vpcb|vol|sg|sgb|sgrp|bkt|addr|rg|grp|lc|port|pdns|peer|pol|fn|que|ntg|role|cert|lb|lbsg|lbhc|tgw|vpce|dc|sube)-\d{4}-\d{4}-[0-9a-f]{4}$/; // sgb-: ske-cluster 의 두 번째 SG (6E 10-13)
 /** File Storage 볼륨명은 fs_<run_id 숫자·hex> 뒤에 콘솔이 6자리 UUID 를 붙인다 */
 const TEST_FS = /^fs_\d{8}[0-9a-f]{4}_?[a-z0-9]{0,6}$/; // 콘솔이 붙이는 접미사 앞의 '_' 허용 (에이전트 C 보고 2026-09-29)
 /** Hosted Zone 은 hz-<run_id>.com (TLD 가 붙는다) */
@@ -435,7 +435,9 @@ async function deleteOne(page: Page, item: Leftover, log: (line: string) => void
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
       return;
     case 'hz':
-      // Hosted Zone: 행 끝 "삭제" → "Hosted Zone을 삭제하시겠습니까?"
+      // Hosted Zone: 행 끝 "삭제" → "Hosted Zone을 삭제하시겠습니까?". 레코드가 남아 있으면 삭제가 조용히 무시된다(6E 10-13) → 먼저 지운다
+      await clearHostedZoneRecords(page, item.name, log);
+      await gotoRoute(page, route);
       await row(page, item.name).getByRole('button', { name: '삭제', exact: true }).click();
       await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true, resourceName: item.name });
       await waitForRow(page, route, item.name, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
@@ -988,6 +990,39 @@ export async function clearIgwFirewallRules(page: Page, igwName: string, log: (l
     await page.waitForTimeout(10_000);
   }
   throw new Error(`${fwName} 규칙이 5분 안에 지워지지 않았습니다`);
+}
+
+/**
+ * Hosted Zone 에 남은 사용자 레코드(SOA·NS 제외)를 지운다 (2026-10-13 6E 실측: 레코드가 남아 있으면 Hosted Zone 삭제 요청이 조용히 무시되어
+ * 행이 Active 로 남고, 그 Private DNS 해지도 안 된다). 레코드 탭 → 행 선택 → 상단 "삭제" → 확인. 지운 개수를 돌려준다.
+ */
+export async function clearHostedZoneRecords(page: Page, zone: string, log: (line: string) => void): Promise<number> {
+  await gotoRoute(page, ROUTES.hz);
+  const link = page.locator('tr.scp-body-row:visible').getByText(zone, { exact: true }).first();
+  if (!(await link.count())) return 0;
+  await link.click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  await page.getByText(/^레코드 \(\d+\)$/).first().click();
+  await settleConsole(page, { appearGraceMs: 800 });
+  const recordRoute = '#' + page.url().split('#')[1]!;
+  let removed = 0;
+  for (let round = 0; round < 10; round++) {
+    const rows = page.locator('tr.scp-body-row:visible');
+    const texts = (await rows.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+    const i = texts.findIndex((t) => !/\b(SOA|NS)\b/.test(t));
+    if (i < 0) break;
+    log(`  ${zone} 레코드 삭제: ${texts[i]!.slice(0, 100)}`);
+    const key = texts[i]!.split(' ')[0]!;
+    await rows.nth(i).locator('i.table-select').first().click();
+    await topButton(page, '삭제').click();
+    await confirmModal(page, /삭제/, '확인', { agree: true });
+    for (let k = 0; k < 2 && (await dismissModalIfAny(page)); k++) await page.waitForTimeout(300);
+    await waitForRow(page, recordRoute, key, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
+    removed++;
+    await gotoRoute(page, recordRoute);
+    await settleConsole(page, { appearGraceMs: 800 });
+  }
+  return removed;
 }
 
 /**

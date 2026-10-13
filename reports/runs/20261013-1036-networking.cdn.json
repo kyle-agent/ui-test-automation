@@ -1,0 +1,57 @@
+{
+  "spec": "networking.cdn",
+  "started": "2026-10-13T01:36:35.484Z",
+  "ended": "2026-10-13T02:09:04.992Z",
+  "seconds": 1950,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.cdn",
+    "run_id": "1013-1036-54de",
+    "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Global CDN 생성 후 해지",
+      "status": "passed",
+      "seconds": 1902.5,
+      "annotations": {
+        "scenario": "networking.cdn",
+        "run_id": "1013-1036-54de",
+        "title": "Global CDN 목록 | Global CDN | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Global CDN 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] CDN cdn1013103654de 생성",
+          "status": "pass",
+          "seconds": 30.5
+        },
+        {
+          "title": "steps[2] Cache 만료시간을 86400초 → 3600초로 수정하고 설정 버전 2 가 배포(Active)되는지 확인한다",
+          "status": "pass",
+          "seconds": 744.5
+        },
+        {
+          "title": "steps[3] CDN cdn1013103654de 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 33.6
+        }
+      ]
+    }
+  ],
+  "git_sha": "74a6f59"
+}

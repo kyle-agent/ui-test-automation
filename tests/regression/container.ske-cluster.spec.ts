@@ -2,7 +2,8 @@
 // 실측(프로브 3회): "생성" 은 StorageClass 설정의 "NFS 볼륨 — 사용" 체크(기본 켜짐, 볼륨 미선택)를 끄기 전엔 활성화되지 않는다.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
-import { logDetail, logModal, openLabelEdit, saveModal, waitDetailValue } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
+import { detailValue, logDetail, logModal, openLabelEdit, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
@@ -12,6 +13,7 @@ import {
   dismissModalIfAny,
   fillField,
   fillStable,
+  isChecked,
   openCreateForm,
   pickOption,
   row,
@@ -188,13 +190,14 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
           });
         }
         await terminateVpc(page, ROUTES.vpc, vars.vpc!, log);
-        await gotoRoute(page, ROUTES.sg);
-        if (await row(page, vars.sg!).count()) {
-          await row(page, vars.sg!).getByText(vars.sg!, { exact: true }).first().click();
+        for (const sg of [vars.sg!, vars.sg2!]) {
+          await gotoRoute(page, ROUTES.sg);
+          if (!(await row(page, sg).count())) continue;
+          await row(page, sg).getByText(sg, { exact: true }).first().click();
           await settleConsole(page, { appearGraceMs: 800 });
           await topButton(page, '서비스 해지').click();
           await confirmModal(page, /해지하시겠습니까/);
-          await waitForRow(page, ROUTES.sg, vars.sg!, { gone: true, timeoutMs: 120_000, log });
+          await waitForRow(page, ROUTES.sg, sg, { gone: true, timeoutMs: 120_000, log });
         }
         await gotoRoute(page, ROUTES.vpc);
         await expectStep(page, resolveExpectation(scenario.teardown[1]!.expect, vars), ctx(1));
@@ -383,6 +386,53 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
             await waitPoolRow(page, pools, /\bRunning/, 900_000);
           }
         });
+      // 2026-10-13 6E (API setnodepoolpreferredips): 노드 풀 상세 "우선 IP 지정" 연필 → 모달에서 Subnet 안 IP 하나 추가 → 확인 → 반영 → 다시 열어 제거.
+      // 모달 구조를 모르므로 logModal 로 남기고, 입력칸에 IP 를 넣은 뒤 "추가" 가 있으면 누른다. 실패해도 spec 을 멈추지 않는다(미실시로 기록). SKE_PREFIP=0 이면 생략
+      if (process.env.SKE_PREFIP !== '0')
+        await test.step('steps[3].c 우선 IP 지정 10.250.0.200 추가 → 반영 → 제거', async () => {
+          const ip = '10.250.0.200';
+          try {
+            await openPoolDetail(page, pools);
+            await logWriteRequests(page, log);
+            await probeEdits(page, log, '노드 풀');
+            const label = /우선 IP/;
+            const modal = await openLabelEdit(page, label);
+            await logModal(page, log, '우선 IP 지정(열기)');
+            const use = modal.locator('.scp-select:visible').first();
+            if ((await use.count()) && !((await use.getAttribute('class')) ?? '').includes('scp-select-checked')) await use.click();
+            const add = modal.getByRole('button', { name: '추가', exact: true });
+            let input = modal.locator('input[type=text]:visible').first();
+            if (!(await input.count()) && (await add.count())) {
+              await add.first().click();
+              await page.waitForTimeout(600);
+              input = modal.locator('input[type=text]:visible').first();
+            }
+            await fillStable(page, input, ip, '우선 IP');
+            if ((await add.count()) && !(await modal.locator('tr, .scp-chip, li').filter({ hasText: ip }).count())) await add.first().click().catch(() => undefined);
+            await logModal(page, log, '우선 IP 지정(입력 후)');
+            await saveModal(page, log);
+            await waitDetailValue(page, label, (v) => v.includes(ip), { log, timeoutMs: 300_000 });
+            await waitPoolRow(page, pools, /\bRunning/, 900_000);
+            // 제거: 행 삭제 아이콘(i.i-btn-del) 이 있으면 지우고, 없으면 "사용" 체크를 끈다
+            await openPoolDetail(page, pools);
+            const again = await openLabelEdit(page, label);
+            const del = again.locator('i.i-btn-del:visible, i.i-del:visible');
+            if (await del.count()) await del.first().click();
+            else {
+              const box = again.locator('.scp-select:visible').first();
+              if (((await box.getAttribute('class')) ?? '').includes('scp-select-checked')) await box.click();
+            }
+            await logModal(page, log, '우선 IP 지정(제거 후)');
+            await saveModal(page, log);
+            await waitDetailValue(page, label, (v) => !v.includes(ip), { log, timeoutMs: 300_000 });
+            await waitPoolRow(page, pools, /\bRunning/, 900_000);
+            log(`  우선 IP 지정 ${ip} 추가 → 제거 확인`);
+          } catch (err) {
+            log(`  (우선 IP 지정) 실패 — 미실시로 기록: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
+            await dismissModalIfAny(page, '취소');
+            await dismissModalIfAny(page);
+          }
+        });
       // 1차 실측(2026-09-30): 삭제 확인 뒤 30분간 1 / 1 Running 그대로 — 요청이 조용히 무시된 것으로 보인다(VM·VPC 해지와 같은 증상)
       // → 모달 문구·버튼 상태를 남기고, 10분 안에 상태가 안 바뀌면 최대 3회 다시 누른다.
       for (let attempt = 1; ; attempt++) {
@@ -426,6 +476,133 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
         }
         await gotoRoute(page, SKE);
         await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+      });
+    /** 클러스터 상세(상세 정보 탭)를 Running 확인 뒤 연다 */
+    const openClusterDetail = async () => {
+      await waitForRow(page, SKE, vars.name!, { status: /Running/i, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+      await row(page, vars.name!).getByText(vars.name!, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 1_500 });
+    };
+    // 2026-10-13 6E (API setclusterpublicaccesscontrol): 상세 "퍼블릭 엔드포인트" 연필 → "사용" 체크 → (경고 "외부 접근이 가능합니다" 확인) → 반영 → 미사용으로 되돌림
+    if (process.env.SKE_SETTING !== '0')
+      await test.step('steps[5] 클러스터 퍼블릭 엔드포인트 켬 → 반영 → 끔', async () => {
+        const label = /^\s*퍼블릭 엔드포인트/;
+        await openClusterDetail();
+        await logWriteRequests(page, log);
+        await logDetail(page, log, '클러스터 상세');
+        await probeEdits(page, log, '클러스터');
+        for (const on of [true, false]) {
+          await openClusterDetail();
+          const before = await detailValue(page, label);
+          const modal = await openLabelEdit(page, label);
+          await logModal(page, log, `퍼블릭 엔드포인트 ${on ? '켬' : '끔'}`);
+          const box = modal.locator('.scp-select:visible').first();
+          if (((await box.getAttribute('class')) ?? '').includes('scp-select-checked') !== on) await box.click();
+          // 켤 때 경고 모달("Kubernetes API 에 대한 외부 접근이 가능합니다…")이 바로 뜬다(2차 실측 10-13). 수정 모달이 DOM 뒤에 남아 .last() 가 수정 모달을 잡으므로
+          // 경고는 문구로 찾아 확인을 누르고 사라질 때까지 기다린 뒤, 수정 모달도 제목으로 다시 잡는다.
+          await page.waitForTimeout(800);
+          const warn = page.locator('.scp-modal:visible').filter({ hasText: /외부 접근이 가능합니다/ }).first();
+          if (await warn.isVisible().catch(() => false)) {
+            log(`    경고 모달: ${((await warn.innerText().catch(() => '')) || '').replace(/\s+/g, ' ').slice(0, 160)}`);
+            // 2차 실측(10-13): 경고 모달엔 라벨 없는 동의 체크(.scp-select)가 있어 켜기 전엔 "확인" 이 먹지 않는다
+            const agree = warn.locator('.scp-select:visible');
+            for (let i = 0; i < (await agree.count()); i++) if (!(await isChecked(agree.nth(i)))) await agree.nth(i).click();
+            await page.waitForTimeout(300);
+            await warn.getByRole('button', { name: /^(확인|예)$/ }).last().click({ timeout: 5_000 }).catch(() => undefined);
+            await warn.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined);
+            await page.waitForTimeout(500);
+          }
+          const edit = page.locator('.scp-modal:visible').filter({ hasText: /퍼블릭 엔드포인트 수정/ }).first();
+          await edit.waitFor({ timeout: 10_000 });
+          if (on) {
+            // 1차 실측(10-13): "사용" 을 켜면 "접근 허용 IP 범위"(CIDR) 를 1개 이상 넣어야 "확인" 이 통한다(안 넣으면 모달이 안 닫힘) → 문서용 IP 1개를 넣고 "추가"
+            log(`    수정 모달(사용 체크 후): ${((await edit.innerText().catch(() => '')) || '').replace(/\s+/g, ' ').slice(0, 300)}`);
+            const ipInput = edit.locator('input[type=text]:visible').first();
+            await ipInput.waitFor({ timeout: 10_000 });
+            await fillStable(page, ipInput, '203.0.113.1/32', '접근 허용 IP 범위');
+            const add = edit.getByRole('button', { name: '추가', exact: true });
+            if (await add.count()) await add.first().click({ timeout: 5_000 }).catch(() => undefined);
+            await page.waitForTimeout(500);
+            log(`    수정 모달(IP 추가 후): ${((await edit.innerText().catch(() => '')) || '').replace(/\s+/g, ' ').slice(0, 300)}`);
+          }
+          await saveModal(page, log, 90_000, { modal: edit });
+          await waitDetailValue(page, label, (v) => (on ? !/미사용/.test(v) && v !== before : /미사용/.test(v) || v === '-'), { log, timeoutMs: 900_000 });
+          await waitForRow(page, SKE, vars.name!, { status: /Running/i, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+        }
+        await gotoRoute(page, SKE);
+        await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
+      });
+    // 2026-10-13 6E (API setclustersecuritygroups): 두 번째 SG 를 만들어 상세 "Security Group" 연필 → 선택 모달에서 체크 → 확인 → 반영 → 다시 열어 체크 해제 → 반영
+    if (process.env.SKE_SETTING !== '0')
+      await test.step(`steps[6] Security Group ${vars.sg2} 추가 → 반영 → 제거`, async () => {
+        await openCreateForm(page, ROUTES.sg, '서비스 생성');
+        await fillField(page, 'Security Group명', vars.sg2!);
+        await setCheckbox(page, '로그 저장 여부', false);
+        await submitForm(page, '생성');
+        await confirmModal(page, /진행하시겠습니까/);
+        await confirmModal(page, /생성하시겠습니까/);
+        await waitForRow(page, ROUTES.sg, vars.sg2!, { timeoutMs: 60_000, log });
+        const label = /^\s*Security Group\s*$/;
+        /** 수정 모달에서 SG 행의 체크 상태를 want 로 맞춘다. 모달 안에 표가 없고 "선택" 버튼만 있으면 그걸 눌러 선택 모달에서 고른다 */
+        const setSg = async (want: boolean) => {
+          await openClusterDetail();
+          const modal = await openLabelEdit(page, label);
+          await logModal(page, log, `Security Group 수정(${want ? '추가' : '제거'})`);
+          let table = modal.locator('tr').filter({ hasText: vars.sg2! });
+          if (!(await table.count())) {
+            // 3차 실측(10-13): 모달은 "Security Group 선택"(검색 input "Security Group 명을 입력하세요" + 표, 처음엔 "데이터가 없습니다") → 이름을 검색해야 행이 나온다
+            const search = modal.locator('input[placeholder*="Security Group"]:visible, input:visible').first();
+            if (await search.count()) {
+              await search.fill(vars.sg2!);
+              await search.press('Enter');
+              await page.waitForTimeout(1_500);
+              table = modal.locator('tr').filter({ hasText: vars.sg2! });
+            }
+          }
+          if (!(await table.count())) {
+            const pick = modal.getByRole('button', { name: /^(선택|추가)$/ }).first();
+            if (await pick.count()) {
+              await pick.click();
+              await page.waitForTimeout(800);
+              const picker = visibleModal(page);
+              const search = picker.locator('input:visible').first();
+              if (await search.count()) {
+                await search.fill(vars.sg2!);
+                await search.press('Enter');
+                await page.waitForTimeout(1_000);
+              }
+              table = picker.locator('tr').filter({ hasText: vars.sg2! });
+            }
+          }
+          if (!(await table.count())) {
+            await logModal(page, log, 'Security Group 수정(행 없음)');
+            throw new Error(`Security Group 수정 모달에 ${vars.sg2} 행이 없습니다`);
+          }
+          // 4차 실측(10-13): 행 선택 아이콘의 class 로는 선택 여부를 못 읽는다(제거 때 클릭이 안 나가 "확인" 이 안 닫힘) → 모달의 "n/4 개" 선택 수로 판단·검증
+          const countOf = async () => Number(((((await modal.innerText().catch(() => '')) || '').replace(/\s+/g, ' ')).match(/(\d+)\s*\/\s*4\s*개/) ?? [])[1] ?? -1);
+          const before = await countOf();
+          const target = want ? before + 1 : before - 1;
+          const sel = table.first().locator('i.table-select, .scp-select, input[type=checkbox]').first();
+          for (let attempt = 1; (await countOf()) !== target; attempt++) {
+            if (attempt > 3) throw new Error(`Security Group 선택 수가 ${target}/4 이 되지 않습니다 (지금 ${await countOf()}/4)`);
+            await sel.click();
+            await page.waitForTimeout(800);
+          }
+          log(`    Security Group 선택 ${before} → ${await countOf()}/4`);
+          // 선택 모달(안쪽)이 열려 있으면 먼저 확인으로 닫고 수정 모달로 돌아온다
+          const inner = visibleModal(page);
+          if ((await inner.innerText().catch(() => '')) !== (await modal.innerText().catch(() => ''))) {
+            await inner.getByRole('button', { name: '확인', exact: true }).click({ timeout: 5_000 }).catch(() => undefined);
+            await page.waitForTimeout(600);
+          }
+          await saveModal(page, log);
+          await waitDetailValue(page, label, (v) => v.includes(vars.sg2!) === want, { log, timeoutMs: 900_000 });
+          await waitForRow(page, SKE, vars.name!, { status: /Running/i, timeoutMs: 1_200_000, intervalMs: 20_000, log });
+        };
+        await setSg(true);
+        await setSg(false);
+        await gotoRoute(page, SKE);
+        await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
       });
   });
 });

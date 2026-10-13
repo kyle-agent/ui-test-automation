@@ -35,6 +35,12 @@ steps:
       url: "#/cdn/cdn/detail"
       text: ["3600초"]
 
+  # 동작(L3, 2026-10-13 6E, API updatedescriptionofcdnservice): 상세 "설명" 연필 → 반영 → 되돌림 (설정 버전 재배포 없음)
+  - goal: "CDN {{name}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/cdn/cdn/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "CDN {{name}} 을 (필요하면 중지 뒤) 해지한다"
     expect:

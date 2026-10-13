@@ -1,6 +1,8 @@
 // 직접 작성 (2026-09-28). 시나리오: scenarios/security/security-group-rule.yaml. 콘솔 사실은 yaml 머리 주석.
 import { expect } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
@@ -157,6 +159,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
       await settleConsole(page, { appearGraceMs: 800 });
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    // 동작(L3, 2026-10-13 6E, API setsecuritygroup): 상세 정보 탭 설명 수정 → 반영 → 되돌림
+    await test.step(`steps[4] Security Group ${vars.name} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await logWriteRequests(page, log);
+      await openDetail(page, ROUTES.sg, vars.name!);
+      await logDetail(page, log, 'Security Group 상세');
+      await probeEdits(page, log, 'Security Group');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
   });
 });

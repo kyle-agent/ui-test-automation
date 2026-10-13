@@ -1,0 +1,97 @@
+{
+  "spec": "networking.vpc-port",
+  "started": "2026-10-13T01:25:46.408Z",
+  "ended": "2026-10-13T01:46:22.151Z",
+  "seconds": 1236,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-port",
+    "run_id": "1013-1026-abfc",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 14.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Port 생성 → Virtual IP 예약 · Port 연결 · Public NAT IP 연결 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1192.6,
+      "annotations": {
+        "scenario": "networking.vpc-port",
+        "run_id": "1013-1026-abfc",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 9.9
+        },
+        {
+          "title": "steps[1] VPC vpc-1013-1026-abfc 생성",
+          "status": "pass",
+          "seconds": 26.3
+        },
+        {
+          "title": "steps[2] Subnet sub-1013-1026-abfc 생성",
+          "status": "pass",
+          "seconds": 276.7
+        },
+        {
+          "title": "steps[3] Port port-1013-1026-abfc 생성",
+          "status": "pass",
+          "seconds": 27.2
+        },
+        {
+          "title": "steps[4] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 65.6
+        },
+        {
+          "title": "steps[5] Virtual IP 예약 (vip-1013-1026-abfc)",
+          "status": "pass",
+          "seconds": 29
+        },
+        {
+          "title": "steps[6] VIP 10.250.0.42 에 Port port-1013-1026-abfc 연결",
+          "status": "pass",
+          "seconds": 36
+        },
+        {
+          "title": "steps[7] VIP Public NAT IP 123.41.33.78 연결",
+          "status": "pass",
+          "seconds": 25.7
+        },
+        {
+          "title": "steps[8] VIP Public NAT IP 해제 → VIP 설명 수정·되돌림 (L3, setsubnetvip)",
+          "status": "pass",
+          "seconds": 40.2
+        },
+        {
+          "title": "steps[9] Port port-1013-1026-abfc 연결 해제",
+          "status": "pass",
+          "seconds": 15.9
+        },
+        {
+          "title": "steps[10] VIP 10.250.0.42 반납",
+          "status": "pass",
+          "seconds": 37.1
+        },
+        {
+          "title": "steps[11] Subnet · Port · IGW · Public IP 상세 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 84.9
+        }
+      ]
+    }
+  ],
+  "git_sha": "74a6f59"
+}

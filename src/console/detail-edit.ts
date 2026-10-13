@@ -86,8 +86,9 @@ export async function openLabelEdit(page: Page, name: string | RegExp): Promise<
  * 수정 모달의 저장 버튼("확인"/"수정"/"저장") → 이어지는 "…하시겠습니까?" 확인 모달 → 완료 안내 모달까지 닫는다.
  * 확인 모달 문구를 로그로 남긴다(프로브).
  */
-export async function saveModal(page: Page, log?: (line: string) => void, timeoutMs = 90_000): Promise<void> {
-  const modal = visibleModal(page);
+export async function saveModal(page: Page, log?: (line: string) => void, timeoutMs = 90_000, opts: { modal?: Locator } = {}): Promise<void> {
+  // opts.modal: 저장할 수정 모달을 직접 준다 — 경고 모달이 위에 떠 있어 마지막(.last()) 모달이 수정 모달이 아닐 때(SKE 퍼블릭 엔드포인트, 2026-10-13 6E)
+  const modal = opts.modal ?? visibleModal(page);
   const title = (((await modal.innerText().catch(() => '')) || '').trim().split('\n')[0] ?? '').trim();
   const save = modal.getByRole('button', { name: /^(확인|수정|저장|완료)$/ }).last();
   await save.click({ timeout: 10_000 }).catch(() => save.click({ force: true }));
@@ -96,9 +97,28 @@ export async function saveModal(page: Page, log?: (line: string) => void, timeou
   let seen = '';
   for (const start = Date.now(); Date.now() - start < timeoutMs; ) {
     await page.waitForTimeout(1_200);
-    const next = visibleModal(page);
-    if (!(await next.isVisible().catch(() => false))) break;
-    const raw = ((await next.innerText().catch(() => '')) || '').trim();
+    // 보이는 모달이 여럿이면(수정 모달 위에 경고 "…진행하시겠습니까?" — SKE 퍼블릭 엔드포인트, 2026-10-13 6E) 수정 모달이 아닌 것을 먼저 처리한다.
+    // 예전엔 마지막(.last()) 모달만 봐서 수정 모달이 DOM 뒤에 있으면 경고를 못 누르고 90초를 기다렸다.
+    const all = page.locator('.scp-modal:visible');
+    const n = await all.count();
+    if (!n) break;
+    let next: Locator | null = null;
+    let raw = '';
+    for (let i = n - 1; i >= 0; i--) {
+      const t = ((await all.nth(i).innerText().catch(() => '')) || '').trim();
+      if (!t) continue;
+      if (title && t.split('\n')[0]!.trim() === title) {
+        if (!next) {
+          next = all.nth(i);
+          raw = t;
+        }
+        continue;
+      }
+      next = all.nth(i);
+      raw = t;
+      break;
+    }
+    if (!next) break;
     const text = raw.replace(/\s+/g, ' ');
     if (title && raw.split('\n')[0]!.trim() === title) {
       if (seen !== 'edit') log?.(`    수정 모달이 아직 열려 있음 → 닫힐 때까지 대기`);
@@ -165,6 +185,25 @@ export async function editDetailText(
   await fillStable(page, field, value, `${String(name)} 수정 입력`);
   await saveModal(page, opts.log);
   await waitDetailValue(page, name, opts.expectShown ?? ((v) => v.includes(value)), { log: opts.log });
+}
+
+/**
+ * 지금 열린 상세 화면의 "설명" 을 바꾸고(화면 반영 확인) 원래 값으로 되돌린다 (API set<리소스> 대응, 2026-10-13 6E).
+ * 설명 연필이 없으면 라벨 목록을 로그로 남기고 오류를 낸다(화면 변경 감지). 원래 값이 "-"(없음)면 빈 값으로 되돌린다.
+ */
+export async function editDescriptionRoundTrip(page: Page, value: string, log?: (line: string) => void, label: string | RegExp = '설명'): Promise<void> {
+  const l = page.locator('.scp-form-group-label:visible').filter({ hasText: typeof label === 'string' ? new RegExp(`^\\s*${esc(label)}\\s*$`) : label }).first();
+  if (!(await l.locator('i').count())) {
+    if (log) await logDetail(page, log, '설명 연필 없음');
+    throw new Error(`"${String(label)}" 수정 아이콘이 없습니다 (${page.url()})`);
+  }
+  const original = await detailValue(page, label);
+  await editDetailText(page, label, value, { log });
+  await editDetailText(page, label, original === '-' ? '' : original, {
+    log,
+    expectShown: (v) => v === original || (original === '-' && (v === '' || v === '-')),
+  });
+  log?.(`    ${String(label)} 수정 → 되돌림 확인 (${original === '-' ? '(없음)' : original.slice(0, 40)})`);
 }
 
 /**

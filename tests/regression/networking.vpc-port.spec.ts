@@ -3,6 +3,8 @@
 // → 역순 삭제. 콘솔 사실은 yaml 머리 주석과 docs/service-facts/compute-vm-stack.md.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { releaseSubnetVips, ROUTES } from '../../src/console/inventory';
 import { createIgw, deleteIgw, openDetailTab, releasePublicIp, reservePublicIp, setPublicNatIp } from '../../src/console/networking';
@@ -215,8 +217,12 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await setPublicNatIp(page, publicIp, log);
       await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
     });
-    await test.step('steps[8] VIP Public NAT IP 해제', async () => {
+    await test.step('steps[8] VIP Public NAT IP 해제 → VIP 설명 수정·되돌림 (L3, setsubnetvip)', async () => {
       await setPublicNatIp(page, null, log);
+      await logWriteRequests(page, log);
+      await logDetail(page, log, 'Virtual IP 상세');
+      await probeEdits(page, log, 'Virtual IP');
+      await editDescriptionRoundTrip(page, `${vars.vip_desc} edited`, log);
       await expectStep(page, resolveExpectation(scenario.steps[8]!.expect, vars), ctx(8));
     });
     await test.step(`steps[9] Port ${vars.name} 연결 해제`, async () => {
@@ -236,6 +242,23 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await confirmModal(page, /Virtual IP를 반납하시겠습니까/);
       await waitForRow(page, tab, vip, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[10]!.expect, vars), ctx(10));
+    });
+    // 동작(L3, 2026-10-13 6E): Subnet · Port · IGW · Public IP 상세 설명 수정 → 반영 → 되돌림 (API setsubnet · setport · setinternetgateway · setpublicip)
+    await test.step('steps[11] Subnet · Port · IGW · Public IP 상세 설명 수정 → 반영 → 되돌림 (L3)', async () => {
+      await logWriteRequests(page, log);
+      const edited = `scp-console-tests ${vars.run_id} edited`;
+      for (const [what, route, name] of [
+        ['Subnet', ROUTES.subnet, vars.subnet!],
+        ['Port', ROUTES.port, vars.name!],
+        ['Internet Gateway', ROUTES.igw, `IGW_${vars.vpc}`],
+        ['Public IP', ROUTES.pip, publicIp],
+      ] as const) {
+        await openDetail(page, route, name);
+        await logDetail(page, log, `${what} 상세`);
+        await probeEdits(page, log, what);
+        await editDescriptionRoundTrip(page, edited, log);
+      }
+      await expectStep(page, resolveExpectation(scenario.steps[11]!.expect, vars), ctx(11));
     });
   });
 });

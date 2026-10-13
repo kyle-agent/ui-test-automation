@@ -480,3 +480,21 @@
 - 동작 대응은 추측 대신 화면이 보내는 요청 경로로 확인(`src/console/api-log.ts` logWriteRequests). IAM 삭제는 bulk API, VM 볼륨 연결은 /servers/{id}/volumes.
 - 알게 된 위험: Cloud Functions 는 PrivateLink Service 가 켜져 있으면 해지가 조용히 무시된다. DBaaS 동작 PASS 는 DBAAS_SOFT=1 로 확인(실패 0) — 다음 회귀에서 기본 모드 확인 필요.
 - SKE: 주간 spec container.ske-upgrade(--weekly), ske-cluster 에 노드 수·레이블·테인트·로깅. 네임스페이스는 클러스터 드롭다운 위치 문제로 미완.
+
+### 9.22 6E 네트워킹·SKE 동작 확대 (2026-10-13)
+
+- 방법: 기존 spec 끝에 "상세 설명 연필 → 수정 → 되돌림" 단계(`editDescriptionRoundTrip`, detail-edit.ts)를 붙이고 `logWriteRequests` 로 실제 PUT 경로를 확인해 data/ui-operations.yaml 에 적었다.
+  첫 실행은 `PROBE_EDITS=1` 로 돌려 상세 연필 라벨·모달 구조를 로그(reports/6e/*.log, 커밋 안 함)에 남겼다.
+- 새로 대응(모두 단독 PASS): VPC setvpc · setsubnet · setport · setinternetgateway · setpublicip · setsubnetvip · setnatgateway · settransitgateway · setvpcpeering,
+  LB setloadbalancer, Firewall setfirewallrule(규칙 수정 화면 비활성화→활성화, PUT /firewalls/rules/bulk — 삭제도 같은 bulk), GSLB setgslb · setgslbhealthcheck(Timeout 10→20→10),
+  Direct Connect setdirectconnect, DNS sethostedzone · setprivatedns, CDN updatedescriptionofcdnservice(PUT …/description), Security Group setsecuritygroup · setaddressgroup ·
+  addaddressgroupcidrs · removeaddressgroupcidrs(대상 주소 탭 이름 없는 아이콘 메뉴 "삭제" → …/remove_addresses). 네트워킹 대상 10개 상품 동작 UI 120/157.
+- 불가로 적음: setfirewall(크기 변경 과금·로그 저장소), sethostedzonerecord(레코드 탭에 수정 버튼 없음), 퍼블릭 도메인 4종(실제 도메인 구매), approvalvpcpeering(다른 Account),
+  TGW Firewall·Uplink 규칙 6종(유료 자원·회선), LB 멤버 4종(실 VM)·L7 Listener 3종, CDN purge. 미실시: startcdnservice(시간), LB Private NAT IP, activateprivatedns(VPC 연결 연필).
+- 알게 된 것: **Hosted Zone 에 레코드가 남아 있으면 삭제 요청이 조용히 무시되고 Private DNS 해지도 막힌다** → `clearHostedZoneRecords`(inventory.ts) 를 spec teardown 과 정리 도구가 먼저 부른다.
+  GSLB Health Check 모달은 Timeout ≤ Interval 이면 안내 없이 "확인" 이 안 닫힌다. Address Group 대상 주소 탭 상단 "Address Group 삭제" 는 그룹 자체 삭제(1차 실행에서 잘못 눌러 그룹이 지워짐).
+  `saveModal` 은 이제 보이는 모달이 여럿이면 수정 모달이 아닌 것(경고)부터 누른다(SKE 퍼블릭 엔드포인트 경고가 DOM 앞에 있어 90초 대기하던 문제).
+- SKE(container.ske-cluster PASS 10-13 14:26, 40.7분 — SKE_SCALE=0 SKE_LABELS=0; 5번째 시도): 노드 풀 "우선 IP 지정"(setnodepoolpreferredips, PUT …/nodepools/{id}/preferred-ips),
+  퍼블릭 엔드포인트 켬→끔(setclusterpublicaccesscontrol, PUT …/clusters/{id}/public-access-control: 사용 체크 → 동의 체크가 있는 경고 모달 → 접근 허용 IP 범위 1개 필수),
+  두 번째 SG sgb-<run_id> 추가→제거(setclustersecuritygroups, PUT …/clusters/{id}/security-groups: "Security Group 선택" 모달은 이름을 검색해야 행이 나오고 선택 여부는 "n/4 개" 로 판단).
+  ServiceWatch 로그 수집 경로는 …/service-watch-logging(setclusterlogging 아님). 불가·미실시 사유는 data/ui-operations.yaml ske 절. 전부 돌리면 ≈55분(suite-plan 55).

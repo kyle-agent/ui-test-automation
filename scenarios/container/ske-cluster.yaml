@@ -47,12 +47,24 @@ steps:
     expect:
       url: "#/ske/cluster"
 
+  # 2026-10-13 6E (API setclusterpublicaccesscontrol): 상세 "퍼블릭 엔드포인트" 연필 → 사용 체크(경고 모달 확인) → 반영 → 미사용으로 되돌림 (SKE_SETTING=0 이면 생략)
+  - goal: "클러스터 {{name}} 의 퍼블릭 엔드포인트를 켜 상세 반영을 확인하고 다시 끈다 (L4)"
+    expect:
+      url: "#/ske/cluster"
+
+  # 2026-10-13 6E (API setclustersecuritygroups): 두 번째 SG {{sg2}} 를 만들어 상세 "Security Group" 연필로 추가 → 반영 → 제거 (SKE_SETTING=0 이면 생략). {{sg2}} 는 teardown 에서 지운다
+  - goal: "Security Group {{sg2}} 를 만들어 클러스터 {{name}} 의 Security Group 에 추가하고 반영을 확인한 뒤 제거한다 (L4)"
+    vars:
+      sg2: "sgb-{{run_id}}"
+    expect:
+      url: "#/ske/cluster"
+
 teardown:
   - goal: "클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"
     expect:
       not_text: ["{{name}}"]
       timeout: 1800000
-  - goal: "SG, Subnet, VPC 를 역순으로 지운다"
+  - goal: "SG({{sg}}, {{sg2}}), Subnet, VPC 를 역순으로 지운다"
     expect:
       not_text: ["{{vpc}}"]
       timeout: 1200000

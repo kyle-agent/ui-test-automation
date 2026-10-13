@@ -1,0 +1,84 @@
+{
+  "spec": "networking.nat-gateway",
+  "started": "2026-10-13T01:46:22.629Z",
+  "ended": "2026-10-13T02:02:34.394Z",
+  "seconds": 972,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "networking.nat-gateway",
+    "run_id": "1013-1046-3acb",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 19.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Public IP → NAT Gateway 생성 후 역순 삭제",
+      "status": "failed",
+      "seconds": 825,
+      "annotations": {
+        "scenario": "networking.nat-gateway",
+        "run_id": "1013-1046-3acb",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.7
+        },
+        {
+          "title": "steps[1] VPC vpc-1013-1046-3acb · Subnet sub-1013-1046-3acb 생성",
+          "status": "pass",
+          "seconds": 365.4
+        },
+        {
+          "title": "steps[2] Public IP 예약",
+          "status": "pass",
+          "seconds": 8.3
+        },
+        {
+          "title": "steps[3] NAT Gateway 생성",
+          "status": "pass",
+          "seconds": 32.2
+        },
+        {
+          "title": "steps[4] NAT Gateway 상세 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "fail",
+          "seconds": 6.3
+        }
+      ],
+      "error": "Error: NAT Gateway 상세로 이동하지 못했습니다 (https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/nat-gateway/list)",
+      "attachments": [
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-4.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-2.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-5.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-1.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-3.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/screenshot-networking.nat-gateway.png",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/error-context.md",
+        "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/trace.zip"
+      ]
+    }
+  ],
+  "git_sha": "74a6f59",
+  "error": "Error: NAT Gateway 상세로 이동하지 못했습니다 (https://console.kr-west1.e.samsungsdscloud.com/console/#/vpc/nat-gateway/list)",
+  "attachments": [
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-4.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-2.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-5.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-1.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/test-failed-3.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/screenshot-networking.nat-gateway.png",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/error-context.md",
+    "test-results/artifacts/networking.nat-gateway/networking.nat-gateway-VPC-33f68-IP-→-NAT-Gateway-생성-후-역순-삭제-regression/trace.zip"
+  ]
+}

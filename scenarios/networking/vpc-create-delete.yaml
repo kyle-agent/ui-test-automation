@@ -36,6 +36,12 @@ steps:
       not_text: ["오류가 발생", "실패"]
       timeout: 60000
 
+  # 동작(L3, 2026-10-13 6E, API setvpc): 상세 "설명" 연필 → 모달 → 확인 → 반영 → 원래 값으로 되돌림. 상세 버튼·연필 라벨은 로그로 남긴다(addvpccidr 진입점 확인용).
+  - goal: "VPC {{name}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/vpc/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "VPC 목록 화면으로 이동한다"
     goto: "#/vpc/vpc/list"

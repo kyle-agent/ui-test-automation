@@ -1,0 +1,72 @@
+{
+  "spec": "container.ske-cluster",
+  "started": "2026-10-13T05:26:07.746Z",
+  "ended": "2026-10-13T06:06:49.171Z",
+  "seconds": 2441,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.ske-cluster",
+    "run_id": "1013-1426-a0b5",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 9.6,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Kubernetes Engine 클러스터 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 2411.6,
+      "annotations": {
+        "scenario": "container.ske-cluster",
+        "run_id": "1013-1426-a0b5",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.1
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG 생성",
+          "status": "pass",
+          "seconds": 297.4
+        },
+        {
+          "title": "steps[2] 클러스터 ske-1013-1426-a0b5 생성",
+          "status": "pass",
+          "seconds": 505.7
+        },
+        {
+          "title": "steps[3] 노드 풀 np-1013-1426-a0b5 추가 → Running → 노드 수·레이블·테인트 → 삭제",
+          "status": "pass",
+          "seconds": 691.6
+        },
+        {
+          "title": "steps[4] 클러스터 ServiceWatch 로그 수집 켬 → 반영 → 끔",
+          "status": "pass",
+          "seconds": 66.9
+        },
+        {
+          "title": "steps[5] 클러스터 퍼블릭 엔드포인트 켬 → 반영 → 끔",
+          "status": "pass",
+          "seconds": 375.6
+        },
+        {
+          "title": "steps[6] Security Group sgb-1013-1426-a0b5 추가 → 반영 → 제거",
+          "status": "pass",
+          "seconds": 63.9
+        }
+      ]
+    }
+  ],
+  "git_sha": "74a6f59"
+}

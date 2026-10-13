@@ -34,6 +34,13 @@ steps:
       url: "#/firewall/firewall/detail/rule"
       text: ["192.168.1.1", "10.250.0.10"]
 
+  # 동작(L3, 2026-10-13 6E, API setfirewallrule): 규칙 수정 화면에서 행 선택 → "비활성화" → 완료 → 규칙 탭 행 상태 비활성화 → 다시 "활성화" 로 되돌림.
+  # 상세 정보 탭의 연필 라벨(setfirewall 후보)은 로그로 남긴다.
+  - goal: "규칙 수정 화면에서 그 규칙을 비활성화하고 반영을 확인한 뒤 다시 활성화한다 (L3)"
+    expect:
+      url: "#/firewall/firewall/detail/rule"
+      text: ["192.168.1.1"]
+
   - goal: "규칙 수정 화면에서 그 규칙을 삭제한다"
     expect:
       url: "#/firewall/firewall/detail/rule"

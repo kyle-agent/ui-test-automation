@@ -40,9 +40,16 @@ steps:
     expect:
       text: ["192.0.2.10"]
 
+  # 2026-10-13 6E 실측: 레코드 탭 버튼은 "Hosted Zone 삭제 · 삭제 · 상세 검색 · 레코드 추가" 뿐, 행 버튼도 없어 레코드 수정(sethostedzonerecord) 진입점이 없다.
   - goal: "A 레코드 www 를 삭제한다"
     expect:
       not_text: ["192.0.2.10"]
+
+  # 동작(L3, 2026-10-13 6E, API sethostedzone · setprivatedns): 상세 "설명" 연필 → 반영 → 되돌림
+  - goal: "Hosted Zone {{zone}} 상세와 Private DNS {{pdns}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/dns/private-dns/detail"
+      text: ["{{pdns}}"]
 
 teardown:
   - goal: "Hosted Zone {{zone}} 을 행의 삭제 버튼으로 지운다"

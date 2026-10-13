@@ -69,6 +69,12 @@ steps:
       url: "#/vpc/private-nat/list"
       not_text: ["{{pnat}}"]
 
+  # 동작(L3, 2026-10-13 6E, API setdirectconnect): Direct Connect 상세 "설명" 연필 → 반영 → 되돌림
+  - goal: "Direct Connect {{name}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/directconnect/directconnect/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "Direct Connect {{name}} 를 해지한다"
     expect:

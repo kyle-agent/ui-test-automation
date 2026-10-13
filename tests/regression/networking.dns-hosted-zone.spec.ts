@@ -2,8 +2,10 @@
 // Private DNS(Active) → Hosted Zone(Private, .com) 생성 → 레코드 A 추가·삭제(L3) → 행 삭제 → Private DNS 상세 서비스 해지. 콘솔 사실은 yaml 머리 주석.
 import { expect } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
-import { ROUTES } from '../../src/console/inventory';
+import { clearHostedZoneRecords, ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
 import {
   confirmModal,
@@ -58,6 +60,9 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await gotoRoute(page, ROUTES.hz);
       if ((await row(page, vars.zone!).count()) === 0) return;
       await test.step(`teardown[0] Hosted Zone ${vars.zone} 삭제`, async () => {
+        // 본 단계가 레코드를 남긴 채 실패했으면 먼저 지운다(레코드가 있으면 Hosted Zone 삭제가 조용히 무시된다, 2026-10-13 6E 실측)
+        await clearHostedZoneRecords(page, vars.zone!, log);
+        await gotoRoute(page, ROUTES.hz);
         await row(page, vars.zone!).getByRole('button', { name: '삭제', exact: true }).click();
         await confirmModal(page, /삭제하시겠습니까/, '확인', { agree: true, resourceName: vars.zone });
         for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
@@ -171,7 +176,9 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       log(`  레코드 행: ${(await row(page, RECORD_IP).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
     });
+    // 2026-10-13 6E 실측: 레코드 탭 버튼(행 선택 후) "Hosted Zone 삭제 · 삭제 · 상세 검색 · 레코드 추가", 행 버튼 없음 → 레코드 수정(sethostedzonerecord) 진입점 없음
     await test.step(`steps[4] 레코드 ${RECORD} 삭제`, async () => {
+      await logWriteRequests(page, log);
       const recordRoute = '#' + page.url().split('#')[1]!;
       await selectRow(page, RECORD_IP);
       await topButton(page, '삭제').click();
@@ -179,6 +186,19 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await waitForRow(page, recordRoute, RECORD_IP, { gone: true, timeoutMs: 180_000, intervalMs: 10_000, log });
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    // 동작(L3, 2026-10-13 6E, API sethostedzone · setprivatedns): 상세 설명 수정 → 반영 → 되돌림. 상세 버튼(activateprivatedns 진입점 확인용)은 로그로.
+    await test.step(`steps[5] Hosted Zone ${vars.zone} · Private DNS ${vars.pdns} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      // 상세 주소 형식을 모른다 → 목록이 아닌 hosted-zone/private-dns 경로면 상세로 본다
+      await openDetail(page, ROUTES.hz, vars.zone!, /\/detail|\/hosted-zone\/(?!list)/);
+      await logDetail(page, log, 'Hosted Zone 상세');
+      await probeEdits(page, log, 'Hosted Zone');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await openDetail(page, ROUTES.pdns, vars.pdns!, /\/detail|\/private-dns\/(?!list)/);
+      await logDetail(page, log, 'Private DNS 상세');
+      await probeEdits(page, log, 'Private DNS');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
   });
 });

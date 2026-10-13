@@ -2,6 +2,8 @@
 // VPC 2개 → VPC Peering(동일 Account) → 규칙 추가·삭제(2026-09-30 에이전트 B) → 상세에서 삭제 → VPC 해지. 콘솔 사실은 yaml 머리 주석.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { openDetailTab } from '../../src/console/networking';
@@ -188,6 +190,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     await test.step(`steps[4] 규칙 ${vars.peer_dest} 삭제`, async () => {
       await deleteRule(page);
       await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
+    });
+    // 동작(L3, 2026-10-13 6E, API setvpcpeering): 상세 설명 수정 → 반영 → 되돌림
+    await test.step(`steps[5] VPC Peering ${vars.name} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await logWriteRequests(page, log);
+      await openDetail(page, ROUTES.peer, vars.name!);
+      await logDetail(page, log, 'VPC Peering 상세');
+      await probeEdits(page, log, 'VPC Peering');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[5]!.expect, vars), ctx(5));
     });
   });
 });

@@ -61,6 +61,12 @@ steps:
       url: "#/vpc/transit-gateway/detail/vpc-connection"
       not_text: ["{{vpc}}"]
 
+  # 동작(L3, 2026-10-13 6E, API settransitgateway): 상세 정보 탭 "설명" 연필 → 반영 → 되돌림. 상세 버튼("Firewall 연결" 등)은 로그로만 남긴다(TGW Firewall 은 과금 자원).
+  - goal: "Transit Gateway {{tgw}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/transit-gateway/detail"
+      text: ["{{tgw}}"]
+
 teardown:
   - goal: "Transit Gateway {{tgw}} 를 삭제한다"
     expect:

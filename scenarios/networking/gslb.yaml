@@ -39,6 +39,12 @@ steps:
       url: "#/gslb/gslb/detail"
       text: ["scp-console-tests {{run_id}}"]
 
+  # 동작(L3, 2026-10-13 6E, API setgslbhealthcheck): 상세 정보 탭 헬스 체크 연필 → Interval 5 → 10 → 반영 → 5 로 되돌림
+  - goal: "헬스 체크 설정(Interval)을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/gslb/gslb/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "GSLB {{name}} 을 해지한다"
     expect:

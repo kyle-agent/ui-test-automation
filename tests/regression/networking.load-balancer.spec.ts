@@ -4,8 +4,10 @@
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
 import { expectStep, gotoRoute } from '../../src/console/expect';
+import { logWriteRequests } from '../../src/console/api-log';
 import {
   detailValue,
+  editDescriptionRoundTrip,
   editDetailText,
   logDetail,
   logModal,
@@ -317,6 +319,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       }
       await editDesc('Listener');
       await expectStep(page, resolveExpectation(scenario.steps[11]!.expect, vars), ctx(11));
+    });
+    // 동작(L3, 2026-10-13 6E, API setloadbalancer): LB 상세 설명 수정 → 반영 → 되돌림
+    await test.step(`steps[12] Load Balancer ${vars.lb} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await logWriteRequests(page, log);
+      await openLbDetail(page);
+      await logDetail(page, log, 'Load Balancer 상세');
+      await probeEdits(page, log, 'Load Balancer');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[12]!.expect, vars), ctx(12));
     });
   });
 });

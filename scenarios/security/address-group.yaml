@@ -26,6 +26,12 @@ steps:
       url: "#/securitygroup/addressgroup/list"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-13 6E): 상세 "설명" 연필(API setaddressgroup) → 반영 → 되돌림. 대상 주소 탭에서 추가한 10.250.1.0/24 행 삭제(API removeaddressgroupcidrs) 진입점을 찾아 지운다.
+  - goal: "Address Group {{name}} 상세에서 설명을 바꿔 되돌리고, 대상 주소 탭에서 추가한 10.250.1.0/24 를 삭제한다 (L3)"
+    expect:
+      url: "#/securitygroup/addressgroup/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "Address Group {{name}} 을 삭제한다"
     expect:

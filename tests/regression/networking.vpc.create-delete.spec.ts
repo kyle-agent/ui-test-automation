@@ -7,6 +7,8 @@
 //  - "생성" 은 폼이 유효해질 때까지 aria-disabled. 누르면 "VPC를 생성하시겠습니까?" 모달 → "확인".
 //  - 행의 "서비스 해지" → "VPC를 해지하시겠습니까?" 모달 → "확인" → 수 초 안에 목록에서 사라진다.
 import { expect, test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { visibleText } from '../../src/console/frames';
 import { settleConsole } from '../../src/console/overlays';
@@ -99,6 +101,21 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud'] },
         consoleTitle: CONSOLE_CHECKS,
         scenario: scenario.id,
         step: 2,
+        testInfo: test.info(),
+      });
+    });
+    // 동작(L3, 2026-10-13 6E): 상세 설명 수정 → 반영 → 되돌림 (API setvpc). 상세 버튼·연필 라벨을 로그로 남긴다.
+    await test.step('steps[3] VPC 상세 설명 수정 → 반영 → 되돌림 (L3)', async () => {
+      const log = (line: string) => console.log(line);
+      await logWriteRequests(page, log);
+      await openDetail(page, '#/vpc/vpc/list', vars.name!);
+      await logDetail(page, log, 'VPC 상세');
+      await probeEdits(page, log, 'VPC');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), {
+        consoleTitle: CONSOLE_CHECKS,
+        scenario: scenario.id,
+        step: 3,
         testInfo: test.info(),
       });
     });

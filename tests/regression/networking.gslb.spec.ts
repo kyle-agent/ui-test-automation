@@ -2,7 +2,8 @@
 import { expect } from '@playwright/test';
 import { defineSimpleCrudSpec } from '../../src/console/simple-crud';
 import { gotoRoute } from '../../src/console/expect';
-import { editDetailText } from '../../src/console/detail-edit';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDetailText, logDetail, logModal, openLabelEdit, probeEdits, saveModal, waitDetailValue } from '../../src/console/detail-edit';
 import { settleConsole } from '../../src/console/overlays';
 import { below, confirmModal, dismissModalIfAny, fillField, fillStable, pickOption, row, selectRow, submitForm, topButton, waitForRow } from '../../src/console/ui';
 
@@ -116,7 +117,41 @@ defineSimpleCrudSpec({
       log(`  연결 대상 ${TARGET} Weight 1 → 5 확인`);
       await page.getByText(/^\s*상세 정보\s*$/).first().click();
       await settleConsole(page, { appearGraceMs: 800 });
+      await logWriteRequests(page, log); // 설명 수정이 setgslb(PUT /gslbs/{id}) 인지 경로로 확인(6E)
       await editDetailText(page, '설명', `scp-console-tests ${vars.run_id}`, { log });
+    },
+    // steps[4] (2026-10-13 6E, API setgslbhealthcheck): 상세 정보 탭의 헬스 체크 연필 → 모달에서 Interval 5 → 10 → 확인 → 반영 → 5 로 되돌림.
+    // 라벨·모달 구조는 logDetail/logModal 로 남긴다(PROBE_EDITS=1 이면 모든 연필을 먼저 프로브).
+    async (page, vars, log) => {
+      await gotoRoute(page, '#/gslb/gslb/list');
+      await row(page, vars.name!).getByText(new RegExp(`^${vars.name}`)).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await logWriteRequests(page, log);
+      await logDetail(page, log, 'GSLB 상세');
+      await probeEdits(page, log, 'GSLB');
+      // 연필이 있는 라벨 중 헬스 체크 관련(Health Check / 헬스 체크 / Interval)을 고른다
+      const labels = page.locator('.scp-form-group-label:visible').filter({ has: page.locator('i') });
+      const names = (await labels.allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
+      const hc = names.find((n) => /health\s*check|헬스\s*체크|interval/i.test(n));
+      if (!hc) throw new Error(`GSLB 상세에 헬스 체크 연필 라벨이 없습니다. 연필 라벨: ${JSON.stringify(names)}`);
+      // 1차 실측(2026-10-13): 모달 = 드롭다운(ICMP) + 입력 Interval 5 · Timeout 10 · Probe Timeout 5. Timeout 은 Interval 보다 커야 해서(검증 실패 시 모달이 닫히지 않고 안내도 없음)
+      // Timeout 10 → 20 → 10 을 바꾼다. 상세 화면엔 Interval·Timeout 값이 없어(Health Check = ICMP 만) 모달을 다시 열어 값으로 확인한다.
+      for (const value of ['20', '10']) {
+        const modal = await openLabelEdit(page, hc);
+        await logModal(page, log, `${hc} 수정`);
+        const timeout = modal.locator('input[type=text]:visible, input[type=number]:visible').nth(1);
+        await fillStable(page, timeout, value, 'Timeout');
+        await saveModal(page, log);
+        await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+        await settleConsole(page, { appearGraceMs: 1_000 });
+        const check = await openLabelEdit(page, hc);
+        const shown = await check.locator('input[type=text]:visible, input[type=number]:visible').nth(1).inputValue();
+        log(`  Health Check Timeout(다시 연 모달) = ${shown} (기대 ${value})`);
+        await check.getByRole('button', { name: '취소', exact: true }).click({ timeout: 5_000 }).catch(() => page.keyboard.press('Escape'));
+        await page.waitForTimeout(500);
+        for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+        expect(shown, 'Health Check Timeout 반영').toBe(value);
+      }
     },
   ],
   deleteButton: '서비스 해지',

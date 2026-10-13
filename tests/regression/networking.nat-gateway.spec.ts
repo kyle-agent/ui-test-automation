@@ -1,6 +1,8 @@
 // 직접 작성 (2026-09-28). 시나리오: scenarios/networking/nat-gateway.yaml. 콘솔 사실은 yaml 머리 주석.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { settleConsole } from '../../src/console/overlays';
@@ -257,6 +259,16 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       });
       log(`  NAT 행: ${(await natRow(page).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    // 동작(L3, 2026-10-13 6E, API setnatgateway): 상세 설명 수정 → 반영 → 되돌림. NAT 이름은 콘솔이 지어 행의 첫 칸(이름 링크)을 누른다.
+    await test.step('steps[4] NAT Gateway 상세 설명 수정 → 반영 → 되돌림 (L3)', async () => {
+      await logWriteRequests(page, log);
+      // 실측(10-13): NAT 이름은 "NAT_GW_<subnet명>". natRow 는 :visible 이 아니라 숨은 행이 먼저 잡혀 링크 클릭이 안 됐다 → 이름으로 openDetail
+      await openDetail(page, ROUTES.nat, `NAT_GW_${vars.subnet}`);
+      await logDetail(page, log, 'NAT Gateway 상세');
+      await probeEdits(page, log, 'NAT Gateway');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
   });
 });

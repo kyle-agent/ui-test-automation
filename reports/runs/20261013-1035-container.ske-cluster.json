@@ -1,0 +1,83 @@
+{
+  "spec": "container.ske-cluster",
+  "started": "2026-10-13T01:35:30.372Z",
+  "ended": "2026-10-13T02:20:17.264Z",
+  "seconds": 2687,
+  "status": "fail",
+  "class": "environment",
+  "annotations": {
+    "scenario": "container.ske-cluster",
+    "run_id": "1013-1036-9c4a",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 17.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → SG → Kubernetes Engine 클러스터 생성 후 역순 해지",
+      "status": "failed",
+      "seconds": 2531.7,
+      "annotations": {
+        "scenario": "container.ske-cluster",
+        "run_id": "1013-1036-9c4a",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] VPC · Subnet · SG 생성",
+          "status": "pass",
+          "seconds": 372.7
+        },
+        {
+          "title": "steps[2] 클러스터 ske-1013-1036-9c4a 생성",
+          "status": "pass",
+          "seconds": 436.4
+        },
+        {
+          "title": "steps[3] 노드 풀 np-1013-1036-9c4a 추가 → Running → 노드 수·레이블·테인트 → 삭제",
+          "status": "pass",
+          "seconds": 1177.9
+        },
+        {
+          "title": "steps[4] 클러스터 ServiceWatch 로그 수집 켬 → 반영 → 끔",
+          "status": "pass",
+          "seconds": 68.5
+        },
+        {
+          "title": "steps[5] 클러스터 퍼블릭 엔드포인트 켬 → 반영 → 끔",
+          "status": "fail",
+          "seconds": 117
+        }
+      ],
+      "error": "Error: 수정 모달이 90초 안에 닫히지 않았습니다: 알림 Kubernetes API 에 대한 외부 접근이 가능합니다. 외부 접근이 필요하지 않다면, '사용' 체크를 해지하여 보안 위협을 최소화해주세요. 진행하시겠습니까? 취소 확인",
+      "attachments": [
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-4.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-3.png",
+        "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png"
+      ]
+    }
+  ],
+  "git_sha": "74a6f59",
+  "error": "Error: 수정 모달이 90초 안에 닫히지 않았습니다: 알림 Kubernetes API 에 대한 외부 접근이 가능합니다. 외부 접근이 필요하지 않다면, '사용' 체크를 해지하여 보안 위협을 최소화해주세요. 진행하시겠습니까? 취소 확인",
+  "attachments": [
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-4.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-3.png",
+    "test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png"
+  ]
+}

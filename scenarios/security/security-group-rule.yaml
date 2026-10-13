@@ -35,6 +35,12 @@ steps:
       not_text: ["{{cidr}}"]
       timeout: 120000
 
+  # 동작(L3, 2026-10-13 6E, API setsecuritygroup): 상세 정보 탭 "설명" 연필 → 모달 → 확인 → 반영 → 되돌림
+  - goal: "Security Group {{name}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/securitygroup/securitygroup/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "상세의 서비스 해지로 Security Group {{name}} 을 해지한다"
     expect:

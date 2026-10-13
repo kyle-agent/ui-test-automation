@@ -2,6 +2,8 @@
 // VPC → Transit Gateway → VPC 연결 추가(L3) → 규칙 추가·삭제(2026-09-30 에이전트 B) → 연결 해제 → TGW 삭제 → VPC 해지.
 import type { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { editDescriptionRoundTrip, logDetail, openDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { createVpcOnly, openDetailTab } from '../../src/console/networking';
@@ -190,6 +192,15 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
     await test.step('steps[6] VPC 연결 해제', async () => {
       await detachVpc(page);
       await expectStep(page, resolveExpectation(scenario.steps[6]!.expect, vars), ctx(6));
+    });
+    // 동작(L3, 2026-10-13 6E, API settransitgateway): 상세 설명 수정 → 반영 → 되돌림. 상세 버튼은 로그로(Firewall 연결 = TGW Firewall, 과금이라 누르지 않음)
+    await test.step(`steps[7] Transit Gateway ${vars.tgw} 설명 수정 → 반영 → 되돌림 (L3)`, async () => {
+      await logWriteRequests(page, log);
+      await openDetail(page, ROUTES.tgw, vars.tgw!);
+      await logDetail(page, log, 'Transit Gateway 상세');
+      await probeEdits(page, log, 'Transit Gateway');
+      await editDescriptionRoundTrip(page, `scp-console-tests ${vars.run_id} edited`, log);
+      await expectStep(page, resolveExpectation(scenario.steps[7]!.expect, vars), ctx(7));
     });
   });
 });

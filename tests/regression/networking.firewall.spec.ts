@@ -2,6 +2,8 @@
 // VPC → IGW(Firewall 사용) → Firewall 규칙 추가 → 규칙 삭제 → IGW 삭제 → VPC 해지. IGW 가 VPC 당 1개라 공유 VPC 는 쓰지 않는다.
 import { expect, type Page } from '@playwright/test';
 import { test } from '../../src/fixtures/test';
+import { logWriteRequests } from '../../src/console/api-log';
+import { logDetail, probeEdits } from '../../src/console/detail-edit';
 import { expectStep, gotoRoute } from '../../src/console/expect';
 import { ROUTES } from '../../src/console/inventory';
 import { createIgw, createVpcOnly, deleteIgw } from '../../src/console/networking';
@@ -33,6 +35,21 @@ async function openRules(page: Page): Promise<string> {
   await page.getByText(/^규칙 \(/).first().click();
   await settleConsole(page, { appearGraceMs: 800 });
   return '#' + page.url().split('#')[1]!;
+}
+
+/** 규칙 탭 → "규칙 수정" 화면(…/rule/edit). 규칙 추가 직후엔 방화벽이 Syncing 이라 눌려도 안 넘어간다 → 넘어갈 때까지 다시 연다(최대 5분). 규칙 탭 route 를 돌려준다. */
+async function openRuleEdit(page: Page): Promise<string> {
+  const rules = await openRules(page);
+  for (let attempt = 1; ; attempt++) {
+    await page.getByRole('button', { name: '규칙 수정', exact: true }).click();
+    const moved = await page.waitForURL(/\/rule\/edit/, { timeout: 20_000 }).then(() => true, () => false);
+    if (moved) break;
+    if (attempt >= 15) throw new Error('"규칙 수정" 화면으로 5분 안에 넘어가지 않았습니다(방화벽 동기화 대기)');
+    log(`  규칙 수정 화면 대기 ${attempt} (방화벽 동기화 중으로 보임)`);
+    await gotoRoute(page, rules);
+  }
+  await settleConsole(page, { appearGraceMs: 1000 });
+  return rules;
 }
 
 test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@stack', '@network'] }, () => {
@@ -112,18 +129,39 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       log(`  규칙 행: ${(await ruleRow(page).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       await expectStep(page, resolveExpectation(scenario.steps[2]!.expect, vars), ctx(2));
     });
-    await test.step('steps[3] 규칙 삭제 (규칙 수정 화면)', async () => {
-      const rules = await openRules(page);
-      // 규칙 추가 직후엔 방화벽이 Syncing 이라 "규칙 수정" 이 눌려도 화면이 안 바뀐다(2026-09-30 재실행 실패) → 넘어갈 때까지 다시 연다(최대 5분)
-      for (let attempt = 1; ; attempt++) {
-        await page.getByRole('button', { name: '규칙 수정', exact: true }).click();
-        const moved = await page.waitForURL(/\/rule\/edit/, { timeout: 20_000 }).then(() => true, () => false);
-        if (moved) break;
-        if (attempt >= 15) throw new Error('"규칙 수정" 화면으로 5분 안에 넘어가지 않았습니다(방화벽 동기화 대기)');
-        log(`  규칙 수정 화면 대기 ${attempt} (방화벽 동기화 중으로 보임)`);
-        await gotoRoute(page, rules);
+    // 동작(L3, 2026-10-13 6E, API setfirewallrule): 규칙 수정 화면에서 행 선택 → "비활성화" → 완료 → 규칙 탭 행 "비활성화" → 다시 "활성화".
+    // 상세 정보 탭의 연필 라벨(setfirewall 후보)은 로그로 남긴다. 규칙 수정 화면의 버튼 목록도 로그로(순서 변경 등 다른 진입점 확인용).
+    await test.step('steps[3] 규칙 비활성화 → 반영 → 활성화 (규칙 수정 화면, L3)', async () => {
+      await logWriteRequests(page, log);
+      await gotoRoute(page, FW_ROUTE);
+      await row(page, vars.vpc!).getByText(`FW_IGW_${vars.vpc}`, { exact: true }).first().click();
+      await settleConsole(page, { appearGraceMs: 800 });
+      await logDetail(page, log, 'Firewall 상세');
+      await probeEdits(page, log, 'Firewall');
+      for (const [button, want] of [
+        ['비활성화', /비활성화/],
+        ['활성화', /(^|[^비])활성화/],
+      ] as const) {
+        const rules = await openRuleEdit(page);
+        await ruleRow(page).first().locator('i.table-select').first().click();
+        await page.waitForTimeout(500);
+        const buttons = (await page.locator('button:visible:not(tr button)').allInnerTexts()).map((s) => s.trim()).filter(Boolean);
+        log(`  규칙 수정 화면 버튼: ${JSON.stringify(buttons)}`);
+        const btn = page.locator('button:visible:not(tr button)').filter({ hasText: new RegExp(`^${button}$`) }).first();
+        if (!(await btn.count())) throw new Error(`규칙 수정 화면에 "${button}" 버튼이 없습니다: ${JSON.stringify(buttons)}`);
+        await btn.click();
+        await page.waitForTimeout(500);
+        log(`  ${button} 뒤 규칙 행: ${(await ruleRow(page).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
+        await submitForm(page, '완료');
+        await confirmModal(page, /규칙을 수정하시겠습니까/);
+        await settleConsole(page, { appearGraceMs: 800 });
+        await waitForRow(page, rules, SRC, { status: want, timeoutMs: 300_000, intervalMs: 10_000, log });
+        log(`  규칙 행(${button} 반영): ${(await ruleRow(page).first().innerText()).replace(/\s+/g, ' ').slice(0, 160)}`);
       }
-      await settleConsole(page, { appearGraceMs: 1000 });
+      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+    });
+    await test.step('steps[4] 규칙 삭제 (규칙 수정 화면)', async () => {
+      const rules = await openRuleEdit(page);
       await ruleRow(page).first().locator('i.table-select').first().click();
       await page.getByRole('button', { name: '삭제', exact: true }).first().click();
       await expect(ruleRow(page).first(), '변경 사항이 "삭제 예정" 이어야 합니다').toContainText('삭제 예정');
@@ -131,7 +169,7 @@ test.describe(scenario.title, { tag: ['@regression', '@destructive', '@crud', '@
       await confirmModal(page, /규칙을 수정하시겠습니까/);
       await settleConsole(page, { appearGraceMs: 800 });
       await waitForRow(page, rules, SRC, { gone: true, timeoutMs: 300_000, intervalMs: 10_000, log });
-      await expectStep(page, resolveExpectation(scenario.steps[3]!.expect, vars), ctx(3));
+      await expectStep(page, resolveExpectation(scenario.steps[4]!.expect, vars), ctx(4));
     });
   });
 });

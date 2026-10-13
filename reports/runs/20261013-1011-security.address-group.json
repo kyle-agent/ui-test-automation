@@ -1,0 +1,52 @@
+{
+  "spec": "security.address-group",
+  "started": "2026-10-13T01:11:54.958Z",
+  "ended": "2026-10-13T01:14:13.524Z",
+  "seconds": 139,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.address-group",
+    "run_id": "1013-1012-3144",
+    "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Address Group 생성 후 삭제",
+      "status": "passed",
+      "seconds": 113.2,
+      "annotations": {
+        "scenario": "security.address-group",
+        "run_id": "1013-1012-3144",
+        "title": "Address Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Address Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.8
+        },
+        {
+          "title": "steps[1] addr-1013-1012-3144 생성",
+          "status": "pass",
+          "seconds": 49.3
+        },
+        {
+          "title": "steps[2] Address Group {{name}} 상세에서 설명을 바꿔 되돌리고, 대상 주소 탭에서 추가한 10.250.1.0/24 를 삭제한다 (L3)",
+          "status": "pass",
+          "seconds": 27.7
+        }
+      ]
+    }
+  ],
+  "git_sha": "74a6f59"
+}

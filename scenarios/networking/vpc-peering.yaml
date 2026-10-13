@@ -51,6 +51,12 @@ steps:
       url: "#/vpc/vpc-peering/detail/route"
       not_text: ["{{peer_dest}}"]
 
+  # 동작(L3, 2026-10-13 6E, API setvpcpeering): 상세 정보 탭 "설명" 연필 → 반영 → 되돌림. approvalvpcpeering 은 다른 Account 승인이라 동일 Account 에선 나오지 않는다.
+  - goal: "VPC Peering {{name}} 상세에서 설명을 바꿔 반영을 확인하고 되돌린다 (L3)"
+    expect:
+      url: "#/vpc/vpc-peering/detail"
+      text: ["{{name}}"]
+
 teardown:
   - goal: "상세 화면의 VPC Peering 삭제로 {{name}} 을 지운다"
     expect:
