@@ -31,7 +31,12 @@ import {
   type Finding,
 } from './insights';
 import type { ApiCoverageSnapshot, CategoryRow, ProductRow } from './api-coverage';
-import { operationsByCategory, type OperationsSummary, type ProductOperations } from './operations';
+import {
+  operationsByCategory,
+  type ConsoleOnlyWrite,
+  type OperationsSummary,
+  type ProductOperations,
+} from './operations';
 import type { ProductMatrix } from './product-matrix';
 import type { RunRecord } from './run-record';
 
@@ -113,6 +118,8 @@ export interface DashboardInput {
   matrix?: readonly ProductMatrix[];
   /** 상품별 쓰기 동작 커버리지(src/report/operations.ts productOperations) */
   operations?: OperationsSummary;
+  /** 콘솔 전용 쓰기 동작: 통과한 실행이 보낸 쓰기 요청 중 API 카탈로그 경로에 없는 것(src/report/operations.ts consoleOnlyWrites) */
+  consoleOnly?: readonly ConsoleOnlyWrite[];
 }
 
 const esc = (s: unknown): string =>
@@ -262,6 +269,38 @@ function opsTotalsOf(operations?: OperationsSummary): {
       }),
       { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
     );
+}
+
+const localDate = (iso: string): string => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso.slice(0, 10) : d.toLocaleDateString('en-CA');
+};
+
+function consoleOnlyBlock(all: readonly ConsoleOnlyWrite[], anyRecorded: boolean): string {
+  if (!anyRecorded)
+    return '<p class="muted">아직 쓰기 요청을 기록한 실행이 없음 — 2026-10-14 이후 실행부터 모든 spec 이 기록한다(src/fixtures/test.ts).</p>';
+  const rows = all.filter((r) => r.kind === 'write');
+  const readLike = all.filter((r) => r.kind === 'read-like');
+  const readLikeBlock = readLike.length
+    ? `<details><summary>POST 지만 조회로 보이는 경로 ${readLike.length}개(세지 않음 · 경로에 search·query·analysis·list·check 등)</summary><ul class="small mono">${readLike
+        .map(
+          (r) =>
+            `<li>${esc(r.method)} ${esc(r.path)} <span class="muted">— ${esc(r.product)} · ${r.specs.map(esc).join(', ')}</span></li>`,
+        )
+        .join('')}</ul></details>`
+    : '';
+  if (!rows.length)
+    return `<p class="muted">없음 — 기록된 쓰기 요청이 모두 API 카탈로그 경로와 맞음.</p>${readLikeBlock}`;
+  const byProduct = new Map<string, ConsoleOnlyWrite[]>();
+  for (const r of rows) byProduct.set(r.product, [...(byProduct.get(r.product) ?? []), r]);
+  const body = rows
+    .map(
+      (r) =>
+        `<tr><td>${esc(r.product)}</td><td class="small muted">${esc(r.method)}</td><td class="mono small">${esc(r.path)}${r.loose ? ' <span class="tag warn" title="카탈로그 경로의 {…} 자리에 글자 세그먼트 — 일괄 처리 등 콘솔 전용으로 보이나 확인 필요">?</span>' : ''}</td><td class="small">${r.specs.map((s) => `<span class="mono">${esc(s)}</span>`).join(' · ')}</td><td class="small muted">${esc(localDate(r.last_seen))}</td></tr>`,
+    )
+    .join('');
+  return `<p>${rows.length}개 · 상품 ${byProduct.size}개: ${[...byProduct].map(([p, l]) => `${esc(p)} ${l.length}`).join(' · ')}</p>
+    <table class="compact"><thead><tr><th>상품</th><th>메서드</th><th>경로(콘솔 접두어 제외)</th><th>spec</th><th>마지막</th></tr></thead><tbody>${body}</tbody></table>${readLikeBlock}`;
 }
 
 const PARITY_MARK: Record<ParityJudged['effective'], string> = {
@@ -608,6 +647,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   const parityDenom = parity.filter((r) => r.effective !== 'skip').length;
   // 작업(쓰기 동작) 단위: 모수 제외 상품을 뺀 카탈로그 합계
   const opsAll = opsTotalsOf(input.operations);
+  const consoleOnly = input.consoleOnly ?? [];
 
   // 조치 필요: 마지막 실행이 실패인 스위트 spec(원인 포함), 정리 실패(7일), 남은 리소스, 불안정, 대응표 진행 중
   const actions: string[] = [];
@@ -779,7 +819,15 @@ export function renderDashboardHtml(input: DashboardInput): string {
   <h2>요약 <small>원본: reports/runs · reports/suites · service-map/coverage.yaml · docs/api-ui-parity.md — <code>npm run results</code> 로 재생성</small></h2>
   <div class="cards">
     ${kpi('현재 녹색 spec', `${greenNow} <span class="s">/ ${input.suiteOrder.length}</span>`, `스위트 spec 의 마지막 실행 기준 · 기록 없음 ${input.suiteOrder.length - suiteLasts.length}`, greenNow < suiteLasts.length ? 'alert' : '')}
-    ${kpi('마지막 스위트 첫 시도', lastSuite ? `${pct(lastSuite.first_pass, lastSuite.specs)}% <span class="s">${lastSuite.first_pass}/${lastSuite.specs}</span>` : '-', lastSuite ? `최종 ${lastSuite.final_pass}/${lastSuite.specs}${lastSuite.attempts > 1 ? ` (재실행 ${lastSuite.attempts - 1}회)` : ''}` : '병렬 스위트(npm run test:suite) 기록부터')}
+    ${kpi(
+      '마지막 스위트 첫 시도 <span class="s">(spec 별 첫 결과)</span>',
+      lastSuite
+        ? `${pct(lastSuite.first_pass, lastSuite.specs)}% <span class="s">${lastSuite.first_pass}/${lastSuite.specs}</span>`
+        : '-',
+      lastSuite
+        ? `최종 ${lastSuite.final_pass}/${lastSuite.specs}${lastSuite.attempts > 1 ? ` · 시도 ${lastSuite.attempts}회 합산` : ''}${lastSuite.synthesized_attempts.length ? ` · ${lastSuite.synthesized_attempts.map((a) => `a${a}`).join(',')} 는 요약 파일 없이 실행 기록으로 채움` : ''}`
+        : '병렬 스위트(npm run test:suite) 기록부터',
+    )}
     ${kpi('최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span>', `${weekViews.length} <span class="s">/ 실행 ${weekRuns.length}</span>`, `<span class="causes">${weekCauses.map(([k, n]) => `<span class="c-${k}">${esc(CAUSE_LABEL[k])} ${n}</span>`).join('') || '없음'}</span>`, weekViews.some((v) => v.cause === 'product' || v.cause === 'unclassified') ? 'alert' : '')}
     ${kpi('불안정 spec', hasSuiteRuns ? String(flakySpecs.length) : '-', hasSuiteRuns ? '스위트 실행 최근 10회에 실패가 섞이고 마지막은 통과' : '스위트 실행 기록이 쌓이면 표시(2026-10-02~)')}
     ${kpi('커버리지 L2+', c ? `${pct(c.at_least_2, c.resources)}% <span class="s">${c.at_least_2}/${c.resources}</span>` : '-', c ? `L3+ ${c.at_least_3}/${c.resources} (${pct(c.at_least_3, c.resources)}%)` : '검증 실패')}
@@ -799,7 +847,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
         ? `${opsAll.apiVerified ? pct(opsAll.uiCovered, opsAll.apiVerified) : 0}% <span class="s">${opsAll.uiCovered}/${opsAll.apiVerified}</span>`
         : '-',
       opsAll.opsTotal
-        ? `API 카탈로그 쓰기 동작 ${opsAll.opsTotal} 중 UI ${opsAll.uiCovered} (${pct(opsAll.uiCovered, opsAll.opsTotal)}%) · API 자동화 ${opsAll.apiVerified} (${pct(opsAll.apiVerified, opsAll.opsTotal)}%) · 통과한 spec 만 집계`
+        ? `API 카탈로그 쓰기 동작 ${opsAll.opsTotal} 중 UI ${opsAll.uiCovered} (${pct(opsAll.uiCovered, opsAll.opsTotal)}%) · API 자동화 ${opsAll.apiVerified} (${pct(opsAll.apiVerified, opsAll.opsTotal)}%) · 통과한 spec 만 집계 · <a href="#console-only">콘솔 전용 +${consoleOnly.filter((r) => r.kind === 'write').length}</a>(모수 밖)`
         : 'data/api-coverage.json · data/ui-operations.yaml 없음',
     )}
   </div>
@@ -842,7 +890,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
 </section>
 
 <section id="suites">
-  <h2>스위트 이력 <small>reports/suites · 첫 시도 = 재실행 없이 통과 · 최종 = 같은 묶음의 재실행 포함</small></h2>
+  <h2>스위트 이력 <small>reports/suites(요약 파일이 없는 시도는 reports/runs 로 채움) · 첫 시도 = spec 별로 그 스위트에서 처음 나온 결과가 통과 · 최종 = 같은 묶음의 재실행 포함</small></h2>
   ${suiteRows ? `<table><thead><tr><th>스위트</th><th>시작</th><th class="num">첫 시도</th><th class="num">최종</th><th class="num">벽시계</th><th>남은 리소스</th><th>여전히 실패</th></tr></thead><tbody>${suiteRows}</tbody></table>` : '<p class="muted">아직 없음 — 2026-10-02 이후 <code>npm run test:suite</code> 부터 기록됩니다.</p>'}
 </section>
 
@@ -862,6 +910,11 @@ export function renderDashboardHtml(input: DashboardInput): string {
 <section id="products">
   <h2>상품·카테고리별 커버리지 — 화면 vs API <small>화면 = 목록 화면 리소스(coverage.yaml) L2+·L3+ 비율 · API = 엔드포인트 검증 비율(data/api-coverage.json${input.apiSnapshot ? ` · ${esc(input.apiSnapshot.source_commit)} · ${esc(input.apiSnapshot.source_date)}` : ''}). 단위가 달라 비율끼리만 비교</small></h2>
   ${productsBlock(input.products, input.apiSnapshot ?? null, input.operations)}
+  <h3 id="console-only">콘솔 전용 쓰기 동작 <small>통과한 실행이 보낸 쓰기 요청(실행 기록 api_writes, 2026-10-14~) 중 API 카탈로그 경로(data/api-coverage.json ops[].path)에 없는 것 · 모수 ${opsAll.opsTotal} 에는 넣지 않고 따로 센다 · {id} 세그먼트는 카탈로그의 {…} 와 맞춘다 · ? = {…} 자리에 글자(bulk 등)가 온 느슨한 일치, 확인 필요</small></h3>
+  ${consoleOnlyBlock(
+    consoleOnly,
+    records.some((r) => r.api_writes?.length),
+  )}
 </section>
 
 <section id="parity">

@@ -1,12 +1,12 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 07:30, 실행 기록 675건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 08:58, 실행 기록 677건.
 
 ## 1. spec 별 최근 상태
 
 | spec | 마지막 실행 | 결과 | 소요 | 최근 5회 | 통과 평균 |
 | --- | --- | --- | ---: | --- | ---: |
-| networking.vpc.create-delete | 2026-10-13 09:54 | PASS | 1분 4초 | PPPPP | 55초 |
+| networking.vpc.create-delete | 2026-10-14 08:52 | PASS | 55초 | PPPPP | 55초 |
 | compute.vm-stack | 2026-10-08 10:46 | PASS | 25분 31초 | PPPPP | 19분 16초 |
 | compute.vm-volume | 2026-10-08 11:11 | PASS | 18분 52초 | PPFPP | 18분 20초 |
 | compute.vm-stack-net | 2026-10-08 11:00 | PASS | 27분 24초 | PPFPP | 22분 10초 |
@@ -52,7 +52,7 @@
 | application-service.api-gateway | 2026-10-08 11:34 | PASS | 12분 14초 | FFFPP | 9분 15초 |
 | application-service.messagehub-domain | 2026-10-13 09:24 | PASS | 1분 28초 | FPPPP | 1분 23초 |
 | application-service.messagehub-email | 2026-10-13 09:25 | PASS | 1분 43초 | PPPPP | 1분 59초 |
-| networking.firewall | 2026-10-13 10:19 | PASS | 6분 15초 | PPPPP | 5분 35초 |
+| networking.firewall | 2026-10-14 08:52 | PASS | 5분 19초 | PPPPP | 5분 32초 |
 | networking.transit-gateway | 2026-10-13 10:49 | PASS | 13분 7초 | PPPPP | 12분 38초 |
 | networking.vpn | 2026-10-13 08:57 | PASS | 11분 2초 | FPPPP | 9분 33초 |
 | networking.vpc-endpoint | 2026-10-13 09:10 | PASS | 4분 35초 | PPPPP | 4분 49초 |
@@ -117,3 +117,14 @@ level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 
 | Security | 7 | 4 | 0 | 3 | 0 |
 | Storage | 8 | 6 | 0 | 2 | 0 |
 | **합계** | **111** | **47** | **3** | **43** | **18** |
+
+## 5. 콘솔 전용 쓰기 동작 (API 카탈로그에 없는 경로)
+
+통과한 실행이 보낸 쓰기 요청(실행 기록 api_writes, 2026-10-14 이후 모든 spec 이 기록) 중 data/api-coverage.json 의 경로와 맞지 않는 것. 동작 단위 모수(API 쓰기 동작)에는 넣지 않고 따로 센다. ? = 카탈로그 {…} 자리에 글자 세그먼트가 온 느슨한 일치(확인 필요).
+
+| 상품 | 메서드 | 경로 | spec | 마지막 |
+| --- | --- | --- | --- | --- |
+| Firewall | POST | `/v1/firewalls/rules/bulk` | networking.firewall | 2026-10-14 |
+| Firewall | PUT | `/v1/firewalls/rules/bulk` ? | networking.firewall | 2026-10-14 |
+
+POST 지만 조회로 보이는 경로(세지 않음) 1개: `POST /v1/cost-analysis/budget`

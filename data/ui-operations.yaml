@@ -13,6 +13,12 @@
 # 서비스 slug·동작 이름은 API 카탈로그 그대로(data/api-coverage.json). 상품 이름은 코드가 붙인다(API_SERVICE + OPS_PRODUCT_EXTRA).
 # 기준: 2026-10-07 시나리오 단계 목표(goal) 문구. 조건부 단계(환경 변수로 건너뛸 수 있는 것)도 포함했다.
 # 태그 탭 추가·삭제는 Resource Groups(resourcemanager)의 태그 API 로 보았다(확인 필요).
+#
+# 콘솔 전용 쓰기 동작(2026-10-14, 사용자 결정): 모수 밖. 여기 적지 않고 자동으로 센다 —
+#   모든 spec 의 fixture(src/fixtures/test.ts)가 화면이 보낸 쓰기 요청 "METHOD /console/api/<svc>/v1/…/{id}" 를 실행 기록(reports/runs/*.json api_writes)에 남기고,
+#   통과한 실행의 요청 중 카탈로그 경로(data/api-coverage.json ops[].path, API 저장소 api_catalog.json http_path)와 strict 하게 맞지 않는 것을
+#   대시보드 "콘솔 전용 쓰기 동작" 표에 올린다(src/report/operations.ts consoleOnlyWrites). {…} 자리에 bulk 같은 글자가 온 느슨한 일치는 "?" 로 표시.
+#   따라서 "불가/확인 필요" 주석에 "카탈로그에 없는 경로" 라고 적힌 동작(예 iam deletegroup 의 DELETE /groups/bulk)은 그 표에서 자동으로 보인다.
 
 # ── Application Service ──
 apigateway:

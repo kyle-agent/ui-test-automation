@@ -7,6 +7,7 @@ import {
   judgeParity,
   parseParity,
   suiteViews,
+  synthesizeSuiteSummaries,
 } from '../../src/report/insights';
 import type { RunRecord } from '../../src/report/run-record';
 
@@ -115,6 +116,70 @@ test.describe('대시보드 파생 지표', () => {
     expect(judged[0]!.checked.filter((c) => c.last === 'fail').map((c) => c.spec)).toEqual([
       'compute.vm-volume',
     ]);
+  });
+
+  test('요약 파일이 없는 1차 시도는 실행 기록으로 채우고, 첫 시도는 spec 별 첫 결과로 센다(2시간 한도로 죽은 S20261008)', () => {
+    const base = {
+      ended: '',
+      wall_minutes: 41,
+      serial_minutes: 200,
+      max_tabs: 5,
+      leftovers_end: [] as string[],
+    };
+    const a2 = {
+      ...base,
+      suite_id: 'S8',
+      attempt: 2,
+      started: '2026-10-13T00:00:00Z',
+      results: [
+        { spec: 'b', status: 'pass' as const, seconds: 60 },
+        { spec: 'c', status: 'pass' as const, seconds: 60 },
+      ],
+    };
+    const runs = [
+      rec('a', '2026-10-08T00:51:00Z', 'pass', {
+        suite_id: 'S8',
+        attempt: 1,
+        ended: '2026-10-08T01:00:00Z',
+        seconds: 540,
+      }),
+      rec('d', '2026-10-08T00:52:00Z', 'fail', {
+        suite_id: 'S8',
+        attempt: 1,
+        ended: '2026-10-08T01:10:00Z',
+        seconds: 1080,
+      }),
+      rec('d', '2026-10-08T01:11:00Z', 'pass', {
+        suite_id: 'S8',
+        attempt: 1,
+        ended: '2026-10-08T01:20:00Z',
+        seconds: 540,
+      }), // 같은 시도 안 재실행 → 마지막 결과
+      rec('b', '2026-10-13T00:00:00Z', 'pass', { suite_id: 'S8', attempt: 2 }), // a2 는 파일이 있으니 만들지 않는다
+      rec('z', '2026-10-13T00:00:00Z', 'pass'), // 스위트 밖
+    ];
+    const synth = synthesizeSuiteSummaries([a2], runs);
+    expect(synth).toHaveLength(1);
+    expect(synth[0]).toMatchObject({
+      suite_id: 'S8',
+      attempt: 1,
+      synthesized: true,
+      max_tabs: 5,
+      wall_minutes: 29,
+    });
+    expect(synth[0]!.results.map((r) => `${r.spec}:${r.status}`).sort()).toEqual(['a:pass', 'd:pass']);
+    const [v] = suiteViews([a2], runs);
+    expect(v).toMatchObject({
+      suite_id: 'S8',
+      started: '2026-10-08T00:51:00Z',
+      specs: 4,
+      first_pass: 4,
+      final_pass: 4,
+      attempts: 2,
+      synthesized_attempts: [1],
+    });
+    // 파일만 있으면 예전과 같다
+    expect(suiteViews([a2])[0]).toMatchObject({ specs: 2, first_pass: 2, synthesized_attempts: [] });
   });
 
   test('같은 스위트의 시도를 합쳐 첫 시도·최종 통과를 계산한다', () => {

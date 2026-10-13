@@ -8,7 +8,9 @@
  */
 import path from 'node:path';
 import { test as base, type Browser, type BrowserContext, type Page } from '@playwright/test';
+import { collectWriteRequests } from '../console/api-log';
 import { connectLiveBrowser, liveContext, usingLiveBrowser } from '../console/browser';
+import { API_WRITES_ANNOTATION } from '../report/run-record';
 
 type WorkerFixtures = { liveBrowser: Browser | null };
 type TestFixtures = { context: BrowserContext; page: Page };
@@ -81,7 +83,12 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   page: async ({ context, screenshot }, use, testInfo) => {
     const page = await context.newPage();
+    // 이 페이지가 보낸 쓰기 요청(메서드·경로만)을 실행 기록에 남긴다 → 콘솔 전용 쓰기 동작 자동 집계(2026-10-14)
+    const writes = collectWriteRequests(page);
     await use(page);
+    const written = writes();
+    if (written.length)
+      testInfo.annotations.push({ type: API_WRITES_ANNOTATION, description: JSON.stringify(written) });
     const failed = testInfo.status !== testInfo.expectedStatus;
     const mode = typeof screenshot === 'string' ? screenshot : screenshot?.mode;
     if ((failed && mode === 'only-on-failure') || mode === 'on') {

@@ -15,6 +15,8 @@ export interface ApiOp {
   name: string;
   method: string;
   verified: boolean;
+  /** 문서의 요청 경로(`/v1/vpcs/{vpc_id}`). 2026-10-14 부터; 화면 요청 경로와 맞춰 콘솔 전용 동작을 가른다 */
+  path?: string;
 }
 
 export interface ApiServiceCoverage {
@@ -123,8 +125,9 @@ export const API_SERVICE: Record<string, string | null> = {
 export function formatApiCoverageJson(snapshot: ApiCoverageSnapshot): string {
   return (
     JSON.stringify(snapshot, null, 2).replace(
-      /\{\s*"name": ("[^"]*"),\s*"method": ("[^"]*"),\s*"verified": (true|false)\s*\}/g,
-      '{ "name": $1, "method": $2, "verified": $3 }',
+      /\{\s*"name": ("[^"]*"),\s*"method": ("[^"]*"),\s*"verified": (true|false)(?:,\s*"path": ("[^"]*"))?\s*\}/g,
+      (_m, name: string, method: string, verified: string, p?: string) =>
+        `{ "name": ${name}, "method": ${method}, "verified": ${verified}${p ? `, "path": ${p}` : ''} }`,
     ) + '\n'
   );
 }
@@ -163,7 +166,12 @@ export function productComparison(
   const rows = new Map<string, ProductRow>();
   for (const e of entries) {
     const k = `${e.category}|${e.service}`;
-    const r = rows.get(k) ?? { category: e.category, product: e.service, ui: { resources: 0, l2: 0, l3: 0 }, api: null };
+    const r = rows.get(k) ?? {
+      category: e.category,
+      product: e.service,
+      ui: { resources: 0, l2: 0, l3: 0 },
+      api: null,
+    };
     r.ui!.resources++;
     if (e.level >= 2) r.ui!.l2++;
     if (e.level >= 3) r.ui!.l3++;
@@ -187,7 +195,11 @@ export function productComparison(
   for (const p of products) if (exclusions.has(p.product)) p.excluded = exclusions.get(p.product);
   for (const p of products) {
     if (p.excluded) continue;
-    const c = cats.get(p.category) ?? { category: p.category, ui: { resources: 0, l2: 0, l3: 0 }, api: { total: 0, verified: 0 } };
+    const c = cats.get(p.category) ?? {
+      category: p.category,
+      ui: { resources: 0, l2: 0, l3: 0 },
+      api: { total: 0, verified: 0 },
+    };
     if (p.ui) {
       c.ui.resources += p.ui.resources;
       c.ui.l2 += p.ui.l2;
@@ -199,5 +211,8 @@ export function productComparison(
     }
     cats.set(p.category, c);
   }
-  return { products, categories: [...cats.values()].sort((a, b) => a.category.localeCompare(b.category, 'en')) };
+  return {
+    products,
+    categories: [...cats.values()].sort((a, b) => a.category.localeCompare(b.category, 'en')),
+  };
 }

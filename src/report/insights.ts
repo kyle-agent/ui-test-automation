@@ -141,6 +141,8 @@ export interface SuiteSummaryFile {
   max_tabs: number;
   results: { spec: string; status: 'pass' | 'fail' | 'skip'; seconds: number }[];
   leftovers_end: string[] | null;
+  /** 요약 파일이 없어 실행 기록으로 만든 시도(synthesizeSuiteSummaries) */
+  synthesized?: boolean;
 }
 
 export interface SuiteView {
@@ -155,6 +157,8 @@ export interface SuiteView {
   max_tabs: number;
   still_failing: string[];
   leftovers_end: string[] | null;
+  /** 실행 기록으로 채운 시도 번호(요약 파일 없음). 비면 모두 파일에서 */
+  synthesized_attempts: number[];
 }
 
 export function readSuiteSummaries(dir = SUITES_DIR): SuiteSummaryFile[] {
@@ -170,29 +174,84 @@ export function readSuiteSummaries(dir = SUITES_DIR): SuiteSummaryFile[] {
   return out;
 }
 
-/** 같은 suite_id 의 시도들을 합친다: 첫 시도 통과 = attempt 1 의 pass, 최종 = 마지막으로 돈 결과 기준 */
-export function suiteViews(files: readonly SuiteSummaryFile[]): SuiteView[] {
+/**
+ * 요약 파일이 없는 시도를 실행 기록(suite_id·attempt)으로 만들어 채운다.
+ * 2026-10-08 전체 스위트 1차가 2시간 백그라운드 한도로 죽어 S20261008-0951-a1.json 이 없고, 그래서 "첫 시도" 카드가 2차(42/42)만 보였다(2026-10-14 사용자 지적).
+ */
+export function synthesizeSuiteSummaries(
+  files: readonly SuiteSummaryFile[],
+  records: readonly RunRecord[],
+): SuiteSummaryFile[] {
+  const have = new Set(files.map((f) => `${f.suite_id}#${f.attempt}`));
+  const groups = new Map<string, RunRecord[]>();
+  for (const r of records) {
+    if (!r.suite_id || !r.attempt || have.has(`${r.suite_id}#${r.attempt}`)) continue;
+    const k = `${r.suite_id}#${r.attempt}`;
+    groups.set(k, [...(groups.get(k) ?? []), r]);
+  }
+  const out: SuiteSummaryFile[] = [];
+  for (const list of groups.values()) {
+    const sorted = [...list].sort((a, b) => a.started.localeCompare(b.started));
+    const lastBySpec = new Map<string, RunRecord>();
+    for (const r of sorted) lastBySpec.set(r.spec, r);
+    const started = sorted[0]!.started;
+    const ended = sorted.reduce((m, r) => (r.ended > m ? r.ended : m), sorted[0]!.ended);
+    const sibling = files.find((f) => f.suite_id === sorted[0]!.suite_id);
+    out.push({
+      suite_id: sorted[0]!.suite_id!,
+      attempt: sorted[0]!.attempt!,
+      started,
+      ended,
+      wall_minutes: Math.round((Date.parse(ended) - Date.parse(started)) / 60_000),
+      serial_minutes: Math.round(sorted.reduce((n, r) => n + r.seconds, 0) / 60),
+      max_tabs: sibling?.max_tabs ?? 0,
+      results: [...lastBySpec.values()].map((r) => ({ spec: r.spec, status: r.status, seconds: r.seconds })),
+      leftovers_end: null,
+      synthesized: true,
+    });
+  }
+  return out;
+}
+
+/**
+ * 같은 suite_id 의 시도들을 합친다. 첫 시도 통과 = **spec 별로 그 스위트에서 처음 나온 결과**가 pass 인 수(2026-10-14~: 1차가 중간에 죽어 2차에서 처음 돈 spec 도 "첫 시도" 로 센다),
+ * 최종 = 마지막으로 돈 결과 기준. 분모 specs = 모든 시도에 나온 spec 의 합집합.
+ * 요약 파일이 없는 시도는 실행 기록으로 채운다(records 를 주면).
+ */
+export function suiteViews(
+  files: readonly SuiteSummaryFile[],
+  records: readonly RunRecord[] = [],
+): SuiteView[] {
+  const all = [...files, ...synthesizeSuiteSummaries(files, records)];
   const by = new Map<string, SuiteSummaryFile[]>();
-  for (const f of files) by.set(f.suite_id, [...(by.get(f.suite_id) ?? []), f]);
+  for (const f of all) by.set(f.suite_id, [...(by.get(f.suite_id) ?? []), f]);
   const out: SuiteView[] = [];
   for (const [id, list] of by) {
     const tries = [...list].sort((a, b) => a.attempt - b.attempt);
     const first = tries[0]!;
+    const firstSeen = new Map<string, string>();
     const final = new Map<string, string>();
-    for (const t of tries) for (const r of t.results) final.set(r.spec, r.status);
+    for (const t of tries)
+      for (const r of t.results) {
+        if (!firstSeen.has(r.spec)) firstSeen.set(r.spec, r.status);
+        final.set(r.spec, r.status);
+      }
     const last = tries[tries.length - 1]!;
     out.push({
       suite_id: id,
       started: first.started,
-      specs: first.results.length,
-      first_pass: first.results.filter((r) => r.status === 'pass').length,
+      specs: final.size,
+      first_pass: [...firstSeen.values()].filter((s) => s === 'pass').length,
       final_pass: [...final.values()].filter((s) => s === 'pass').length,
       attempts: tries.length,
       wall_minutes: tries.reduce((n, t) => n + t.wall_minutes, 0),
-      serial_minutes: first.serial_minutes,
-      max_tabs: first.max_tabs,
+      serial_minutes: first.synthesized
+        ? tries.reduce((n, t) => n + t.serial_minutes, 0)
+        : first.serial_minutes,
+      max_tabs: Math.max(...tries.map((t) => t.max_tabs)),
       still_failing: [...final].filter(([, s]) => s !== 'pass').map(([spec]) => spec),
       leftovers_end: last.leftovers_end,
+      synthesized_attempts: tries.filter((t) => t.synthesized).map((t) => t.attempt),
     });
   }
   return out.sort((a, b) => b.started.localeCompare(a.started));

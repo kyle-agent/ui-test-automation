@@ -23,6 +23,9 @@ import { matchKnownIssue, type KnownIssue } from './known-issues';
 
 export const RUNS_DIR = path.resolve(process.cwd(), 'reports', 'runs');
 
+/** fixture 가 테스트마다 붙이는 annotation: 그 페이지가 보낸 쓰기 요청 "METHOD /path" 목록(JSON 배열). 기록에선 api_writes 로 합친다 */
+export const API_WRITES_ANNOTATION = 'api_writes';
+
 export type RunStatus = 'pass' | 'fail';
 export type FailureClass = 'pass' | 'unclassified' | 'environment' | 'product' | 'test';
 
@@ -65,6 +68,11 @@ export interface RunRecord {
   attempt?: number;
   /** 실행 시점의 git 커밋 (짧은 해시) */
   git_sha?: string;
+  /**
+   * 화면이 보낸 쓰기 요청 "METHOD /console/api/…/{id}" (중복 제거, 본문·쿼리 없음). src/fixtures/test.ts 가 모든 spec 에서 모은다(2026-10-14~).
+   * 카탈로그 경로와 맞춰 "콘솔 전용 쓰기 동작" 을 센다(src/report/operations.ts consoleOnlyWrites)
+   */
+  api_writes?: string[];
 }
 
 /** 세션·브라우저 문제로 보는 오류 문구 (src/console/browser.ts, src/console/expect.ts 의 메시지) */
@@ -138,6 +146,15 @@ function annotationsOf(test: JSONReportTest): Record<string, string> {
   return out;
 }
 
+function parseApiWrites(description: string): string[] {
+  try {
+    const v = JSON.parse(description);
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 /** Playwright JSON 리포트에서 테스트 목록을 뽑는다. 재시도가 있으면 마지막 결과를 쓴다. */
 export function testsFromReport(report: JSONReport): RunTest[] {
   const tests: RunTest[] = [];
@@ -199,8 +216,15 @@ export function buildRunRecord(input: BuildRunRecordInput): RunRecord {
   const failedTests = tests.filter((t) => t.status !== 'passed' && t.status !== 'skipped');
   const status: RunStatus = input.ok && failedTests.length === 0 ? 'pass' : 'fail';
   const annotations: Record<string, string> = {};
-  for (const t of tests)
-    for (const [k, v] of Object.entries(t.annotations)) if (!(k in annotations)) annotations[k] = v;
+  const apiWrites = new Set<string>();
+  for (const t of tests) {
+    for (const [k, v] of Object.entries(t.annotations)) {
+      if (k === API_WRITES_ANNOTATION) {
+        for (const w of parseApiWrites(v)) apiWrites.add(w);
+        delete t.annotations[k]; // 테스트별로 반복하지 않고 기록 한 곳(api_writes)에 합친다
+      } else if (!(k in annotations)) annotations[k] = v;
+    }
+  }
   const record: RunRecord = {
     spec: input.spec,
     started: input.started.toISOString(),
@@ -211,6 +235,7 @@ export function buildRunRecord(input: BuildRunRecordInput): RunRecord {
     annotations,
     tests,
   };
+  if (apiWrites.size) record.api_writes = [...apiWrites];
   if (input.reportError) record.report_error = input.reportError;
   if (input.suiteId) record.suite_id = input.suiteId;
   if (input.attempt) record.attempt = input.attempt;

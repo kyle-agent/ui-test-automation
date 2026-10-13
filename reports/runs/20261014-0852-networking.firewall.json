@@ -1,0 +1,71 @@
+{
+  "spec": "networking.firewall",
+  "started": "2026-10-13T23:52:22.792Z",
+  "ended": "2026-10-13T23:57:41.476Z",
+  "seconds": 319,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.firewall",
+    "run_id": "1014-0852-a57f",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 9.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Internet Gateway(Firewall 사용) → Firewall 규칙 추가 → 규칙 삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 297.8,
+      "annotations": {
+        "scenario": "networking.firewall",
+        "run_id": "1014-0852-a57f",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Firewall 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 4.5
+        },
+        {
+          "title": "steps[1] VPC vpc-1014-0852-a57f · IGW(Firewall 사용) 생성",
+          "status": "pass",
+          "seconds": 70
+        },
+        {
+          "title": "steps[2] 규칙 추가 (192.168.1.1 → 10.250.0.10, TCP 22, Allow, Inbound)",
+          "status": "pass",
+          "seconds": 14.3
+        },
+        {
+          "title": "steps[3] 규칙 비활성화 → 반영 → 활성화 (규칙 수정 화면, L3)",
+          "status": "pass",
+          "seconds": 114.7
+        },
+        {
+          "title": "steps[4] 규칙 삭제 (규칙 수정 화면)",
+          "status": "pass",
+          "seconds": 26.5
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "POST /console/api/vpc/v1/internet-gateways",
+    "POST /console/api/firewall/v1/firewalls/rules/bulk",
+    "PUT /console/api/firewall/v1/firewalls/rules/bulk",
+    "DELETE /console/api/vpc/v1/internet-gateways/{id}",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "git_sha": "408c41e"
+}

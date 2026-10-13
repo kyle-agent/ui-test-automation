@@ -49,7 +49,8 @@ export function opsProductOf(service: string): string | null {
 export function isWriteOp(service: string, op: Pick<ApiOp, 'name' | 'method'>): boolean {
   if (op.method.toUpperCase() === 'GET') return false;
   const prefix = service.replace(/-/g, '');
-  const verb = op.name.startsWith(prefix) && op.name.length > prefix.length ? op.name.slice(prefix.length) : op.name;
+  const verb =
+    op.name.startsWith(prefix) && op.name.length > prefix.length ? op.name.slice(prefix.length) : op.name;
   return !READ_VERB.test(verb);
 }
 
@@ -158,11 +159,26 @@ export function productOperations(
     const product = opsProductOf(s.service);
     if (!product || !writes.length) continue;
     const category = API_CATEGORY[s.category] ?? s.category;
-    const p = byProduct.get(product) ?? { product, category, services: [], ops: [], opsTotal: 0, apiVerified: 0, uiCovered: 0 };
+    const p = byProduct.get(product) ?? {
+      product,
+      category,
+      services: [],
+      ops: [],
+      opsTotal: 0,
+      apiVerified: 0,
+      uiCovered: 0,
+    };
     p.services.push(s.service);
     for (const o of writes) {
       const ui = m.get(o.name);
-      p.ops.push({ service: s.service, name: o.name, method: o.method, api: o.verified, ui: (ui?.specs ?? []).filter((id) => !passedSpecs || passedSpecs.has(id)), uncertain: ui?.uncertain ?? false });
+      p.ops.push({
+        service: s.service,
+        name: o.name,
+        method: o.method,
+        api: o.verified,
+        ui: (ui?.specs ?? []).filter((id) => !passedSpecs || passedSpecs.has(id)),
+        uncertain: ui?.uncertain ?? false,
+      });
     }
     p.opsTotal = p.ops.length;
     p.apiVerified = p.ops.filter((o) => o.api).length;
@@ -175,13 +191,17 @@ export function productOperations(
     (a, b) => a.category.localeCompare(b.category, 'en') || a.product.localeCompare(b.product, 'en'),
   );
   const unknownSpecs = specIds
-    ? [...new Set([...mapping.values()].flatMap((m) => [...m.values()].flatMap((x) => x.specs)))].filter((id) => !specIds.has(id)).sort()
+    ? [...new Set([...mapping.values()].flatMap((m) => [...m.values()].flatMap((x) => x.specs)))]
+        .filter((id) => !specIds.has(id))
+        .sort()
     : [];
   return { products, unknown: unknown.sort(), unknownServices, unknownSpecs };
 }
 
 /** 카테고리별 합계 */
-export function operationsByCategory(products: readonly ProductOperations[]): Map<string, { opsTotal: number; apiVerified: number; uiCovered: number }> {
+export function operationsByCategory(
+  products: readonly ProductOperations[],
+): Map<string, { opsTotal: number; apiVerified: number; uiCovered: number }> {
   const m = new Map<string, { opsTotal: number; apiVerified: number; uiCovered: number }>();
   for (const p of products) {
     if (p.excluded) continue;
@@ -192,4 +212,110 @@ export function operationsByCategory(products: readonly ProductOperations[]): Ma
     m.set(p.category, c);
   }
   return m;
+}
+
+// ───────── 콘솔 전용 쓰기 동작 (2026-10-14, 사용자 결정) ─────────
+// 화면이 보낸 쓰기 요청(RunRecord.api_writes, 통과한 실행만) 중 API 카탈로그(ops[].path)에 없는 경로.
+// 모수 881 에는 넣지 않고 따로 센다 — "API 자동화 대비" 비교 가능성을 지키면서 콘솔에만 있는 동작을 드러낸다.
+
+export interface ConsoleOnlyWrite {
+  method: string;
+  /** 콘솔 접두어(/console/api/<서비스>)를 뗀 경로. 예 /v1/firewalls/rules/bulk */
+  path: string;
+  /** 콘솔 경로의 서비스 세그먼트 */
+  service: string;
+  /** 서비스 → 화면 상품(없으면 서비스 slug 그대로) */
+  product: string;
+  /** 이 요청을 보낸 spec(통과한 실행 기준) */
+  specs: string[];
+  /** 마지막으로 본 실행 시작 시각 */
+  last_seen: string;
+  /**
+   * true: 카탈로그 경로의 {…} 자리에 콘솔이 {id} 가 아닌 글자 세그먼트(예 bulk)를 보냈을 때만 맞는다 — 콘솔 전용(일괄 처리 등)일 가능성이 커 목록에 "?" 로 올린다.
+   * false: 어떤 카탈로그 경로와도 맞지 않는다.
+   */
+  loose: boolean;
+  /**
+   * write: 콘솔 전용 쓰기 동작으로 센다.
+   * read-like: 경로에 조회 낱말(search·query·analysis·list·check …)이 있어 POST 로 보내는 조회로 본다(콘솔 홈 예산 위젯 POST /cost-analysis/budget 등). 접힌 목록에만 둔다.
+   */
+  kind: 'write' | 'read-like';
+}
+
+/** POST 지만 조회로 보이는 경로 낱말(세그먼트 어디든). 콘솔은 목록·검색·통계를 POST 로 자주 보낸다 */
+export const READ_LIKE_PATH =
+  /(search|query|queries|list|analysis|analytics|statistic|summary|summaries|count|check|validat|duplicat|export|download|preview|estimat|price|pricing|usage|history|histories|log|metric|chart|graph|report)/i;
+
+/** `METHOD /console/api/<svc>/v1/…` → { method, service, path }. 콘솔 API 가 아니면 null */
+export function splitConsoleWrite(write: string): { method: string; service: string; path: string } | null {
+  const m = /^([A-Z]+) \/console\/api\/([^/]+)(\/.*)$/.exec(write);
+  return m ? { method: m[1]!, service: m[2]!, path: m[3]! } : null;
+}
+
+/**
+ * 카탈로그 경로 `/v1/vpcs/{vpc_id}` 와 화면 경로 `/v1/vpcs/{id}` 가 같은가.
+ * strict(기본): 카탈로그 {…} 는 콘솔 {id} 와만 맞고 나머지는 글자 그대로. loose: {…} 가 아무 세그먼트와 맞는다(bulk 같은 글자가 id 자리에 온 경우까지).
+ */
+export function pathMatches(
+  catalogPath: string,
+  consolePath: string,
+  mode: 'strict' | 'loose' = 'strict',
+): boolean {
+  const a = catalogPath.split('/').filter(Boolean);
+  const b = consolePath.split('/').filter(Boolean);
+  if (a.length !== b.length) return false;
+  const isParam = (seg: string) => /^\{.*\}$/.test(seg);
+  return a.every((seg, i) => {
+    const c = b[i]!;
+    if (isParam(seg)) return mode === 'loose' || isParam(c);
+    return seg.toLowerCase() === c.toLowerCase();
+  });
+}
+
+export function consoleOnlyWrites(
+  api: ApiCoverageSnapshot | null,
+  records: readonly { spec: string; status: string; started: string; api_writes?: string[] }[],
+): ConsoleOnlyWrite[] {
+  // 메서드별 카탈로그 경로(읽기 동작 포함 — POST 조회가 카탈로그에 있으면 콘솔 전용이 아니다)
+  const byMethod = new Map<string, string[]>();
+  for (const s of api?.services ?? [])
+    for (const o of s.ops ?? []) {
+      if (!o.path) continue;
+      const k = o.method.toUpperCase();
+      byMethod.set(k, [...(byMethod.get(k) ?? []), o.path]);
+    }
+  if (!byMethod.size) return [];
+  const out = new Map<string, ConsoleOnlyWrite>();
+  for (const r of records) {
+    if (r.status !== 'pass' || !r.api_writes?.length) continue;
+    for (const w of r.api_writes) {
+      const c = splitConsoleWrite(w);
+      if (!c) continue;
+      const candidates = byMethod.get(c.method) ?? [];
+      if (candidates.some((p) => pathMatches(p, c.path, 'strict'))) continue;
+      const loose = candidates.some((p) => pathMatches(p, c.path, 'loose'));
+      const key = `${c.method} ${c.service} ${c.path}`;
+      const row =
+        out.get(key) ??
+        ({
+          method: c.method,
+          path: c.path,
+          service: c.service,
+          product: opsProductOf(c.service) ?? c.service,
+          specs: [],
+          last_seen: r.started,
+          loose,
+          kind: c.method === 'POST' && READ_LIKE_PATH.test(c.path) ? 'read-like' : 'write',
+        } satisfies ConsoleOnlyWrite);
+      if (!row.specs.includes(r.spec)) row.specs.push(r.spec);
+      if (r.started > row.last_seen) row.last_seen = r.started;
+      out.set(key, row);
+    }
+  }
+  return [...out.values()].sort(
+    (a, b) =>
+      a.product.localeCompare(b.product, 'en') ||
+      a.path.localeCompare(b.path) ||
+      a.method.localeCompare(b.method),
+  );
 }

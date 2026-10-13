@@ -2,7 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
 import { formatApiCoverageJson, type ApiCoverageSnapshot } from '../../src/report/api-coverage';
-import { isWriteOp, operationsByCategory, parseUiOperations, productOperations } from '../../src/report/operations';
+import {
+  consoleOnlyWrites,
+  isWriteOp,
+  operationsByCategory,
+  parseUiOperations,
+  pathMatches,
+  productOperations,
+  splitConsoleWrite,
+} from '../../src/report/operations';
 
 const snap = (services: ApiCoverageSnapshot['services']): ApiCoverageSnapshot => ({
   source: 't',
@@ -34,7 +42,9 @@ test.describe('동작 단위 커버리지', () => {
     expect(isWriteOp('ske', { name: 'deletenodepool', method: 'DELETE' })).toBe(true);
     expect(isWriteOp('ske', { name: 'createclusterkubeconfig', method: 'GET' })).toBe(false);
     expect(isWriteOp('iam', { name: 'querypolicy', method: 'POST' })).toBe(false);
-    expect(isWriteOp('secretsmanager', { name: 'showsecretsmanagersecretvalue', method: 'POST' })).toBe(false);
+    expect(isWriteOp('secretsmanager', { name: 'showsecretsmanagersecretvalue', method: 'POST' })).toBe(
+      false,
+    );
     expect(isWriteOp('mysql', { name: 'mysqllistclusters', method: 'POST' })).toBe(false);
     expect(isWriteOp('mysql', { name: 'mysqlcreatecluster', method: 'POST' })).toBe(true);
     expect(isWriteOp('servicewatch', { name: 'listmetricdata', method: 'POST' })).toBe(false);
@@ -55,7 +65,10 @@ test.describe('동작 단위 커버리지', () => {
       ].join('\r\n'),
     );
     expect([...m.keys()]).toEqual(['ske', 'vpc']);
-    expect(m.get('ske')!.get('createcluster')).toEqual({ specs: ['container.ske-cluster'], uncertain: false });
+    expect(m.get('ske')!.get('createcluster')).toEqual({
+      specs: ['container.ske-cluster'],
+      uncertain: false,
+    });
     expect(m.get('ske')!.get('setnodepool')).toEqual({ specs: ['a.b', 'c.d'], uncertain: true });
     expect(m.get('ske')!.has('setclusterupgrade')).toBe(false);
     expect(m.get('vpc')!.get('createvpc')!.specs).toEqual(['x.y', 'z.w', 'q.r']);
@@ -63,21 +76,52 @@ test.describe('동작 단위 커버리지', () => {
 
   test('상품별 지표: 쓰기 동작만 모수, API 검증·UI 대응 수, 모르는 동작·spec 보고', () => {
     const mapping = parseUiOperations(
-      ['ske:', '  createcluster: container.ske-cluster', '  deletecluster: container.ske-cluster', '  listclusters: container.ske-cluster', '  nosuchop: x', 'ghost:', '  createx: y'].join('\n'),
+      [
+        'ske:',
+        '  createcluster: container.ske-cluster',
+        '  deletecluster: container.ske-cluster',
+        '  listclusters: container.ske-cluster',
+        '  nosuchop: x',
+        'ghost:',
+        '  createx: y',
+      ].join('\n'),
     );
     const s = productOperations(snap([ske]), mapping, new Set(['container.ske-cluster']));
     expect(s.products).toHaveLength(1);
     const p = s.products[0]!;
-    expect(p).toMatchObject({ product: 'Kubernetes Engine', category: 'Container', services: ['ske'], opsTotal: 4, apiVerified: 2, uiCovered: 2 });
-    expect(p.ops.map((o) => o.name)).toEqual(['createcluster', 'deletecluster', 'setnodepool', 'setclusterupgrade']);
+    expect(p).toMatchObject({
+      product: 'Kubernetes Engine',
+      category: 'Container',
+      services: ['ske'],
+      opsTotal: 4,
+      apiVerified: 2,
+      uiCovered: 2,
+    });
+    expect(p.ops.map((o) => o.name)).toEqual([
+      'createcluster',
+      'deletecluster',
+      'setnodepool',
+      'setclusterupgrade',
+    ]);
     expect(s.unknown).toEqual(['ske/listclusters', 'ske/nosuchop']);
     expect(s.unknownServices).toEqual(['ghost']);
     expect(s.unknownSpecs).toEqual(['x', 'y']);
-    expect(operationsByCategory(s.products).get('Container')).toEqual({ opsTotal: 4, apiVerified: 2, uiCovered: 2 });
+    expect(operationsByCategory(s.products).get('Container')).toEqual({
+      opsTotal: 4,
+      apiVerified: 2,
+      uiCovered: 2,
+    });
   });
 
   test('API_SERVICE 가 null 이어도 서비스 맵 상품이 있으면 붙인다, ops 없는 옛 스냅샷은 빠진다', () => {
-    const sw = { category: 'management', service: 'servicewatch', total: 1, verified: 0, ok2xx: 0, ops: [{ name: 'createalert', method: 'POST', verified: false }] };
+    const sw = {
+      category: 'management',
+      service: 'servicewatch',
+      total: 1,
+      verified: 0,
+      ok2xx: 0,
+      ops: [{ name: 'createalert', method: 'POST', verified: false }],
+    };
     const old = { category: 'networking', service: 'vpc', total: 10, verified: 5, ok2xx: 5 };
     const s = productOperations(snap([sw, old]), new Map());
     expect(s.products.map((p) => [p.product, p.opsTotal, p.uiCovered])).toEqual([['ServiceWatch', 1, 0]]);
@@ -88,12 +132,113 @@ test.describe('동작 단위 커버리지', () => {
     const text = formatApiCoverageJson(snap([ske]));
     expect(text).toContain('{ "name": "createcluster", "method": "POST", "verified": true }');
     expect(JSON.parse(text)).toEqual(snap([ske]));
+    const withPath = {
+      ...ske,
+      ops: [{ name: 'createcluster', method: 'POST', verified: true, path: '/v1/clusters' }],
+    };
+    const t2 = formatApiCoverageJson(snap([withPath]));
+    expect(t2).toContain(
+      '{ "name": "createcluster", "method": "POST", "verified": true, "path": "/v1/clusters" }',
+    );
+    expect(JSON.parse(t2)).toEqual(snap([withPath]));
+  });
+
+  test('콘솔 전용 쓰기 동작: 통과한 실행의 쓰기 요청 중 카탈로그 경로에 없는 것만, {id} 는 {…} 와 맞춘다', () => {
+    expect(splitConsoleWrite('PUT /console/api/firewall/v1/firewalls/rules/bulk')).toEqual({
+      method: 'PUT',
+      service: 'firewall',
+      path: '/v1/firewalls/rules/bulk',
+    });
+    expect(splitConsoleWrite('POST /sso/login')).toBeNull();
+    expect(pathMatches('/v1/vpcs/{vpc_id}', '/v1/vpcs/{id}')).toBe(true);
+    expect(pathMatches('/v1/firewalls/rules/{firewall_rule_id}', '/v1/firewalls/rules/bulk')).toBe(false); // strict: {…} 는 {id} 와만
+    expect(pathMatches('/v1/firewalls/rules/{firewall_rule_id}', '/v1/firewalls/rules/bulk', 'loose')).toBe(
+      true,
+    );
+    expect(
+      pathMatches('/v1/clusters/{id}/public-access-control', '/v1/clusters/{id}/service-watch-logging'),
+    ).toBe(false);
+    expect(pathMatches('/v1/vpcs', '/v1/vpcs/{id}')).toBe(false);
+    const api = snap([
+      {
+        category: 'networking',
+        service: 'firewall',
+        total: 3,
+        verified: 3,
+        ok2xx: 3,
+        ops: [
+          {
+            name: 'setfirewallrule',
+            method: 'PUT',
+            verified: true,
+            path: '/v1/firewalls/rules/{firewall_rule_id}',
+          },
+          {
+            name: 'deletefirewallrule',
+            method: 'DELETE',
+            verified: true,
+            path: '/v1/firewalls/rules/{firewall_rule_id}',
+          },
+          { name: 'createfirewallrule', method: 'POST', verified: true, path: '/v1/firewalls/rules' },
+          { name: 'listfirewallrules', method: 'GET', verified: true, path: '/v1/firewalls/rules' },
+        ],
+      },
+      {
+        ...ske,
+        ops: [
+          {
+            name: 'setclusterlogging',
+            method: 'PUT',
+            verified: false,
+            path: '/v1/clusters/{cluster_id}/logging',
+          },
+        ],
+      },
+    ]);
+    const rows = consoleOnlyWrites(api, [
+      {
+        spec: 'networking.firewall',
+        status: 'pass',
+        started: '2026-10-14T01:00:00Z',
+        api_writes: [
+          'PUT /console/api/firewall/v1/firewalls/rules/{id}',
+          'POST /console/api/firewall/v1/firewalls/rules',
+          'DELETE /console/api/firewall/v1/firewalls/rules/bulk',
+        ],
+      },
+      {
+        spec: 'container.ske-cluster',
+        status: 'pass',
+        started: '2026-10-14T02:00:00Z',
+        api_writes: [
+          'PUT /console/api/ske/v1/clusters/{id}/service-watch-logging',
+          'PUT /console/api/ske/v1/clusters/{id}/logging',
+        ],
+      },
+      {
+        spec: 'container.ske-cluster',
+        status: 'fail',
+        started: '2026-10-14T03:00:00Z',
+        api_writes: ['POST /console/api/ske/v1/only-in-failed-run'],
+      },
+    ]);
+    expect(rows.map((r) => `${r.method} ${r.path} <- ${r.specs.join(',')}${r.loose ? ' ?' : ''}`)).toEqual([
+      'DELETE /v1/firewalls/rules/bulk <- networking.firewall ?', // deletefirewallrule 의 {id} 자리에 bulk → 느슨한 일치 = 콘솔 전용 의심
+      'PUT /v1/clusters/{id}/service-watch-logging <- container.ske-cluster',
+    ]);
+    expect(rows[1]!.product).toBe('Kubernetes Engine');
+    expect(
+      consoleOnlyWrites(snap([ske]), [
+        { spec: 'a', status: 'pass', started: '', api_writes: ['PUT /console/api/x/v1/y'] },
+      ]),
+    ).toEqual([]); // 경로 없는 옛 스냅샷이면 판단 불가 → 빈 목록
   });
 
   test('data/ui-operations.yaml 이 읽히고 동작이 비어 있지 않다', () => {
     const file = path.resolve(process.cwd(), 'data', 'ui-operations.yaml');
     const m = parseUiOperations(fs.readFileSync(file, 'utf8'));
     expect(m.get('ske')?.get('createcluster')?.specs).toContain('container.ske-cluster');
-    for (const [svc, ops] of m) for (const [op, v] of ops) expect(v.specs.length, `${svc}/${op}`).toBeGreaterThan(0);
+    for (const [svc, ops] of m)
+      for (const [op, v] of ops) expect(v.specs.length, `${svc}/${op}`).toBeGreaterThan(0);
   });
 });

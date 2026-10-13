@@ -446,7 +446,7 @@
   파생 지표는 `src/report/insights.ts`(단위 테스트 tests/unit/insights.spec.ts), 화면은 `src/report/dashboard.ts`.
 - **API 대응 카드는 리소스 단위**(docs/api-ui-parity.md 의 ✅ ÷ (전체 − ⏭)). 사용자가 "API 대비 100%" 를 작업 단위로 오해한 뒤(2026-10-14) 두 가지를 고쳤다:
   카드 이름에 "(리소스 단위 · 실행 연동)" 을 붙이고 옆에 **UI 쓰기 동작(작업 단위 · API 대비)** 카드(350/485 = 72%, 모수 881)를 추가; 대응표의 손 표시 ✅ 는 `judgeParity` 가 UI spec 칸의 spec id 마지막 실행과 맞춰
-  ✅ 통과 확인 / ⚠ 깨짐(조치 필요에 뜸) / ❔ 미확인(실행 기록 있는 spec 없음) 으로 다시 판정한다. "마지막 스위트 첫 시도" 카드는 아직 시도 단위(S20261008 은 a2 42/42 만 보임) — 미수정.
+  ✅ 통과 확인 / ⚠ 깨짐(조치 필요에 뜸) / ❔ 미확인(실행 기록 있는 spec 없음) 으로 다시 판정한다. "마지막 스위트 첫 시도" 카드는 같은 날 spec 별 첫 결과 합산으로 고침(§9.23).
 - 실패 원인은 화면에서 다시 판정: 알려진 이슈(product/test/environment) > 환경 문구(탭·컨텍스트 소멸, CDP, 세션, 산출물 폴더 ENOENT 추가) > 정리 실패 > 다음 실행 48시간 안 통과(간헐) > 미분류.
   **제품 결함은 data/known-issues.yaml 에 kind: product 로 등록한 것만.**
 - 실행 기록에 `suite_id`·`attempt`·`git_sha` 추가(run-stacks 가 SUITE_ID·SUITE_ATTEMPT 환경 변수로 받음). 병렬 실행기가 `reports/suites/<id>-a<n>.json` 요약(벽시계·직렬 예상·결과·끝난 뒤 남은 리소스)을 남긴다.
@@ -501,3 +501,23 @@
   퍼블릭 엔드포인트 켬→끔(setclusterpublicaccesscontrol, PUT …/clusters/{id}/public-access-control: 사용 체크 → 동의 체크가 있는 경고 모달 → 접근 허용 IP 범위 1개 필수),
   두 번째 SG sgb-<run_id> 추가→제거(setclustersecuritygroups, PUT …/clusters/{id}/security-groups: "Security Group 선택" 모달은 이름을 검색해야 행이 나오고 선택 여부는 "n/4 개" 로 판단).
   ServiceWatch 로그 수집 경로는 …/service-watch-logging(setclusterlogging 아님). 불가·미실시 사유는 data/ui-operations.yaml ske 절. 전부 돌리면 ≈55분(suite-plan 55).
+
+### 9.23 콘솔 전용 쓰기 동작 자동 집계 · 스위트 첫 시도 합산 · 대응표 실행 연동 (2026-10-14)
+
+- 배경: 대시보드 "API 대응 100%" 를 사용자가 작업 단위로 오해("api 대비 100%라고 되어 있던데 어떻게 그렇지?"). 리소스 단위(대응표 ✅ 67/67)였다.
+  이어서 "api 가 없는 화면 액션도 있는 거 아닌가" → 모수(API 쓰기 동작 881) 밖의 콘솔 전용 동작을 **자동으로** 세기로 결정.
+- 콘솔 전용 쓰기 동작(모수 밖, 따로 센다):
+  1. `src/fixtures/test.ts` page fixture 가 `collectWriteRequests`(api-log.ts)로 그 페이지의 쓰기 요청 "METHOD /console/api/<svc>/v1/…/{id}" 를 모아
+     annotation `api_writes` 로 붙이고, `buildRunRecord` 가 테스트별 annotation 을 걷어 `RunRecord.api_writes`(중복 제거) 한 곳에 넣는다. 본문·쿼리는 안 남긴다.
+     모든 spec 에 적용(spec 이 `logWriteRequests` 를 따로 부르지 않아도). 숫자만인 세그먼트도 {id} 로 줄인다.
+  2. `scripts/import-api-coverage.ts` 가 API 저장소 `api_catalog.json` 의 `http_path` 를 `ops[].path` 로 함께 가져온다(1490/1490, 같은 커밋 65bb173 — 숫자 변화 없음).
+     API 저장소는 로컬에 없어 scratchpad 에 `git clone --depth 1 https://github.com/kyle-agent/api-test-automation` 해서 `--repo` 로 넘겼다.
+  3. `consoleOnlyWrites`(operations.ts): 통과한 실행의 api_writes 중 같은 메서드의 카탈로그 경로와 **strict** 하게 맞지 않는 것.
+     strict = 카탈로그 `{…}` 는 콘솔 `{id}` 와만, 나머지는 글자 그대로. `{…}` 자리에 bulk 같은 글자가 와서 **loose** 로만 맞으면 "?" 표시(콘솔 전용 의심, 예 firewall PUT /rules/bulk).
+     POST 인데 경로에 조회 낱말(search·query·analysis·list·check·…, `READ_LIKE_PATH`)이 있으면 `read-like` 로 분류해 세지 않고 접힌 목록에만(콘솔 홈 예산 위젯 POST /cost-analysis/budget 이 첫 예).
+  4. 대시보드: "UI 쓰기 동작" 카드 설명 끝에 `콘솔 전용 +N`(링크) · "화면 vs API" 섹션 아래 표(상품·메서드·경로·spec·마지막). RESULTS.md §5.
+  5. 검증: networking.vpc.create-delete 단독 PASS(10-14 08:52) → api_writes 4건(budget POST 는 read-like, VPC POST/PUT/DELETE 는 카탈로그와 맞음) · networking.firewall 로 bulk "?" 확인(아래).
+  한계: 2026-10-14 이전 실행 기록에는 api_writes 가 없어 전체 스위트를 한 번 돌려야 표가 찬다. 콘솔 ID 가 UUID·숫자가 아니면(이름 세그먼트) strict 가 어긋나 콘솔 전용으로 잘못 보일 수 있다 — 그때 `shortenIds` 에 규칙 추가.
+- "마지막 스위트 첫 시도" 카드: S20261008-0951 1차가 2시간 한도로 죽어 요약 파일(a1.json)이 없었고 2차 42/42 만 보였다. `synthesizeSuiteSummaries` 가 요약 파일 없는 시도를
+  실행 기록(suite_id·attempt)으로 채우고, 첫 시도 = **spec 별로 그 스위트에서 처음 나온 결과**가 pass 인 수(분모 = 모든 시도 spec 합집합) → 61/61. 카드 설명에 "a1 는 요약 파일 없이 실행 기록으로 채움" 표시.
+- 대응표 ✅ 실행 연동(`judgeParity`)은 9.18 보충 참고. 카드 두 장 모두 "(리소스 단위 · 실행 연동)" / "(작업 단위 · API 대비)" 로 단위를 이름에 적었다.

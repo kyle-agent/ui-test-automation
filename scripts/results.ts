@@ -17,12 +17,18 @@ import {
   validateCoverage,
 } from '../src/report/coverage';
 import { productComparison, readApiCoverage } from '../src/report/api-coverage';
-import { productOperations, readUiOperations } from '../src/report/operations';
+import { consoleOnlyWrites, productOperations, readUiOperations } from '../src/report/operations';
 import { readExclusions } from '../src/report/population';
 import { buildProductMatrix, readDecisions } from '../src/report/product-matrix';
 import { readScenarioCatalog } from '../src/report/scenario-catalog';
 import { readExploreSummaries, renderDashboardHtml } from '../src/report/dashboard';
-import { coverageHistory, readFindings, readParity, readSuiteSummaries, suiteViews } from '../src/report/insights';
+import {
+  coverageHistory,
+  readFindings,
+  readParity,
+  readSuiteSummaries,
+  suiteViews,
+} from '../src/report/insights';
 import { loadKnownIssues } from '../src/report/known-issues';
 import { failuresTable, fmtTime, knownIssuesSection, resultsTable } from '../src/report/results';
 import { readRunRecords, RUNS_DIR } from '../src/report/run-record';
@@ -42,7 +48,9 @@ function main(): void {
         `coverage.yaml 검증 실패 ${errors.length}건 (npm run coverage 로 확인)`,
         ...errors.map((e) => `- ${e}`),
       ]
-    : formatCoverageMarkdown(summarizeCoverage(ledger, map, readExclusions())).trimEnd().split('\n');
+    : formatCoverageMarkdown(summarizeCoverage(ledger, map, readExclusions()))
+        .trimEnd()
+        .split('\n');
 
   const out: string[] = [];
   out.push('# 회귀 결과 정리');
@@ -75,12 +83,44 @@ function main(): void {
   out.push('');
   out.push(...coverage);
   out.push('');
+  const apiSnapshot = readApiCoverage();
+  const consoleOnly = consoleOnlyWrites(apiSnapshot, records);
+  out.push('## 5. 콘솔 전용 쓰기 동작 (API 카탈로그에 없는 경로)');
+  out.push('');
+  out.push(
+    '통과한 실행이 보낸 쓰기 요청(실행 기록 api_writes, 2026-10-14 이후 모든 spec 이 기록) 중 data/api-coverage.json 의 경로와 맞지 않는 것. 동작 단위 모수(API 쓰기 동작)에는 넣지 않고 따로 센다. ? = 카탈로그 {…} 자리에 글자 세그먼트가 온 느슨한 일치(확인 필요).',
+  );
+  out.push('');
+  if (!records.some((r) => r.api_writes?.length)) out.push('아직 쓰기 요청을 기록한 실행이 없다.');
+  else if (!consoleOnly.some((r) => r.kind === 'write'))
+    out.push('없음 — 기록된 쓰기 요청이 모두 카탈로그 경로와 맞는다.');
+  else {
+    out.push('| 상품 | 메서드 | 경로 | spec | 마지막 |');
+    out.push('| --- | --- | --- | --- | --- |');
+    for (const r of consoleOnly.filter((x) => x.kind === 'write'))
+      out.push(
+        `| ${r.product} | ${r.method} | \`${r.path}\`${r.loose ? ' ?' : ''} | ${r.specs.join(', ')} | ${fmtTime(r.last_seen).slice(0, 10)} |`,
+      );
+  }
+  const readLike = consoleOnly.filter((r) => r.kind === 'read-like');
+  if (readLike.length) {
+    out.push('');
+    out.push(
+      `POST 지만 조회로 보이는 경로(세지 않음) ${readLike.length}개: ${readLike.map((r) => '`' + r.method + ' ' + r.path + '`').join(', ')}`,
+    );
+  }
+  out.push('');
   fs.mkdirSync(path.dirname(RESULTS_MD), { recursive: true });
   fs.writeFileSync(RESULTS_MD, out.join('\n'));
   const explores = readExploreSummaries();
-  const apiSnapshot = readApiCoverage();
   const catalog = readScenarioCatalog(records);
-  const operations = productOperations(apiSnapshot, readUiOperations(), new Set(collectSpecIds()), new Set(records.filter((r) => r.status === 'pass').map((r) => r.spec)), readExclusions());
+  const operations = productOperations(
+    apiSnapshot,
+    readUiOperations(),
+    new Set(collectSpecIds()),
+    new Set(records.filter((r) => r.status === 'pass').map((r) => r.spec)),
+    readExclusions(),
+  );
   fs.writeFileSync(
     DASHBOARD_HTML,
     renderDashboardHtml({
@@ -92,7 +132,7 @@ function main(): void {
       entries: ledger.resources,
       issues,
       explores,
-      suites: suiteViews(readSuiteSummaries()),
+      suites: suiteViews(readSuiteSummaries(), records),
       parity: readParity(),
       findings: readFindings(),
       coverageHistory: coverageHistory(),
@@ -100,6 +140,7 @@ function main(): void {
       apiSnapshot,
       matrix: buildProductMatrix(map, ledger.resources, catalog, readDecisions(), readExclusions()),
       operations,
+      consoleOnly,
     }),
   );
   console.log(
@@ -107,7 +148,8 @@ function main(): void {
   );
   console.log(`${path.relative(process.cwd(), DASHBOARD_HTML)} 갱신: 탐색 보고서 ${explores.length}건`);
   const opsWarn = [...operations.unknown, ...operations.unknownServices, ...operations.unknownSpecs];
-  if (opsWarn.length) console.log(`(경고) data/ui-operations.yaml 에 모르는 동작·서비스·spec: ${opsWarn.join(', ')}`);
+  if (opsWarn.length)
+    console.log(`(경고) data/ui-operations.yaml 에 모르는 동작·서비스·spec: ${opsWarn.join(', ')}`);
   if (process.argv.includes('--open')) {
     const cmd =
       process.platform === 'win32'
