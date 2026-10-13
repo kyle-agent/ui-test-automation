@@ -21,8 +21,10 @@ import {
   failureViews,
   groupBySignature,
   isFlakySpec,
+  judgeParity,
   type Cause,
   type FailureView,
+  type ParityJudged,
   type ParityRow,
   type SuiteView,
   type CoveragePoint,
@@ -173,8 +175,11 @@ function runRows(records: readonly RunRecord[], causes: Map<RunRecord, Cause>, l
     .reverse()
     .slice(0, limit)
     .map((r) => {
-      const failedSteps = r.tests.flatMap((t) => t.steps.filter((s) => s.status === 'fail').map((s) => s.title));
-      const detail = r.status === 'pass' ? '' : `${failedSteps[0] ? `[${failedSteps[0]}] ` : ''}${r.error ?? ''}`;
+      const failedSteps = r.tests.flatMap((t) =>
+        t.steps.filter((s) => s.status === 'fail').map((s) => s.title),
+      );
+      const detail =
+        r.status === 'pass' ? '' : `${failedSteps[0] ? `[${failedSteps[0]}] ` : ''}${r.error ?? ''}`;
       const cause = causes.get(r);
       const att = ownAttachments(r.attachments).slice(0, 3).map(attachmentLink).join(' ');
       return `<tr class="run ${statusClass(r)}" data-status="${r.status === 'pass' ? 'pass' : (cause ?? 'unclassified')}">
@@ -212,7 +217,9 @@ function coverageBlock(input: DashboardInput): string {
     )
     .join('\n');
   const entries = [...input.entries]
-    .sort((a, b) => b.level - a.level || a.category.localeCompare(b.category, 'en') || a.key.localeCompare(b.key))
+    .sort(
+      (a, b) => b.level - a.level || a.category.localeCompare(b.category, 'en') || a.key.localeCompare(b.key),
+    )
     .map(
       (e) => `<tr class="res" data-level="${e.level}" data-cat="${esc(e.category)}">
         <td><span class="lv l${e.level}">L${e.level}</span></td>
@@ -239,25 +246,63 @@ function coverageBlock(input: DashboardInput): string {
     </details>`;
 }
 
-function parityBlock(rows: readonly ParityRow[]): string {
+/** 모수 제외 상품을 뺀 쓰기 동작 합계(작업 단위 커버리지의 분모·분자) */
+function opsTotalsOf(operations?: OperationsSummary): {
+  opsTotal: number;
+  apiVerified: number;
+  uiCovered: number;
+} {
+  return (operations?.products ?? [])
+    .filter((p) => !p.excluded)
+    .reduce(
+      (n, c) => ({
+        opsTotal: n.opsTotal + c.opsTotal,
+        apiVerified: n.apiVerified + c.apiVerified,
+        uiCovered: n.uiCovered + c.uiCovered,
+      }),
+      { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
+    );
+}
+
+const PARITY_MARK: Record<ParityJudged['effective'], string> = {
+  done: '✅',
+  broken: '⚠',
+  unverified: '❔',
+  wip: '🔧',
+  skip: '⏭',
+};
+
+function parityBlock(rows: readonly ParityJudged[]): string {
   if (!rows.length) return '<p class="muted">대응표 없음 (docs/api-ui-parity.md)</p>';
   const cats = [...new Set(rows.map((r) => r.category))];
-  const count = (list: readonly ParityRow[], s: ParityRow['status']) => list.filter((r) => r.status === s).length;
+  const count = (list: readonly ParityJudged[], s: ParityJudged['effective']) =>
+    list.filter((r) => r.effective === s).length;
+  const num = (n: number, cls = '') => `<td class="num${cls ? ` ${cls}` : ''}">${n || ''}</td>`;
   const catRows = cats
     .map((cat) => {
       const list = rows.filter((r) => r.category === cat);
-      return `<tr><td>${esc(cat)}</td><td class="num">${count(list, 'done')}</td><td class="num">${count(list, 'wip') || ''}</td><td class="num">${count(list, 'skip') || ''}</td></tr>`;
+      return `<tr><td>${esc(cat)}</td>${num(count(list, 'done'))}${num(count(list, 'broken'), count(list, 'broken') ? 'fail' : '')}${num(count(list, 'unverified'))}${num(count(list, 'wip'))}${num(count(list, 'skip'))}</tr>`;
     })
     .join('');
-  const mark = { done: '✅', wip: '🔧', skip: '⏭' } as const;
+  const checkedCell = (r: ParityJudged) =>
+    r.status !== 'done'
+      ? ''
+      : r.checked.length
+        ? r.checked
+            .map(
+              (c) =>
+                `<span class="mono">${esc(c.spec)}</span> ${c.last === 'pass' ? '통과' : '<span class="fail">실패</span>'}`,
+            )
+            .join(' · ')
+        : '<span class="muted">실행 기록이 있는 spec 없음</span>';
   const detail = rows
     .map(
       (r) =>
-        `<tr><td>${mark[r.status]}</td><td>${esc(r.category)}</td><td class="small">${esc(r.api)}</td><td class="small">${esc(r.ui)}</td></tr>`,
+        `<tr${r.effective === 'broken' ? ' class="fail"' : ''}><td title="표 표시: ${r.status}">${PARITY_MARK[r.effective]}</td><td>${esc(r.category)}</td><td class="small">${esc(r.api)}</td><td class="small">${esc(r.ui)}</td><td class="small">${checkedCell(r)}</td></tr>`,
     )
     .join('');
-  return `<table class="compact"><thead><tr><th>분류</th><th class="num">✅ 화면 자동화</th><th class="num">🔧 진행</th><th class="num">⏭ 제외</th></tr></thead><tbody>${catRows}</tbody></table>
-    <details><summary>항목별 (${rows.length})</summary><table><thead><tr><th></th><th>분류</th><th>API 리소스</th><th>UI spec · 비고</th></tr></thead><tbody>${detail}</tbody></table></details>`;
+  return `<table class="compact"><thead><tr><th>분류</th><th class="num">✅ 통과 확인</th><th class="num">⚠ 깨짐</th><th class="num">❔ 미확인</th><th class="num">🔧 진행</th><th class="num">⏭ 제외</th></tr></thead><tbody>${catRows}</tbody></table>
+    <details><summary>항목별 (${rows.length})</summary><table><thead><tr><th></th><th>분류</th><th>API 리소스</th><th>UI spec · 비고</th><th>마지막 실행</th></tr></thead><tbody>${detail}</tbody></table></details>`;
 }
 
 function exploreBlock(explores: readonly ExploreSummary[]): string {
@@ -284,7 +329,8 @@ function exploreBlock(explores: readonly ExploreSummary[]): string {
 
 function issuesBlock(input: DashboardInput): string {
   const applied = new Map<string, number>();
-  for (const r of input.records) if (r.known_issue) applied.set(r.known_issue, (applied.get(r.known_issue) ?? 0) + 1);
+  for (const r of input.records)
+    if (r.known_issue) applied.set(r.known_issue, (applied.get(r.known_issue) ?? 0) + 1);
   if (!input.issues.length) return '<p class="muted">등록된 알려진 이슈 없음 (data/known-issues.yaml)</p>';
   return `<table><thead><tr><th>id</th><th>kind</th><th>spec</th><th>활성</th><th class="num">적용</th><th>note</th></tr></thead><tbody>${input.issues
     .map(
@@ -349,7 +395,9 @@ function findingsBlock(findings: readonly Finding[]): string {
 
 function dualBar(uiPct: number | null, apiPct: number | null): string {
   const seg = (v: number | null, cls: string) =>
-    v === null ? '<div class="pb none"></div>' : `<div class="pb"><span class="${cls}" style="width:${v}%"></span></div>`;
+    v === null
+      ? '<div class="pb none"></div>'
+      : `<div class="pb"><span class="${cls}" style="width:${v}%"></span></div>`;
   return `<div class="dual">${seg(uiPct, 'ui')}${seg(apiPct, 'api')}</div>`;
 }
 
@@ -366,7 +414,11 @@ function productsBlock(
       ? `<td class="num" title="쓰기 동작: 화면 ${o.uiCovered} · API ${o.apiVerified} / ${o.opsTotal}">${o.uiCovered}/${o.opsTotal} <span class="muted">(${pct(o.uiCovered, o.opsTotal)}%)</span></td>`
       : '<td class="num muted">—</td>';
   const opsTot = [...opsByCat.values()].reduce(
-    (n, c) => ({ opsTotal: n.opsTotal + c.opsTotal, apiVerified: n.apiVerified + c.apiVerified, uiCovered: n.uiCovered + c.uiCovered }),
+    (n, c) => ({
+      opsTotal: n.opsTotal + c.opsTotal,
+      apiVerified: n.apiVerified + c.apiVerified,
+      uiCovered: n.uiCovered + c.uiCovered,
+    }),
     { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
   );
   const uiCell = (u: { resources: number; l2: number; l3: number } | null) =>
@@ -377,13 +429,22 @@ function productsBlock(
     a && a.total
       ? `<td class="num">${a.verified}/${a.total} <span class="muted">(${pct(a.verified, a.total)}%)</span></td>`
       : '<td class="num muted">—</td>';
-  const gap = (u: { resources: number; l2: number } | null, a: { total: number; verified: number } | null) => {
+  const gap = (
+    u: { resources: number; l2: number } | null,
+    a: { total: number; verified: number } | null,
+  ) => {
     if (!u || !u.resources || !a || !a.total) return '<td></td>';
     const d = pct(u.l2, u.resources) - pct(a.verified, a.total);
     return `<td class="num ${d < -20 ? 'warn' : d > 20 ? 'good' : 'muted'}">${d > 0 ? '+' : ''}${d}p</td>`;
   };
   const tot = data.categories.reduce(
-    (n, c) => ({ r: n.r + c.ui.resources, l2: n.l2 + c.ui.l2, l3: n.l3 + c.ui.l3, t: n.t + c.api.total, v: n.v + c.api.verified }),
+    (n, c) => ({
+      r: n.r + c.ui.resources,
+      l2: n.l2 + c.ui.l2,
+      l3: n.l3 + c.ui.l3,
+      t: n.t + c.api.total,
+      v: n.v + c.api.verified,
+    }),
     { r: 0, l2: 0, l3: 0, t: 0, v: 0 },
   );
   const catRows = data.categories
@@ -434,20 +495,22 @@ function opsTable(o: ProductOperations): string {
       : ids.map(spec).join(', ');
   const rows = o.ops
     .map(
-      (r) => `<tr${r.ui.length ? '' : ' class="op-gap"'}><td class="mono small">${esc(r.name)}${o.services.length > 1 ? ` <span class="muted">${esc(r.service)}</span>` : ''}</td><td class="small muted">${esc(r.method)}</td><td>${mark(r.api)}</td><td>${mark(r.ui.length > 0)}${r.uncertain ? ' <span class="tag warn" title="data/ui-operations.yaml: 확인 필요">?</span>' : ''}</td><td class="small">${specs(r.ui)}</td></tr>`,
+      (r) =>
+        `<tr${r.ui.length ? '' : ' class="op-gap"'}><td class="mono small">${esc(r.name)}${o.services.length > 1 ? ` <span class="muted">${esc(r.service)}</span>` : ''}</td><td class="small muted">${esc(r.method)}</td><td>${mark(r.api)}</td><td>${mark(r.ui.length > 0)}${r.uncertain ? ' <span class="tag warn" title="data/ui-operations.yaml: 확인 필요">?</span>' : ''}</td><td class="small">${specs(r.ui)}</td></tr>`,
     )
     .join('');
   return `<details class="ops"><summary>쓰기 동작 ${o.opsTotal} — UI ${o.uiCovered} (${pct(o.uiCovered, o.opsTotal)}%) · API ${o.apiVerified} (${pct(o.apiVerified, o.opsTotal)}%)</summary>
     <table class="mx ops-t"><thead><tr><th>동작 <span class="muted small">(API 카탈로그)</span></th><th>메서드</th><th>API</th><th>UI</th><th>spec</th></tr></thead><tbody>${rows}</tbody></table></details>`;
 }
 
-function matrixBlock(matrix: readonly ProductMatrix[], products: readonly ProductRow[], operations?: OperationsSummary): string {
+function matrixBlock(
+  matrix: readonly ProductMatrix[],
+  products: readonly ProductRow[],
+  operations?: OperationsSummary,
+): string {
   if (!matrix.length) return '<p class="muted">서비스 맵 없음</p>';
   const opsOf = (svc: string) => operations?.products.find((p) => p.product === svc);
-  const opsAll = (operations?.products ?? []).filter((p) => !p.excluded).reduce(
-    (n, c) => ({ opsTotal: n.opsTotal + c.opsTotal, apiVerified: n.apiVerified + c.apiVerified, uiCovered: n.uiCovered + c.uiCovered }),
-    { opsTotal: 0, apiVerified: 0, uiCovered: 0 },
-  );
+  const opsAll = opsTotalsOf(operations);
   const opsWarn = operations
     ? [
         ...operations.unknown.map((x) => `카탈로그에 없거나 읽기 동작: ${x}`),
@@ -455,7 +518,12 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
         ...operations.unknownSpecs.map((x) => `없는 spec: ${x}`),
       ]
     : [];
-  const stateCls: Record<string, string> = { 시나리오: 'st-ok', 스모크만: 'st-smoke', 제외: 'st-ex', 홈: 'st-home' };
+  const stateCls: Record<string, string> = {
+    시나리오: 'st-ok',
+    스모크만: 'st-smoke',
+    제외: 'st-ex',
+    홈: 'st-home',
+  };
   const apiOf = (svc: string) => products.find((p) => p.product === svc)?.api ?? null;
   const all = matrix.flatMap((m) => m.screens);
   const count = (st: string) => all.filter((r) => r.state === st).length;
@@ -484,7 +552,9 @@ function matrixBlock(matrix: readonly ProductMatrix[], products: readonly Produc
             .join('');
           const scen = m.specs
             .map(
-              (sp) => `<li><span class="mono">${esc(sp.spec)}</span> — ${esc(sp.title)} ${sp.last ? `<span class="badge ${sp.last.status}">${sp.last.status === 'pass' ? 'PASS' : 'FAIL'}</span> <span class="muted small">${esc(fmtTime(sp.last.started))} · ${sp.passes}/${sp.runs}</span>` : '<span class="muted small">기록 없음</span>'}
+              (
+                sp,
+              ) => `<li><span class="mono">${esc(sp.spec)}</span> — ${esc(sp.title)} ${sp.last ? `<span class="badge ${sp.last.status}">${sp.last.status === 'pass' ? 'PASS' : 'FAIL'}</span> <span class="muted small">${esc(fmtTime(sp.last.started))} · ${sp.passes}/${sp.runs}</span>` : '<span class="muted small">기록 없음</span>'}
                 <ol class="steps">${sp.steps.map((st) => `<li class="${st.teardown ? 'td' : ''}">${st.teardown ? '<span class="muted">[정리]</span> ' : ''}${esc(st.goal)}${st.route ? ` <span class="muted mono small">${esc(st.route)}</span>` : ''}</li>`).join('')}</ol></li>`,
             )
             .join('');
@@ -531,9 +601,13 @@ export function renderDashboardHtml(input: DashboardInput): string {
 
   const suites = input.suites ?? [];
   const lastSuite = suites[0];
-  const parity = input.parity ?? [];
-  const parityDone = parity.filter((r) => r.status === 'done').length;
-  const parityDenom = parity.filter((r) => r.status !== 'skip').length;
+  // API 대응표: 손 표시 ✅ 를 UI 칸의 spec 마지막 실행과 맞춰 다시 판정(깨짐 ⚠ · 미확인 ❔). 2026-10-14 사용자 결정
+  const parity = judgeParity(input.parity ?? [], (spec) => bySpec.get(spec)?.at(-1)?.status);
+  const parityCount = (e: ParityJudged['effective']) => parity.filter((r) => r.effective === e).length;
+  const parityDone = parityCount('done');
+  const parityDenom = parity.filter((r) => r.effective !== 'skip').length;
+  // 작업(쓰기 동작) 단위: 모수 제외 상품을 뺀 카탈로그 합계
+  const opsAll = opsTotalsOf(input.operations);
 
   // 조치 필요: 마지막 실행이 실패인 스위트 spec(원인 포함), 정리 실패(7일), 남은 리소스, 불안정, 대응표 진행 중
   const actions: string[] = [];
@@ -560,11 +634,22 @@ export function renderDashboardHtml(input: DashboardInput): string {
     actions.push(
       `<li class="act c-flaky"><span class="tag warn">불안정</span> 최근 10회에 실패가 섞인 spec ${flakySpecs.length}개: <span class="mono small">${esc(flakySpecs.join(', '))}</span></li>`,
     );
-  for (const r of parity.filter((p) => p.status === 'wip'))
+  for (const r of parity.filter((p) => p.effective === 'broken'))
+    actions.push(
+      `<li class="act c-product"><span class="tag fail">⚠ 대응표</span> ✅ 로 적혀 있지만 spec 마지막 실행이 실패: ${esc(r.category)} · ${esc(r.api)} <span class="mono small">(${esc(
+        r.checked
+          .filter((c) => c.last === 'fail')
+          .map((c) => c.spec)
+          .join(', '),
+      )})</span></li>`,
+    );
+  for (const r of parity.filter((p) => p.effective === 'wip'))
     actions.push(`<li class="act">🔧 API 대응 진행 중: ${esc(r.category)} · ${esc(r.api)}</li>`);
 
   // 실패 묶음(최근 14일)
-  const groups = groupBySignature(views.filter((v) => now.getTime() - Date.parse(v.record.started) < 14 * DAY)).slice(0, 25);
+  const groups = groupBySignature(
+    views.filter((v) => now.getTime() - Date.parse(v.record.started) < 14 * DAY),
+  ).slice(0, 25);
   const groupRows = groups
     .map(
       (g) => `<tr data-cause="${g.cause}">
@@ -698,7 +783,25 @@ export function renderDashboardHtml(input: DashboardInput): string {
     ${kpi('최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span>', `${weekViews.length} <span class="s">/ 실행 ${weekRuns.length}</span>`, `<span class="causes">${weekCauses.map(([k, n]) => `<span class="c-${k}">${esc(CAUSE_LABEL[k])} ${n}</span>`).join('') || '없음'}</span>`, weekViews.some((v) => v.cause === 'product' || v.cause === 'unclassified') ? 'alert' : '')}
     ${kpi('불안정 spec', hasSuiteRuns ? String(flakySpecs.length) : '-', hasSuiteRuns ? '스위트 실행 최근 10회에 실패가 섞이고 마지막은 통과' : '스위트 실행 기록이 쌓이면 표시(2026-10-02~)')}
     ${kpi('커버리지 L2+', c ? `${pct(c.at_least_2, c.resources)}% <span class="s">${c.at_least_2}/${c.resources}</span>` : '-', c ? `L3+ ${c.at_least_3}/${c.resources} (${pct(c.at_least_3, c.resources)}%)` : '검증 실패')}
-    ${kpi('API 대응', parityDenom ? `${pct(parityDone, parityDenom)}% <span class="s">${parityDone}/${parityDenom}</span>` : '-', parity.length ? `제외 ${parity.length - parityDenom} · 진행 ${parity.filter((r) => r.status === 'wip').length}` : 'docs/api-ui-parity.md 없음')}
+    ${kpi(
+      'API 대응 <span class="s">(리소스 단위 · 실행 연동)</span>',
+      parityDenom
+        ? `${pct(parityDone, parityDenom)}% <span class="s">${parityDone}/${parityDenom}</span>`
+        : '-',
+      parity.length
+        ? `API 로 생성·삭제가 검증된 리소스 종류 중 UI spec 마지막 실행이 통과한 것 · 깨짐 ${parityCount('broken')} · 미확인 ${parityCount('unverified')} · 진행 ${parityCount('wip')} · 제외 ${parityCount('skip')}`
+        : 'docs/api-ui-parity.md 없음',
+      parityCount('broken') ? 'alert' : '',
+    )}
+    ${kpi(
+      'UI 쓰기 동작 <span class="s">(작업 단위 · API 대비)</span>',
+      opsAll.opsTotal
+        ? `${opsAll.apiVerified ? pct(opsAll.uiCovered, opsAll.apiVerified) : 0}% <span class="s">${opsAll.uiCovered}/${opsAll.apiVerified}</span>`
+        : '-',
+      opsAll.opsTotal
+        ? `API 카탈로그 쓰기 동작 ${opsAll.opsTotal} 중 UI ${opsAll.uiCovered} (${pct(opsAll.uiCovered, opsAll.opsTotal)}%) · API 자동화 ${opsAll.apiVerified} (${pct(opsAll.apiVerified, opsAll.opsTotal)}%) · 통과한 spec 만 집계`
+        : 'data/api-coverage.json · data/ui-operations.yaml 없음',
+    )}
   </div>
   <div class="trend">${trend || '<span class="muted">기록 없음</span>'}</div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span class="muted">일별 실행 기록(디버깅 재실행 포함)</span></div>
@@ -713,18 +816,24 @@ export function renderDashboardHtml(input: DashboardInput): string {
 <section id="specs">
   <h2>spec 상태 <small>실행 순서 = src/report/suite.ts · 최근 10회</small></h2>
   <table><thead><tr><th>spec</th><th>결과</th><th>마지막 실행</th><th class="num">소요</th><th>최근 10회</th><th class="num">통과 평균</th></tr></thead>
-  <tbody>${input.suiteOrder.map((s) => {
-    const runs = bySpec.get(s) ?? [];
-    const last = runs[runs.length - 1];
-    return specRow(s, runs, last ? causeByRecord.get(last) : undefined);
-  }).join('\n')}</tbody></table>
-  ${otherSpecs.length ? `<details><summary>스위트에 없는 spec (제외·이름 바뀜) ${otherSpecs.length}개</summary><table><tbody>${otherSpecs
+  <tbody>${input.suiteOrder
     .map((s) => {
       const runs = bySpec.get(s) ?? [];
       const last = runs[runs.length - 1];
       return specRow(s, runs, last ? causeByRecord.get(last) : undefined);
     })
-    .join('\n')}</tbody></table></details>` : ''}
+    .join('\n')}</tbody></table>
+  ${
+    otherSpecs.length
+      ? `<details><summary>스위트에 없는 spec (제외·이름 바뀜) ${otherSpecs.length}개</summary><table><tbody>${otherSpecs
+          .map((s) => {
+            const runs = bySpec.get(s) ?? [];
+            const last = runs[runs.length - 1];
+            return specRow(s, runs, last ? causeByRecord.get(last) : undefined);
+          })
+          .join('\n')}</tbody></table></details>`
+      : ''
+  }
 </section>
 
 <section id="failures">
@@ -756,7 +865,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
 </section>
 
 <section id="parity">
-  <h2>API 자동화 대비 화면 자동화 <small>docs/api-ui-parity.md · ✅ 화면 자동화 · 🔧 진행 · ⏭ 제외(이유는 항목별 표)</small></h2>
+  <h2>API 자동화 대비 화면 자동화 <small>리소스 단위 · docs/api-ui-parity.md 의 ✅ 를 UI spec 마지막 실행과 맞춰 다시 판정 — ✅ 통과 확인 · ⚠ 깨짐(spec 마지막 실행 실패) · ❔ 미확인(실행 기록 있는 spec 없음) · 🔧 진행 · ⏭ 제외(이유는 항목별 표). 작업 단위는 위 "화면 vs API"</small></h2>
   ${parityBlock(parity)}
 </section>
 

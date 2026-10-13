@@ -6,6 +6,10 @@
 기준: API lifecycle(`regression/scenarios/lifecycles/*.json` + `scenarios.json`)에서 **필수 단계(optional 아님)로 POST 생성 + cleanup** 이 있는 리소스.
 선택 단계(4xx 도 허용하는 추측성 호출)는 제외했다. 상태: ✅ UI spec 통과 · 🔧 진행 중 · ⏭ 건너뜀(이유) · — 선행 리소스(다른 spec 에서 다룸).
 
+**이 표는 리소스(생성·삭제 단위) 대응표다.** 작업(쓰기 동작) 단위 커버리지는 `data/ui-operations.yaml` 로 따로 센다(대시보드 "화면 vs API", 10-14 기준 UI 350/485, API 대비 72%).
+✅ 는 손으로 적지만 대시보드(`npm run results`)는 "UI spec" 칸에 적힌 spec id(`compute.vm-stack` 꼴)의 **마지막 실행 결과**와 맞춰 다시 판정한다(2026-10-14 사용자 결정):
+모두 통과 → ✅ 통과 확인, 하나라도 실패 → ⚠ 깨짐(조치 필요 목록에 뜸), 실행 기록 있는 spec 이 없음 → ❔ 미확인. 그러므로 UI spec 칸에는 spec id 를 정확히 적는다(`database.*` 같은 글롭은 미확인으로 나온다).
+
 ## 제외 (라이선스·자원 없음, API 도 접근성만)
 
 SQL Server · Vertica · Search Engine · Bare Metal · Multi-node GPU Cluster · Archive Storage · Baremetal Block Storage · Parallel File Storage ·
@@ -36,7 +40,7 @@ IAM Identity Center · Cloud Control · Cloud Monitoring(deprecate 예정)
 | Container | ske nodepools | container.ske-cluster steps[3] (노드 1대 추가·Running·삭제 L3 + 노드 수 1→2→1·레이블·테인트 추가→제거 L4, 2026-10-07 에이전트 SKE) | ✅ |
 | Container | ske cluster upgrade · nodepool upgrade (setclusterupgrade·setnodepoolupgrade) | container.ske-upgrade (주간 전용, run-suite --weekly): v1.35.5 생성 → 상세 Kubernetes 버전 연필로 v1.36.3 업그레이드 → 노드 풀 상세 "업그레이드"(OS Ubuntu 24.04 (Kubernetes)-v1.36.3), 2026-10-07 에이전트 SKE | ✅ |
 | Container | scr container-registries · repositories | container.container-registry (엔드포인트 프라이빗↔프라이빗&퍼블릭·태그 L3) · container.repository (태그 삭제 정책·이미지 잠금·설명·태그 L3), 2026-10-06 3C. 계정 쿼터: 프라이빗 레지스트리 1개 → 두 spec 동시 실행 불가 · 2026-10-07 6D: Repository pull 제한·자동 스캔 켬/끔 | ✅ |
-| Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.* 5종 | ✅ |
+| Database | postgresql · mysql · mariadb · epas · cachestore clusters | database.postgresql · database.mysql · database.mariadb · database.epas · database.cachestore | ✅ |
 | Database | postgresql · mysql · mariadb · epas replicas (읽기 복제본) | database.postgresql·mysql·mariadb·epas steps[3]·[4] (백업 켠 Master → 상세 더보기 Replica 구성 → Running → 해지). 10-01 4종 모두 PASS(공유 VPC 병렬 35분) | ✅ |
 | Database | postgresql 상세 동작: syncclusterstate · restartcluster · stop/startcluster · setbackup · set/unsetmaintenance · setauditlog · setsecuritygrouprules(IP 접근 제어) · set/syncparametervalues · set/syncarchiveconfig (6차) | database.postgresql steps[5] (2026-10-07 6A, src/console/dbaas.ts ops, 단독 PASS 72분). upgradekernel·promotereplica·addblockstorages·setblockstoragesize 는 되돌릴 수 없어 불가. mysql·mariadb·epas 는 같은 ops 로 켤 수 있으나 미실행 | ✅ |
 | Database | cachestore 상세 동작: syncclusterstate · restartcluster · stop/startcluster · setbackup · set/unsetmaintenance · setsecuritygrouprules(IP 접근 제어) (6차) | database.cachestore steps[3] (2026-10-07 6A, 단독 PASS 38분). setservertype·synccommands 미시도, setblockstoragesize 불가(확장만) | ✅ |

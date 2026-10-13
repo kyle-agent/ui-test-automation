@@ -27,7 +27,14 @@ export const CAUSE_LABEL: Record<Cause, string> = {
 };
 
 /** 화면 표시 순서(위험한 것 먼저) */
-export const CAUSE_ORDER: readonly Cause[] = ['product', 'unclassified', 'cleanup', 'test', 'flaky', 'environment'];
+export const CAUSE_ORDER: readonly Cause[] = [
+  'product',
+  'unclassified',
+  'cleanup',
+  'test',
+  'flaky',
+  'environment',
+];
 
 const HOUR = 3_600_000;
 
@@ -37,7 +44,8 @@ export function causeOf(r: RunRecord, later: readonly RunRecord[]): Cause {
   if (r.class === 'environment' || isEnvironmentError(r.error ?? '')) return 'environment';
   if (/정리 중 실패/.test(r.error ?? '')) return 'cleanup';
   const next = later[0];
-  if (next && next.status === 'pass' && Date.parse(next.started) - Date.parse(r.started) < 48 * HOUR) return 'flaky';
+  if (next && next.status === 'pass' && Date.parse(next.started) - Date.parse(r.started) < 48 * HOUR)
+    return 'flaky';
   return 'unclassified';
 }
 
@@ -73,7 +81,8 @@ export function failureViews(records: readonly RunRecord[]): FailureView[] {
   const out: FailureView[] = [];
   for (const runs of bySpec.values())
     runs.forEach((r, i) => {
-      if (r.status === 'fail') out.push({ record: r, cause: causeOf(r, runs.slice(i + 1)), signature: errorSignature(r.error) });
+      if (r.status === 'fail')
+        out.push({ record: r, cause: causeOf(r, runs.slice(i + 1)), signature: errorSignature(r.error) });
     });
   return out.sort((a, b) => b.record.started.localeCompare(a.record.started));
 }
@@ -92,7 +101,13 @@ export function groupBySignature(views: readonly FailureView[]): SignatureGroup[
   for (const v of views) {
     const g = m.get(v.signature);
     if (!g) {
-      m.set(v.signature, { signature: v.signature, cause: v.cause, count: 1, specs: [v.record.spec], latest: v.record });
+      m.set(v.signature, {
+        signature: v.signature,
+        cause: v.cause,
+        count: 1,
+        specs: [v.record.spec],
+        latest: v.record,
+      });
       continue;
     }
     g.count++;
@@ -100,7 +115,9 @@ export function groupBySignature(views: readonly FailureView[]): SignatureGroup[
     if (CAUSE_ORDER.indexOf(v.cause) < CAUSE_ORDER.indexOf(g.cause)) g.cause = v.cause;
     if (v.record.started > g.latest.started) g.latest = v.record;
   }
-  return [...m.values()].sort((a, b) => b.count - a.count || b.latest.started.localeCompare(a.latest.started));
+  return [...m.values()].sort(
+    (a, b) => b.count - a.count || b.latest.started.localeCompare(a.latest.started),
+  );
 }
 
 /** 최근 n회에 통과·실패가 섞여 있고 마지막이 통과 */
@@ -191,8 +208,14 @@ export interface ParityRow {
   category: string;
   api: string;
   ui: string;
+  /** 표에 손으로 적은 상태 */
   status: ParityStatus;
+  /** "UI spec" 칸에서 뽑은 spec id 후보(`compute.vm-stack` 꼴). 실행 기록과 연동할 때 쓴다 */
+  specs: string[];
 }
+
+/** spec id 꼴: `<분류>.<이름>` — 분류는 소문자·하이픈, 이름은 소문자·숫자를 `.`·`-` 로 이은 것(`networking.vpc.create-delete`) */
+const SPEC_ID_RE = /\b[a-z]+(?:-[a-z]+)*\.[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*/g;
 
 /** "| 분류 | API 리소스 | UI spec | 상태 |" 표의 행을 읽는다(✅ done · 🔧 wip · ⏭ skip) */
 export function parseParity(markdown: string): ParityRow[] {
@@ -201,11 +224,58 @@ export function parseParity(markdown: string): ParityRow[] {
     const cells = line.split('|').map((c) => c.trim());
     if (cells.length < 6 || cells[1] === '분류' || /^-+$/.test(cells[1] ?? '')) continue;
     const mark = cells[4] ?? '';
-    const status: ParityStatus | null = mark.startsWith('✅') ? 'done' : mark.startsWith('🔧') ? 'wip' : mark.startsWith('⏭') ? 'skip' : null;
+    const status: ParityStatus | null = mark.startsWith('✅')
+      ? 'done'
+      : mark.startsWith('🔧')
+        ? 'wip'
+        : mark.startsWith('⏭')
+          ? 'skip'
+          : null;
     if (!status) continue;
-    rows.push({ category: cells[1]!, api: cells[2]!, ui: cells[3]!, status });
+    const ui = cells[3]!;
+    rows.push({
+      category: cells[1]!,
+      api: cells[2]!,
+      ui,
+      status,
+      specs: [...new Set(ui.match(SPEC_ID_RE) ?? [])],
+    });
   }
   return rows;
+}
+
+/**
+ * 대응표의 손 표시(✅)를 실행 기록과 맞춰 다시 판정한 상태(2026-10-14, 사용자 결정).
+ * - done: ✅ 이고 UI 칸의 spec 들 마지막 실행이 모두 통과(기록 있는 것 기준)
+ * - broken: ✅ 인데 spec 중 하나라도 마지막 실행이 실패
+ * - unverified: ✅ 인데 UI 칸에 실행 기록이 있는 spec 이 없다(손 표시만 있음)
+ * - wip / skip: 표 그대로
+ */
+export type ParityEffective = 'done' | 'broken' | 'unverified' | 'wip' | 'skip';
+
+export interface ParityJudged extends ParityRow {
+  effective: ParityEffective;
+  /** 판정에 쓴 spec 과 마지막 실행 결과 */
+  checked: { spec: string; last: 'pass' | 'fail' }[];
+}
+
+export function judgeParity(
+  rows: readonly ParityRow[],
+  lastStatusOf: (spec: string) => 'pass' | 'fail' | undefined,
+): ParityJudged[] {
+  return rows.map((r) => {
+    if (r.status !== 'done') return { ...r, effective: r.status, checked: [] };
+    const checked = r.specs.flatMap((spec) => {
+      const last = lastStatusOf(spec);
+      return last ? [{ spec, last }] : [];
+    });
+    const effective: ParityEffective = !checked.length
+      ? 'unverified'
+      : checked.some((c) => c.last === 'fail')
+        ? 'broken'
+        : 'done';
+    return { ...r, effective, checked };
+  });
 }
 
 export function readParity(file = PARITY_FILE): ParityRow[] {
@@ -249,7 +319,9 @@ export function parseFindings(markdown: string, dir: string): Omit<Finding, 'sta
       kind: m[3]!.trim(),
       text: rest.trim(),
       action: tail?.[1]?.trim() ?? '',
-      screenshot: tail?.[2] ? `recordings/explore/${dir}/${tail[2].split(String.fromCharCode(92)).join('/')}` : undefined,
+      screenshot: tail?.[2]
+        ? `recordings/explore/${dir}/${tail[2].split(String.fromCharCode(92)).join('/')}`
+        : undefined,
     });
   }
   return out;
@@ -267,9 +339,14 @@ export function parseFindingStatus(text: string): Map<string, { status: FindingS
   return m;
 }
 
-export function readFindings(exploreDir = path.resolve(process.cwd(), 'recordings', 'explore'), statusFile = FINDINGS_FILE): Finding[] {
+export function readFindings(
+  exploreDir = path.resolve(process.cwd(), 'recordings', 'explore'),
+  statusFile = FINDINGS_FILE,
+): Finding[] {
   if (!fs.existsSync(exploreDir)) return [];
-  const status = fs.existsSync(statusFile) ? parseFindingStatus(fs.readFileSync(statusFile, 'utf8')) : new Map();
+  const status = fs.existsSync(statusFile)
+    ? parseFindingStatus(fs.readFileSync(statusFile, 'utf8'))
+    : new Map();
   const out: Finding[] = [];
   for (const d of fs.readdirSync(exploreDir).sort().reverse()) {
     const file = path.join(exploreDir, d, 'report.md');
@@ -312,7 +389,8 @@ export function coverageHistory(file = 'service-map/coverage.yaml'): CoveragePoi
   }
   const points: CoveragePoint[] = [];
   for (const [date, sha] of lastOfDay) {
-    const body = spawnSync('git', ['show', `${sha}:${file}`], { encoding: 'utf8', maxBuffer: 20_000_000 }).stdout ?? '';
+    const body =
+      spawnSync('git', ['show', `${sha}:${file}`], { encoding: 'utf8', maxBuffer: 20_000_000 }).stdout ?? '';
     if (body) points.push({ date, ...countLevels(body) });
   }
   if (fs.existsSync(file)) {
