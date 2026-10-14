@@ -757,6 +757,32 @@ export function renderDashboardHtml(input: DashboardInput): string {
   const kpi = (k: string, v: string, s: string, cls = '') =>
     `<div class="card ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
 
+  // 한 줄 요약(데모·보고용, 2026-10-14). 요약 보기에서는 카드의 설명 글을 숨기고 이 문장들이 맥락을 준다.
+  const productRows = (input.products?.products ?? []).filter(
+    (p) => !p.excluded && !p.product.startsWith('(API)'),
+  );
+  const productsCovered = productRows.filter((p) => p.ui && p.ui.l2 > 0).length;
+  const productIssues = (input.issues ?? []).filter(
+    (i) => i.enabled && i.kind === 'product' && records.some((r) => r.known_issue === i.id),
+  );
+  const consoleOnlyWriteCount = consoleOnly.filter((r) => r.kind === 'write').length;
+  const noApiProducts = new Set(consoleOnly.filter((r) => r.kind === 'no-api-service').map((r) => r.product))
+    .size;
+  const highlights = [
+    `회귀 spec <b>${input.suiteOrder.length}개</b> · 지금 녹색 <b>${greenNow}</b>${
+      lastSuite
+        ? ` · 마지막 전체 스위트 <span class="mono">${esc(lastSuite.suite_id)}</span>: 첫 시도 <b>${lastSuite.first_pass}/${lastSuite.specs}</b> → 최종 <b>${lastSuite.final_pass}/${lastSuite.specs}</b> (${lastSuite.wall_minutes}분, 탭 ${lastSuite.max_tabs}개 병렬)`
+        : ''
+    }`,
+    c
+      ? `콘솔 리소스 <b>${c.resources}종</b> 중 생성·삭제까지 자동화(L2+) <b>${c.at_least_2}종 (${pct(c.at_least_2, c.resources)}%)</b> · 동작·설정까지(L3+) ${c.at_least_3}종 · 상품 ${productRows.length}개 중 ${productsCovered}개에 회귀 spec`
+      : '',
+    opsAll.opsTotal
+      ? `API 자동화와 비교: 리소스 단위 대응 <b>${parityDone}/${parityDenom}</b> · 쓰기 동작 단위 UI <b>${opsAll.uiCovered}</b> / API ${opsAll.apiVerified} (카탈로그 ${opsAll.opsTotal}개)`
+      : '',
+    `실행하며 찾은 것: 제품 결함 <b>${productIssues.length}건</b>${productIssues.length ? ` (${productIssues.map((i) => esc(i.id)).join(', ')})` : ''} · API 카탈로그에 없는 콘솔 전용 쓰기 동작 <b>${consoleOnlyWriteCount}개</b> · 공개 API 없는 상품 ${noApiProducts}개`,
+  ].filter(Boolean);
+
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -817,6 +843,13 @@ export function renderDashboardHtml(input: DashboardInput): string {
   tr.cathead td { background:#f3f4f6; font-weight:600; font-size:12px } tr.total td { font-weight:600; border-top:2px solid var(--line) } .good { color:var(--pass) }
   .trendbox svg .ax { stroke:#9ca3af } .trendbox svg .grid { stroke:#e5e7eb; stroke-dasharray:3 3 } .trendbox svg .s2 { fill:none; stroke:var(--l2); stroke-width:2.5 } .trendbox svg .s3 { fill:none; stroke:var(--l4); stroke-width:2.5 } .trendbox svg .tl { font-size:10px; fill:#6b7280 } .trendbox svg .tv { font-size:10px; fill:#1e40af; font-weight:600 }
   .trendbox { margin:8px 0 16px }
+  .view { margin-left:auto; display:flex; gap:4px; align-self:center } .view button { border:1px solid #374151; background:#1f2937; color:#d1d5db; border-radius:4px; padding:2px 10px; font-size:12px; cursor:pointer } .view button.on { background:#fff; color:#111827; border-color:#fff }
+  ul.hl { margin:0 0 12px; padding:0 0 0 18px; font-size:14px } ul.hl li { margin:3px 0 } ul.hl b { font-weight:600 }
+  /* 요약(데모) 보기: 핵심 섹션만, 설명 글·세부 표는 숨김 */
+  body.demo [data-demo="hide"] { display:none }
+  body.demo h2 small, body.demo .card .s, body.demo #summary .trend, body.demo #summary .legend, body.demo #actions .legend,
+  body.demo #coverage details, body.demo #coverage .legend, body.demo #products details, body.demo #products > p, body.demo #products .legend { display:none }
+  body.demo .card .v { font-size:32px } body.demo ul.hl { font-size:15px } body.demo #suites tbody tr:nth-child(n+6) { display:none } body.demo section { padding:20px 24px }
   @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
 </style>
 </head>
@@ -824,9 +857,10 @@ export function renderDashboardHtml(input: DashboardInput): string {
 <header>
   <div class="top">
     <h1>SCP 콘솔 회귀 대시보드</h1>
+    <span class="view" title="요약: 데모·보고용으로 핵심만 · 전체: 모든 표와 설명"><button data-view="demo">요약</button><button data-view="full">전체</button></span>
     <span class="muted">${lastSuite ? `마지막 스위트 ${esc(lastSuite.suite_id)} · ${esc(fmtTime(lastSuite.started))} · ${lastSuite.specs} spec · 탭 ${lastSuite.max_tabs} · ${lastSuite.wall_minutes}분` : '스위트 요약 없음'} · 마지막 실행 ${lastRun ? esc(fmtTime(lastRun.started)) + ' ' + esc(lastRun.spec) : '없음'} · 생성 ${esc(input.generated)}</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs">spec 상태</a><a href="#failures">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#matrix">상품별 판단표</a><a href="#products">화면 vs API</a><a href="#parity">API 대응</a><a href="#explore">탐색</a><a href="#findings">발견 사항</a><a href="#runs">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs" data-demo="hide">spec 상태</a><a href="#failures" data-demo="hide">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#matrix" data-demo="hide">상품별 판단표</a><a href="#products">화면 vs API</a><a href="#parity" data-demo="hide">API 대응</a><a href="#explore" data-demo="hide">탐색</a><a href="#findings" data-demo="hide">발견 사항</a><a href="#runs" data-demo="hide">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
 <section id="summary">
@@ -865,6 +899,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
         : 'data/api-coverage.json · data/ui-operations.yaml 없음',
     )}
   </div>
+  <ul class="hl">${highlights.map((h) => `<li>${h}</li>`).join('')}</ul>
   <div class="trend">${trend || '<span class="muted">기록 없음</span>'}</div>
   <div class="legend"><span><i style="background:var(--pass)"></i>통과</span><span><i style="background:var(--fail)"></i>실패</span><span class="muted">일별 실행 기록(디버깅 재실행 포함)</span></div>
 </section>
@@ -875,7 +910,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   <p class="legend">${CAUSE_ORDER.map((k) => `<span>${causeBadge(k)}</span>`).join('')}<span class="muted">제품 결함은 data/known-issues.yaml 에 kind: product 로 등록한 것만. 간헐 = 다음 실행(48시간 안)이 통과.</span></p>
 </section>
 
-<section id="specs">
+<section id="specs" data-demo="hide">
   <h2>spec 상태 <small>실행 순서 = src/report/suite.ts · 최근 10회</small></h2>
   <table><thead><tr><th>spec</th><th>결과</th><th>마지막 실행</th><th class="num">소요</th><th>최근 10회</th><th class="num">통과 평균</th></tr></thead>
   <tbody>${input.suiteOrder
@@ -898,7 +933,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   }
 </section>
 
-<section id="failures">
+<section id="failures" data-demo="hide">
   <h2>실패 분류 <small>최근 14일 · 오류 첫 줄의 숫자·이름을 지워 같은 원인끼리 묶음</small></h2>
   ${groupRows ? `<table><thead><tr><th>원인</th><th class="num">건수</th><th>오류 시그니처</th><th>spec</th><th>최근</th><th>첨부</th></tr></thead><tbody>${groupRows}</tbody></table>` : '<p class="muted">최근 14일 실패 없음</p>'}
 </section>
@@ -916,7 +951,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   ${coverageBlock(input)}
 </section>
 
-<section id="matrix">
+<section id="matrix" data-demo="hide">
   <h2>상품별 판단표 — 화면·시나리오·제외 사유 <small>서비스 맵의 상품·화면 전체 기준. 판단은 data/coverage-decisions.yaml 에 "&lt;route&gt;: 해라|제외|보류 | 메모"</small></h2>
   ${matrixBlock(input.matrix ?? [], input.products?.products ?? [], input.operations)}
 </section>
@@ -931,22 +966,22 @@ export function renderDashboardHtml(input: DashboardInput): string {
   )}
 </section>
 
-<section id="parity">
+<section id="parity" data-demo="hide">
   <h2>API 자동화 대비 화면 자동화 <small>리소스 단위 · docs/api-ui-parity.md 의 ✅ 를 UI spec 마지막 실행과 맞춰 다시 판정 — ✅ 통과 확인 · ⚠ 깨짐(spec 마지막 실행 실패) · ❔ 미확인(실행 기록 있는 spec 없음) · 🔧 진행 · ⏭ 제외(이유는 항목별 표). 작업 단위는 위 "화면 vs API"</small></h2>
   ${parityBlock(parity)}
 </section>
 
-<section id="findings">
+<section id="findings" data-demo="hide">
   <h2>탐색 발견 사항 <small>recordings/explore/*/report.md 의 "이상·정보 판정" · 검토 상태는 data/findings.yaml 에 "&lt;id&gt;: 결함|정상|무시 | 메모"</small></h2>
   ${findingsBlock(input.findings ?? [])}
 </section>
 
-<section id="explore">
+<section id="explore" data-demo="hide">
   <h2>탐색(Level 5, Jev) <small>recordings/explore</small></h2>
   ${exploreBlock(input.explores)}
 </section>
 
-<section id="runs">
+<section id="runs" data-demo="hide">
   <h2>실행 기록 <small>최신 ${Math.min(60, records.length)}건 / 전체 ${records.length}건</small></h2>
   <div class="filters">보기:
     <button data-st="all" class="on">전체</button><button data-st="pass">통과</button>${CAUSE_ORDER.map((k) => `<button data-st="${k}">${esc(CAUSE_LABEL[k])}</button>`).join('')}
@@ -961,6 +996,19 @@ export function renderDashboardHtml(input: DashboardInput): string {
 </section>
 </main>
 <script>
+  (function () {
+    // 보기 전환: ?view=full|demo > 저장된 선택 > 기본 요약. 선택은 브라우저에 기억한다.
+    var key = 'scp-dash-view';
+    var q = new URLSearchParams(location.search).get('view');
+    var saved = null; try { saved = localStorage.getItem(key); } catch (e) {}
+    function apply(v) {
+      document.body.classList.toggle('demo', v === 'demo');
+      document.querySelectorAll('.view button').forEach(function (b) { b.classList.toggle('on', b.dataset.view === v); });
+      try { localStorage.setItem(key, v); } catch (e) {}
+    }
+    apply(q === 'full' || q === 'demo' ? q : saved === 'full' ? 'full' : 'demo');
+    document.querySelectorAll('.view button').forEach(function (b) { b.addEventListener('click', function () { apply(b.dataset.view); }); });
+  })();
   document.querySelectorAll('.filters').forEach(function (box) {
     box.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return;

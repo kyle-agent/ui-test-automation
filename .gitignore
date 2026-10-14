@@ -27,3 +27,4 @@ __pycache__/
 reports/suite/
 
 .claude/settings.local.json
+reports/videos/
