@@ -31,7 +31,7 @@ import {
 } from '../src/report/insights';
 import { loadKnownIssues } from '../src/report/known-issues';
 import { failuresTable, fmtTime, knownIssuesSection, resultsTable } from '../src/report/results';
-import { readRunRecords, RUNS_DIR } from '../src/report/run-record';
+import { classifyFailure, readRunRecords, RUNS_DIR } from '../src/report/run-record';
 import { SUITE_ORDER } from '../src/report/suite';
 
 const RESULTS_MD = path.resolve(process.cwd(), 'reports', 'RESULTS.md');
@@ -40,6 +40,15 @@ const DASHBOARD_HTML = path.resolve(process.cwd(), 'reports', 'dashboard.html');
 function main(): void {
   const records = readRunRecords();
   const issues = loadKnownIssues();
+  // 알려진 이슈를 실패 뒤에 등록해도(KI-001, 2026-10-14) 예전 미분류 실패가 다시 분류되게 한다. 기록 파일은 고치지 않고 보고서에서만 재판정.
+  for (const r of records) {
+    if (r.status !== 'fail' || r.class !== 'unclassified' || !r.error) continue;
+    const c = classifyFailure(r.spec, r.error, issues, r.started.slice(0, 10));
+    if (c.known_issue) {
+      r.class = c.class;
+      r.known_issue = c.known_issue;
+    }
+  }
   const map = loadServiceMap();
   const ledger = loadCoverageLedger();
   const errors = validateCoverage(ledger, map, collectSpecIds());

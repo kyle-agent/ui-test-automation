@@ -19,3 +19,13 @@ issues:
     since: 2026-09-23
     note: "예시 항목 (형식 안내용). 실제 항목을 추가할 때 이 줄을 참고하고, 이 항목은 그대로 둔다."
     enabled: false
+  - id: KI-001
+    spec: container.container-registry
+    match: "엔드포인트가 프라이빗 로 바뀌지 않았습니다. 마지막: 프라이빗&퍼블릭"
+    kind: product
+    since: 2026-10-14
+    note: >-
+      Container Registry 퍼블릭 엔드포인트 끄기가 조용히 무시된다. 콘솔이 PUT /console/api/scr/v1/container-registries/{id}/enable-public-endpoint
+      {"public_endpoint_enabled": false} 를 보내고 200 을 받지만(trace 12:23:47) 이후 상세 GET 은 modified_at 만 갱신되고 public_endpoint_enabled 가 true 로 남으며
+      상태도 Editing 을 거치지 않고 Running 그대로다(켤 때는 Editing≈2분 → Running, 값 반영). 10-08 까지 3회 PASS 였고 10-14 스위트 a1·a2 모두 재현(2/2).
+      spec 은 그대로 둔다(결함을 정확히 잡고 있음). 콘솔팀 문의 필요. 근거: reports/runs/20261014-1116-·1218-container.container-registry.json, trace.zip.

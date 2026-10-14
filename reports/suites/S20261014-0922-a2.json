@@ -1,0 +1,17 @@
+{
+  "suite_id": "S20261014-0922",
+  "attempt": 2,
+  "started": "2026-10-14T03:18:08.845Z",
+  "ended": "2026-10-14T03:35:09.180Z",
+  "wall_minutes": 17,
+  "serial_minutes": 14,
+  "max_tabs": 5,
+  "results": [
+    {
+      "spec": "container.container-registry",
+      "status": "fail",
+      "seconds": 762
+    }
+  ],
+  "leftovers_end": []
+}

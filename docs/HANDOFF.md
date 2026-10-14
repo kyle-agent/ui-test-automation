@@ -531,3 +531,7 @@
   IAM DELETE /groups/bulk(?)·POST /policies/compose·decompose·PUT /roles/{id}/trust-policy/principals·DELETE /groups/{id}/policy-bindings(카탈로그는 /{policy_id} 단건),
   Cost Management 예산 POST·PUT·DELETE /budgets(카탈로그는 /budgets/account), Resource Groups POST /resources, ServiceWatch PATCH /event-rules(카탈로그는 /{id}), VM POST /servers/{id}/uploaded-images.
   조회성 POST 5개(cost-analysis/budget·costs/estimate·policies/summary·validate·saml validate-metadata)는 세지 않음.
+- Container Registry 재실행(a2 12:18)도 같은 실패 → trace 로 확인한 **제품 결함 KI-001**(data/known-issues.yaml): 콘솔이 `PUT …/enable-public-endpoint {"public_endpoint_enabled": false}` 를 보내 200 을 받지만
+  상세 GET 의 public_endpoint_enabled 는 true 그대로(modified_at 만 갱신, Editing 단계 없음). 켤 때(true)는 Editing≈2분 → Running 으로 정상 반영. 10-08 까지 3회 PASS → 그 뒤 제품 변경 추정. 콘솔팀 문의 필요.
+  `npm run results` 는 이제 미분류 실패를 현재 known-issues 로 다시 분류한다(기록 파일은 안 고침) — 이슈를 나중에 등록해도 대시보드 "제품 결함" 으로 잡힌다.
+  스위트 최종: **S20261014-0922 60/61**(a1 60 + a2 0), 여전히 실패 1 = KI-001.

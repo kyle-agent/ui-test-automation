@@ -1,0 +1,80 @@
+{
+  "spec": "container.container-registry",
+  "started": "2026-10-14T03:18:10.846Z",
+  "ended": "2026-10-14T03:30:49.098Z",
+  "seconds": 758,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "container.container-registry",
+    "run_id": "1014-1218-4f8c",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.1,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Container Registry 생성 후 해지",
+      "status": "failed",
+      "seconds": 698.7,
+      "annotations": {
+        "scenario": "container.container-registry",
+        "run_id": "1014-1218-4f8c",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] cr101412184f8c 생성",
+          "status": "pass",
+          "seconds": 165.5
+        },
+        {
+          "title": "steps[2] 엔드포인트를 프라이빗 → 프라이빗&퍼블릭으로 바꿔 퍼블릭 엔드포인트가 생기는지 보고 프라이빗으로 되돌린다",
+          "status": "fail",
+          "seconds": 272.1
+        }
+      ],
+      "error": "Error: 엔드포인트가 프라이빗 로 바뀌지 않았습니다. 마지막: 프라이빗&퍼블릭",
+      "attachments": [
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-4.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-1.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-2.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-3.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md",
+        "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip"
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/scr/v1/container-registries",
+    "PUT /console/api/scr/v1/container-registries/{id}/enable-public-endpoint",
+    "DELETE /console/api/scr/v1/container-registries/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 2,
+  "git_sha": "accdac6",
+  "error": "Error: 엔드포인트가 프라이빗 로 바뀌지 않았습니다. 마지막: 프라이빗&퍼블릭",
+  "attachments": [
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-4.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-1.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-2.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-3.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md",
+    "test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip"
+  ]
+}
