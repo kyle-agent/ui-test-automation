@@ -1,0 +1,72 @@
+{
+  "spec": "security.security-group-rule",
+  "started": "2026-10-14T02:52:58.045Z",
+  "ended": "2026-10-14T02:55:29.279Z",
+  "seconds": 151,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "security.security-group-rule",
+    "run_id": "1014-1153-b5eb",
+    "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Security Group 생성 → 규칙 추가·삭제 → 해지",
+      "status": "passed",
+      "seconds": 116.7,
+      "annotations": {
+        "scenario": "security.security-group-rule",
+        "run_id": "1014-1153-b5eb",
+        "title": "Security Group 목록 | Security Group | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Security Group 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.2
+        },
+        {
+          "title": "steps[1] Security Group sg-1014-1153-b5eb 생성",
+          "status": "pass",
+          "seconds": 30.9
+        },
+        {
+          "title": "steps[2] 규칙 추가 (Inbound, 10.250.0.0/24, ALL)",
+          "status": "pass",
+          "seconds": 22.8
+        },
+        {
+          "title": "steps[3] 규칙 삭제",
+          "status": "pass",
+          "seconds": 11.1
+        },
+        {
+          "title": "steps[4] Security Group sg-1014-1153-b5eb 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 24.1
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/security-group/v1/security-groups",
+    "POST /console/api/security-group/v1/security-group-rules/bulk",
+    "DELETE /console/api/security-group/v1/security-group-rules/{id}",
+    "PUT /console/api/security-group/v1/security-groups/{id}",
+    "DELETE /console/api/security-group/v1/security-groups/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

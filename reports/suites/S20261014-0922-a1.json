@@ -1,0 +1,317 @@
+{
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "started": "2026-10-14T00:34:10.022Z",
+  "ended": "2026-10-14T03:13:36.179Z",
+  "wall_minutes": 159,
+  "serial_minutes": 759,
+  "max_tabs": 5,
+  "results": [
+    {
+      "spec": "networking.vpc.create-delete",
+      "status": "pass",
+      "seconds": 97
+    },
+    {
+      "spec": "compute.vm-stack",
+      "status": "pass",
+      "seconds": 1806
+    },
+    {
+      "spec": "compute.vm-volume",
+      "status": "pass",
+      "seconds": 1440
+    },
+    {
+      "spec": "compute.vm-stack-net",
+      "status": "pass",
+      "seconds": 2014
+    },
+    {
+      "spec": "compute.server-group",
+      "status": "pass",
+      "seconds": 124
+    },
+    {
+      "spec": "security.address-group",
+      "status": "pass",
+      "seconds": 185
+    },
+    {
+      "spec": "storage.object-storage-bucket",
+      "status": "pass",
+      "seconds": 146
+    },
+    {
+      "spec": "management.resource-group",
+      "status": "pass",
+      "seconds": 221
+    },
+    {
+      "spec": "iam.user-group",
+      "status": "pass",
+      "seconds": 70
+    },
+    {
+      "spec": "compute.launch-configuration",
+      "status": "pass",
+      "seconds": 86
+    },
+    {
+      "spec": "networking.vpc-port",
+      "status": "pass",
+      "seconds": 1534
+    },
+    {
+      "spec": "networking.private-dns",
+      "status": "pass",
+      "seconds": 382
+    },
+    {
+      "spec": "storage.file-storage",
+      "status": "pass",
+      "seconds": 118
+    },
+    {
+      "spec": "networking.dns-hosted-zone",
+      "status": "pass",
+      "seconds": 739
+    },
+    {
+      "spec": "security.security-group-rule",
+      "status": "pass",
+      "seconds": 157
+    },
+    {
+      "spec": "networking.nat-gateway",
+      "status": "pass",
+      "seconds": 1032
+    },
+    {
+      "spec": "compute.auto-scaling-group",
+      "status": "pass",
+      "seconds": 1221
+    },
+    {
+      "spec": "networking.vpc-peering",
+      "status": "pass",
+      "seconds": 924
+    },
+    {
+      "spec": "container.ske-cluster",
+      "status": "pass",
+      "seconds": 3447
+    },
+    {
+      "spec": "database.postgresql",
+      "status": "pass",
+      "seconds": 3778
+    },
+    {
+      "spec": "database.mysql",
+      "status": "pass",
+      "seconds": 2066
+    },
+    {
+      "spec": "database.mariadb",
+      "status": "pass",
+      "seconds": 2093
+    },
+    {
+      "spec": "database.epas",
+      "status": "pass",
+      "seconds": 1939
+    },
+    {
+      "spec": "database.cachestore",
+      "status": "pass",
+      "seconds": 1949
+    },
+    {
+      "spec": "application-service.queue",
+      "status": "pass",
+      "seconds": 140
+    },
+    {
+      "spec": "management.notification-group",
+      "status": "pass",
+      "seconds": 129
+    },
+    {
+      "spec": "compute.cloud-function",
+      "status": "pass",
+      "seconds": 603
+    },
+    {
+      "spec": "container.container-registry",
+      "status": "fail",
+      "seconds": 1189
+    },
+    {
+      "spec": "iam.role",
+      "status": "pass",
+      "seconds": 148
+    },
+    {
+      "spec": "security.certificate",
+      "status": "pass",
+      "seconds": 105
+    },
+    {
+      "spec": "container.repository",
+      "status": "pass",
+      "seconds": 754
+    },
+    {
+      "spec": "security.kms-key",
+      "status": "pass",
+      "seconds": 162
+    },
+    {
+      "spec": "security.secrets-manager",
+      "status": "pass",
+      "seconds": 216
+    },
+    {
+      "spec": "iam.policy",
+      "status": "pass",
+      "seconds": 220
+    },
+    {
+      "spec": "storage.file-storage-snapshot",
+      "status": "pass",
+      "seconds": 280
+    },
+    {
+      "spec": "management.servicewatch-dashboard",
+      "status": "pass",
+      "seconds": 155
+    },
+    {
+      "spec": "management.servicewatch-log-group",
+      "status": "pass",
+      "seconds": 123
+    },
+    {
+      "spec": "management.servicewatch-event-rule",
+      "status": "pass",
+      "seconds": 86
+    },
+    {
+      "spec": "management.servicewatch-alert",
+      "status": "pass",
+      "seconds": 162
+    },
+    {
+      "spec": "compute.volume-snapshot",
+      "status": "pass",
+      "seconds": 334
+    },
+    {
+      "spec": "management.network-logging",
+      "status": "pass",
+      "seconds": 165
+    },
+    {
+      "spec": "networking.load-balancer",
+      "status": "pass",
+      "seconds": 1884
+    },
+    {
+      "spec": "financial-management.budget",
+      "status": "pass",
+      "seconds": 160
+    },
+    {
+      "spec": "application-service.api-gateway",
+      "status": "pass",
+      "seconds": 912
+    },
+    {
+      "spec": "application-service.messagehub-domain",
+      "status": "pass",
+      "seconds": 93
+    },
+    {
+      "spec": "application-service.messagehub-email",
+      "status": "pass",
+      "seconds": 112
+    },
+    {
+      "spec": "networking.firewall",
+      "status": "pass",
+      "seconds": 391
+    },
+    {
+      "spec": "networking.transit-gateway",
+      "status": "pass",
+      "seconds": 840
+    },
+    {
+      "spec": "networking.vpn",
+      "status": "pass",
+      "seconds": 752
+    },
+    {
+      "spec": "networking.vpc-endpoint",
+      "status": "pass",
+      "seconds": 311
+    },
+    {
+      "spec": "networking.direct-connect",
+      "status": "pass",
+      "seconds": 510
+    },
+    {
+      "spec": "data-analytics.event-streams",
+      "status": "pass",
+      "seconds": 1444
+    },
+    {
+      "spec": "networking.cdn",
+      "status": "pass",
+      "seconds": 1781
+    },
+    {
+      "spec": "networking.gslb",
+      "status": "pass",
+      "seconds": 351
+    },
+    {
+      "spec": "networking.privatelink-service",
+      "status": "pass",
+      "seconds": 1471
+    },
+    {
+      "spec": "networking.cloud-wan-network",
+      "status": "pass",
+      "seconds": 174
+    },
+    {
+      "spec": "networking.cloud-fabric-connect",
+      "status": "pass",
+      "seconds": 335
+    },
+    {
+      "spec": "networking.cloud-lan-data-center",
+      "status": "pass",
+      "seconds": 723
+    },
+    {
+      "spec": "iam.saml-provider",
+      "status": "pass",
+      "seconds": 110
+    },
+    {
+      "spec": "management.trail",
+      "status": "pass",
+      "seconds": 205
+    },
+    {
+      "spec": "devops-tools.devops-service",
+      "status": "pass",
+      "seconds": 142
+    }
+  ],
+  "leftovers_end": []
+}

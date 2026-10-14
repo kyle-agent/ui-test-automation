@@ -12,6 +12,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { shortenIds } from '../console/api-log';
 import { API_CATEGORY, API_SERVICE, type ApiCoverageSnapshot, type ApiOp } from './api-coverage';
 
 export const UI_OPERATIONS_FILE = path.resolve(process.cwd(), 'data', 'ui-operations.yaml');
@@ -217,12 +218,15 @@ export function operationsByCategory(
 // ───────── 콘솔 전용 쓰기 동작 (2026-10-14, 사용자 결정) ─────────
 // 화면이 보낸 쓰기 요청(RunRecord.api_writes, 통과한 실행만) 중 API 카탈로그(ops[].path)에 없는 경로.
 // 모수 881 에는 넣지 않고 따로 센다 — "API 자동화 대비" 비교 가능성을 지키면서 콘솔에만 있는 동작을 드러낸다.
+// 콘솔 경로의 서비스 세그먼트(/console/api/<svc>/)는 카탈로그 서비스 slug 와 같다(2026-10-14 전체 스위트로 확인) → 같은 서비스 안에서만 맞춘다.
+
+export type ConsoleOnlyKind = 'write' | 'read-like' | 'no-api-service';
 
 export interface ConsoleOnlyWrite {
   method: string;
   /** 콘솔 접두어(/console/api/<서비스>)를 뗀 경로. 예 /v1/firewalls/rules/bulk */
   path: string;
-  /** 콘솔 경로의 서비스 세그먼트 */
+  /** 콘솔 경로의 서비스 세그먼트(= 카탈로그 slug) */
   service: string;
   /** 서비스 → 화면 상품(없으면 서비스 slug 그대로) */
   product: string;
@@ -231,30 +235,48 @@ export interface ConsoleOnlyWrite {
   /** 마지막으로 본 실행 시작 시각 */
   last_seen: string;
   /**
-   * true: 카탈로그 경로의 {…} 자리에 콘솔이 {id} 가 아닌 글자 세그먼트(예 bulk)를 보냈을 때만 맞는다 — 콘솔 전용(일괄 처리 등)일 가능성이 커 목록에 "?" 로 올린다.
-   * false: 어떤 카탈로그 경로와도 맞지 않는다.
+   * true: 카탈로그 경로의 {…} 자리에 콘솔이 식별자로 보이지 않는 글자 세그먼트(예 bulk)를 보냈을 때만 맞는다 — 콘솔 전용(일괄 처리 등)일 가능성이 커 "?" 로 올린다.
+   * false: 같은 서비스의 어떤 카탈로그 경로와도 맞지 않는다.
    */
   loose: boolean;
   /**
    * write: 콘솔 전용 쓰기 동작으로 센다.
-   * read-like: 경로에 조회 낱말(search·query·analysis·list·check …)이 있어 POST 로 보내는 조회로 본다(콘솔 홈 예산 위젯 POST /cost-analysis/budget 등). 접힌 목록에만 둔다.
+   * read-like: POST 인데 경로에 조회 낱말(search·query·analysis·list·check …)이 있어 조회로 본다(콘솔 홈 예산 위젯 POST /cost-analysis/budget 등). 접힌 목록에만.
+   * no-api-service: 그 서비스가 카탈로그에 아예 없다(Object Storage·Cloud LAN-DC·Cloud Fabric Connect·Cloud WAN·Notification Manager, 2026-10-14) — 상품 단위로 따로 보여 준다.
    */
-  kind: 'write' | 'read-like';
+  kind: ConsoleOnlyKind;
 }
 
 /** POST 지만 조회로 보이는 경로 낱말(세그먼트 어디든). 콘솔은 목록·검색·통계를 POST 로 자주 보낸다 */
 export const READ_LIKE_PATH =
   /(search|query|queries|list|analysis|analytics|statistic|summary|summaries|count|check|validat|duplicat|export|download|preview|estimat|price|pricing|usage|history|histories|log|metric|chart|graph|report)/i;
 
+/** 카탈로그에 없는 콘솔 서비스 세그먼트 → 상품 이름 */
+export const CONSOLE_ONLY_SERVICE: Record<string, string> = {
+  clandc: 'Cloud LAN-Data Center',
+  'cloud-fabric-connect': 'Cloud Fabric Connect',
+  cloudwan: 'Cloud WAN',
+  objectstorage: 'Object Storage',
+  notification: 'Notification Manager',
+};
+
 /** `METHOD /console/api/<svc>/v1/…` → { method, service, path }. 콘솔 API 가 아니면 null */
 export function splitConsoleWrite(write: string): { method: string; service: string; path: string } | null {
   const m = /^([A-Z]+) \/console\/api\/([^/]+)(\/.*)$/.exec(write);
-  return m ? { method: m[1]!, service: m[2]!, path: m[3]! } : null;
+  return m ? { method: m[1]!, service: m[2]!, path: shortenIds(m[3]!) } : null;
 }
+
+const isParam = (seg: string) => /^\{.*\}$/.test(seg);
+/** 카탈로그 파라미터 이름이 식별자를 뜻하는가({vpc_id}·{srn}·{resource_identifier}). {region}·{stage_name}·{method_type}·{key} 는 이름·낱말이 올 수 있다 */
+const isIdParam = (seg: string) => /^\{(id|.*_id|.*srn|.*identifier|.*uuid)\}$/i.test(seg);
+/** 콘솔 세그먼트가 식별자로 보이는가: {id} 이거나 숫자·대문자가 섞였거나 길다 */
+const isIdLike = (seg: string) => seg === '{id}' || /\d|[A-Z]/.test(seg) || seg.length >= 20;
 
 /**
  * 카탈로그 경로 `/v1/vpcs/{vpc_id}` 와 화면 경로 `/v1/vpcs/{id}` 가 같은가.
- * strict(기본): 카탈로그 {…} 는 콘솔 {id} 와만 맞고 나머지는 글자 그대로. loose: {…} 가 아무 세그먼트와 맞는다(bulk 같은 글자가 id 자리에 온 경우까지).
+ * strict(기본): 글자 세그먼트는 그대로 같아야 하고, 카탈로그 {…} 는 — 식별자 파라미터({…_id}·{srn})면 식별자로 보이는 세그먼트({id}·숫자/대문자 포함·긴 것)와만,
+ *   이름·낱말 파라미터({region}·{stage_name}·{method_type})면 아무 세그먼트와 — 맞는다.
+ * loose: {…} 가 아무 세그먼트와 맞는다(bulk 같은 글자가 id 자리에 온 경우까지).
  */
 export function pathMatches(
   catalogPath: string,
@@ -264,10 +286,9 @@ export function pathMatches(
   const a = catalogPath.split('/').filter(Boolean);
   const b = consolePath.split('/').filter(Boolean);
   if (a.length !== b.length) return false;
-  const isParam = (seg: string) => /^\{.*\}$/.test(seg);
   return a.every((seg, i) => {
     const c = b[i]!;
-    if (isParam(seg)) return mode === 'loose' || isParam(c);
+    if (isParam(seg)) return mode === 'loose' || !isIdParam(seg) || isIdLike(c);
     return seg.toLowerCase() === c.toLowerCase();
   });
 }
@@ -276,24 +297,36 @@ export function consoleOnlyWrites(
   api: ApiCoverageSnapshot | null,
   records: readonly { spec: string; status: string; started: string; api_writes?: string[] }[],
 ): ConsoleOnlyWrite[] {
-  // 메서드별 카탈로그 경로(읽기 동작 포함 — POST 조회가 카탈로그에 있으면 콘솔 전용이 아니다)
-  const byMethod = new Map<string, string[]>();
-  for (const s of api?.services ?? [])
+  // 서비스별·메서드별 카탈로그 경로(읽기 동작 포함 — POST 조회가 카탈로그에 있으면 콘솔 전용이 아니다)
+  const byService = new Map<string, Map<string, string[]>>();
+  let anyPath = false;
+  for (const s of api?.services ?? []) {
+    const m = new Map<string, string[]>();
     for (const o of s.ops ?? []) {
       if (!o.path) continue;
+      anyPath = true;
       const k = o.method.toUpperCase();
-      byMethod.set(k, [...(byMethod.get(k) ?? []), o.path]);
+      m.set(k, [...(m.get(k) ?? []), o.path]);
     }
-  if (!byMethod.size) return [];
+    byService.set(s.service, m);
+  }
+  if (!anyPath) return [];
   const out = new Map<string, ConsoleOnlyWrite>();
   for (const r of records) {
     if (r.status !== 'pass' || !r.api_writes?.length) continue;
     for (const w of r.api_writes) {
       const c = splitConsoleWrite(w);
       if (!c) continue;
-      const candidates = byMethod.get(c.method) ?? [];
-      if (candidates.some((p) => pathMatches(p, c.path, 'strict'))) continue;
-      const loose = candidates.some((p) => pathMatches(p, c.path, 'loose'));
+      const svc = byService.get(c.service);
+      let kind: ConsoleOnlyKind = 'write';
+      let loose = false;
+      if (!svc) kind = 'no-api-service';
+      else {
+        const candidates = svc.get(c.method) ?? [];
+        if (candidates.some((p) => pathMatches(p, c.path, 'strict'))) continue;
+        loose = candidates.some((p) => pathMatches(p, c.path, 'loose'));
+        if (c.method === 'POST' && READ_LIKE_PATH.test(c.path)) kind = 'read-like';
+      }
       const key = `${c.method} ${c.service} ${c.path}`;
       const row =
         out.get(key) ??
@@ -301,11 +334,11 @@ export function consoleOnlyWrites(
           method: c.method,
           path: c.path,
           service: c.service,
-          product: opsProductOf(c.service) ?? c.service,
+          product: CONSOLE_ONLY_SERVICE[c.service] ?? opsProductOf(c.service) ?? c.service,
           specs: [],
           last_seen: r.started,
           loose,
-          kind: c.method === 'POST' && READ_LIKE_PATH.test(c.path) ? 'read-like' : 'write',
+          kind,
         } satisfies ConsoleOnlyWrite);
       if (!row.specs.includes(r.spec)) row.specs.push(r.spec);
       if (r.started > row.last_seen) row.last_seen = r.started;

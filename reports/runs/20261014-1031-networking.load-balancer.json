@@ -1,0 +1,130 @@
+{
+  "spec": "networking.load-balancer",
+  "started": "2026-10-14T01:31:59.703Z",
+  "ended": "2026-10-14T02:03:07.181Z",
+  "seconds": 1867,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.load-balancer",
+    "run_id": "1014-1032-ea9f",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Load Balancer → LB 헬스 체크 → LB 서버 그룹 → Listener → Public NAT IP 연결·해제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1779.5,
+      "annotations": {
+        "scenario": "networking.load-balancer",
+        "run_id": "1014-1032-ea9f",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Load Balancer 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.2
+        },
+        {
+          "title": "steps[1] VPC · Subnet 준비",
+          "status": "pass",
+          "seconds": 291.9
+        },
+        {
+          "title": "steps[2] Load Balancer lb-1014-1032-ea9f 생성",
+          "status": "pass",
+          "seconds": 110.2
+        },
+        {
+          "title": "steps[3] LB 헬스 체크 lbhc-1014-1032-ea9f 생성",
+          "status": "pass",
+          "seconds": 56.9
+        },
+        {
+          "title": "steps[4] LB 서버 그룹 lbsg-1014-1032-ea9f 생성",
+          "status": "pass",
+          "seconds": 37.7
+        },
+        {
+          "title": "steps[5] Listener lbls-1014-1032-ea9f 생성 (TCP 80)",
+          "status": "pass",
+          "seconds": 42.7
+        },
+        {
+          "title": "steps[6] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 66.8
+        },
+        {
+          "title": "steps[7] Public NAT IP 123.41.34.163 연결",
+          "status": "pass",
+          "seconds": 33.8
+        },
+        {
+          "title": "steps[8] Public NAT IP 해제",
+          "status": "pass",
+          "seconds": 26
+        },
+        {
+          "title": "steps[9] LB 헬스 체크 lbhc-1014-1032-ea9f 탐지 횟수 3→5·설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 96.1
+        },
+        {
+          "title": "steps[10] LB 서버 그룹 lbsg-1014-1032-ea9f 설정 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 114.6
+        },
+        {
+          "title": "steps[11] Listener lbls-1014-1032-ea9f 설정 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 106.3
+        },
+        {
+          "title": "steps[12] Load Balancer lb-1014-1032-ea9f 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 20.7
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "POST /console/api/vpc/v1/subnets",
+    "POST /console/api/costexplorer/v1/costs/estimate",
+    "POST /console/api/loadbalancer/v1/loadbalancers",
+    "POST /console/api/loadbalancer/v1/lb-health-checks",
+    "POST /console/api/loadbalancer/v1/lb-server-groups",
+    "POST /console/api/loadbalancer/v1/lb-listeners",
+    "POST /console/api/vpc/v1/internet-gateways",
+    "POST /console/api/vpc/v1/publicips",
+    "POST /console/api/loadbalancer/v1/loadbalancers/{id}/static-nats",
+    "DELETE /console/api/loadbalancer/v1/loadbalancers/{id}/static-nats",
+    "PUT /console/api/loadbalancer/v1/lb-health-checks/{id}",
+    "PUT /console/api/loadbalancer/v1/lb-server-groups/{id}",
+    "PUT /console/api/loadbalancer/v1/lb-listeners/{id}/resource",
+    "PUT /console/api/loadbalancer/v1/loadbalancers/{id}",
+    "DELETE /console/api/loadbalancer/v1/lb-listeners/{id}",
+    "DELETE /console/api/loadbalancer/v1/lb-server-groups/{id}",
+    "DELETE /console/api/loadbalancer/v1/lb-health-checks/{id}",
+    "DELETE /console/api/loadbalancer/v1/loadbalancers/{id}",
+    "DELETE /console/api/vpc/v1/publicips/{id}",
+    "DELETE /console/api/vpc/v1/internet-gateways/{id}",
+    "DELETE /console/api/vpc/v1/subnets/{id}",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

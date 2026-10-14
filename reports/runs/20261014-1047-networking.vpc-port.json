@@ -1,0 +1,124 @@
+{
+  "spec": "networking.vpc-port",
+  "started": "2026-10-14T01:47:53.861Z",
+  "ended": "2026-10-14T02:13:23.252Z",
+  "seconds": 1529,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc-port",
+    "run_id": "1014-1048-3aa1",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → Port 생성 → Virtual IP 예약 · Port 연결 · Public NAT IP 연결 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1470.6,
+      "annotations": {
+        "scenario": "networking.vpc-port",
+        "run_id": "1014-1048-3aa1",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 7.6
+        },
+        {
+          "title": "steps[1] VPC vpc-1014-1048-3aa1 생성",
+          "status": "pass",
+          "seconds": 26.2
+        },
+        {
+          "title": "steps[2] Subnet sub-1014-1048-3aa1 생성",
+          "status": "pass",
+          "seconds": 504.8
+        },
+        {
+          "title": "steps[3] Port port-1014-1048-3aa1 생성",
+          "status": "pass",
+          "seconds": 28.1
+        },
+        {
+          "title": "steps[4] Internet Gateway · Public IP 준비",
+          "status": "pass",
+          "seconds": 80.9
+        },
+        {
+          "title": "steps[5] Virtual IP 예약 (vip-1014-1048-3aa1)",
+          "status": "pass",
+          "seconds": 26.1
+        },
+        {
+          "title": "steps[6] VIP 10.250.0.123 에 Port port-1014-1048-3aa1 연결",
+          "status": "pass",
+          "seconds": 31.3
+        },
+        {
+          "title": "steps[7] VIP Public NAT IP 123.41.35.218 연결",
+          "status": "pass",
+          "seconds": 23.9
+        },
+        {
+          "title": "steps[8] VIP Public NAT IP 해제 → VIP 설명 수정·되돌림 (L3, setsubnetvip)",
+          "status": "pass",
+          "seconds": 40.4
+        },
+        {
+          "title": "steps[9] Port port-1014-1048-3aa1 연결 해제",
+          "status": "pass",
+          "seconds": 17.3
+        },
+        {
+          "title": "steps[10] VIP 10.250.0.123 반납",
+          "status": "pass",
+          "seconds": 36.4
+        },
+        {
+          "title": "steps[11] Subnet · Port · IGW · Public IP 상세 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 124.5
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "POST /console/api/vpc/v1/subnets",
+    "POST /console/api/vpc/v1/ports",
+    "POST /console/api/vpc/v1/internet-gateways",
+    "POST /console/api/costexplorer/v1/costs/estimate",
+    "POST /console/api/vpc/v1/publicips",
+    "POST /console/api/vpc/v1/subnets/{id}/vips",
+    "POST /console/api/vpc/v1/subnets/{id}/vips/{id}/connected-ports",
+    "POST /console/api/vpc/v1/subnets/{id}/vips/{id}/static-nat-ips",
+    "DELETE /console/api/vpc/v1/subnets/{id}/vips/{id}/static-nat-ips/{id}",
+    "PUT /console/api/vpc/v1/subnets/{id}/vips/{id}",
+    "DELETE /console/api/vpc/v1/subnets/{id}/vips/{id}/connected-ports/{id}",
+    "DELETE /console/api/vpc/v1/subnets/{id}/vips/{id}",
+    "PUT /console/api/vpc/v1/subnets/{id}",
+    "PUT /console/api/vpc/v1/ports/{id}",
+    "PUT /console/api/vpc/v1/internet-gateways/{id}",
+    "PUT /console/api/vpc/v1/publicips/{id}",
+    "DELETE /console/api/vpc/v1/ports/{id}",
+    "DELETE /console/api/vpc/v1/publicips/{id}",
+    "DELETE /console/api/vpc/v1/internet-gateways/{id}",
+    "DELETE /console/api/vpc/v1/subnets/{id}",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

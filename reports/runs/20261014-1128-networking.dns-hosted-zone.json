@@ -1,0 +1,80 @@
+{
+  "spec": "networking.dns-hosted-zone",
+  "started": "2026-10-14T02:28:13.695Z",
+  "ended": "2026-10-14T02:40:26.972Z",
+  "seconds": 733,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.dns-hosted-zone",
+    "run_id": "1014-1128-7643",
+    "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 11.8,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Private DNS → Hosted Zone(Private) 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 693.3,
+      "annotations": {
+        "scenario": "networking.dns-hosted-zone",
+        "run_id": "1014-1128-7643",
+        "title": "Private DNS 목록 | DNS | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Private DNS 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.5
+        },
+        {
+          "title": "steps[1] Private DNS pdns-1014-1128-7643 생성",
+          "status": "pass",
+          "seconds": 229.5
+        },
+        {
+          "title": "steps[2] Hosted Zone hz-1014-1128-7643.com 생성",
+          "status": "pass",
+          "seconds": 42
+        },
+        {
+          "title": "steps[3] 레코드 www.hz-1014-1128-7643.com A 192.0.2.10 추가",
+          "status": "pass",
+          "seconds": 45.5
+        },
+        {
+          "title": "steps[4] 레코드 www 삭제",
+          "status": "pass",
+          "seconds": 44.1
+        },
+        {
+          "title": "steps[5] Hosted Zone hz-1014-1128-7643.com · Private DNS pdns-1014-1128-7643 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 139.5
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/dns/v1/private-dns",
+    "POST /console/api/dns/v1/hosted-zones",
+    "POST /console/api/dns/v1/hosted-zones/{id}/records",
+    "DELETE /console/api/dns/v1/hosted-zones/{id}/records/{id}",
+    "PUT /console/api/dns/v1/hosted-zones/{id}",
+    "PUT /console/api/dns/v1/private-dns/{id}",
+    "DELETE /console/api/dns/v1/hosted-zones/{id}",
+    "DELETE /console/api/dns/v1/private-dns/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

@@ -1,0 +1,81 @@
+{
+  "spec": "iam.role",
+  "started": "2026-10-14T02:48:28.552Z",
+  "ended": "2026-10-14T02:50:50.883Z",
+  "seconds": 142,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.role",
+    "run_id": "1014-1148-b132",
+    "title": "역할 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 10.7,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 역할 생성 후 삭제",
+      "status": "passed",
+      "seconds": 113.5,
+      "annotations": {
+        "scenario": "iam.role",
+        "run_id": "1014-1148-b132",
+        "title": "역할 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 역할 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6
+        },
+        {
+          "title": "steps[1] role-1014-1148-b132 생성",
+          "status": "pass",
+          "seconds": 22.8
+        },
+        {
+          "title": "steps[2] 정책 탭에서 기본 정책 CostNavigatorReadOnlyAccess 를 연결했다가 연결 해제한다",
+          "status": "pass",
+          "seconds": 15.6
+        },
+        {
+          "title": "steps[3] 수행 주체에 서비스 cloudscope.samsungsdscloud.com 을 추가했다가 제거한다",
+          "status": "pass",
+          "seconds": 17.1
+        },
+        {
+          "title": "steps[4] 최대 세션 지속 시간을 1시간 → 2시간으로 수정하고 상세에 반영됐는지 확인한다",
+          "status": "pass",
+          "seconds": 7
+        },
+        {
+          "title": "steps[5] 태그 탭에서 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 18.8
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/iam/v1/roles",
+    "POST /console/api/iam/v1/policies/list",
+    "POST /console/api/iam/v1/roles/{id}/policy-bindings",
+    "DELETE /console/api/iam/v1/roles/{id}/policy-bindings",
+    "PUT /console/api/iam/v1/roles/{id}/trust-policy/principals",
+    "PUT /console/api/iam/v1/roles/{id}",
+    "PUT /console/api/resourcemanager/v1/tags/global/iam/role/{id}/bulk",
+    "DELETE /console/api/resourcemanager/v1/tags/global/iam/role/{id}",
+    "DELETE /console/api/iam/v1/roles/bulk"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

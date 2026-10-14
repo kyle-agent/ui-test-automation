@@ -151,7 +151,36 @@ test.describe('동작 단위 커버리지', () => {
     });
     expect(splitConsoleWrite('POST /sso/login')).toBeNull();
     expect(pathMatches('/v1/vpcs/{vpc_id}', '/v1/vpcs/{id}')).toBe(true);
-    expect(pathMatches('/v1/firewalls/rules/{firewall_rule_id}', '/v1/firewalls/rules/bulk')).toBe(false); // strict: {…} 는 {id} 와만
+    expect(pathMatches('/v1/firewalls/rules/{firewall_rule_id}', '/v1/firewalls/rules/bulk')).toBe(false); // strict: 식별자 파라미터는 식별자꼴과만
+    expect(
+      pathMatches(
+        '/v1/apis/{api_id}/stages/{stage_name}/config',
+        '/v1/apis/{id}/stages/stg-1014-1128-f0b5/config',
+      ),
+    ).toBe(true); // 이름 파라미터는 아무 세그먼트
+    expect(
+      pathMatches(
+        '/v1/apis/{api_id}/resources/{resource_id}/methods/{method_type}',
+        '/v1/apis/{id}/resources/{id}/methods/GET',
+      ),
+    ).toBe(true);
+    expect(
+      pathMatches(
+        '/v1/tags/{region}/{service}/{resource_type}/{resource_identifier}',
+        '/v1/tags/global/iam/role/{id}',
+      ),
+    ).toBe(true);
+    expect(
+      splitConsoleWrite(
+        'PUT /console/api/resourcemanager/v1/tags/c3JuOmU6OjE3ZTY0MjIzOTg4YjQxNDY5YTY1NjJlNGZmY2E5YmM0OmtyLXdlc3QxOjprbXM6a21zLzg0M2MwZDIyNWI4YzQwMmNiYTQ5MWJlNmU3MjhjMDU3/bulk',
+      )?.path,
+    ).toBe('/v1/tags/{id}/bulk');
+    expect(splitConsoleWrite('DELETE /console/api/scr/v1/container-registries/pjkpjr{id}')?.path).toBe(
+      '/v1/container-registries/{id}',
+    );
+    expect(splitConsoleWrite('DELETE /console/api/objectstorage/v1/buckets/bkt-1014-1207-31bd')?.path).toBe(
+      '/v1/buckets/{id}',
+    );
     expect(pathMatches('/v1/firewalls/rules/{firewall_rule_id}', '/v1/firewalls/rules/bulk', 'loose')).toBe(
       true,
     );
@@ -221,11 +250,25 @@ test.describe('동작 단위 커버리지', () => {
         started: '2026-10-14T03:00:00Z',
         api_writes: ['POST /console/api/ske/v1/only-in-failed-run'],
       },
+      {
+        spec: 'storage.object-storage-bucket',
+        status: 'pass',
+        started: '2026-10-14T04:00:00Z',
+        api_writes: [
+          'POST /console/api/objectstorage/v1/buckets',
+          'PUT /console/api/objectstorage/v1/buckets/bkt-1014-1207-31bd/versioning',
+        ],
+      },
     ]);
-    expect(rows.map((r) => `${r.method} ${r.path} <- ${r.specs.join(',')}${r.loose ? ' ?' : ''}`)).toEqual([
-      'DELETE /v1/firewalls/rules/bulk <- networking.firewall ?', // deletefirewallrule 의 {id} 자리에 bulk → 느슨한 일치 = 콘솔 전용 의심
-      'PUT /v1/clusters/{id}/service-watch-logging <- container.ske-cluster',
+    expect(
+      rows.map((r) => `${r.method} ${r.path} <- ${r.specs.join(',')}${r.loose ? ' ?' : ''} [${r.kind}]`),
+    ).toEqual([
+      'DELETE /v1/firewalls/rules/bulk <- networking.firewall ? [write]', // deletefirewallrule 의 {id} 자리에 bulk → 느슨한 일치 = 콘솔 전용 의심
+      'PUT /v1/clusters/{id}/service-watch-logging <- container.ske-cluster [write]',
+      'POST /v1/buckets <- storage.object-storage-bucket [no-api-service]', // objectstorage 는 카탈로그에 서비스가 없다
+      'PUT /v1/buckets/{id}/versioning <- storage.object-storage-bucket [no-api-service]',
     ]);
+    expect(rows[2]!.product).toBe('Object Storage');
     expect(rows[1]!.product).toBe('Kubernetes Engine');
     expect(
       consoleOnlyWrites(snap([ske]), [

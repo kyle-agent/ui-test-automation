@@ -1,0 +1,100 @@
+{
+  "spec": "networking.direct-connect",
+  "started": "2026-10-14T02:36:07.684Z",
+  "ended": "2026-10-14T02:44:32.567Z",
+  "seconds": 505,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.direct-connect",
+    "run_id": "1014-1136-f293",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 15.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Direct Connect 생성 → 라우팅 규칙 추가·삭제 → Private NAT 생성·삭제 → 역순 삭제",
+      "status": "passed",
+      "seconds": 459.1,
+      "annotations": {
+        "scenario": "networking.direct-connect",
+        "run_id": "1014-1136-f293",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Direct Connect 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.7
+        },
+        {
+          "title": "steps[1] VPC vpc-1014-1136-f293 생성",
+          "status": "pass",
+          "seconds": 26.5
+        },
+        {
+          "title": "steps[2] Direct Connect dc-1014-1136-f293 생성",
+          "status": "pass",
+          "seconds": 42.4
+        },
+        {
+          "title": "steps[3] 규칙 추가 (원격지 11.11.11.0/24)",
+          "status": "pass",
+          "seconds": 50.2
+        },
+        {
+          "title": "steps[4] 규칙 삭제",
+          "status": "pass",
+          "seconds": 58.6
+        },
+        {
+          "title": "steps[5] Private NAT pnat-1014-1136-f293 생성 (연결 자원 dc-1014-1136-f293)",
+          "status": "pass",
+          "seconds": 78
+        },
+        {
+          "title": "steps[6] Private NAT pnat-1014-1136-f293 설명 수정·되돌림 + IP 관리에서 NAT IP 192.168.100.10 추가·삭제 (L3)",
+          "status": "pass",
+          "seconds": 75.3
+        },
+        {
+          "title": "steps[7] Private NAT pnat-1014-1136-f293 삭제",
+          "status": "pass",
+          "seconds": 51.9
+        },
+        {
+          "title": "steps[8] Direct Connect dc-1014-1136-f293 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 19
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "POST /console/api/costexplorer/v1/costs/estimate",
+    "POST /console/api/direct-connect/v1/direct-connects",
+    "POST /console/api/direct-connect/v1/direct-connects/{id}/routing-rules",
+    "DELETE /console/api/direct-connect/v1/direct-connects/{id}/routing-rules/{id}",
+    "POST /console/api/vpc/v1/private-nats",
+    "PUT /console/api/vpc/v1/private-nats/{id}",
+    "POST /console/api/vpc/v1/private-nats/{id}/private-nat-ips",
+    "DELETE /console/api/vpc/v1/private-nats/{id}/private-nat-ips/{id}",
+    "DELETE /console/api/vpc/v1/private-nats/{id}",
+    "PUT /console/api/direct-connect/v1/direct-connects/{id}",
+    "DELETE /console/api/direct-connect/v1/direct-connects/{id}",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

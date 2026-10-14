@@ -102,6 +102,18 @@ function main(): void {
         `| ${r.product} | ${r.method} | \`${r.path}\`${r.loose ? ' ?' : ''} | ${r.specs.join(', ')} | ${fmtTime(r.last_seen).slice(0, 10)} |`,
       );
   }
+  const noApi = consoleOnly.filter((r) => r.kind === 'no-api-service');
+  if (noApi.length) {
+    out.push('');
+    out.push('API 카탈로그에 서비스 자체가 없는 상품(콘솔로만 다루는 상품, 모수 밖):');
+    out.push('');
+    const byProd = new Map<string, typeof noApi>();
+    for (const r of noApi) byProd.set(r.product, [...(byProd.get(r.product) ?? []), r]);
+    for (const [prod, list] of byProd)
+      out.push(
+        `- ${prod}: ${list.map((r) => '`' + r.method + ' ' + r.path + '`').join(', ')} — ${[...new Set(list.flatMap((r) => r.specs))].join(', ')}`,
+      );
+  }
   const readLike = consoleOnly.filter((r) => r.kind === 'read-like');
   if (readLike.length) {
     out.push('');

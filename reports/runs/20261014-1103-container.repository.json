@@ -1,0 +1,88 @@
+{
+  "spec": "container.repository",
+  "started": "2026-10-14T02:03:43.607Z",
+  "ended": "2026-10-14T02:16:13.126Z",
+  "seconds": 750,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "container.repository",
+    "run_id": "1014-1104-aaff",
+    "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 20.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "Registry 위에 Repository 생성 후 역순 삭제",
+      "status": "passed",
+      "seconds": 695.2,
+      "annotations": {
+        "scenario": "container.repository",
+        "run_id": "1014-1104-aaff",
+        "title": "Registry 목록 | Container Registry | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] Registry 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 8.5
+        },
+        {
+          "title": "steps[1] Registry cr10141104aaff 생성",
+          "status": "pass",
+          "seconds": 186.9
+        },
+        {
+          "title": "steps[2] Repository repo-1014-1104-aaff 생성",
+          "status": "pass",
+          "seconds": 27.7
+        },
+        {
+          "title": "steps[3] 이미지 태그 삭제 정책(Untagged Image 90일 + 삭제 정책 활성화)을 켰다가 끈다",
+          "status": "pass",
+          "seconds": 67.7
+        },
+        {
+          "title": "steps[4] 이미지 잠금 여부를 Lock 으로 바꿨다가 Unlock 으로 되돌린다",
+          "status": "pass",
+          "seconds": 41.8
+        },
+        {
+          "title": "steps[5] 설명을 수정하고 태그 qa-tag={{run_id}} 를 추가했다가 삭제한다",
+          "status": "pass",
+          "seconds": 44.9
+        },
+        {
+          "title": "steps[6] 이미지 pull 제한(스캔되지 않은 이미지)과 이미지 자동 스캔을 켰다가 끈다",
+          "status": "pass",
+          "seconds": 88.9
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/scr/v1/container-registries",
+    "POST /console/api/scr/v1/repositories",
+    "PUT /console/api/scr/v1/repositories/{id}/lifecycle-policy",
+    "PUT /console/api/scr/v1/repositories/{id}/lock-policy",
+    "PUT /console/api/scr/v1/repositories/{id}/description",
+    "PUT /console/api/resourcemanager/v1/tags/c3JuOmU6OjE3ZTY0MjIzOTg4YjQxNDY5YTY1NjJlNGZmY2E5YmM0OmtyLXdlc3QxOjpzY3I6cmVwb3NpdG9yeS85YjdjOGMzOGNhY2E0MzcyOWIyNjhhNTNkYWMwMmI5Mw==/bulk",
+    "DELETE /console/api/resourcemanager/v1/tags/c3JuOmU6OjE3ZTY0MjIzOTg4YjQxNDY5YTY1NjJlNGZmY2E5YmM0OmtyLXdlc3QxOjpzY3I6cmVwb3NpdG9yeS85YjdjOGMzOGNhY2E0MzcyOWIyNjhhNTNkYWMwMmI5Mw==",
+    "PUT /console/api/scr/v1/repositories/{id}/pull-policy",
+    "PUT /console/api/scr/v1/repositories/{id}/scan-policy",
+    "DELETE /console/api/scr/v1/repositories/{id}",
+    "DELETE /console/api/scr/v1/container-registries/pjkpjr{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}

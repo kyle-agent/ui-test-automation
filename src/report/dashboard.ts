@@ -281,6 +281,20 @@ function consoleOnlyBlock(all: readonly ConsoleOnlyWrite[], anyRecorded: boolean
     return '<p class="muted">아직 쓰기 요청을 기록한 실행이 없음 — 2026-10-14 이후 실행부터 모든 spec 이 기록한다(src/fixtures/test.ts).</p>';
   const rows = all.filter((r) => r.kind === 'write');
   const readLike = all.filter((r) => r.kind === 'read-like');
+  const noApi = all.filter((r) => r.kind === 'no-api-service');
+  const noApiByProduct = new Map<string, ConsoleOnlyWrite[]>();
+  for (const r of noApi) noApiByProduct.set(r.product, [...(noApiByProduct.get(r.product) ?? []), r]);
+  const noApiBlock = noApi.length
+    ? `<h4>API 카탈로그에 서비스 자체가 없는 상품 <small>콘솔로만 다루는 상품 · 쓰기 요청 ${noApi.length}개 · 모수 밖</small></h4>
+      <table class="compact"><thead><tr><th>상품</th><th class="num">쓰기 경로</th><th>경로</th><th>spec</th></tr></thead><tbody>${[
+        ...noApiByProduct,
+      ]
+        .map(
+          ([prod, list]) =>
+            `<tr><td>${esc(prod)}</td><td class="num">${list.length}</td><td class="mono small">${list.map((r) => `${esc(r.method)} ${esc(r.path)}`).join('<br>')}</td><td class="small">${[...new Set(list.flatMap((r) => r.specs))].map((x) => `<span class="mono">${esc(x)}</span>`).join(' · ')}</td></tr>`,
+        )
+        .join('')}</tbody></table>`
+    : '';
   const readLikeBlock = readLike.length
     ? `<details><summary>POST 지만 조회로 보이는 경로 ${readLike.length}개(세지 않음 · 경로에 search·query·analysis·list·check 등)</summary><ul class="small mono">${readLike
         .map(
@@ -300,7 +314,7 @@ function consoleOnlyBlock(all: readonly ConsoleOnlyWrite[], anyRecorded: boolean
     )
     .join('');
   return `<p>${rows.length}개 · 상품 ${byProduct.size}개: ${[...byProduct].map(([p, l]) => `${esc(p)} ${l.length}`).join(' · ')}</p>
-    <table class="compact"><thead><tr><th>상품</th><th>메서드</th><th>경로(콘솔 접두어 제외)</th><th>spec</th><th>마지막</th></tr></thead><tbody>${body}</tbody></table>${readLikeBlock}`;
+    <table class="compact"><thead><tr><th>상품</th><th>메서드</th><th>경로(콘솔 접두어 제외)</th><th>spec</th><th>마지막</th></tr></thead><tbody>${body}</tbody></table>${noApiBlock}${readLikeBlock}`;
 }
 
 const PARITY_MARK: Record<ParityJudged['effective'], string> = {
@@ -847,7 +861,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
         ? `${opsAll.apiVerified ? pct(opsAll.uiCovered, opsAll.apiVerified) : 0}% <span class="s">${opsAll.uiCovered}/${opsAll.apiVerified}</span>`
         : '-',
       opsAll.opsTotal
-        ? `API 카탈로그 쓰기 동작 ${opsAll.opsTotal} 중 UI ${opsAll.uiCovered} (${pct(opsAll.uiCovered, opsAll.opsTotal)}%) · API 자동화 ${opsAll.apiVerified} (${pct(opsAll.apiVerified, opsAll.opsTotal)}%) · 통과한 spec 만 집계 · <a href="#console-only">콘솔 전용 +${consoleOnly.filter((r) => r.kind === 'write').length}</a>(모수 밖)`
+        ? `API 카탈로그 쓰기 동작 ${opsAll.opsTotal} 중 UI ${opsAll.uiCovered} (${pct(opsAll.uiCovered, opsAll.opsTotal)}%) · API 자동화 ${opsAll.apiVerified} (${pct(opsAll.apiVerified, opsAll.opsTotal)}%) · 통과한 spec 만 집계 · <a href="#console-only">콘솔 전용 +${consoleOnly.filter((r) => r.kind === 'write').length}</a>(모수 밖${consoleOnly.some((r) => r.kind === 'no-api-service') ? ` · API 없는 상품 ${new Set(consoleOnly.filter((r) => r.kind === 'no-api-service').map((r) => r.product)).size}개` : ''})`
         : 'data/api-coverage.json · data/ui-operations.yaml 없음',
     )}
   </div>

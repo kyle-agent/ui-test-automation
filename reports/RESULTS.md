@@ -1,72 +1,72 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 08:58, 실행 기록 677건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 12:19, 실행 기록 738건.
 
 ## 1. spec 별 최근 상태
 
 | spec | 마지막 실행 | 결과 | 소요 | 최근 5회 | 통과 평균 |
 | --- | --- | --- | ---: | --- | ---: |
-| networking.vpc.create-delete | 2026-10-14 08:52 | PASS | 55초 | PPPPP | 55초 |
-| compute.vm-stack | 2026-10-08 10:46 | PASS | 25분 31초 | PPPPP | 19분 16초 |
-| compute.vm-volume | 2026-10-08 11:11 | PASS | 18분 52초 | PPFPP | 18분 20초 |
-| compute.vm-stack-net | 2026-10-08 11:00 | PASS | 27분 24초 | PPFPP | 22분 10초 |
-| compute.server-group | 2026-10-13 09:29 | PASS | 2분 13초 | PPPPP | 1분 44초 |
-| security.address-group | 2026-10-13 10:11 | PASS | 2분 19초 | PPPFP | 2분 6초 |
-| storage.object-storage-bucket | 2026-10-13 09:30 | PASS | 2분 56초 | FPPPP | 2분 6초 |
-| management.resource-group | 2026-10-13 09:15 | PASS | 3분 30초 | PPPPP | 1분 49초 |
-| iam.user-group | 2026-10-13 09:31 | PASS | 1분 16초 | PPPPP | 1분 5초 |
-| compute.launch-configuration | 2026-10-13 09:30 | PASS | 1분 12초 | PPPPP | 1분 35초 |
-| networking.vpc-port | 2026-10-13 10:25 | PASS | 20분 36초 | PPPPP | 14분 49초 |
-| networking.private-dns | 2026-10-13 09:16 | PASS | 6분 17초 | FPPPP | 6분 16초 |
-| storage.file-storage | 2026-10-13 09:27 | PASS | 1분 44초 | PPPPP | 3분 6초 |
-| networking.dns-hosted-zone | 2026-10-13 10:25 | PASS | 10분 48초 | PPPFP | 7분 53초 |
-| security.security-group-rule | 2026-10-13 09:58 | PASS | 4분 47초 | PPPPP | 3분 16초 |
-| networking.nat-gateway | 2026-10-13 11:03 | PASS | 14분 12초 | PPPFP | 14분 30초 |
-| compute.auto-scaling-group | 2026-10-08 11:27 | PASS | 19분 49초 | PPFPP | 15분 0초 |
-| networking.vpc-peering | 2026-10-13 10:35 | PASS | 14분 32초 | PPPPP | 13분 24초 |
-| container.ske-cluster | 2026-10-13 14:26 | PASS | 40분 41초 | FFFFP | 30분 19초 |
-| database.postgresql | 2026-10-08 10:00 | PASS | 63분 27초 | FFFPP | 34분 34초 |
-| database.mysql | 2026-10-08 10:00 | PASS | 35분 12초 | FPPPP | 26분 43초 |
-| database.mariadb | 2026-10-08 10:00 | PASS | 33분 25초 | PPPPP | 25분 40초 |
-| database.epas | 2026-10-08 10:01 | PASS | 33분 52초 | PPPPP | 25분 36초 |
-| database.cachestore | 2026-10-08 10:34 | PASS | 32분 6초 | PPPPP | 21분 12초 |
-| application-service.queue | 2026-10-13 09:15 | PASS | 2분 18초 | FFFPP | 2분 4초 |
-| management.notification-group | 2026-10-13 09:17 | PASS | 1분 49초 | PPPPP | 1분 43초 |
-| compute.cloud-function | 2026-10-13 08:57 | PASS | 8분 18초 | FFFPP | 4분 27초 |
-| container.container-registry | 2026-10-08 11:30 | PASS | 12분 14초 | PFPPP | 9분 28초 |
-| iam.role | 2026-10-13 09:13 | PASS | 2분 59초 | PPPPP | 2분 21초 |
-| security.certificate | 2026-10-13 09:18 | PASS | 2분 26초 | PFPPP | 1분 48초 |
-| container.repository | 2026-10-08 11:12 | PASS | 12분 47초 | PPFPP | 9분 58초 |
-| security.kms-key | 2026-10-13 09:19 | PASS | 2분 50초 | PFFPP | 2분 55초 |
-| security.secrets-manager | 2026-10-13 09:19 | PASS | 3분 34초 | FPPPP | 2분 23초 |
-| iam.policy | 2026-10-13 09:19 | PASS | 3분 51초 | PPPPP | 3분 19초 |
-| storage.file-storage-snapshot | 2026-10-13 09:14 | PASS | 3분 59초 | PFPPP | 3분 30초 |
-| management.servicewatch-dashboard | 2026-10-13 09:21 | PASS | 2분 58초 | PPFPP | 2분 1초 |
-| management.servicewatch-log-group | 2026-10-13 09:21 | PASS | 2분 2초 | FPPPP | 1분 44초 |
-| management.servicewatch-event-rule | 2026-10-13 09:23 | PASS | 1분 54초 | PPPPP | 1분 44초 |
-| management.servicewatch-alert | 2026-10-13 09:23 | PASS | 2분 57초 | FPFPP | 2분 12초 |
-| compute.volume-snapshot | 2026-10-13 09:08 | PASS | 5분 40초 | PFFPP | 4분 21초 |
-| management.network-logging | 2026-10-13 09:23 | PASS | 2분 56초 | FPPPP | 2분 31초 |
-| networking.load-balancer | 2026-10-13 11:02 | PASS | 29분 44초 | FPPPP | 24분 22초 |
-| financial-management.budget | 2026-10-13 09:24 | PASS | 2분 38초 | FPPPP | 2분 23초 |
-| application-service.api-gateway | 2026-10-08 11:34 | PASS | 12분 14초 | FFFPP | 9분 15초 |
-| application-service.messagehub-domain | 2026-10-13 09:24 | PASS | 1분 28초 | FPPPP | 1분 23초 |
-| application-service.messagehub-email | 2026-10-13 09:25 | PASS | 1분 43초 | PPPPP | 1분 59초 |
-| networking.firewall | 2026-10-14 08:52 | PASS | 5분 19초 | PPPPP | 5분 32초 |
-| networking.transit-gateway | 2026-10-13 10:49 | PASS | 13분 7초 | PPPPP | 12분 38초 |
-| networking.vpn | 2026-10-13 08:57 | PASS | 11분 2초 | FPPPP | 9분 33초 |
-| networking.vpc-endpoint | 2026-10-13 09:10 | PASS | 4분 35초 | PPPPP | 4분 49초 |
-| networking.direct-connect | 2026-10-13 10:25 | PASS | 9분 19초 | PFPPP | 6분 24초 |
-| data-analytics.event-streams | 2026-10-08 10:35 | PASS | 24분 53초 | FPPPP | 21분 10초 |
-| networking.cdn | 2026-10-13 10:36 | PASS | 32분 30초 | FPPPP | 29분 43초 |
-| networking.gslb | 2026-10-13 10:14 | PASS | 4분 35초 | PPPFP | 2분 57초 |
-| networking.privatelink-service | 2026-10-08 11:11 | PASS | 21분 37초 | FFPPP | 19분 25초 |
-| networking.cloud-wan-network | 2026-10-13 09:26 | PASS | 2분 35초 | FPPPP | 1분 50초 |
-| networking.cloud-fabric-connect | 2026-10-13 09:14 | PASS | 5분 2초 | FPFPP | 3분 4초 |
-| networking.cloud-lan-data-center | 2026-10-13 08:57 | PASS | 9분 8초 | FPPPP | 7분 16초 |
-| iam.saml-provider | 2026-10-13 09:26 | PASS | 1분 36초 | PPFPP | 1분 23초 |
-| management.trail | 2026-10-13 09:26 | PASS | 3분 8초 | PPPPP | 2분 50초 |
-| devops-tools.devops-service | 2026-10-13 09:27 | PASS | 2분 17초 | PPFPP | 1분 44초 |
+| networking.vpc.create-delete | 2026-10-14 12:05 | PASS | 1분 32초 | PPPPP | 58초 |
+| compute.vm-stack | 2026-10-14 10:33 | PASS | 30분 1초 | PPPPP | 20분 10초 |
+| compute.vm-volume | 2026-10-14 10:39 | PASS | 23분 54초 | PFPPP | 18분 57초 |
+| compute.vm-stack-net | 2026-10-14 10:37 | PASS | 33분 30초 | PFPPP | 23분 25초 |
+| compute.server-group | 2026-10-14 12:06 | PASS | 2분 0초 | PPPPP | 1분 46초 |
+| security.address-group | 2026-10-14 12:04 | PASS | 2분 59초 | PPFPP | 2분 11초 |
+| storage.object-storage-bucket | 2026-10-14 12:07 | PASS | 2분 22초 | PPPPP | 2분 8초 |
+| management.resource-group | 2026-10-14 11:52 | PASS | 3분 37초 | PPPPP | 1분 59초 |
+| iam.user-group | 2026-10-14 12:07 | PASS | 1분 6초 | PPPPP | 1분 5초 |
+| compute.launch-configuration | 2026-10-14 12:07 | PASS | 1분 22초 | PPPPP | 1분 34초 |
+| networking.vpc-port | 2026-10-14 10:47 | PASS | 25분 29초 | PPPPP | 15분 53초 |
+| networking.private-dns | 2026-10-14 11:41 | PASS | 6분 12초 | PPPPP | 6분 16초 |
+| storage.file-storage | 2026-10-14 12:05 | PASS | 1분 53초 | PPPPP | 2분 59초 |
+| networking.dns-hosted-zone | 2026-10-14 11:28 | PASS | 12분 13초 | PPFPP | 8분 17초 |
+| security.security-group-rule | 2026-10-14 11:52 | PASS | 2분 31초 | PPPPP | 3분 11초 |
+| networking.nat-gateway | 2026-10-14 11:10 | PASS | 17분 6초 | PPFPP | 14분 49초 |
+| compute.auto-scaling-group | 2026-10-14 11:04 | PASS | 20분 17초 | PFPPP | 15분 27초 |
+| networking.vpc-peering | 2026-10-14 11:13 | PASS | 15분 20초 | PPPPP | 13분 36초 |
+| container.ske-cluster | 2026-10-14 09:34 | PASS | 57분 23초 | FFFPP | 32분 46초 |
+| database.postgresql | 2026-10-14 09:34 | PASS | 62분 54초 | FFPPP | 37분 9초 |
+| database.mysql | 2026-10-14 09:34 | PASS | 34분 21초 | PPPPP | 27분 40초 |
+| database.mariadb | 2026-10-14 09:35 | PASS | 34분 44초 | PPPPP | 26분 48초 |
+| database.epas | 2026-10-14 09:35 | PASS | 32분 13초 | PPPPP | 26분 26초 |
+| database.cachestore | 2026-10-14 10:07 | PASS | 32분 24초 | PPPPP | 22분 36초 |
+| application-service.queue | 2026-10-14 11:55 | PASS | 2분 14초 | FFPPP | 2분 5초 |
+| management.notification-group | 2026-10-14 11:55 | PASS | 2분 5초 | PPPPP | 1분 45초 |
+| compute.cloud-function | 2026-10-14 11:38 | PASS | 9분 57초 | FFPPP | 4분 57초 |
+| container.container-registry | 2026-10-14 11:16 | FAIL(unclassified) | 19분 44초 | FPPPF | 9분 28초 |
+| iam.role | 2026-10-14 11:48 | PASS | 2분 22초 | PPPPP | 2분 21초 |
+| security.certificate | 2026-10-14 11:56 | PASS | 1분 40초 | FPPPP | 1분 47초 |
+| container.repository | 2026-10-14 11:03 | PASS | 12분 30초 | PFPPP | 10분 14초 |
+| security.kms-key | 2026-10-14 11:56 | PASS | 2분 37초 | FFPPP | 2분 53초 |
+| security.secrets-manager | 2026-10-14 11:56 | PASS | 3분 29초 | PPPPP | 2분 31초 |
+| iam.policy | 2026-10-14 11:57 | PASS | 3분 36초 | PPPPP | 3분 22초 |
+| storage.file-storage-snapshot | 2026-10-14 11:50 | PASS | 4분 34초 | FPPPP | 3분 37초 |
+| management.servicewatch-dashboard | 2026-10-14 11:58 | PASS | 2분 30초 | PFPPP | 2분 5초 |
+| management.servicewatch-log-group | 2026-10-14 11:58 | PASS | 1분 58초 | PPPPP | 1분 46초 |
+| management.servicewatch-event-rule | 2026-10-14 11:59 | PASS | 1분 21초 | PPPPP | 1분 40초 |
+| management.servicewatch-alert | 2026-10-14 12:00 | PASS | 2분 37초 | PFPPP | 2분 15초 |
+| compute.volume-snapshot | 2026-10-14 11:44 | PASS | 5분 28초 | FFPPP | 4분 28초 |
+| management.network-logging | 2026-10-14 12:00 | PASS | 2분 40초 | PPPPP | 2분 32초 |
+| networking.load-balancer | 2026-10-14 10:31 | PASS | 31분 7초 | PPPPP | 25분 7초 |
+| financial-management.budget | 2026-10-14 12:01 | PASS | 2분 36초 | PPPPP | 2분 25초 |
+| application-service.api-gateway | 2026-10-14 11:27 | PASS | 15분 7초 | FFPPP | 9분 50초 |
+| application-service.messagehub-domain | 2026-10-14 12:01 | PASS | 1분 27초 | PPPPP | 1분 23초 |
+| application-service.messagehub-email | 2026-10-14 12:01 | PASS | 1분 46초 | PPPPP | 1분 57초 |
+| networking.firewall | 2026-10-14 11:43 | PASS | 6분 25초 | PPPPP | 5분 39초 |
+| networking.transit-gateway | 2026-10-14 11:24 | PASS | 13분 55초 | PPPPP | 12분 47초 |
+| networking.vpn | 2026-10-14 11:28 | PASS | 12분 27초 | PPPPP | 9분 55초 |
+| networking.vpc-endpoint | 2026-10-14 11:47 | PASS | 5분 4초 | PPPPP | 4분 51초 |
+| networking.direct-connect | 2026-10-14 11:36 | PASS | 8분 25초 | FPPPP | 6분 36초 |
+| data-analytics.event-streams | 2026-10-14 10:09 | PASS | 23분 48초 | PPPPP | 21분 30초 |
+| networking.cdn | 2026-10-14 10:10 | PASS | 29분 30초 | PPPPP | 29분 41초 |
+| networking.gslb | 2026-10-14 11:49 | PASS | 5분 43초 | PPFPP | 3분 11초 |
+| networking.privatelink-service | 2026-10-14 11:03 | PASS | 24분 25초 | FPPPP | 20분 15초 |
+| networking.cloud-wan-network | 2026-10-14 12:02 | PASS | 2분 46초 | PPPPP | 1분 56초 |
+| networking.cloud-fabric-connect | 2026-10-14 11:50 | PASS | 5분 29초 | PFPPP | 3분 22초 |
+| networking.cloud-lan-data-center | 2026-10-14 11:40 | PASS | 11분 56초 | PPPPP | 7분 56초 |
+| iam.saml-provider | 2026-10-14 12:03 | PASS | 1분 43초 | PFPPP | 1분 26초 |
+| management.trail | 2026-10-14 12:03 | PASS | 3분 20초 | PPPPP | 2분 55초 |
+| devops-tools.devops-service | 2026-10-14 12:03 | PASS | 2분 17초 | PFPPP | 1분 51초 |
 | container.ske-upgrade | 2026-10-07 12:29 | PASS | 39분 29초 | FFPP | 41분 46초 |
 | database.searchengine | 2026-09-28 16:04 | FAIL(unclassified) | 1분 20초 | F | - |
 
@@ -76,6 +76,7 @@
 
 | 실행 | spec | class | 오류 | 첨부 |
 | --- | --- | --- | --- | --- |
+| 2026-10-14 11:16 | container.container-registry | unclassified | Error: 엔드포인트가 프라이빗 로 바뀌지 않았습니다. 마지막: 프라이빗&퍼블릭 | `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-2.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-8.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-7.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-1.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-3.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-4.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-5.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-6.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/screenshot-container.container-registry.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/test-failed-9.png`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/error-context.md`, `test-results/artifacts/container.container-registry/container.container-regist-57e13--Container-Registry-생성-후-해지-regression/trace.zip` |
 | 2026-10-13 13:38 | container.ske-cluster | unclassified | Error: 수정 모달이 90초 안에 닫히지 않았습니다: Security Group 선택 서버에 적용할 Security Group을 검색하여 선택하세요. 최대 4개까지 선택이 가능합니다. 적용할 Security Group이 없는 경우 별도로 Security Group을 생성 후 새로고침 | `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/error-context.md` |
 | 2026-10-13 12:14 | container.ske-cluster | unclassified | Error: Security Group 수정 모달에 sgb-1013-1214-a7d7 행이 없습니다 | `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/error-context.md`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip` |
 | 2026-10-13 11:25 | container.ske-cluster | unclassified | Error: 수정 모달이 90초 안에 닫히지 않았습니다: 알림 Kubernetes API 에 대한 외부 접근이 가능합니다. 외부 접근이 필요하지 않다면, '사용' 체크를 해지하여 보안 위협을 최소화해주세요. 진행하시겠습니까? 취소 확인 | `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-2.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/test-failed-1.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/screenshot-container.ske-cluster.png`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/error-context.md`, `test-results/artifacts/container.ske-cluster/container.ske-cluster-VPC--610b7-etes-Engine-클러스터-생성-후-역순-해지-regression/trace.zip` |
@@ -85,7 +86,6 @@
 | 2026-10-13 10:01 | networking.dns-hosted-zone | unclassified | Error: 레코드 탭에 수정 버튼이 없습니다: ["Hosted Zone 삭제","삭제","상세 검색","레코드 추가"] | `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-2.png`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-1.png`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-3.png`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/screenshot-networking.dns-hosted-zone.png`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/test-failed-4.png`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/error-context.md`, `test-results/artifacts/networking.dns-hosted-zone/networking.dns-hosted-zone-fa6c6-ted-Zone-Private-생성-후-역순-삭제-regression/trace.zip` |
 | 2026-10-13 09:55 | security.address-group | unclassified | TimeoutError: locator.click: Timeout 15000ms exceeded. | `test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-2.png`, `test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/test-failed-1.png`, `test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/screenshot-simple-crud.ts.png`, `test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/error-context.md`, `test-results/artifacts/security.address-group/security.address-group-Add-f70db--후-삭제-Address-Group-생성-후-삭제-regression/trace.zip` |
 | 2026-10-07 18:41 | container.repository | unclassified | Error: PROBE END | `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-14.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-5.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-4.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-11.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-6.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-3.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-9.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-2.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-8.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-1.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-10.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-13.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-12.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/test-failed-7.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/screenshot-container.repository.png`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/error-context.md`, `test-results/artifacts/container.repository/container.repository-Regis-249ea-ry-위에-Repository-생성-후-역순-삭제-regression/trace.zip` |
-| 2026-10-07 18:36 | compute.vm-volume | unclassified | TimeoutError: locator.click: Timeout 15000ms exceeded. | `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-3.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-2.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-1.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-7.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-14.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-4.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-9.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-5.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-6.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-13.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-8.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-11.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-12.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/test-failed-10.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/screenshot-compute.vm-volume.png`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/error-context.md`, `test-results/artifacts/compute.vm-volume/compute.vm-volume-Virtual--ddb2f-lock-Storage-볼륨-생성·연결·분리·삭제-regression/trace.zip` |
 
 ## 3. 알려진 이슈
 
@@ -124,7 +124,27 @@ level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 
 
 | 상품 | 메서드 | 경로 | spec | 마지막 |
 | --- | --- | --- | --- | --- |
+| Cost Management | DELETE | `/v1/budgets` | financial-management.budget | 2026-10-14 |
+| Cost Management | POST | `/v1/budgets` | financial-management.budget | 2026-10-14 |
+| Cost Management | PUT | `/v1/budgets/{id}` | financial-management.budget | 2026-10-14 |
 | Firewall | POST | `/v1/firewalls/rules/bulk` | networking.firewall | 2026-10-14 |
 | Firewall | PUT | `/v1/firewalls/rules/bulk` ? | networking.firewall | 2026-10-14 |
+| IAM | DELETE | `/v1/groups/{id}/policy-bindings` | iam.policy | 2026-10-14 |
+| IAM | DELETE | `/v1/groups/bulk` ? | iam.policy, iam.user-group | 2026-10-14 |
+| IAM | POST | `/v1/policies/compose` | iam.policy | 2026-10-14 |
+| IAM | POST | `/v1/policies/decompose` | iam.policy | 2026-10-14 |
+| IAM | PUT | `/v1/roles/{id}/trust-policy/principals` | iam.role | 2026-10-14 |
+| Resource Groups | POST | `/v1/resources` | management.resource-group | 2026-10-14 |
+| Security Group | POST | `/v1/security-group-rules/bulk` | security.security-group-rule | 2026-10-14 |
+| ServiceWatch | PATCH | `/v1/event-rules` | management.servicewatch-event-rule | 2026-10-14 |
+| Virtual Server | POST | `/v1/servers/{id}/uploaded-images` | compute.vm-stack | 2026-10-14 |
 
-POST 지만 조회로 보이는 경로(세지 않음) 1개: `POST /v1/cost-analysis/budget`
+API 카탈로그에 서비스 자체가 없는 상품(콘솔로만 다루는 상품, 모수 밖):
+
+- Cloud Fabric Connect: `POST /v1/connections`, `DELETE /v1/connections/{id}`, `PUT /v1/connections/{id}`, `POST /v1/fabrics`, `DELETE /v1/fabrics/{id}`, `PUT /v1/fabrics/{id}`, `POST /v1/policies`, `DELETE /v1/policies/{id}`, `PUT /v1/policies/{id}` — networking.cloud-fabric-connect
+- Cloud LAN-Data Center: `POST /v1/cable`, `DELETE /v1/cable/{id}`, `POST /v1/device`, `DELETE /v1/device/{id}`, `POST /v1/network`, `DELETE /v1/network/{id}` — networking.cloud-lan-data-center
+- Cloud WAN: `POST /v1/networks`, `DELETE /v1/networks/{id}`, `PUT /v1/networks/{id}/description` — networking.cloud-wan-network
+- Notification Manager: `DELETE /v1/receiver-groups`, `POST /v1/receiver-groups`, `PUT /v1/receiver-groups/{id}` — management.notification-group
+- Object Storage: `POST /v1/buckets`, `DELETE /v1/buckets/{id}`, `POST /v1/buckets/{id}/folder`, `DELETE /v1/buckets/{id}/objects`, `POST /v1/buckets/{id}/presigned-url`, `PUT /v1/buckets/{id}/versioning` — management.network-logging, management.trail, storage.object-storage-bucket
+
+POST 지만 조회로 보이는 경로(세지 않음) 5개: `POST /v1/cost-analysis/budget`, `POST /v1/costs/estimate`, `POST /v1/policies/summary`, `POST /v1/policies/validate`, `POST /v1/saml-providers/validate-metadata`

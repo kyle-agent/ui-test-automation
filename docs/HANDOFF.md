@@ -521,3 +521,13 @@
 - "마지막 스위트 첫 시도" 카드: S20261008-0951 1차가 2시간 한도로 죽어 요약 파일(a1.json)이 없었고 2차 42/42 만 보였다. `synthesizeSuiteSummaries` 가 요약 파일 없는 시도를
   실행 기록(suite_id·attempt)으로 채우고, 첫 시도 = **spec 별로 그 스위트에서 처음 나온 결과**가 pass 인 수(분모 = 모든 시도 spec 합집합) → 61/61. 카드 설명에 "a1 는 요약 파일 없이 실행 기록으로 채움" 표시.
 - 대응표 ✅ 실행 연동(`judgeParity`)은 9.18 보충 참고. 카드 두 장 모두 "(리소스 단위 · 실행 연동)" / "(작업 단위 · API 대비)" 로 단위를 이름에 적었다.
+- 10-14 전체 스위트 S20261014-0922(a1, 5탭, 159분 — DBaaS 5종·SKE 57분 포함): **60/61**, 잔여 0. 유일한 실패 container.container-registry(엔드포인트 프라이빗&퍼블릭 → 프라이빗 되돌림이 2분 안에 상세에 반영 안 됨, 10-08 까지 3회 PASS) → a2 재실행.
+  콘솔 홈 공지(10-14 갱신): **2026-10-20 22:00~24:00 KST 네트워크 상품(VPC·Subnet·SG·포트) 생성·변경·삭제 불가** — 그 시간대 스위트 금지.
+- 콘솔 전용 표를 첫 전체 스위트(63 실행 전부 api_writes 기록)로 다듬음: 처음엔 73행(태그 경로의 base64 SRN, `stg-1014-…`·`bkt-…` 같은 이름, `pjkpjr{id}` 접두 id 가 {id} 로 안 줄어 행이 쪼개짐; 다른 서비스 경로와 우연히 맞음).
+  고친 것 — `shortenIds` 가 base64(32자+)·run_id 이름·{id} 섞인 세그먼트·숫자를 {id} 로; 같은 서비스 안에서만 맞춤(콘솔 `/console/api/<svc>/` = 카탈로그 slug, 34개 서비스 전부 일치 확인);
+  strict 는 파라미터 이름이 식별자꼴({…_id}·{srn}·{…identifier})일 때만 식별자꼴 세그먼트를 요구하고 {region}·{stage_name}·{method_type} 는 아무 세그먼트 허용;
+  카탈로그에 서비스가 없는 5개(Object Storage · Cloud LAN-DC · Cloud Fabric Connect · Cloud WAN · Notification Manager)는 `no-api-service` 로 상품 단위 표.
+  결과 **콘솔 전용 쓰기 14개**: Firewall 규칙 생성 POST /firewalls/rules/bulk(카탈로그는 단건 POST /rules)·수정 PUT …/bulk(?), Security Group 규칙 POST /security-group-rules/bulk,
+  IAM DELETE /groups/bulk(?)·POST /policies/compose·decompose·PUT /roles/{id}/trust-policy/principals·DELETE /groups/{id}/policy-bindings(카탈로그는 /{policy_id} 단건),
+  Cost Management 예산 POST·PUT·DELETE /budgets(카탈로그는 /budgets/account), Resource Groups POST /resources, ServiceWatch PATCH /event-rules(카탈로그는 /{id}), VM POST /servers/{id}/uploaded-images.
+  조회성 POST 5개(cost-analysis/budget·costs/estimate·policies/summary·validate·saml validate-metadata)는 세지 않음.

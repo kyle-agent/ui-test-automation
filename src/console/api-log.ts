@@ -24,11 +24,25 @@ export function writeRequestOf(req: Request): string | null {
   return `${method} ${shortenIds(path)}`;
 }
 
-/** UUID(하이픈 유무)·24자 이상 16진수 → {id}. 숫자만인 세그먼트도 {id} (일부 서비스의 숫자 id) */
+/**
+ * 경로 세그먼트의 식별자를 {id} 로 줄인다(멱등 — 기록할 때와 분석할 때 둘 다 거친다).
+ *   UUID(하이픈 유무)·24자 이상 16진수 · 숫자만 · base64 SRN(태그 경로, 32자 이상) · 테스트 리소스 이름(xxx-MMDD-HHMM-hhhh)
+ *   · {id} 가 섞인 세그먼트(pjkpjr{id}, RECEIVER-GROUP-{id}, ipr-{id}-acl-…) 는 통째로 {id}
+ */
 export function shortenIds(path: string): string {
   return path
-    .replace(/[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}|[0-9a-f]{24,}/gi, '{id}')
-    .replace(/\/\d+(?=\/|$)/g, '/{id}');
+    .split('/')
+    .map((seg) => {
+      if (!seg) return seg;
+      const s = seg
+        .replace(/[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}|[0-9a-f]{24,}/gi, '{id}')
+        .replace(/[a-z]+\d*-\d{4}-\d{4}-[0-9a-f]{4}/gi, '{id}');
+      if (s === '{id}' || s.includes('{id}')) return '{id}';
+      if (/^\d+$/.test(s)) return '{id}';
+      if (s.length >= 32 && /^[A-Za-z0-9+/=_-]+$/.test(s) && /\d/.test(s)) return '{id}'; // base64 SRN
+      return s;
+    })
+    .join('/');
 }
 
 export async function logWriteRequests(page: Page, log: (line: string) => void): Promise<void> {

@@ -1,0 +1,99 @@
+{
+  "spec": "networking.privatelink-service",
+  "started": "2026-10-14T02:03:23.993Z",
+  "ended": "2026-10-14T02:27:48.977Z",
+  "seconds": 1465,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.privatelink-service",
+    "run_id": "1014-1103-7487",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → PrivateLink Service → PrivateLink Endpoint 연결 요청 · 승인 → 역순 삭제",
+      "status": "passed",
+      "seconds": 1404.7,
+      "annotations": {
+        "scenario": "networking.privatelink-service",
+        "run_id": "1014-1103-7487",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] PrivateLink Service 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 11.8
+        },
+        {
+          "title": "steps[1] VPC vpc-1014-1103-7487 · Subnet sub-1014-1103-7487 생성",
+          "status": "pass",
+          "seconds": 500.1
+        },
+        {
+          "title": "steps[2] PrivateLink Service pls-1014-1103-7487 생성",
+          "status": "pass",
+          "seconds": 85.2
+        },
+        {
+          "title": "steps[3] PrivateLink Endpoint ple-1014-1103-7487 생성 (연결 요청)",
+          "status": "pass",
+          "seconds": 24
+        },
+        {
+          "title": "steps[4] 연결 요청 승인 → Endpoint Active",
+          "status": "pass",
+          "seconds": 49.7
+        },
+        {
+          "title": "steps[5] Endpoint ple-1014-1103-7487 · Service pls-1014-1103-7487 설명 수정 → 반영 확인 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 54.5
+        },
+        {
+          "title": "steps[6] 연결 관리: 연결 차단 → Disconnected 반영 → 재연결 → Active (L3)",
+          "status": "pass",
+          "seconds": 75
+        },
+        {
+          "title": "steps[7] PrivateLink Endpoint ple-1014-1103-7487 삭제",
+          "status": "pass",
+          "seconds": 78.9
+        },
+        {
+          "title": "steps[8] PrivateLink Service pls-1014-1103-7487 삭제",
+          "status": "pass",
+          "seconds": 74.8
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "POST /console/api/vpc/v1/subnets",
+    "POST /console/api/vpc/v1/privatelink-services",
+    "POST /console/api/vpc/v1/privatelink-endpoints",
+    "PUT /console/api/vpc/v1/privatelink-endpoints/{id}/approval",
+    "PUT /console/api/vpc/v1/privatelink-endpoints/{id}",
+    "PUT /console/api/vpc/v1/privatelink-services/{id}",
+    "PUT /console/api/vpc/v1/privatelink-endpoints/{id}/connection",
+    "DELETE /console/api/vpc/v1/privatelink-endpoints/{id}",
+    "DELETE /console/api/vpc/v1/privatelink-services/{id}",
+    "DELETE /console/api/vpc/v1/subnets/{id}",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "suite_id": "S20261014-0922",
+  "attempt": 1,
+  "git_sha": "f529b88"
+}
