@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 21:41, 실행 기록 741건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-15 08:58, 실행 기록 742건.
 
 ## 1. spec 별 최근 상태
 
@@ -55,7 +55,7 @@
 | networking.firewall | 2026-10-14 11:43 | PASS | 6분 25초 | PPPPP | 5분 39초 |
 | networking.transit-gateway | 2026-10-14 11:24 | PASS | 13분 55초 | PPPPP | 12분 47초 |
 | networking.vpn | 2026-10-14 11:28 | PASS | 12분 27초 | PPPPP | 9분 55초 |
-| networking.vpc-endpoint | 2026-10-14 11:47 | PASS | 5분 4초 | PPPPP | 4분 51초 |
+| networking.vpc-endpoint | 2026-10-14 21:39 | PASS | 5분 37초 | PPPPP | 4분 57초 |
 | networking.direct-connect | 2026-10-14 11:36 | PASS | 8분 25초 | FPPPP | 6분 36초 |
 | data-analytics.event-streams | 2026-10-14 10:09 | PASS | 23분 48초 | PPPPP | 21분 30초 |
 | networking.cdn | 2026-10-14 10:10 | PASS | 29분 30초 | PPPPP | 29분 41초 |

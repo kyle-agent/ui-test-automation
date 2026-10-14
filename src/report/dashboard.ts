@@ -846,7 +846,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   .view { margin-left:auto; display:flex; gap:4px; align-self:center } .view button { border:1px solid #374151; background:#1f2937; color:#d1d5db; border-radius:4px; padding:2px 10px; font-size:12px; cursor:pointer } .view button.on { background:#fff; color:#111827; border-color:#fff }
   ul.hl { margin:0 0 12px; padding:0 0 0 18px; font-size:14px } ul.hl li { margin:3px 0 } ul.hl b { font-weight:600 }
   /* 요약(데모) 보기: 핵심 섹션만, 설명 글·세부 표는 숨김 */
-  body.demo [data-demo="hide"] { display:none }
+  body.demo [data-demo="hide"], body.demo .card.wk { display:none }
   body.demo h2 small, body.demo .card .s, body.demo #summary .trend, body.demo #summary .legend, body.demo #actions .legend,
   body.demo #coverage details, body.demo #coverage .legend, body.demo #products details, body.demo #products > p, body.demo #products .legend { display:none }
   body.demo .card .v { font-size:32px } body.demo ul.hl { font-size:15px } body.demo #suites tbody tr:nth-child(n+6) { display:none } body.demo section { padding:20px 24px }

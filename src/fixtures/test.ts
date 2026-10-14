@@ -10,6 +10,7 @@ import path from 'node:path';
 import { test as base, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { collectWriteRequests } from '../console/api-log';
 import { connectLiveBrowser, liveContext, usingLiveBrowser } from '../console/browser';
+import { recordingVideo, startScreencast, VIDEO_DIR } from '../console/screencast';
 import { API_WRITES_ANNOTATION } from '../report/run-record';
 
 type WorkerFixtures = { liveBrowser: Browser | null };
@@ -85,7 +86,25 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     const page = await context.newPage();
     // 이 페이지가 보낸 쓰기 요청(메서드·경로만)을 실행 기록에 남긴다 → 콘솔 전용 쓰기 동작 자동 집계(2026-10-14)
     const writes = collectWriteRequests(page);
+    // PW_VIDEO_DIR 이 있으면 화면을 webm 으로 남긴다 (팀 공유용, src/console/screencast.ts). 실패해도 테스트는 계속 간다.
+    const specBase = path.basename(testInfo.file, '.spec.ts');
+    const stopVideo =
+      recordingVideo() && !/\.setup\.ts$/.test(testInfo.file) // 세션 확인(setup 프로젝트)은 찍지 않는다
+        ? await startScreencast(page, testInfo.outputPath('frames'), (l) => console.log(l)).catch((err) => {
+            console.log(
+              `[video] 녹화를 시작하지 못했습니다: ${err instanceof Error ? err.message : String(err)}`,
+            );
+            return null;
+          })
+        : null;
     await use(page);
+    if (stopVideo) {
+      const d = new Date(); // 실행 기록(reports/runs)과 같은 현지 시각 YYYYMMDD-HHMM
+      const p2 = (n: number) => String(n).padStart(2, '0');
+      const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}`;
+      const video = await stopVideo(path.join(VIDEO_DIR, `${stamp}-${specBase}.webm`)).catch(() => null);
+      if (video) testInfo.attachments.push({ name: 'video', path: video, contentType: 'video/webm' });
+    }
     const written = writes();
     if (written.length)
       testInfo.annotations.push({ type: API_WRITES_ANNOTATION, description: JSON.stringify(written) });
