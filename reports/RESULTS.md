@@ -1,12 +1,12 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 21:29, 실행 기록 739건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-14 21:41, 실행 기록 741건.
 
 ## 1. spec 별 최근 상태
 
 | spec | 마지막 실행 | 결과 | 소요 | 최근 5회 | 통과 평균 |
 | --- | --- | --- | ---: | --- | ---: |
-| networking.vpc.create-delete | 2026-10-14 12:05 | PASS | 1분 32초 | PPPPP | 58초 |
+| networking.vpc.create-delete | 2026-10-14 21:38 | PASS | 1분 20초 | PPPPP | 1분 1초 |
 | compute.vm-stack | 2026-10-14 10:33 | PASS | 30분 1초 | PPPPP | 20분 10초 |
 | compute.vm-volume | 2026-10-14 10:39 | PASS | 23분 54초 | PFPPP | 18분 57초 |
 | compute.vm-stack-net | 2026-10-14 10:37 | PASS | 33분 30초 | PFPPP | 23분 25초 |

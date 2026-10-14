@@ -876,7 +876,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
         ? `최종 ${lastSuite.final_pass}/${lastSuite.specs}${lastSuite.attempts > 1 ? ` · 시도 ${lastSuite.attempts}회 합산` : ''}${lastSuite.synthesized_attempts.length ? ` · ${lastSuite.synthesized_attempts.map((a) => `a${a}`).join(',')} 는 요약 파일 없이 실행 기록으로 채움` : ''}`
         : '병렬 스위트(npm run test:suite) 기록부터',
     )}
-    ${kpi('최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span>', `${weekViews.length} <span class="s">/ 실행 ${weekRuns.length}</span>`, `<span class="causes">${weekCauses.map(([k, n]) => `<span class="c-${k}">${esc(CAUSE_LABEL[k])} ${n}</span>`).join('') || '없음'}</span>`, weekViews.some((v) => v.cause === 'product' || v.cause === 'unclassified') ? 'alert' : '')}
+    ${kpi('최근 7일 실패 <span class="s">(개발 중 재실행 포함)</span>', `${weekViews.length} <span class="s">/ 실행 ${weekRuns.length}</span>`, `<span class="causes">${weekCauses.map(([k, n]) => `<span class="c-${k}">${esc(CAUSE_LABEL[k])} ${n}</span>`).join('') || '없음'}</span>`, weekViews.some((v) => v.cause === 'product' || v.cause === 'unclassified') ? 'alert wk' : 'wk')}
     ${kpi('불안정 spec', hasSuiteRuns ? String(flakySpecs.length) : '-', hasSuiteRuns ? '스위트 실행 최근 10회에 실패가 섞이고 마지막은 통과' : '스위트 실행 기록이 쌓이면 표시(2026-10-02~)')}
     ${kpi('커버리지 L2+', c ? `${pct(c.at_least_2, c.resources)}% <span class="s">${c.at_least_2}/${c.resources}</span>` : '-', c ? `L3+ ${c.at_least_3}/${c.resources} (${pct(c.at_least_3, c.resources)}%)` : '검증 실패')}
     ${kpi(

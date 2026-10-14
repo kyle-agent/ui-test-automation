@@ -68,11 +68,11 @@ queueservice:
 
 # ── Compute ──
 scf:
-  createcloudfunction: compute.cloud-function
+  createcloudfunction: compute.cloud-function, application-service.api-gateway  # api_writes 2026-10-14
   createcloudfunctioncronjobtrigger: compute.cloud-function
   createcloudfunctionapigatewaytrigger: application-service.api-gateway
   deletecloudfunctiontrigger: compute.cloud-function, application-service.api-gateway
-  deletecloudfunction: compute.cloud-function
+  deletecloudfunction: compute.cloud-function, application-service.api-gateway  # api_writes 2026-10-14
   updatecloudfunctioncronjobtrigger: compute.cloud-function
   updatecloudfunctionconfig: compute.cloud-function
   updatecloudfunctionurl: compute.cloud-function
@@ -90,7 +90,7 @@ virtualserver:
   deletekeypair: compute.vm-stack  # 확인 필요 — 이 실행에서 만든 경우만
   createvirtualserver: compute.vm-stack, compute.vm-stack-net, compute.vm-volume
   deletevirtualserver: compute.vm-stack, compute.vm-stack-net, compute.vm-volume
-  stopvirtualserver: compute.vm-stack
+  stopvirtualserver: compute.vm-stack, compute.vm-stack-net  # api_writes 2026-10-14
   startvirtualserver: compute.vm-stack
   updatevirtualserver: compute.vm-stack  # 확인 필요 — 서버명 변경
   lockvirtualserver: compute.vm-stack
@@ -341,8 +341,8 @@ resourcemanager:
   createresourcegroup: management.resource-group
   setresourcegroup: management.resource-group
   deleteresourcegroup: management.resource-group  # 실측: 목록 삭제(1건) → DELETE /v1/resource-groups/{id} (6C)
-  updateresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, security.certificate, security.kms-key  # 확인 필요 — 상세 태그 탭 (KMS·Resource Group 은 실측: 저장 = PUT /v1/tags/{srn}/bulk 전체 교체)
-  deleteresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, security.certificate, security.kms-key  # 확인 필요 — 상세 태그 탭 (KMS·Resource Group 실측: 마지막 태그를 지우면 DELETE /v1/tags/{srn})
+  updateresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, security.certificate, security.kms-key, networking.cloud-fabric-connect, networking.cloud-wan-network, storage.object-storage-bucket  # 확인 필요 — 상세 태그 탭 (KMS·Resource Group 은 실측: 저장 = PUT /v1/tags/{srn}/bulk 전체 교체) · api_writes 2026-10-14
+  deleteresourcetags: management.resource-group, compute.server-group, compute.vm-stack, container.container-registry, container.repository, devops-tools.devops-service, security.certificate, security.kms-key, networking.cloud-fabric-connect, networking.cloud-wan-network, storage.object-storage-bucket  # 확인 필요 — 상세 태그 탭 (KMS·Resource Group 실측: 마지막 태그를 지우면 DELETE /v1/tags/{srn}) · api_writes 2026-10-14
   updatecomponentstags: iam.role  # 실측: 전역 자원(IAM 역할) 태그 저장 → PUT /v1/tags/global/iam/role/{id}/bulk (6C)
   deletecomponentstags: iam.role  # 실측: 마지막 태그 삭제 → DELETE /v1/tags/global/iam/role/{id} (6C)
   # 불가: updateresourcetagvalue — 콘솔 태그 수정 화면은 값만 바꿔도 PUT …/tags/{srn}/bulk(전체 교체)를 부른다(Resource Group 실측) — 단건 API 경로를 부르는 화면 없음
@@ -352,6 +352,8 @@ resourcemanager:
   # 불가: updatetags — 여러 자원 일괄 태그(/v1/tags/bulk) 화면이 콘솔에 없다(Resource Groups 메뉴는 Resource Group 목록뿐)
   # 불가: deletetags — 위와 같음(/v1/tags)
   # 불가: deleteresourcegroups — 일괄 삭제(/v1/resource-groups): 1건 선택 삭제는 단건 API 를 부른다(실측), 여러 그룹 동시 삭제는 시험하지 않음 # 확인 필요
+  updateresourcetagvalue: compute.vm-stack, container.repository, networking.cloud-fabric-connect, management.resource-group, security.certificate, security.kms-key, networking.cloud-wan-network, devops-tools.devops-service, compute.server-group, storage.object-storage-bucket  # api_writes 2026-10-14
+  updatecomponentstagvalue: iam.role  # api_writes 2026-10-14
 
 servicewatch:
   createalert: management.servicewatch-alert
@@ -436,6 +438,7 @@ loadbalancer:
   # 불가: addlbservergroupmembers · setlbservergroupmember · removelbservergroupmember · removelbservergroupmembers — 서버 그룹 멤버는 실제 Virtual Server 가 있어야 등록된다(09-29 의도적 제외, LB 멤버)
   # 불가: setlblistenerrule · setlblistenerresource · setlblistenercertificate — L7(HTTP/HTTPS) Listener 의 URL 규칙·인증서(Certificate Manager 인증서 선행)·연결 자원 변경, 이 spec 의 Listener 는 L4 TCP 라 항목이 없다 # 확인 필요
   # 미실시: createloadbalancerprivatenatip · deleteloadbalancerprivatenatip — Private NAT(Direct Connect 선행) 의 IP 를 LB 에 붙이는 동작, direct-connect spec 과 LB spec 을 합쳐야 해 미착수
+  setlblistenerresource: networking.load-balancer  # api_writes 2026-10-14
 
 security-group:
   createsecuritygroup: security.security-group-rule, compute.vm-stack, compute.vm-stack-net, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade
@@ -455,8 +458,8 @@ vpc:
   deletevpc: networking.vpc.create-delete, networking.vpc-port, networking.vpc-peering, networking.transit-gateway, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.firewall, networking.direct-connect, networking.vpn, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
   createsubnet: networking.vpc-port, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
   deletesubnet: networking.vpc-port, networking.nat-gateway, networking.privatelink-service, networking.vpc-endpoint, networking.load-balancer, compute.vm-stack, compute.vm-stack-net, compute.vm-volume, compute.auto-scaling-group, container.ske-cluster, container.ske-upgrade, data-analytics.event-streams, database.cachestore, database.epas, database.mariadb, database.mysql, database.postgresql
-  createinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
-  deleteinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
+  createinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net, networking.nat-gateway  # api_writes 2026-10-14
+  deleteinternetgateway: networking.firewall, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net, networking.nat-gateway  # api_writes 2026-10-14
   createpublicip: networking.nat-gateway, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
   deletepublicip: networking.nat-gateway, networking.vpc-port, networking.vpn, networking.load-balancer, compute.vm-stack-net
   createnatgateway: networking.nat-gateway
@@ -466,7 +469,7 @@ vpc:
   deleteport: networking.vpc-port
   # 6E 10-13 실측: 각 상세 "설명" 연필 → 수정 → 되돌림 (networking.vpc-port steps[8]·[11])
   setsubnet: networking.vpc-port  # PUT /v1/subnets/{id}
-  setport: networking.vpc-port  # PUT /v1/ports/{id} (다른 연필: Security Group)
+  setport: networking.vpc-port, compute.vm-stack  # PUT /v1/ports/{id} (다른 연필: Security Group) · api_writes 2026-10-14
   setinternetgateway: networking.vpc-port  # PUT /v1/internet-gateways/{id} (다른 연필: Firewall 사용·로그 저장·NAT Gateway·NAT 로그 저장 여부)
   setpublicip: networking.vpc-port  # PUT /v1/publicips/{id}
   setsubnetvip: networking.vpc-port  # Virtual IP 상세 설명 → PUT /v1/subnets/{id}/vips/{id}
