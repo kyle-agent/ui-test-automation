@@ -7,13 +7,28 @@ import { defineSimpleCrudSpec } from '../../src/console/simple-crud';
 import { openDetail } from '../../src/console/detail-edit';
 import { settleConsole } from '../../src/console/overlays';
 import { addTag, removeTag } from '../../src/console/tags';
-import { below, confirmModal, dismissModalIfAny, fillStable, submitForm } from '../../src/console/ui';
+import { gotoRoute } from '../../src/console/expect';
+import {
+  below,
+  confirmModal,
+  dismissModalIfAny,
+  fillField,
+  fillStable,
+  openCreateForm,
+  selectRow,
+  submitForm,
+  topButton,
+  waitForRow,
+} from '../../src/console/ui';
 
 const ROUTE = '#/resourcegroups/resource-group/list';
 const TAG_INPUT = 'input[placeholder^="한글, 영문, 숫자, 공백과"]:visible';
 
 async function openGroupResources(page: Page): Promise<void> {
-  await page.getByText(/^\s*그룹 자원 \(\d+\)\s*$/).first().click();
+  await page
+    .getByText(/^\s*그룹 자원 \(\d+\)\s*$/)
+    .first()
+    .click();
   await settleConsole(page, { appearGraceMs: 800 });
   await page.getByRole('button', { name: '그룹 자원 수정', exact: true }).waitFor({ timeout: 15_000 });
 }
@@ -101,12 +116,42 @@ defineSimpleCrudSpec({
       for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
       await page.waitForURL((u) => !u.hash.includes('/tag/edit'), { timeout: 20_000 });
       await settleConsole(page, { appearGraceMs: 800 });
-      await expect(page.locator('tr.scp-body-row:visible').filter({ hasText: 'qa-a' }).filter({ hasText: `${vars.run_id}-v2` })).toHaveCount(1, {
+      await expect(
+        page
+          .locator('tr.scp-body-row:visible')
+          .filter({ hasText: 'qa-a' })
+          .filter({ hasText: `${vars.run_id}-v2` }),
+      ).toHaveCount(1, {
         timeout: 20_000,
       });
       log(`    태그 qa-a 값 → ${vars.run_id}-v2 확인`);
       await removeTag(page, 'qa-a', log);
       await removeTag(page, 'qa-b', log);
+    },
+    // steps[6] (agent C 10-16) 그룹 2개 더 생성 → 목록에서 둘을 함께 선택 → "삭제" (여러 건 삭제가 DELETE /v1/resource-groups 일괄 API 인지 관찰)
+    async (page, vars, log) => {
+      const create = async (name: string) => {
+        await openCreateForm(page, ROUTE, 'Resource Group 생성');
+        await fillField(page, 'Resource Group명', name);
+        await (await below(page, '그룹 정의 태그', 'input', 0)).fill('qa');
+        await (await below(page, '그룹 정의 태그', 'input', 1)).fill(vars.run_id!);
+        await page.getByRole('button', { name: '태그 추가', exact: true }).first().click();
+        await submitForm(page, '생성');
+        await confirmModal(page, /생성/, '확인', { agree: true });
+        for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+        await waitForRow(page, ROUTE, name, { timeoutMs: 120_000, intervalMs: 5_000, log });
+      };
+      await create(vars.name_b!);
+      await create(vars.name_c!);
+      await gotoRoute(page, ROUTE);
+      await selectRow(page, vars.name_b!);
+      await selectRow(page, vars.name_c!);
+      await topButton(page, '삭제').click();
+      await confirmModal(page, /삭제/, '확인', { agree: true });
+      for (let i = 0; i < 2 && (await dismissModalIfAny(page)); i++) await page.waitForTimeout(300);
+      await waitForRow(page, ROUTE, vars.name_b!, { gone: true, timeoutMs: 120_000, intervalMs: 5_000, log });
+      await waitForRow(page, ROUTE, vars.name_c!, { gone: true, timeoutMs: 60_000, intervalMs: 5_000, log });
+      log(`    ${vars.name_b}·${vars.name_c} 동시 삭제 확인`);
     },
   ],
   deleteButton: '삭제',

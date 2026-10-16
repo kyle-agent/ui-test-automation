@@ -47,6 +47,16 @@ steps:
       url: "#/resourcegroups/resource-group/detail/"
       text: ["태그 (0)"]
 
+  # agent C(2026-10-16): 여러 그룹 동시 삭제가 일괄 API(DELETE /v1/resource-groups, deleteresourcegroups)를 부르는지 — 그룹 2개를 더 만들어 한 번에 지운다(단건 삭제는 teardown 그대로).
+  - goal: "Resource Group {{name_b}}·{{name_c}} 를 만들어 목록에서 둘을 한 번에 선택해 삭제한다"
+    vars:
+      name_b: "rg-b-{{run_id}}"
+      name_c: "rg-c-{{run_id}}"
+    expect:
+      url: "#/resourcegroups/resource-group/list"
+      not_text: ["{{name_b}}", "{{name_c}}"]
+      timeout: 120000
+
 teardown:
   - goal: "Resource Group {{name}} 을 삭제한다"
     expect:
