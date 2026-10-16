@@ -42,6 +42,20 @@ steps:
       url: "#/vpc/vpc/detail"
       text: ["{{name}}"]
 
+  # 동작(L3, 2026-10-16 에이전트 A, API addvpccidr): 상세 탭 "IP 대역 관리 (n)" (#/vpc/vpc/detail/ip-range) → 버튼 "IP 대역 추가" → 모달 "IP 대역 추가"
+  # (입력란 1개, CIDR /16~/28, 관리용·Peering·DC·TGW·Private NAT 대역과 중복 불가) → "확인" → 탭 표(IP 대역 | 생성 일시)에 행 추가.
+  # 10.251/10.252 는 관리용으로 막힌다 → 192.168.100.0/24. 2026-10-16 프로브 기준 표에 행 버튼·선택 아이콘이 없어 삭제 진입점은 미확인(spec 이 있으면 지우고, 없으면 로그만; VPC 해지가 함께 지운다).
+  - goal: "VPC {{name}} 상세 IP 대역 관리 탭에서 IP 대역 {{cidr2}} 를 추가하고 표에 보이는지 확인한다 (L3)"
+    vars:
+      cidr2: "192.168.100.0/24"
+    expect:
+      url: "#/vpc/vpc/detail/ip-range"
+      text: ["{{cidr2}}"]
+
+  - goal: "추가한 IP 대역 {{cidr2}} 를 삭제한다 (삭제 진입점이 있을 때만; 없으면 로그로 남기고 건너뛴다)"
+    expect:
+      url: "#/vpc/vpc/detail/ip-range"
+
 teardown:
   - goal: "VPC 목록 화면으로 이동한다"
     goto: "#/vpc/vpc/list"
