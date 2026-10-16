@@ -48,6 +48,15 @@ steps:
       url: "#/iam/role/"
       text: ["태그(0)"]
 
+  # agent C(2026-10-16): 목록 "삭제" 는 bulk API(deletebulkrole)라 단건 deleterole 은 상세 상단 "역할 삭제" 로만 나간다 → 두 번째 역할을 만들어 상세에서 지운다.
+  - goal: "역할 {{name2}} 를 같은 조건으로 만들고 상세 상단 '역할 삭제' 로 삭제한다"
+    vars:
+      name2: "role2-{{run_id}}"
+    expect:
+      url: "#/iam/role"
+      not_text: ["{{name2}}"]
+      timeout: 120000
+
 teardown:
   - goal: "역할 {{name}} 을 삭제한다"
     expect:
