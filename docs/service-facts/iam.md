@@ -32,8 +32,8 @@ adduserpolicybinding·removeuserpolicybinding·removerolepolicybinding·deletero
 
 ## 3. 역할 · 정책 상세의 단건 삭제 버튼
 
-- 역할 상세 `#/iam/role/<id>/info`: 상단 **"역할 삭제"** 버튼(목록 "삭제" 는 `DELETE /v1/roles/bulk`). 기존 OrganizationAccountAccessRole·SCPServiceRoleFor* 는 건드리지 않는다(상세에 "타 서비스에서 설정된 역할" 경고).
-- 정책 상세 `#/iam/policy/detail/<id>/basic`: 상단 **"정책 삭제"** 버튼(목록 "삭제" 는 `DELETE /v1/policies/bulk`). 기본 정책도 버튼이 보인다(누르지 않음).
+- 역할 상세 `#/iam/role/<id>/info`: 상단 **"역할 삭제"** 버튼 → **`DELETE /v1/roles/{id}`**(단건, iam.role steps[6] 실측 10-16; 목록 "삭제" 는 `DELETE /v1/roles/bulk`). 기존 OrganizationAccountAccessRole·SCPServiceRoleFor* 는 건드리지 않는다(상세에 "타 서비스에서 설정된 역할" 경고).
+- 정책 상세 `#/iam/policy/detail/<id>/basic`: 상단 **"정책 삭제"** 버튼 → 확인 모달 "정책명: … 정책을 삭제하시겠습니까?" → **역시 `DELETE /v1/policies/bulk`**(iam.policy steps[8] 실행 기록에 단건 DELETE …/policies/{id} 없음) → 단건 deletepolicy 를 부르는 화면은 없다. 기본 정책도 버튼이 보인다(누르지 않음).
 - 역할 정책 탭 "연결 해제" 는 `DELETE /v1/roles/{id}/policy-bindings`(bulk, 6C 실측) → 단건 removerolepolicybinding(`…/policy-bindings/{policy_id}`) 을 부르는 화면은 없다.
 
 ## 4. 리소스 기반 정책 (API `/v1/resource-policies/{srn}`, addpermission·setpermission·removepermission·setresourcepolicy·deleteresourcepolicy)
