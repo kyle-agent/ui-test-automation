@@ -1,0 +1,63 @@
+id: iam.user
+title: IAM 지정 테스트 사용자 설명 수정 → 그룹 추가·제외 → 권한 연결·해제
+service: Identity and Access Management(IAM)
+category: Management
+tags: [regression, destructive, crud]
+precondition:
+  session: root
+  region: kr-west1
+  language: ko
+  cleanup: true
+
+# 콘솔(2026-10-16 agent C 프로브, docs/service-facts/iam.md): 사용자 목록 #/iam/user/list (Global), "사용자 생성" 폼은 "사용자 ID" 만 필수(비밀번호 자동 생성).
+# **사용자 삭제(목록 "삭제"·상세 "사용자 삭제")는 로그인 계정의 비밀번호 확인 모달이 뜬다** → 자격 증명을 코드에 두지 않는 원칙상 spec 이 사용자를 만들고 지울 수 없다.
+# 그래서 이 시나리오는 사용자를 만들지 않고, 사람이 지정한 테스트 사용자(환경 변수 IAM_TEST_USER = 사용자 ID)를 대상으로 삭제 외 동작만 한다.
+# IAM_TEST_USER 가 없으면 건너뛴다. 지정 사용자는 비밀번호를 아무도 모르는 자동 생성 사용자여야 하며 권한(정책·그룹)은 이 시나리오가 붙였다 뗀다.
+# 상세 #/iam/user/detail/<id>/basic: 연필 = 설명(PUT …/users/{id}) · 비밀번호(재설정, 자격 증명이라 하지 않음) · 비밀번호 재사용 제한. 탭 사용자 그룹(n)·권한(n)·인증키(n)·태그(n).
+# 권한 탭 "권한 추가" → #/iam/user/<id>/policy/update (정책 검색 → 행 선택 → 완료), "연결 해제". 그룹 상세 사용자 탭 "사용자 추가" → #/iam/group/<id>/users/update, "제외".
+# 그룹은 이 시나리오가 만들고 지운다(무과금, 목록 삭제 = DELETE /groups/bulk).
+steps:
+  - goal: "사용자 목록으로 이동해 지정 테스트 사용자 {{user}} 가 있는지 확인한다"
+    goto: "#/iam/user/list"
+    expect:
+      url: "#/iam/user/list"
+
+  - goal: "사용자 {{user}} 상세에서 설명을 scp-console-tests {{run_id}} 로 수정하고 원래 값으로 되돌린다"
+    expect:
+      url: "#/iam/user/detail/"
+      text: ["{{user}}"]
+
+  - goal: "사용자 그룹 {{group}} 을 만든다"
+    vars:
+      group: "grp-{{run_id}}"
+    expect:
+      url: "#/iam/group/list"
+      text: ["{{group}}"]
+
+  - goal: "그룹 {{group}} 상세 사용자 탭에서 사용자 {{user}} 를 추가한다"
+    expect:
+      url: "#/iam/group/detail/"
+      text: ["사용자 (1)", "{{user}}"]
+
+  - goal: "그룹 {{group}} 에서 사용자 {{user}} 를 제외한다"
+    expect:
+      url: "#/iam/group/detail/"
+      text: ["사용자 (0)"]
+      not_text: ["{{user}}"]
+
+  - goal: "사용자 {{user}} 상세 권한 탭에서 정책 CostNavigatorReadOnlyAccess 를 추가한다"
+    expect:
+      url: "#/iam/user/detail/"
+      text: ["권한 (1)", "CostNavigatorReadOnlyAccess"]
+
+  - goal: "사용자 {{user}} 의 정책 CostNavigatorReadOnlyAccess 연결을 해제한다"
+    expect:
+      url: "#/iam/user/detail/"
+      text: ["권한 (0)"]
+      not_text: ["CostNavigatorReadOnlyAccess"]
+
+teardown:
+  - goal: "사용자 그룹 {{group}} 을 삭제한다"
+    expect:
+      not_text: ["{{group}}"]
+      timeout: 120000
