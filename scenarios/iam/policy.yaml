@@ -57,6 +57,15 @@ steps:
     expect:
       text: ["scp-console-tests {{run_id}} edited"]
 
+  # agent C(2026-10-16): 목록 "삭제" 는 bulk API(deletepolicies)라 단건 deletepolicy 는 상세 상단 "정책 삭제" 로만 나간다 → 두 번째 정책을 만들어 상세에서 지운다.
+  - goal: "정책 {{name2}} 를 같은 방법으로 만들고 상세 상단 '정책 삭제' 로 삭제한다"
+    vars:
+      name2: "pol2-{{run_id}}"
+    expect:
+      url: "#/iam/policy/list"
+      not_text: ["{{name2}}"]
+      timeout: 120000
+
 teardown:
   - goal: "사용자 그룹 {{group}} 을 삭제한다"
     expect:
