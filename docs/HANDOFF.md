@@ -535,3 +535,20 @@
   상세 GET 의 public_endpoint_enabled 는 true 그대로(modified_at 만 갱신, Editing 단계 없음). 켤 때(true)는 Editing≈2분 → Running 으로 정상 반영. 10-08 까지 3회 PASS → 그 뒤 제품 변경 추정. 콘솔팀 문의 필요.
   `npm run results` 는 이제 미분류 실패를 현재 known-issues 로 다시 분류한다(기록 파일은 안 고침) — 이슈를 나중에 등록해도 대시보드 "제품 결함" 으로 잡힌다.
   스위트 최종: **S20261014-0922 60/61**(a1 60 + a2 0), 여전히 실패 1 = KI-001.
+
+### 9.24 화면 녹화(데모용) · 대시보드 요약 보기 · api_writes 로 대응표 보강 · DBaaS 7차 (2026-10-14~15)
+
+- 사용자 요청: "회귀 테스트 수행하는 모습을 동영상으로 공유" → `src/console/screencast.ts`. Playwright `recordVideo` 는 못 쓴다(살아 있는 CDP 컨텍스트, 쿠키 복사는 세션을 깨뜨릴 수 있음 — browser.ts 주석).
+  대신 CDP `Page.startScreencast`(JPEG q80, 최대 1440x900) 프레임을 모아 Playwright 번들 ffmpeg(`npx playwright install ffmpeg`, `~/AppData/Local/ms-playwright/ffmpeg-*/ffmpeg-win64.exe`; libvpx 만 있는 최소 빌드, concat demuxer 없음)
+  에 image2pipe 로 흘려 VP8 10fps 1440x900 webm 으로 만든다(틱마다 마지막 프레임 반복 → 실제 시간 유지, `PW_VIDEO_SPEED=2` 배속). 1시간 넘으면 거부. 인코딩 실패 시 프레임 폴더를 남기고 경로를 찍는다.
+  사용: `PW_VIDEO_DIR=reports/videos npm run test:stacks -- --only <spec>` → `reports/videos/<YYYYMMDD-HHMM 현지>-<spec>.webm`(gitignore). setup 프로젝트(세션 확인)는 찍지 않는다.
+  **프레임은 탭이 보일 때만 온다** → 녹화 중에는 다른 spec·탭을 띄우지 말 것. 영상에 계정·프로젝트명이 그대로 보인다(공유 전 확인).
+  결과: networking.vpc.create-delete 47초(2.4MB) · networking.vpc-endpoint(VPC→Subnet→Endpoint) 4분 47초(9.9MB), 둘 다 PASS.
+- 대시보드 요약(데모) 보기: 머리 오른쪽 `요약 | 전체` 토글(`?view=demo|full` > localStorage `scp-dash-view` > 기본 요약). 요약은 핵심 카드 + 한 줄 요약 4개(`ul.hl`: 상품 커버·동작 커버·제품 결함·콘솔 전용) + 조치 + 최근 스위트 5행 + 커버리지·상품 표만.
+  세부 섹션(spec·실패·매트릭스·대응표·탐색·발견·실행)은 `data-demo="hide"`, 최근 7일 실패 카드는 `.card.wk` 로 숨김. 전체 보기는 그대로.
+- 대응표 보강(`data/ui-operations.yaml`, `# api_writes 2026-10-14`): 통과 실행의 api_writes 가 카탈로그 동작과 strict 로 맞는데 그 spec 이 대응표에 없는 것 11건(태그 updateresourcetagvalue 10 spec, NAT GW 의 IGW 생성/삭제, vm-stack setport, api-gateway 의 Cloud Functions 생성/삭제, LB setlblistenerresource 등)
+  → UI 쓰기 동작 350→**353/485**. 남은 후보 2건은 조회성(iam/querypolicy, certificatemanager/checknameduplication)이라 뺐다.
+  리소스 단위 L2 는 상한(L<2 48개 모두 제외/스킵 사유 있음). 작업 단위 여지는 **API 검증·UI 없음 160건**(제품별 목록은 scratch `opgaps.ts`), 그중 가장 싼 묶음이 DBaaS 상세 동작.
+- DBaaS 7차(진행 중): MySQL·MariaDB·EPAS 에 PostgreSQL 과 같은 `ops`(backup·parameter·archive·sync·restart·maintenance·ipAcl·stopStart[·audit]) 를 steps[5] 로 붙였다(`src/console/dbaas.ts` 팩토리 그대로).
+  MySQL 은 Audit Log API 가 카탈로그에 없어 audit 제외, 파라미터는 max_connections·wait_timeout·connect_timeout. 순서: 공유 VPC(`SHARED_VPC`/`SHARED_SUBNET`) 하나로 `DBAAS_SOFT=1` 프로브 → 라벨 수정 → run-stacks 본 실행 → 대응표 매핑.
+- 세션: 10-14 07:19 로그인 → 19:16~19:21 만료(≈12h, keep-alive 로그의 "약 35.1시간" 은 브라우저 첫 로그인 기준이라 틀림). 21:15 재로그인 → 10-15 09:19 keep-alive 까지 OK(docs/session-log.md).
