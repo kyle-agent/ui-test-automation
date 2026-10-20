@@ -544,6 +544,9 @@
   사용: `PW_VIDEO_DIR=reports/videos npm run test:stacks -- --only <spec>` → `reports/videos/<YYYYMMDD-HHMM 현지>-<spec>.webm`(gitignore). setup 프로젝트(세션 확인)는 찍지 않는다.
   **프레임은 탭이 보일 때만 온다** → 녹화 중에는 다른 spec·탭을 띄우지 말 것. 영상에 계정·프로젝트명이 그대로 보인다(공유 전 확인).
   결과: networking.vpc.create-delete 47초(2.4MB) · networking.vpc-endpoint(VPC→Subnet→Endpoint) 4분 47초(9.9MB), 둘 다 PASS.
+  자르기(10-20): 녹화기가 `<video>.json`(영상 0초의 실제 시각·배속)을 함께 남기고, `npm run video:cut -- <video> --until "steps[5]" [--from "steps[2]"]` 가
+  Playwright JSON 보고서(test-results/stacks, 영상과 같은 spec 의 최신)의 최상위 test.step duration 을 누적해 단계 시작 시각을 구해 `-c copy` 로 잘라낸다(재인코딩 없음, 몇 초 오차).
+  용도: compute.vm-stack 30분 녹화에서 "VPC→Subnet→VM 생성" 부분(steps[5] 직전)만 데모 영상으로.
 - 대시보드 요약(데모) 보기: 머리 오른쪽 `요약 | 전체` 토글(`?view=demo|full` > localStorage `scp-dash-view` > 기본 요약). 요약은 핵심 카드 + 한 줄 요약 4개(`ul.hl`: 상품 커버·동작 커버·제품 결함·콘솔 전용) + 조치 + 최근 스위트 5행 + 커버리지·상품 표만.
   세부 섹션(spec·실패·매트릭스·대응표·탐색·발견·실행)은 `data-demo="hide"`, 최근 7일 실패 카드는 `.card.wk` 로 숨김. 전체 보기는 그대로.
 - 대응표 보강(`data/ui-operations.yaml`, `# api_writes 2026-10-14`): 통과 실행의 api_writes 가 카탈로그 동작과 strict 로 맞는데 그 spec 이 대응표에 없는 것 11건(태그 updateresourcetagvalue 10 spec, NAT GW 의 IGW 생성/삭제, vm-stack setport, api-gateway 의 Cloud Functions 생성/삭제, LB setlblistenerresource 등)

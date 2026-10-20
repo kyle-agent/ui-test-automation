@@ -208,6 +208,22 @@ export async function encodeFrames(
     log(`[video] ffmpeg 실패 (${code}): ${stderr.trim().split('\n').slice(-3).join(' | ')}`);
     return null;
   }
+  // 옆 파일: 영상 0초가 실제 어느 시각인지(첫 프레임)·배속 → scripts/video-cut.ts 가 Playwright 보고서의 단계 시각으로 잘라낸다
+  fs.writeFileSync(
+    `${outFile}.json`,
+    JSON.stringify(
+      {
+        videoStart: new Date(first * 1000).toISOString(),
+        videoEnd: new Date(end * 1000).toISOString(),
+        speed,
+        fps: FPS,
+        frames: frames.length,
+        seconds: Math.round(total / FPS),
+      },
+      null,
+      2,
+    ),
+  );
   log(
     `[video] ${outFile} (프레임 ${frames.length}개 → ${Math.round(total / FPS)}초${speed !== 1 ? `, ${speed}배속` : ''})`,
   );

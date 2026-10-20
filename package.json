@@ -30,6 +30,7 @@
     "probe": "tsx scripts/probe-form.ts",
     "coverage": "tsx scripts/coverage.ts",
     "results": "tsx scripts/results.ts",
+    "video:cut": "tsx scripts/video-cut.ts",
     "test:headed": "playwright test --project=smoke --headed",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit",
