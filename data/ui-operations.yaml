@@ -163,8 +163,10 @@ scr:
   deleterepository: container.repository
   updaterepositorypullpolicy: container.repository  # 상세 "이미지 pull 제한" 스캔되지 않은 이미지 pull 제한 켬→끔
   updaterepositoryscanpolicy: container.repository  # 상세 "이미지 스캔" 자동 스캔 켬→끔(빈 Repository 라 스캔 과금 없음)
-  # 불가: updateprivateacl — 상세 "프라이빗 엔드포인트 접근 제어" 연필이 열리지 않음(2026-10-07 6D 프로브, 허용 리소스는 VPC 자원 선택 필요, 확인 필요)
-  # 불가: updatepublicacl — 퍼블릭 엔드포인트를 켠 동안만 보이는 접근 제어. 이번엔 확인하지 못함(프라이빗 레지스트리 쿼터 1 · 실행 13분, 확인 필요)
+  # 확인 필요: updateprivateacl — 2026-10-16~20 agent B: 연필은 열린다(10-07 "안 열림" 은 라벨 글자 사이 비표준 공백·안내 아이콘 때문에 로케이터가 빈 것). 모달 "사용" 끄기 → 확인(aria-disabled 로 보여 강제 클릭) → 알림 "…사용을 해제하시겠습니까?" 까지 확인했고
+  #   PUT …/private-acl 송신·반영은 아직 미검증. container.container-registry steps[2] 에 구현(사용→미사용→사용), 10-20 23:38 실행은 확인 버튼 비활성으로 FAIL → 강제 클릭 보강 후 재실행 필요. docs/service-facts/container-registry.md
+  # 확인 필요: updatepublicacl — 2026-10-16 agent B 프로브 실측: 퍼블릭 켠 뒤 "퍼블릭 엔드포인트 접근 제어" 연필 → IP 192.0.2.10/32 추가 → 확인 → "수정한 정보를 저장하시겠습니까?" → PUT /container-registries/{id}/public-acl, 상세 "퍼블릭 접근 허용 IP 총 1".
+  #   container.container-registry steps[4] 에 구현했지만 spec 은 steps[2] 실패·KI-001(프라이빗 되돌림 미반영, 10-16 재현) 로 아직 PASS 기록 없음
   updaterepositorylifecyclepolicy: container.repository  # 확인 필요 — 이미지 태그 삭제 정책 켜기·끄기
   updaterepositorylockpolicy: container.repository
   updaterepositorydescription: container.repository
