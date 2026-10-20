@@ -1,0 +1,141 @@
+{
+  "spec": "application-service.api-gateway",
+  "started": "2026-10-16T07:41:11.680Z",
+  "ended": "2026-10-16T07:55:37.000Z",
+  "seconds": 865,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "application-service.api-gateway",
+    "run_id": "1016-1641-f375",
+    "title": "API 목록 | API Gateway | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 18.9,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "API Gateway API 생성 → 리소스·메서드 추가 → 스테이지 배포 → 해지",
+      "status": "passed",
+      "seconds": 809.5,
+      "annotations": {
+        "scenario": "application-service.api-gateway",
+        "run_id": "1016-1641-f375",
+        "title": "API 목록 | API Gateway | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] API 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.8
+        },
+        {
+          "title": "steps[1] API apigw-1016-1641-f375 생성",
+          "status": "pass",
+          "seconds": 198.9
+        },
+        {
+          "title": "steps[2] 리소스 /items 생성",
+          "status": "pass",
+          "seconds": 16.4
+        },
+        {
+          "title": "steps[3] /items GET 메서드 생성",
+          "status": "pass",
+          "seconds": 11.7
+        },
+        {
+          "title": "steps[4] 스테이지 stg-1016-1641-f375 로 배포",
+          "status": "pass",
+          "seconds": 17.7
+        },
+        {
+          "title": "steps[5] JWT 인증 jwt-1016-1641-f375 생성·삭제",
+          "status": "pass",
+          "seconds": 61.2
+        },
+        {
+          "title": "steps[6] 접근 제어 acl-1016-1641-f375 생성·삭제",
+          "status": "pass",
+          "seconds": 73.1
+        },
+        {
+          "title": "steps[7] 사용량 정책 plan-1016-1641-f375 + API Key key-1016-1641-f375 생성·삭제",
+          "status": "pass",
+          "seconds": 78.5
+        },
+        {
+          "title": "steps[8] Cloud Function fn-1016-1641-f375 에 API Gateway 트리거 추가·삭제",
+          "status": "pass",
+          "seconds": 87.3
+        },
+        {
+          "title": "steps[9] API 상세 설명을 수정한다",
+          "status": "pass",
+          "seconds": 11.3
+        },
+        {
+          "title": "steps[10] GET 메서드의 엔드포인트 URL 을 https://example.org 로 수정한다",
+          "status": "pass",
+          "seconds": 23.6
+        },
+        {
+          "title": "steps[11] 스테이지 {{stage}} 설명을 수정하고, 같은 스테이지로 다시 배포한 뒤 배포 변경으로 첫 배포를 활성으로 되돌린다",
+          "status": "pass",
+          "seconds": 76.3
+        },
+        {
+          "title": "steps[12] GET 메서드 → 스테이지 {{stage}} 순서로 삭제한다",
+          "status": "pass",
+          "seconds": 36.2
+        },
+        {
+          "title": "steps[13] 리소스 정책(기본 정책)을 삭제한 뒤 기본 정책 템플릿으로 다시 생성한다",
+          "status": "pass",
+          "seconds": 61.2
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/apigateway/v1/apis",
+    "POST /console/api/apigateway/v1/apis/{id}/resources/{id}",
+    "POST /console/api/apigateway/v1/apis/{id}/resources/{id}/methods",
+    "POST /console/api/apigateway/v1/apis/{id}/deployments",
+    "POST /console/api/apigateway/v1/apis/{id}/auths",
+    "PUT /console/api/apigateway/v1/apis/{id}/auths/{id}",
+    "DELETE /console/api/apigateway/v1/apis/{id}/auths/{id}",
+    "POST /console/api/apigateway/v1/apis/{id}/access-controls",
+    "PUT /console/api/apigateway/v1/apis/{id}/access-controls/{id}",
+    "DELETE /console/api/apigateway/v1/apis/{id}/access-controls/{id}",
+    "POST /console/api/apigateway/v1/apis/{id}/usage-plans",
+    "POST /console/api/apigateway/v1/apis/{id}/usage-plans/{id}/api-keys",
+    "PUT /console/api/apigateway/v1/apis/{id}/usage-plans/{id}/description",
+    "PUT /console/api/apigateway/v1/apis/{id}/usage-plans/{id}/quota",
+    "PUT /console/api/apigateway/v1/apis/{id}/usage-plans/{id}/api-keys/{id}/description",
+    "DELETE /console/api/apigateway/v1/apis/{id}/usage-plans/{id}/api-keys/{id}",
+    "DELETE /console/api/apigateway/v1/apis/{id}/usage-plans/{id}",
+    "POST /console/api/scf/v1/cloud-functions",
+    "POST /console/api/scf/v1/triggers/apigateway",
+    "DELETE /console/api/scf/v1/triggers/{id}",
+    "PUT /console/api/apigateway/v1/apis/{id}/description",
+    "PUT /console/api/apigateway/v1/apis/{id}/resources/{id}/methods/GET",
+    "PUT /console/api/apigateway/v1/apis/{id}/stages/{id}/config",
+    "PUT /console/api/apigateway/v1/apis/{id}/stages/{id}/deployment",
+    "DELETE /console/api/apigateway/v1/apis/{id}/resources/{id}/methods/GET",
+    "DELETE /console/api/apigateway/v1/apis/{id}/stages/{id}",
+    "DELETE /console/api/apigateway/v1/apis/{id}/resource-policies",
+    "POST /console/api/iam/v1/resource-policies/validate",
+    "PUT /console/api/apigateway/v1/apis/{id}/resource-policies",
+    "DELETE /console/api/scf/v1/cloud-functions/{id}",
+    "DELETE /console/api/apigateway/v1/apis/{id}"
+  ],
+  "git_sha": "ef52f70"
+}

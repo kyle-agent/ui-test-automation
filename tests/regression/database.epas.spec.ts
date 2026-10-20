@@ -16,4 +16,6 @@ defineDbaasSpec({
   ],
   check: ['License'], // BYOL 확인 체크
   replica: true, // 2026-10-01 켬: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4])
+  // 2026-10-14 7차: PostgreSQL 과 같은 상세 공통 동작(steps[5], Replica 전에 실행). EPAS 는 PostgreSQL 계열이라 cpu_tuple_cost 기본값 그대로.
+  ops: ['backup', 'parameter', 'archive', 'sync', 'restart', 'maintenance', 'audit', 'ipAcl', 'stopStart'],
 });

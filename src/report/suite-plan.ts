@@ -27,6 +27,7 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'storage.object-storage-bucket': { vpc: 0, minutes: 1.5 },
   'management.resource-group': { vpc: 0, minutes: 3 }, // 6C 2026-10-07 태그 단계 추가 실측 2.8분
   'iam.user-group': { vpc: 0, minutes: 1 },
+  'iam.user': { vpc: 0, minutes: 2 }, // agent C 10-16: 지정 테스트 사용자(IAM_TEST_USER) 설명·그룹·권한 동작, 실측 2.0분. 변수 없으면 skip
   'compute.launch-configuration': { vpc: 0, minutes: 1.5 },
   'networking.vpc-port': { vpc: 1, minutes: 21 }, // VIP·Port 연결·Public NAT 단계 포함(2026-09-30, IGW·Public IP 도 만든다). 6E 10-13 Subnet·Port·IGW·Public IP·VIP 설명 수정 포함 실측 20.5분
   'networking.private-dns': { vpc: 0, minutes: 7, lock: 'private-dns' }, // 4F 2026-10-06: dns-hosted-zone 의 Private DNS 가 Creating 일 때 같이 신청하면 행이 끝내 안 생긴다(10-02·10-06 실패 2회 모두 겹침)
@@ -38,9 +39,9 @@ export const SUITE_PLAN: Record<string, SpecPlan> = {
   'networking.vpc-peering': { vpc: 2, minutes: 14.5 }, // 규칙 단계 포함(2026-09-30), VPC 2개. 6E 10-13 설명 수정 포함 실측 14.5분
   'container.ske-cluster': { vpc: 1, minutes: 55 }, // 노드 풀 단계 포함(2026-09-30). 10-07 에이전트 SKE: 노드 수 1→2→1·레이블·테인트·ServiceWatch 로그 수집(L4) 포함 실측 38.5분. 6E 10-13 우선 IP·퍼블릭 엔드포인트·SG 추가/제거 포함: 노드 수·레이블 생략(SKE_SCALE=0 SKE_LABELS=0) 실측 40.7분, 전부 돌리면 ≈55분
   'database.postgresql': { vpc: 0, shared: true, minutes: 72 }, // 09-30 Replica 단계 추가 (에이전트 C, 단독 45분) · 10-07 상세 동작 9종 추가(6A, 단독 72분)
-  'database.mysql': { vpc: 0, shared: true, minutes: 40 }, // 09-30 Replica 단계 추가 (에이전트 C)
-  'database.mariadb': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
-  'database.epas': { vpc: 0, shared: true, minutes: 40 }, // 10-01 Replica 단계 켬(추정)
+  'database.mysql': { vpc: 0, shared: true, minutes: 62 }, // 09-30 Replica 단계 추가 (에이전트 C) · 10-16 7차 상세 동작 8종(실측 60분)
+  'database.mariadb': { vpc: 0, shared: true, minutes: 62 }, // 10-01 Replica 단계 켬 · 10-16 7차 상세 동작 9종(실측 61분)
+  'database.epas': { vpc: 0, shared: true, minutes: 62 }, // 10-01 Replica 단계 켬 · 10-16 7차 상세 동작 9종(실측 61분)
   'database.cachestore': { vpc: 0, shared: true, minutes: 38 }, // 10-07 상세 동작 6종 추가(6A, 단독 38분)
   // 2026-09-29 커버리지 확장(단독 통과 실측). 나머지(queue·notification-group·cloud-function·certificate)는 기본값 3분
   'container.repository': { vpc: 0, minutes: 16, lock: 'private-registry' }, // 6D 2026-10-07 pull 제한·자동 스캔 켬/끔 포함 실측 15.5분. // 3C 2026-10-06 L3 단계 포함 실측 10.7분. 프라이빗 레지스트리 쿼터 1 — registry spec 과 동시 실행 불가

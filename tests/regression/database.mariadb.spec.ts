@@ -15,4 +15,7 @@ defineDbaasSpec({
     { label: 'Database Port번호', value: '3306' },
   ],
   replica: true, // 2026-10-01 켬: 백업 켠 채 생성 → Replica 추가 → Running → 해지 (steps[3]·[4])
+  // 2026-10-14 7차: PostgreSQL 과 같은 상세 공통 동작(steps[5], Replica 전에 실행)
+  ops: ['backup', 'parameter', 'archive', 'sync', 'restart', 'maintenance', 'audit', 'ipAcl', 'stopStart'],
+  parameter: { names: ['max_connections', 'wait_timeout', 'connect_timeout'] }, // MariaDB 동적 파라미터(정수 +1 → 되돌림)
 });

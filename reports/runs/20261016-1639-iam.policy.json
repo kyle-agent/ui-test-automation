@@ -1,0 +1,98 @@
+{
+  "spec": "iam.policy",
+  "started": "2026-10-16T07:39:11.044Z",
+  "ended": "2026-10-16T07:43:54.742Z",
+  "seconds": 284,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "iam.policy",
+    "run_id": "1016-1639-58c6",
+    "title": "정책 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 13.2,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 정책 생성 → 사용자 그룹에 연결·해제 → 삭제",
+      "status": "passed",
+      "seconds": 253.8,
+      "annotations": {
+        "scenario": "iam.policy",
+        "run_id": "1016-1639-58c6",
+        "title": "정책 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 정책 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 6.1
+        },
+        {
+          "title": "steps[1] 정책 pol-1016-1639-58c6 생성 (BillingplanReadOnlyAccess 불러오기)",
+          "status": "pass",
+          "seconds": 33.6
+        },
+        {
+          "title": "steps[2] 그룹 grp-1016-1639-58c6 생성",
+          "status": "pass",
+          "seconds": 13.4
+        },
+        {
+          "title": "steps[3] 그룹에 정책 pol-1016-1639-58c6 연결",
+          "status": "pass",
+          "seconds": 9
+        },
+        {
+          "title": "steps[4] 정책 pol-1016-1639-58c6 연결 해제",
+          "status": "pass",
+          "seconds": 9.1
+        },
+        {
+          "title": "steps[5] 정책 pol-1016-1639-58c6 설명 수정",
+          "status": "pass",
+          "seconds": 9.1
+        },
+        {
+          "title": "steps[6] 정책 상세 연결 대상에서 그룹 grp-1016-1639-58c6 연결 → 해제",
+          "status": "pass",
+          "seconds": 34.3
+        },
+        {
+          "title": "steps[7] 그룹 grp-1016-1639-58c6 설명 수정",
+          "status": "pass",
+          "seconds": 17.2
+        },
+        {
+          "title": "steps[8] 정책 pol2-1016-1639-58c6 생성 → 상세 \"정책 삭제\"",
+          "status": "pass",
+          "seconds": 70.2
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/iam/v1/policies/decompose",
+    "POST /console/api/iam/v1/policies/compose",
+    "POST /console/api/iam/v1/policies/validate",
+    "POST /console/api/iam/v1/policies/summary",
+    "POST /console/api/iam/v1/policies",
+    "POST /console/api/iam/v1/groups",
+    "POST /console/api/iam/v1/groups/{id}/policy-bindings",
+    "DELETE /console/api/iam/v1/groups/{id}/policy-bindings",
+    "PUT /console/api/iam/v1/policies/{id}",
+    "PUT /console/api/iam/v1/policies/{id}/bindings",
+    "PUT /console/api/iam/v1/groups/{id}",
+    "DELETE /console/api/iam/v1/policies/bulk",
+    "DELETE /console/api/iam/v1/groups/bulk"
+  ],
+  "git_sha": "1ca7e51"
+}

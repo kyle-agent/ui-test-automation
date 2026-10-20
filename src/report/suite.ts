@@ -12,6 +12,7 @@ export const SUITE_ORDER: readonly string[] = [
   'storage.object-storage-bucket', // 전제: 계정에 Object Storage 인증키 1개 (2026-09-23 생성)
   'management.resource-group',
   'iam.user-group',
+  'iam.user', // agent C 10-16: 지정 테스트 사용자(IAM_TEST_USER) 설명 수정·그룹 추가/제외·권한 연결/해제. 없으면 skip. Global
   'compute.launch-configuration',
   'networking.vpc-port', // VPC → Subnet → Port (≈10분)
   'networking.private-dns', // ≈2분. 생성 → Active → 상세 서비스 해지

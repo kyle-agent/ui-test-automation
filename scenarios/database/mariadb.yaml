@@ -48,6 +48,11 @@ steps:
       text: ["{{name}}"]
       not_text: ["{{replica}}"]
       timeout: 1800000
+  - goal: "클러스터 {{name}} 상세에서 동기화·재시작·백업·유지 관리 기간·Audit Log·IP 접근 제어·Parameter·Archive·중지/시작을 하고 되돌린다"
+    expect:
+      url: "#/mariadb/mariadb/list"
+      text:
+        - "{{name}}"
 
 teardown:
   - goal: "상세의 서비스 해지로 클러스터 {{name}} 을 해지하고 목록에서 사라질 때까지 기다린다"

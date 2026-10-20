@@ -1,0 +1,74 @@
+{
+  "spec": "networking.vpc.create-delete",
+  "started": "2026-10-16T05:49:08.233Z",
+  "ended": "2026-10-16T05:51:04.283Z",
+  "seconds": 116,
+  "status": "pass",
+  "class": "pass",
+  "annotations": {
+    "scenario": "networking.vpc.create-delete",
+    "run_id": "1016-1449-cf5d",
+    "title": "VPC 목록 | VPC | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.4,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC 생성 후 삭제",
+      "status": "passed",
+      "seconds": 83.3,
+      "annotations": {
+        "scenario": "networking.vpc.create-delete",
+        "run_id": "1016-1449-cf5d",
+        "title": "VPC 목록 | VPC | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록 화면으로 이동한다",
+          "status": "pass",
+          "seconds": 6.8
+        },
+        {
+          "title": "steps[1] 서비스 생성 버튼을 눌러 생성 화면을 연다",
+          "status": "pass",
+          "seconds": 0.6
+        },
+        {
+          "title": "steps[2] VPC명과 IP 대역을 입력하고 생성 → 확인",
+          "status": "pass",
+          "seconds": 12
+        },
+        {
+          "title": "steps[3] VPC 상세 설명 수정 → 반영 → 되돌림 (L3)",
+          "status": "pass",
+          "seconds": 28.4
+        },
+        {
+          "title": "steps[4] VPC 상세 IP 대역 관리 탭에서 IP 대역 192.168.100.0/24 추가 (L3)",
+          "status": "pass",
+          "seconds": 25.8
+        },
+        {
+          "title": "steps[5] 추가한 IP 대역 192.168.100.0/24 삭제 (진입점이 있을 때만)",
+          "status": "pass",
+          "seconds": 0.2
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/vpc/v1/vpcs",
+    "PUT /console/api/vpc/v1/vpcs/{id}",
+    "POST /console/api/vpc/v1/vpcs/{id}/cidrs",
+    "DELETE /console/api/vpc/v1/vpcs/{id}"
+  ],
+  "git_sha": "8cffcf4"
+}

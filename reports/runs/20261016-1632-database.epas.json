@@ -1,0 +1,88 @@
+{
+  "spec": "database.epas",
+  "started": "2026-10-16T07:32:51.612Z",
+  "ended": "2026-10-16T08:33:39.050Z",
+  "seconds": 3647,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "database.epas",
+    "run_id": "1016-1633-c357",
+    "title": "EPAS(DBaaS) 목록 | EPAS(DBaaS) | kr-west1 | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 12.3,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "VPC → Subnet → EPAS(DBaaS) 단일 서버 생성 후 역순 해지",
+      "status": "passed",
+      "seconds": 3503.4,
+      "annotations": {
+        "scenario": "database.epas",
+        "run_id": "1016-1633-c357",
+        "title": "EPAS(DBaaS) 목록 | EPAS(DBaaS) | kr-west1 | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] VPC 목록으로 이동한다",
+          "status": "pass",
+          "seconds": 5.2
+        },
+        {
+          "title": "steps[1] 네트워크 (VPC · Subnet)",
+          "status": "pass",
+          "seconds": 1.4
+        },
+        {
+          "title": "steps[2] epcbabgbgddcdfh 생성",
+          "status": "pass",
+          "seconds": 547.9
+        },
+        {
+          "title": "steps[5] epcbabgbgddcdfh 상세 동작: backup · parameter · archive · sync · restart · maintenance · audit · ipAcl · stopStart",
+          "status": "pass",
+          "seconds": 1739.2
+        },
+        {
+          "title": "steps[3] Replica rep10161633c357 추가 → Running",
+          "status": "pass",
+          "seconds": 591.1
+        },
+        {
+          "title": "steps[4] Replica rep10161633c357 해지",
+          "status": "pass",
+          "seconds": 334.2
+        }
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "POST /console/api/costexplorer/v1/costs/estimate",
+    "POST /console/api/epas/v1/clusters",
+    "POST /console/api/epas/v1/clusters/{id}/backups",
+    "POST /console/api/epas/v1/clusters/{id}/parameters/sync",
+    "PUT /console/api/epas/v1/clusters/{id}/parameters",
+    "POST /console/api/epas/v1/clusters/{id}/archive/sync",
+    "PUT /console/api/epas/v1/clusters/{id}/archive",
+    "POST /console/api/epas/v1/clusters/{id}/sync-state",
+    "POST /console/api/epas/v1/clusters/{id}/restart",
+    "POST /console/api/epas/v1/clusters/{id}/maintenance",
+    "DELETE /console/api/epas/v1/clusters/{id}/maintenance",
+    "PUT /console/api/epas/v1/clusters/{id}/audit-log",
+    "POST /console/api/epas/v1/clusters/{id}/security-group-rules",
+    "POST /console/api/epas/v1/clusters/{id}/stop",
+    "POST /console/api/epas/v1/clusters/{id}/start",
+    "POST /console/api/epas/v1/clusters/{id}/replicas",
+    "DELETE /console/api/epas/v1/clusters/{id}"
+  ],
+  "git_sha": "443c56d",
+  "error": "Worker teardown timeout of 90000ms exceeded while tearing down \"liveBrowser\"."
+}

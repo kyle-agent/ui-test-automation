@@ -1,0 +1,115 @@
+{
+  "spec": "iam.user",
+  "started": "2026-10-16T06:00:50.832Z",
+  "ended": "2026-10-16T06:04:07.000Z",
+  "seconds": 196,
+  "status": "fail",
+  "class": "unclassified",
+  "annotations": {
+    "scenario": "iam.user",
+    "run_id": "1016-1501-fb59",
+    "title": "사용자 그룹 목록 | Identity and Access Management(IAM) | Global | Console",
+    "phase": "teardown"
+  },
+  "tests": [
+    {
+      "title": "로그인 세션 확인 (root, 살아 있는 브라우저)",
+      "status": "passed",
+      "seconds": 24.5,
+      "annotations": {},
+      "steps": []
+    },
+    {
+      "title": "IAM 지정 테스트 사용자 설명 수정 → 그룹 추가·제외 → 권한 연결·해제",
+      "status": "failed",
+      "seconds": 128.6,
+      "annotations": {
+        "scenario": "iam.user",
+        "run_id": "1016-1501-fb59",
+        "title": "사용자 그룹 목록 | Identity and Access Management(IAM) | Global | Console",
+        "phase": "teardown"
+      },
+      "steps": [
+        {
+          "title": "steps[0] 사용자 목록으로 이동해 지정 테스트 사용자 {{user}} 가 있는지 확인한다",
+          "status": "pass",
+          "seconds": 10.4
+        },
+        {
+          "title": "steps[1] 사용자 usr-cprobe-1016-1442 설명 수정 → 되돌림",
+          "status": "pass",
+          "seconds": 23.8
+        },
+        {
+          "title": "steps[2] 그룹 grp-1016-1501-fb59 생성",
+          "status": "pass",
+          "seconds": 9.4
+        },
+        {
+          "title": "steps[3] 그룹 grp-1016-1501-fb59 에 사용자 usr-cprobe-1016-1442 추가",
+          "status": "pass",
+          "seconds": 13.4
+        },
+        {
+          "title": "steps[4] 그룹 grp-1016-1501-fb59 에서 사용자 usr-cprobe-1016-1442 제외",
+          "status": "pass",
+          "seconds": 9
+        },
+        {
+          "title": "steps[5] 사용자 usr-cprobe-1016-1442 권한 탭에 정책 CostNavigatorReadOnlyAccess 추가",
+          "status": "fail",
+          "seconds": 22.8
+        }
+      ],
+      "error": "TimeoutError: locator.fill: Timeout 15000ms exceeded.",
+      "attachments": [
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-13.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-2.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-7.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-9.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-3.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-1.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-8.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-6.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-12.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-10.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-5.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-11.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-4.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/screenshot-iam.user.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-14.png",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/error-context.md",
+        "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/trace.zip"
+      ]
+    }
+  ],
+  "api_writes": [
+    "POST /console/api/budget/v1/cost-analysis/budget",
+    "PUT /console/api/iam/v1/accounts/{id}/users/{id}",
+    "POST /console/api/iam/v1/groups",
+    "POST /console/api/iam/v1/groups/{id}/members/bulk",
+    "DELETE /console/api/iam/v1/groups/{id}/members/bulk",
+    "DELETE /console/api/iam/v1/groups/bulk"
+  ],
+  "git_sha": "05c3205",
+  "error": "TimeoutError: locator.fill: Timeout 15000ms exceeded.",
+  "attachments": [
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-13.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-2.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-7.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-9.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-3.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-1.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-8.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-6.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-12.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-10.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-5.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-11.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-4.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/screenshot-iam.user.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/test-failed-14.png",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/error-context.md",
+    "test-results/artifacts/iam.user/iam.user-IAM-지정-테스트-사용자-설명-3b233-설명-수정-→-그룹-추가·제외-→-권한-연결·해제-regression/trace.zip"
+  ]
+}

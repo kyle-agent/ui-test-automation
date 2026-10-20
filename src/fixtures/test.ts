@@ -25,7 +25,12 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       }
       const browser = await connectLiveBrowser();
       await use(browser);
-      await browser.close().catch(() => undefined); // 연결만 끊는다. 브라우저 자체는 계속 산다.
+      // 연결만 끊는다. 브라우저 자체는 계속 산다. 2026-10-16 DBaaS 3개 동시 실행 뒤 close() 가 90초 워커 teardown 한도를 넘겨
+      // 테스트는 다 통과했는데 실행 기록이 FAIL 로 남았다 → 15초만 기다리고 넘어간다(CDP 세션은 프로세스 종료로 정리됨).
+      await Promise.race([
+        browser.close().catch(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, 15_000).unref()),
+      ]);
     },
     { scope: 'worker' },
   ],

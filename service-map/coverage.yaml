@@ -265,10 +265,10 @@ resources:
     service: "IAM"
     category: "Management"
     route: /iam/user/list
-    level: 1
-    specs: [smoke.iam]
-    last_pass: null
-    note: "제외: 실제 로그인 자격 증명을 만듦(원칙)"
+    level: 3
+    specs: [smoke.iam, iam.user]
+    last_pass: "2026-10-16"
+    note: "생성·삭제는 제외(생성 = 실제 로그인 자격 증명, 삭제 = 로그인 계정 비밀번호 확인 모달 — 2026-10-16 agent C 확인). iam.user: 사람이 지정한 테스트 사용자(IAM_TEST_USER)에 설명 연필(PUT …/users/{id}) · 그룹 상세 사용자 추가/제외(…/members/bulk) · 권한 탭 정책 직접 연결/해제(PUT …/users/{id}/assignments)(L3), 그룹은 spec 이 만들고 지운다. 변수 없으면 skip. PASS 2.0분"
   - key: group@id-center
     service: "ID Center"
     category: "Management"
