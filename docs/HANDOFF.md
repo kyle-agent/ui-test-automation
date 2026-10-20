@@ -547,6 +547,15 @@
   자르기(10-20): 녹화기가 `<video>.json`(영상 0초의 실제 시각·배속)을 함께 남기고, `npm run video:cut -- <video> --until "steps[5]" [--from "steps[2]"]` 가
   Playwright JSON 보고서(test-results/stacks, 영상과 같은 spec 의 최신)의 최상위 test.step duration 을 누적해 단계 시작 시각을 구해 `-c copy` 로 잘라낸다(재인코딩 없음, 몇 초 오차).
   용도: compute.vm-stack 30분 녹화에서 "VPC→Subnet→VM 생성" 부분(steps[5] 직전)만 데모 영상으로.
+  10-20 23:06 실행: compute.vm-stack PASS 26분 30초 → `20261020-2330-compute.vm-stack.webm`(24분, 37.9MB) + `-cut.webm`(9분 40초, 12.9MB, VM Active 까지).
+  콘솔 점검 공지(10-20 22:00~24:00 네트워크 상품 변경 불가) 시간대였지만 VPC·Subnet 생성·삭제가 모두 정상 동작했다(공지가 실제로는 막지 않음).
+- 10-16 에이전트 3개 결과(각 보고는 reports/agent*-20261016.log): C(IAM·RG) 완료 — iam.user 신규 spec(IAM_TEST_USER 필요, 아래), iam.role 역할 단건 삭제, iam.policy 정책 상세 삭제, RG 일괄 삭제, 모두 PASS;
+  B(보안·앱) — API Gateway setauth·setaccesscontrol·setapikeydescription·deleteresourcepolicy·setresourcepolicy PASS(443c56d); Container Registry 프라이빗 ACL 은 10-16·10-20 실패("프라이빗 엔드포인트 접근 제어 값이 60초 안에 바뀌지 않음", KI-001 과 같은 계열 의심), 작업 트리에 미커밋;
+  A(네트워킹) — VPC addvpccidr PASS(05c3205); LB 서버 그룹 멤버 추가·포트 변경·삭제는 "부하 분산 수정" 모달이 안 닫혀 실패, 미커밋(scenarios/networking/load-balancer.yaml, 같은 spec). 두 에이전트 모두 Claude 사용 한도(429)로 중단됨.
+  **IAM 잔여물(사람이 결정)**: 프로브가 만든 사용자 `usr-cprobe-1016-1442`(권한·그룹 없음, 비밀번호 미기록). 콘솔 사용자 삭제는 로그인 계정 비밀번호 확인 모달을 요구해 spec 이 지울 수 없다.
+  유지하면 .env 에 `IAM_TEST_USER=usr-cprobe-1016-1442` 를 넣어 iam.user 를 스위트에 포함(없으면 skip), 지우려면 콘솔에서 직접.
+- DBaaS 7차 본 실행(10-16 16:32, 3개 동시): 테스트 전부 통과했으나 liveBrowser close() 가 90초 워커 teardown 한도를 넘겨 기록 FAIL(df67a60 에서 close 15초 상한). **재실행 필요**: 공유 VPC 만들고
+  `SHARED_VPC=… SHARED_SUBNET=… node node_modules/tsx/dist/cli.mjs scripts/run-stacks.ts --only database.<engine> --no-preflight` 3개 동시(각 ~60분). 10-20 밤에는 사용 한도로 미실행(만든 공유 VPC vpc-1020-2333-6f32 는 지움).
 - 대시보드 요약(데모) 보기: 머리 오른쪽 `요약 | 전체` 토글(`?view=demo|full` > localStorage `scp-dash-view` > 기본 요약). 요약은 핵심 카드 + 한 줄 요약 4개(`ul.hl`: 상품 커버·동작 커버·제품 결함·콘솔 전용) + 조치 + 최근 스위트 5행 + 커버리지·상품 표만.
   세부 섹션(spec·실패·매트릭스·대응표·탐색·발견·실행)은 `data-demo="hide"`, 최근 7일 실패 카드는 `.card.wk` 로 숨김. 전체 보기는 그대로.
 - 대응표 보강(`data/ui-operations.yaml`, `# api_writes 2026-10-14`): 통과 실행의 api_writes 가 카탈로그 동작과 strict 로 맞는데 그 spec 이 대응표에 없는 것 11건(태그 updateresourcetagvalue 10 spec, NAT GW 의 IGW 생성/삭제, vm-stack setport, api-gateway 의 Cloud Functions 생성/삭제, LB setlblistenerresource 등)
