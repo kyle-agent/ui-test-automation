@@ -9,6 +9,20 @@
  *  - 첫 행을 눌러 상세로 가면 상세의 제목·탭·버튼·수정 아이콘 라벨을 모으고, 탭을 하나씩 눌러 route 가 바뀌는지 본다.
  *  아무것도 입력·저장하지 않는다. 모달은 취소/닫기/Esc 로 닫는다.
  */
+import fs from 'node:fs';
+import path from 'node:path';
+
+export const SCREEN_TREE_JSON = path.resolve(process.cwd(), 'service-map', 'screen-tree.json');
+
+/** 수집된 화면 트리. 없으면 null (대시보드는 트리 없이도 그린다) */
+export function readScreenTree(file = SCREEN_TREE_JSON): ScreenTree | null {
+  if (!fs.existsSync(file)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8')) as ScreenTree;
+  } catch {
+    return null;
+  }
+}
 
 export type ButtonKind = 'opens' | 'needs-row' | 'destructive' | 'other';
 

@@ -37,6 +37,7 @@ import {
   type OperationsSummary,
   type ProductOperations,
 } from './operations';
+import type { ScreenTree } from '../service-map/screen-tree';
 import type { ProductMatrix } from './product-matrix';
 import { buildScreenBoard, SCREEN_BOARD_CSS, screenBoardBlock } from './screen-board';
 import type { RunRecord } from './run-record';
@@ -117,6 +118,8 @@ export interface DashboardInput {
   apiSnapshot?: ApiCoverageSnapshot | null;
   /** 상품별 화면 판단표(src/report/product-matrix.ts) */
   matrix?: readonly ProductMatrix[];
+  /** 콘솔을 돌며 모은 화면 트리(scripts/screen-crawl.ts → service-map/screen-tree.json): 생성 화면·상세·상세 탭 근거 */
+  tree?: ScreenTree | null;
   /** 상품별 쓰기 동작 커버리지(src/report/operations.ts productOperations) */
   operations?: OperationsSummary;
   /** 콘솔 전용 쓰기 동작: 통과한 실행이 보낸 쓰기 요청 중 API 카탈로그 경로에 없는 것(src/report/operations.ts consoleOnlyWrites) */
@@ -785,7 +788,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   ].filter(Boolean);
 
   // 첫 화면: 카테고리·상품·화면별 정상 여부(2026-10-22, src/report/screen-board.ts)
-  const board = buildScreenBoard(input.matrix ?? [], records, new Set(flakySpecs));
+  const board = buildScreenBoard(input.matrix ?? [], records, new Set(flakySpecs), input.tree);
 
   return `<!doctype html>
 <html lang="ko">

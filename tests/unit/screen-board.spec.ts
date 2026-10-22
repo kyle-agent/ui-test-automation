@@ -7,11 +7,14 @@ import {
   countParts,
   countScreenStatuses,
   judgeScreen,
+  normRoute,
   orderCategories,
   screenBoardBlock,
   specPartsOnScreen,
+  treeEvidence,
   type BoardSpec,
 } from '../../src/report/screen-board';
+import type { ScreenTree } from '../../src/service-map/screen-tree';
 
 const rec = (spec: string, started: string, status: 'pass' | 'fail', error?: string): RunRecord => ({
   spec,
@@ -33,6 +36,7 @@ const bs = (spec: string, own: boolean, status?: 'pass' | 'fail', flaky = false)
   steps: 1,
   parts: ['list'],
   actions: [],
+  routes: [],
   status,
   runs: status ? 1 : 0,
   passes: status === 'pass' ? 1 : 0,
@@ -60,15 +64,24 @@ test.describe('화면 상태판', () => {
   });
 
   test('단계 → 칸(목록·생성·상세)·동작(수정·삭제)', () => {
-    expect(classifyStep('VPC 목록 화면으로 이동한다', '/vpc/vpc/list')).toEqual({ parts: ['list'], actions: [] });
+    expect(classifyStep('VPC 목록 화면으로 이동한다', '/vpc/vpc/list')).toEqual({
+      parts: ['list'],
+      actions: [],
+    });
     expect(classifyStep('VPC 생성 버튼을 눌러 생성 화면을 연다', '/vpc/vpc/list').parts).toEqual(['create']);
     expect(classifyStep('설명을 바꿔 반영을 확인하고 되돌린다', '/vpc/vpc/detail')).toEqual({
       parts: ['detail'],
       actions: ['수정'],
     });
     // 상세 아래 탭도 상세 칸. 생성 낱말이 있어도 route 가 먼저
-    expect(classifyStep('IP 대역 추가 후 삭제한다', '/vpc/vpc/detail/ip-range')).toEqual({ parts: ['detail'], actions: ['삭제'] });
-    expect(classifyStep('VPC {{name}} 을 삭제한다', '/vpc/vpc/list')).toEqual({ parts: ['list'], actions: ['삭제'] });
+    expect(classifyStep('IP 대역 추가 후 삭제한다', '/vpc/vpc/detail/ip-range')).toEqual({
+      parts: ['detail'],
+      actions: ['삭제'],
+    });
+    expect(classifyStep('VPC {{name}} 을 삭제한다', '/vpc/vpc/list')).toEqual({
+      parts: ['list'],
+      actions: ['삭제'],
+    });
     // route 없는 단계는 바로 앞 단계의 화면에 있는 것으로. 다른 화면의 단계는 세지 않는다
     expect(
       specPartsOnScreen('/vpc/vpc/list', [
@@ -78,11 +91,144 @@ test.describe('화면 상태판', () => {
         { goal: 'VPC 상세에서 설명을 수정한다', route: '/vpc/vpc/detail' },
         { goal: 'VPC 를 삭제한다', route: '/vpc/vpc/list', teardown: true },
       ]),
-    ).toEqual({ parts: ['list', 'create', 'detail'], actions: ['수정', '삭제'] });
-    expect(specPartsOnScreen('/vpc/subnet/list', [{ goal: 'Subnet 을 만든다', route: '/vpc/subnet/list' }])).toEqual({
+    ).toEqual({
+      parts: ['list', 'create', 'detail'],
+      actions: ['수정', '삭제'],
+      routes: ['/vpc/vpc/list', '/vpc/vpc/detail'],
+    });
+    expect(
+      specPartsOnScreen('/vpc/subnet/list', [{ goal: 'Subnet 을 만든다', route: '/vpc/subnet/list' }]),
+    ).toEqual({
       parts: ['create'],
       actions: [],
+      routes: ['/vpc/subnet/list'],
     });
+    expect(normRoute('#/iam/user/detail/9158b971e6624c21bfa503f9d28d51a3/group?x=1')).toBe(
+      '/iam/user/detail/group',
+    );
+    expect(normRoute('/vpc/vpc/detail/info?vpcId={id}')).toBe('/vpc/vpc/detail/info');
+    expect(normRoute('/vpc/vpc/detail/ip-range')).toBe('/vpc/vpc/detail/ip-range');
+  });
+
+  test('화면 트리: 생성 화면·상세·상세 탭 근거와 탭 칸 판정, 없다고 확인된 칸은 na', () => {
+    const tree: ScreenTree = {
+      generatedAt: '2026-10-22T05:00:00.000Z',
+      services: [
+        {
+          category: 'Networking',
+          name: 'VPC',
+          screens: [
+            {
+              name: 'VPC',
+              route: '/vpc/vpc/list',
+              tabs: [],
+              rows: 1,
+              buttons: [
+                {
+                  label: 'VPC 생성',
+                  kind: 'opens',
+                  opens: { type: 'page', route: '/vpc/vpc/request', title: 'VPC 생성' },
+                },
+              ],
+              rowActions: [],
+              detail: {
+                route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/basic',
+                title: 'VPC 상세',
+                tabs: [
+                  { label: '기본 정보' },
+                  {
+                    label: 'IP 대역 관리 (1)',
+                    route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/ip-range',
+                  },
+                  { label: '태그 (0)', route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/tag' },
+                ],
+                buttons: [],
+                edits: ['설명'],
+              },
+              crawledAt: '2026-10-22T05:00:00.000Z',
+            },
+            // 생성 버튼이 없고 행을 눌러도 상세가 없는 화면(조회 전용): 생성·상세 칸은 na
+            {
+              name: 'Port',
+              route: '/vpc/port/list',
+              tabs: [],
+              rows: 3,
+              buttons: [{ label: '새로고침', kind: 'other' }],
+              rowActions: [],
+              crawledAt: '2026-10-22T05:00:00.000Z',
+            },
+          ],
+        },
+      ],
+    };
+    const ev = treeEvidence(tree.services[0]!.screens[0]!);
+    expect(ev).toMatchObject({
+      create: '/vpc/vpc/request "VPC 생성"',
+      createKnownAbsent: false,
+      detailKnownAbsent: false,
+    });
+    expect(ev.tabs).toEqual([
+      { label: 'IP 대역 관리', route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/ip-range' },
+      { label: '태그', route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/tag' },
+    ]);
+    expect(treeEvidence(tree.services[0]!.screens[1]!)).toMatchObject({
+      createKnownAbsent: true,
+      detailKnownAbsent: true,
+    });
+
+    const matrix: ProductMatrix[] = [
+      {
+        category: 'Networking',
+        service: 'VPC',
+        screens: [
+          {
+            name: 'VPC',
+            route: '/vpc/vpc/list',
+            state: '시나리오',
+            specs: [{ spec: 'networking.vpc.create-delete', steps: 3, status: 'pass' }],
+          },
+          { name: 'Port', route: '/vpc/port/list', state: '스모크만', specs: [] },
+        ],
+        specs: [
+          {
+            spec: 'networking.vpc.create-delete',
+            title: 't',
+            file: 'f',
+            category: 'Networking',
+            service: 'VPC',
+            screens: [],
+            steps: [
+              { goal: 'VPC 목록으로 이동한다', route: '/vpc/vpc/list' },
+              { goal: 'VPC 를 생성한다' },
+              { goal: 'IP 대역을 추가한다', route: '/vpc/vpc/detail/ip-range' },
+            ],
+            runs: 1,
+            passes: 1,
+          },
+        ],
+      },
+    ];
+    const board = buildScreenBoard(
+      matrix,
+      [rec('networking.vpc.create-delete', '2026-10-20T01:00:00.000Z', 'pass')],
+      new Set(),
+      tree,
+    );
+    const vpc = board.products[0]!.screens[0]!;
+    expect(vpc.parts).toEqual({ list: 'pass', create: 'pass', detail: 'pass' });
+    expect(vpc.tabs).toEqual([
+      {
+        label: 'IP 대역 관리',
+        route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/ip-range',
+        status: 'pass',
+      },
+      { label: '태그', route: '/vpc/vpc/detail/abcdef0123456789abcdef0123456789/tag', status: 'none' },
+    ]);
+    expect(vpc.tree).toMatchObject({ create: '/vpc/vpc/request "VPC 생성"' });
+    const port = board.products[0]!.screens[1]!;
+    expect(port.parts).toEqual({ list: 'smoke', create: 'na', detail: 'na' });
+    // 칸: VPC 3 + 탭 2 = 5, Port 목록 1 (na 2 는 전체에서 뺀다)
+    expect(countParts(board)).toEqual({ total: 6, verified: 4, fail: 0, none: 1, na: 2, tabs: 2 });
   });
 
   test('카테고리는 콘솔 순서, 모르는 것은 뒤에 이름순', () => {
@@ -194,7 +340,11 @@ test.describe('화면 상태판', () => {
     expect(by('/vpc/vpc/list').status).toBe('pass'); // 자기 spec 통과, DBaaS 실패는 전제 단계
     expect(by('/vpc/vpc/list').parts).toEqual({ list: 'pass', create: 'pass', detail: 'pass' });
     expect(by('/vpc/vpc/list').actions).toEqual({ edit: 'pass', delete: 'none' });
-    expect(by('/vpc/vpc/list').specs[0]).toMatchObject({ spec: 'networking.vpc.create-delete', parts: ['list', 'create', 'detail'], actions: ['수정'] });
+    expect(by('/vpc/vpc/list').specs[0]).toMatchObject({
+      spec: 'networking.vpc.create-delete',
+      parts: ['list', 'create', 'detail'],
+      actions: ['수정'],
+    });
     expect(by('/vpc/vpc/list').specs[1]).toMatchObject({ spec: 'database.mysql', parts: ['list'] });
     expect(by('/vpc/subnet/list').status).toBe('fail'); // 전제 단계 spec 만 있고 통과한 것이 없음
     expect(by('/vpc/subnet/list').parts).toEqual({ list: 'none', create: 'fail', detail: 'none' });
@@ -202,7 +352,7 @@ test.describe('화면 상태판', () => {
     expect(by('/vpc/port/list').parts).toEqual({ list: 'smoke', create: 'none', detail: 'none' });
     expect(by('/vpc/port/list').actions).toEqual({ edit: 'none', delete: 'none' });
     expect(by('/vpc/dashboard').status).toBe('home');
-    expect(by('/vpc/dashboard').parts).toEqual({ list: 'home', create: 'none', detail: 'none' });
+    expect(by('/vpc/dashboard').parts).toEqual({ list: 'home', create: 'na', detail: 'na' }); // 홈에는 생성·상세가 없다
     const mysql = board.products.find((p) => p.name === 'MySQL')!.screens[0]!;
     expect(mysql.status).toBe('fail');
     expect(mysql.specs[0]).toMatchObject({
@@ -215,7 +365,7 @@ test.describe('화면 상태판', () => {
     expect(mysql.parts).toEqual({ list: 'none', create: 'fail', detail: 'none' });
     expect(countScreenStatuses(board)).toMatchObject({ pass: 1, fail: 2, smoke: 1, home: 1, excluded: 1 });
     // 칸: 검증 대상 화면 4개 × 3 = 12, 검증 3(VPC), 실패 2(Subnet 생성·MySQL 생성), 미검증 6, 진입만 1
-    expect(countParts(board)).toEqual({ total: 12, verified: 3, fail: 2, none: 6 });
+    expect(countParts(board)).toEqual({ total: 12, verified: 3, fail: 2, none: 6, na: 0, tabs: 0 });
 
     const html = screenBoardBlock(board);
     expect(html).toContain('id="sb-data"');

@@ -33,6 +33,7 @@ import { loadKnownIssues } from '../src/report/known-issues';
 import { failuresTable, fmtTime, knownIssuesSection, resultsTable } from '../src/report/results';
 import { classifyFailure, readRunRecords, RUNS_DIR } from '../src/report/run-record';
 import { SUITE_ORDER } from '../src/report/suite';
+import { readScreenTree } from '../src/service-map/screen-tree';
 
 const RESULTS_MD = path.resolve(process.cwd(), 'reports', 'RESULTS.md');
 const DASHBOARD_HTML = path.resolve(process.cwd(), 'reports', 'dashboard.html');
@@ -160,6 +161,7 @@ function main(): void {
       products: productComparison(ledger.resources, apiSnapshot, readExclusions()),
       apiSnapshot,
       matrix: buildProductMatrix(map, ledger.resources, catalog, readDecisions(), readExclusions()),
+      tree: readScreenTree(),
       operations,
       consoleOnly,
     }),
