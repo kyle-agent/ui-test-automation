@@ -15,6 +15,10 @@ export interface Screen {
   route: string;
   /** 메뉴 API 가 주는 리소스 종류 (있을 때만) */
   resource_type?: string;
+  /** 메뉴 API 가 주는 상세 화면 route 패턴(예: /vpc/vpc/detail/info?vpcId={id}) (있을 때만, 2026-10-22) */
+  detail_path?: string;
+  /** 하위 메뉴(child_menu)면 상위 메뉴 이름 */
+  parent?: string;
 }
 
 export interface Service {
@@ -22,6 +26,8 @@ export interface Service {
   name: string;
   /** 모든 서비스 화면에서 서비스를 열었을 때의 진입 라우트 */
   route: string;
+  /** 메뉴 API 의 생성 화면 route(console_request_path, 예: /vpc/vpc/request) (있을 때만, 2026-10-22) */
+  request_path?: string;
   screens: Screen[];
 }
 
@@ -98,6 +104,7 @@ export const KEYS = {
     'title',
   ],
   category: [
+    'product_category_name_ko', // 실제 응답 키(2026-10-22)
     'category_name_ko',
     'category_ko',
     'category_name',
@@ -105,7 +112,8 @@ export const KEYS = {
     'service_category_ko',
     'service_category',
   ],
-  serviceRoute: ['service_route', 'route', 'path', 'url', 'link', 'service_url', 'menu_url'],
+  // console_path: 실제 응답(2026-09-21·10-22 raw)의 키. "vpc/vpc/list" 처럼 앞 슬래시가 없다 → normalizeRoute 가 붙인다
+  serviceRoute: ['service_route', 'route', 'path', 'url', 'link', 'service_url', 'menu_url', 'console_path'],
   menuJson: ['service_menu_ko', 'service_menu', 'menu_ko', 'menu'],
   nodeName: [
     'name_ko',
@@ -119,9 +127,24 @@ export const KEYS = {
     'title',
     'text',
   ],
-  nodeRoute: ['route', 'path', 'url', 'link', 'to', 'href', 'menu_url', 'menuUrl'],
-  nodeChildren: ['children', 'sub_menus', 'subMenus', 'sub_menu', 'subMenu', 'items', 'menus', 'child'],
+  nodeRoute: ['route', 'path', 'url', 'link', 'to', 'href', 'menu_url', 'menuUrl', 'console_path'],
+  // child_menu: 실제 응답(2026-09-21 raw)의 하위 메뉴 키 — Message Hub(Domain·Email), ServiceWatch, Resource Optimizer 등 15개 메뉴
+  nodeChildren: [
+    'children',
+    'sub_menus',
+    'subMenus',
+    'sub_menu',
+    'subMenu',
+    'items',
+    'menus',
+    'child',
+    'child_menu',
+  ],
   resourceType: ['resource_type', 'resourceType', 'resource'],
+  /** 상세 화면 route 패턴(실제 응답: "vpc/vpc/detail/info?vpcId={id}") */
+  detailPath: ['detail_path', 'detailPath'],
+  /** 서비스 항목의 생성 화면 route(실제 응답: console_request_path "vpc/vpc/request", 없으면 "-") */
+  requestPath: ['console_request_path', 'request_path', 'requestPath'],
 } as const;
 
 type Raw = Record<string, unknown>;
@@ -153,7 +176,10 @@ export function normalizeMenusApi(items: unknown[], generatedAt = new Date().toI
       });
       return;
     }
-    services.push({ category, name, route: normalizeRoute(route), screens: nodes });
+    const service: Service = { category, name, route: normalizeRoute(route), screens: nodes };
+    const request = pickString(item, KEYS.requestPath);
+    if (request && request !== '-' && isRouteLike(request)) service.request_path = normalizeRoute(request);
+    services.push(service);
   });
   return {
     map: {
@@ -183,9 +209,9 @@ function parseMenuJson(value: unknown): unknown {
 export function collectNodes(tree: unknown): Screen[] {
   const out: Screen[] = [];
   const seen = new Set<string>();
-  const walk = (node: unknown): void => {
+  const walk = (node: unknown, parent?: string): void => {
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      node.forEach((n) => walk(n, parent));
       return;
     }
     if (!isRecord(node)) return;
@@ -198,11 +224,14 @@ export function collectNodes(tree: unknown): Screen[] {
         const screen: Screen = { name, route: r };
         const rt = pickString(node, KEYS.resourceType);
         if (rt) screen.resource_type = rt;
+        const dp = pickString(node, KEYS.detailPath);
+        if (dp && isRouteLike(dp)) screen.detail_path = normalizeRoute(dp);
+        if (parent) screen.parent = parent;
         out.push(screen);
       }
     }
     for (const key of KEYS.nodeChildren) {
-      if (key in node) walk(node[key]);
+      if (key in node) walk(node[key], name ?? parent);
     }
   };
   walk(tree);
@@ -358,7 +387,8 @@ export function normalizeRoute(route: string): string {
 
 function isRouteLike(value: string): boolean {
   const v = value.trim();
-  return v.startsWith('/') || v.startsWith('#/');
+  // "/vpc/vpc/list" · "#/vpc/vpc/list" · 메뉴 API 의 "vpc/vpc/list"(앞 슬래시 없음). "-"·빈 값·절대 URL 은 아니다
+  return v.startsWith('/') || v.startsWith('#/') || /^[a-z0-9][a-z0-9_-]*\/[a-z0-9]/i.test(v);
 }
 
 export function countScreens(map: ScreenMap): number {

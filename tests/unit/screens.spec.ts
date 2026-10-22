@@ -18,7 +18,7 @@ test.describe('screens.txt 파서', () => {
   test('실제 screens.txt 를 읽고 다시 써도 같은 트리가 나온다', () => {
     const text = fs.readFileSync(SCREENS_TXT, 'utf8');
     const map = parseScreensTxt(text);
-    expect(map.services.length).toBe(89);
+    expect(map.services.length).toBeGreaterThanOrEqual(89); // 2026-10-22 메뉴 API: 90 (Managed Prometheus 추가)
     expect(countScreens(map)).toBeGreaterThan(190);
     const again = parseScreensTxt(formatScreensTxt(map));
     expect(again.services).toEqual(map.services);
@@ -79,11 +79,78 @@ test.describe('메뉴 API 정규화', () => {
         route: '/iam',
         screens: [
           { name: 'Service Home', route: '/iam/dashboard' },
-          { name: '사용자', route: '/iam/user/list', resource_type: 'user' },
-          { name: '정책', route: '/iam/policy/list' },
+          { name: '사용자', route: '/iam/user/list', resource_type: 'user', parent: '사용자 관리' },
+          { name: '정책', route: '/iam/policy/list', parent: '사용자 관리' },
         ],
       },
     ]);
+  });
+
+  test('실제 응답 키: console_path(앞 슬래시 없음)·detail_path·child_menu·console_request_path (2026-10-22)', () => {
+    const menu = JSON.stringify([
+      { console_path: 'vpc/dashboard', name: 'Service Home', seq: 1 },
+      {
+        console_path: 'vpc/vpc/list',
+        name: 'VPC',
+        seq: 2,
+        resource_type: 'vpc',
+        detail: 'true',
+        detail_path: 'vpc/vpc/detail/info?vpcId={id}',
+      },
+      {
+        console_path: 'messagehub/email',
+        name: 'Email',
+        seq: 3,
+        child_menu: [
+          {
+            console_path: 'messagehub/domain',
+            name: 'Domain',
+            seq: 1,
+            detail_path: 'messagehub/domain/detail/info?domainId={id}',
+          },
+        ],
+      },
+    ]);
+    const { map, unresolved } = normalizeMenusApi([
+      {
+        name_ko: 'VPC',
+        product_category_name_ko: 'Networking',
+        console_path: 'vpc/dashboard',
+        console_request_path: 'vpc/vpc/request',
+        service_menu_ko: menu,
+      },
+      {
+        name_ko: 'Dedicated',
+        product_category_name_ko: 'Compute',
+        console_path: 'dedicated/dashboard',
+        console_request_path: '-',
+        service_menu_ko: '[]',
+      },
+    ]);
+    expect(unresolved).toHaveLength(0);
+    expect(map.services[1]).toMatchObject({
+      name: 'VPC',
+      route: '/vpc/dashboard',
+      request_path: '/vpc/vpc/request',
+    });
+    expect(map.services[1]!.screens).toEqual([
+      { name: 'Service Home', route: '/vpc/dashboard' },
+      {
+        name: 'VPC',
+        route: '/vpc/vpc/list',
+        resource_type: 'vpc',
+        detail_path: '/vpc/vpc/detail/info?vpcId={id}',
+      },
+      { name: 'Email', route: '/messagehub/email' },
+      {
+        name: 'Domain',
+        route: '/messagehub/domain',
+        detail_path: '/messagehub/domain/detail/info?domainId={id}',
+        parent: 'Email',
+      },
+    ]);
+    expect(map.services[0]).toMatchObject({ name: 'Dedicated', route: '/dedicated/dashboard' });
+    expect(map.services[0]!.request_path).toBeUndefined();
   });
 
   test('진입 라우트가 없으면 첫 화면 라우트를 쓴다', () => {

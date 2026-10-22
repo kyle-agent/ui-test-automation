@@ -28,3 +28,7 @@ reports/suite/
 
 .claude/settings.local.json
 reports/videos/
+
+# 콘솔에서 받아온 화면 트리(scripts/screen-crawl.ts) — 커밋하지 않는다
+service-map/screen-tree.json
+service-map/screen-tree.md
