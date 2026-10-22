@@ -13,9 +13,16 @@
  *   home     홈      Service Home(대시보드 화면). 검증 대상이 아니라 기본으로 숨긴다
  *
  * "자기 상품 spec" = 시나리오 yaml 의 service 가 그 상품인 spec. 다른 상품 spec 은 전제 리소스를 만들며 이 화면을 지나는 것.
+ *
+ * 화면 하나는 콘솔 관례대로 목록 → 생성 · 상세 의 세 칸(ScreenPart)으로 펼친다(2026-10-22). 서비스 맵은 목록 route 만 가지므로
+ * 칸은 시나리오 단계로 판정한다: route 가 …/detail 이면 상세, 목표(goal)가 생성·만든다·등록이면 생성, 그 외는 목록.
+ * route 없는 단계(생성 버튼을 누른다 등)는 바로 앞 단계의 화면에 있는 것으로 본다. 수정·삭제는 칸이 아니라 그 spec 의 동작으로 적는다.
+ * 어느 spec 도 지나지 않는 칸은 none(미검증) — 점선 빈 칸. 화면 상태는 세 칸을 합친 spec 전체로, 칸 상태는 그 칸을 지나는 spec 만으로 판정.
+ *
  * 화면·상태 계산은 순수 함수(buildScreenBoard), 표는 브라우저에서 그린다(필터·검색·상세 패널). 외부 요청 없음.
  */
-import type { ProductMatrix, ScreenRow } from './product-matrix';
+import { routeMatches, type ProductMatrix, type ScreenRow } from './product-matrix';
+import type { CatalogStep } from './scenario-catalog';
 import { groupBySpec } from './results';
 import type { RunRecord } from './run-record';
 
@@ -30,6 +37,13 @@ export const SCREEN_STATUS_LABEL: Record<ScreenStatus, string> = {
   excluded: '제외',
   home: '홈',
 };
+
+/** 화면 하나를 펼친 세 칸: 목록 화면, 생성 화면, 상세 화면 */
+export type ScreenPart = 'list' | 'create' | 'detail';
+export const SCREEN_PARTS: readonly ScreenPart[] = ['list', 'create', 'detail'];
+export const SCREEN_PART_LABEL: Record<ScreenPart, string> = { list: '목록', create: '생성', detail: '상세' };
+/** 칸 상태: 화면 상태 + none(그 칸을 지나는 spec 없음) */
+export type PartStatus = ScreenStatus | 'none';
 
 /** 콘솔 "모든 서비스" 화면의 카테고리 순서(service-map/catalog.yaml). 없는 카테고리는 뒤에 이름순 */
 export const CATEGORY_ORDER: readonly string[] = [
@@ -54,6 +68,10 @@ export interface BoardSpec {
   own: boolean;
   /** 이 화면을 지나는 단계 수 */
   steps: number;
+  /** 이 화면에서 지나는 칸(목록·생성·상세) */
+  parts: ScreenPart[];
+  /** 이 화면에서 하는 쓰기 동작(수정·삭제). 생성은 칸으로 보인다 */
+  actions: string[];
   status?: 'pass' | 'fail';
   started?: string;
   seconds?: number;
@@ -74,6 +92,8 @@ export interface BoardScreen {
   reason?: string;
   decision?: { decision: string; note?: string };
   specs: BoardSpec[];
+  /** 칸별 상태(목록·생성·상세). 홈 화면은 list 칸 하나만 home, 나머지 none */
+  parts: Record<ScreenPart, PartStatus>;
 }
 
 export interface BoardProduct {
@@ -127,6 +147,42 @@ export function orderCategories(names: Iterable<string>): string[] {
 const ownAttachments = (list: readonly string[] | undefined): string[] =>
   (list ?? []).filter((p) => !/\/test-failed-\d+\.png$/.test(p));
 
+const CREATE_RE = /생성|만든다|만들어|등록|발급|신청/;
+const EDIT_RE = /수정|변경|바꿔|바꾼|편집|갱신/;
+const DELETE_RE = /삭제|해지|제거|지운다|지우고/;
+
+/** 단계 하나가 어느 칸에 있고 무엇을 하는가. route 가 …/detail(/…) 이면 상세, 목표가 생성이면 생성, 그 외 목록 */
+export function classifyStep(goal: string, route: string): { part: ScreenPart; actions: string[] } {
+  const actions: string[] = [];
+  if (EDIT_RE.test(goal)) actions.push('수정');
+  if (DELETE_RE.test(goal)) actions.push('삭제');
+  if (/\/detail(\/|$)/.test(route)) return { part: 'detail', actions };
+  if (CREATE_RE.test(goal)) return { part: 'create', actions };
+  return { part: 'list', actions };
+}
+
+/** spec 의 단계들이 이 화면(목록 route)에서 지나는 칸과 동작. route 없는 단계는 바로 앞 단계의 화면에 있는 것으로 본다 */
+export function specPartsOnScreen(
+  screenRoute: string,
+  steps: readonly CatalogStep[],
+): { parts: ScreenPart[]; actions: string[] } {
+  let current: string | undefined;
+  const parts = new Set<ScreenPart>();
+  const actions = new Set<string>();
+  for (const s of steps) {
+    if (s.route) current = s.route;
+    const route = s.route ?? current;
+    if (!route || !routeMatches(screenRoute, route)) continue;
+    const c = classifyStep(s.goal, route);
+    parts.add(c.part);
+    for (const a of c.actions) actions.add(a);
+  }
+  return {
+    parts: SCREEN_PARTS.filter((p) => parts.has(p)),
+    actions: ['수정', '삭제'].filter((a) => actions.has(a)),
+  };
+}
+
 export function buildScreenBoard(
   matrix: readonly ProductMatrix[],
   records: readonly RunRecord[],
@@ -135,7 +191,12 @@ export function buildScreenBoard(
   const bySpec = groupBySpec(records);
   // spec → 그 시나리오의 상품 (자기 상품 spec 판정용)
   const specService = new Map<string, string>();
-  for (const m of matrix) for (const c of m.specs) specService.set(c.spec, c.service);
+  const specSteps = new Map<string, readonly CatalogStep[]>();
+  for (const m of matrix)
+    for (const c of m.specs) {
+      specService.set(c.spec, c.service);
+      specSteps.set(c.spec, c.steps);
+    }
 
   const used = new Set<string>();
   const products: BoardProduct[] = [];
@@ -148,10 +209,16 @@ export function buildScreenBoard(
       const specs: BoardSpec[] = row.specs.map((x) => {
         const runs = bySpec.get(x.spec) ?? [];
         const last = runs[runs.length - 1];
+        // 단계 목록이 없는 spec(판단표에 없는 상품의 spec)은 목록 칸만 지난 것으로 본다
+        const on = specSteps.has(x.spec)
+          ? specPartsOnScreen(row.route, specSteps.get(x.spec)!)
+          : { parts: ['list' as ScreenPart], actions: [] };
         return {
           spec: x.spec,
           own: specService.get(x.spec) === m.service,
           steps: x.steps,
+          parts: on.parts,
+          actions: on.actions,
           status: last?.status,
           started: last?.started,
           seconds: last?.seconds,
@@ -164,14 +231,23 @@ export function buildScreenBoard(
       });
       // 자기 상품 spec 먼저, 그 다음 전제 단계 spec
       specs.sort((a, b) => Number(b.own) - Number(a.own) || a.spec.localeCompare(b.spec));
+      const status = judgeScreen(row, specs, !!m.excluded);
+      const partStatus = (part: ScreenPart): PartStatus => {
+        if (status === 'excluded') return 'excluded';
+        if (status === 'home') return part === 'list' ? 'home' : 'none';
+        const sub = specs.filter((s) => s.parts.includes(part));
+        if (!sub.length) return status === 'smoke' && part === 'list' ? 'smoke' : 'none';
+        return judgeScreen(row, sub, false);
+      };
       return {
         name: row.name,
         route: row.route,
-        status: judgeScreen(row, specs, !!m.excluded),
+        status,
         level: row.level,
         reason: row.reason ?? (m.excluded ? `모수 제외: ${m.excluded}` : undefined),
         decision: row.decision,
         specs,
+        parts: { list: partStatus('list'), create: partStatus('create'), detail: partStatus('detail') },
       };
     });
     products.push({ id, category: m.category, name: m.service, excluded: m.excluded, screens });
@@ -197,6 +273,23 @@ export function countScreenStatuses(board: ScreenBoard): Record<ScreenStatus, nu
   return n;
 }
 
+/** 검증 대상 화면(제외·홈 제외)의 칸 수: 전체 = 화면 × 3, 검증 = 정상·불안정, 실패, 미검증 = 지나는 spec 없음 */
+export function countParts(board: ScreenBoard): { total: number; verified: number; fail: number; none: number } {
+  const n = { total: 0, verified: 0, fail: 0, none: 0 };
+  for (const p of board.products)
+    for (const s of p.screens) {
+      if (s.status === 'excluded' || s.status === 'home') continue;
+      for (const part of SCREEN_PARTS) {
+        const st = s.parts[part];
+        n.total++;
+        if (st === 'pass' || st === 'flaky') n.verified++;
+        else if (st === 'fail') n.fail++;
+        else if (st === 'none') n.none++;
+      }
+    }
+  return n;
+}
+
 const esc = (s: unknown): string =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -209,7 +302,7 @@ const jsonForHtml = (v: unknown): string =>
 export const SCREEN_BOARD_CSS = `
   #screens { padding:0; overflow:hidden }
   #screens > h2 { padding:16px 20px 0 }
-  .sb-sum { display:grid; grid-template-columns:1.2fr repeat(6,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff }
+  .sb-sum { display:grid; grid-template-columns:1.9fr repeat(6,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff }
   .sb-sum button { border:0; border-left:1px solid var(--line); background:none; text-align:left; padding:12px 16px; font:inherit; color:inherit; cursor:pointer; min-width:0 }
   .sb-sum button:first-child { border-left:0 } .sb-sum button:hover { background:#f9fafb } .sb-sum button.on { background:#eef2ff }
   .sb-sum .k { display:block; font-size:12px; color:var(--muted); white-space:nowrap } .sb-sum .v { font-size:24px; font-weight:650; letter-spacing:-.5px; line-height:1.3; font-variant-numeric:tabular-nums } .sb-sum .v small { font-size:11px; font-weight:400; color:var(--muted); margin-left:3px }
@@ -234,28 +327,32 @@ export const SCREEN_BOARD_CSS = `
   table.sb th.prod { font-weight:600; color:#1f2937; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   table.sb th.prod .m { font-size:11px; font-weight:400; color:#9ca3af; margin-top:2px; white-space:nowrap } .m .f { color:#b91c1c; font-weight:600 } .m .w { color:#a16207 } .m .g { color:#6b7280 } .m .ok { color:#15803d }
   table.sb tr.excl th.prod { color:#9ca3af }
-  .sb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:6px }
-  .scr { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:6px; text-align:left; border:1px solid #dfe5e2; border-radius:6px; padding:6px 8px; background:#fbfdfc; min-height:36px; font:inherit; color:#1f2937; cursor:pointer }
-  .scr .nm { font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .scr .stt { font-size:10px; font-weight:600; padding:1px 5px; border-radius:4px; white-space:nowrap; flex:none; background:#dcfce7; color:#166534 }
+  .sb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:6px }
+  .scr { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; border:1px solid #dfe5e2; border-radius:6px; padding:6px 8px; background:#fbfdfc; font:inherit; color:#1f2937; cursor:pointer }
+  .scr .nm { font-size:12px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   .scr:hover { border-color:#6b8fcf; box-shadow:0 0 0 2px #e0e9fa }
-  .scr.fail { border-color:#f1b7bc; background:#fff1f2; box-shadow:inset 3px 0 #dc2626 } .scr.fail .stt { background:#fee2e2; color:#991b1b }
-  .scr.flaky { border-color:#ead9b0; background:#fffbeb; box-shadow:inset 3px 0 #ca8a04 } .scr.flaky .stt { background:#fef3c7; color:#92400e }
-  .scr.smoke { border-color:#e5e7eb; background:#f9fafb; color:#4b5563 } .scr.smoke .stt { background:#e5e7eb; color:#4b5563 }
-  .scr.unrun { border-style:dashed; border-color:#cbd5e1; background:#f8fafc; color:#64748b } .scr.unrun .stt { background:#e2e8f0; color:#475569 }
-  .scr.excluded { border-style:dashed; border-color:#e5e7eb; background:#fff; color:#9ca3af } .scr.excluded .stt { background:#f3f4f6; color:#9ca3af }
-  .scr.home { border-color:#e5e7eb; background:#fff; color:#9ca3af } .scr.home .stt { background:#f3f4f6; color:#9ca3af }
+  .scr.fail { border-color:#f1b7bc; background:#fff1f2; box-shadow:inset 3px 0 #dc2626 }
+  .scr.flaky { border-color:#ead9b0; background:#fffbeb; box-shadow:inset 3px 0 #ca8a04 }
+  .scr.smoke { border-color:#e5e7eb; background:#f9fafb; color:#4b5563 }
+  .scr.unrun { border-style:dashed; border-color:#cbd5e1; background:#f8fafc; color:#64748b }
+  .scr.excluded { border-style:dashed; border-color:#e5e7eb; background:#fff; color:#9ca3af }
+  .scr.home { border-color:#e5e7eb; background:#fff; color:#9ca3af }
   .scr.hit { box-shadow:0 0 0 2px #93c5fd }
-  /* 기본 보기: 이름 없는 작은 네모(색으로만 판단). 한 화면에 카테고리·상품·화면이 다 보이게 */
+  /* 화면 하나 = 칸 셋(목록·생성·상세). 칸 색이 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 지나는 spec 없음 */
+  .scr .pts { display:inline-flex; gap:2px; flex:none }
+  .pt { display:inline-flex; align-items:center; justify-content:center; width:26px; height:19px; font-size:10px; font-style:normal; font-weight:600; letter-spacing:-.5px; border-radius:3px; background:#4ade80; color:#14532d; box-sizing:border-box }
+  .pt.fail { background:#dc2626; color:#fff } .pt.flaky { background:#eab308; color:#422006 } .pt.smoke { background:#cbd5e1; color:#334155 }
+  .pt.unrun { background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#f1f5f9 3px,#f1f5f9 6px); color:#334155 }
+  .pt.none { background:#fff; border:1px dashed #d1d5db; color:#b3bac4; font-weight:400 } .pt.excluded { background:#fff; border:1px dashed #e5e7eb; color:#c4c8cf; font-weight:400 } .pt.home { background:#f3f4f6; color:#9ca3af; width:54px }
+  /* 기본 보기: 이름 없이 칸 셋만. 한 화면에 카테고리·상품·화면이 다 보이게 */
   .sb-grid.mini { display:flex; flex-wrap:wrap; gap:3px }
-  .mini .scr { width:22px; height:22px; min-height:0; padding:0; border-radius:4px; border:1px solid transparent; box-shadow:none; background:#4ade80 }
-  .mini .scr .nm, .mini .scr .stt { display:none }
-  .mini .scr.fail { background:#dc2626 } .mini .scr.flaky { background:#eab308 } .mini .scr.smoke { background:#cbd5e1 } .mini .scr.unrun { background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#f1f5f9 3px,#f1f5f9 6px) }
-  .mini .scr.excluded { background:#fff; border:1px dashed #cbd5e1 } .mini .scr.home { background:#f3f4f6 }
+  .mini .scr { padding:1px; gap:0; border-radius:4px; border:1px solid #e5e7eb; background:#fff; box-shadow:none }
+  .mini .scr .nm { display:none }
+  .mini .scr.fail { border-color:#dc2626 } .mini .scr.flaky { border-color:#ca8a04 } .mini .scr.unrun, .mini .scr.excluded { border-style:dashed }
   .mini .scr:hover, .mini .scr.hit { box-shadow:0 0 0 2px #1d4ed8 }
   table.sb.mini td, table.sb.mini th { padding-top:4px; padding-bottom:4px } table.sb.mini th.cat { padding-top:8px }
   table.sb.mini th.prod { font-size:12px } table.sb.mini th.prod .m { display:inline; margin-left:6px } table.sb.mini td.ratio .mt { display:none }
-  .mini .scr { width:18px; height:18px }
-  table.sb td.ratio { text-align:center; white-space:nowrap; font-variant-numeric:tabular-nums; color:#4b5563 } td.ratio b { color:#15803d } td.ratio .mt { width:48px; height:4px; background:#eef0f3; border-radius:3px; margin:5px auto 0; overflow:hidden } td.ratio .mt i { display:block; height:100%; background:#4ade80 }
+  table.sb td.ratio { text-align:center; white-space:nowrap; font-variant-numeric:tabular-nums; color:#4b5563 } td.ratio b { color:#15803d } td.ratio .cl { font-size:10px; color:#9ca3af } td.ratio .mt { width:48px; height:4px; background:#eef0f3; border-radius:3px; margin:5px auto 0; overflow:hidden } td.ratio .mt i { display:block; height:100%; background:#4ade80 }
   .sb-foot { display:flex; justify-content:space-between; gap:16px; padding:10px 20px; font-size:11px; color:#6b7280; border-top:1px solid var(--line); flex-wrap:wrap }
   .sb-empty { padding:40px; text-align:center; color:#6b7280 }
   dialog.sb-dlg { padding:0; border:0; position:fixed; inset:0 0 0 auto; margin:0; width:640px; max-width:100%; height:100dvh; max-height:100dvh; box-shadow:-12px 0 48px #1f293733; color:var(--ink); background:#fff; overflow:auto; font-size:13px }
@@ -277,12 +374,13 @@ export const SCREEN_BOARD_CSS = `
 export function screenBoardBlock(board: ScreenBoard): string {
   const n = countScreenStatuses(board);
   const target = n.pass + n.fail + n.flaky + n.unrun + n.smoke;
+  const parts = countParts(board);
   const productCount = board.products.filter((p) => !p.excluded).length;
   const tile = (st: ScreenStatus | 'all', k: string, v: number, extra = '') =>
     `<button class="${st}" data-sb-status="${st}"><span class="k">${k}</span><span class="v">${v}<small>개</small></span>${extra}</button>`;
   return `
   <div class="sb-sum" aria-label="화면 상태 요약">
-    ${tile('all', '검증 대상 화면', target, `<span class="x">카테고리 ${board.categories.length} · 상품 ${productCount}${n.home ? ` · Service Home ${n.home}개 숨김` : ''}</span>`)}
+    ${tile('all', '검증 대상 화면', target, `<span class="x">카테고리 ${board.categories.length} · 상품 ${productCount}${n.home ? ` · Service Home ${n.home}개 숨김` : ''}</span><span class="x">칸 ${parts.total} (목록·생성·상세) · 검증 ${parts.verified} · 실패 ${parts.fail} · 미검증 ${parts.none}</span>`)}
     ${tile('pass', SCREEN_STATUS_LABEL.pass, n.pass)}${tile('fail', SCREEN_STATUS_LABEL.fail, n.fail)}${tile('flaky', SCREEN_STATUS_LABEL.flaky, n.flaky)}${tile('smoke', SCREEN_STATUS_LABEL.smoke, n.smoke)}${tile('unrun', SCREEN_STATUS_LABEL.unrun, n.unrun)}${tile('excluded', SCREEN_STATUS_LABEL.excluded, n.excluded)}
   </div>
   <nav class="sb-cats" id="sb-cats" aria-label="카테고리"></nav>
@@ -294,10 +392,10 @@ export function screenBoardBlock(board: ScreenBoard): string {
     <label class="chk"><input type="checkbox" id="sb-home"> Service Home 보기</label>
     <label class="chk"><input type="checkbox" id="sb-excl" checked> 제외 화면 보기</label>
     <button class="reset" id="sb-reset">초기화</button>
-    <div class="legend"><span><i style="background:#4ade80"></i>정상</span><span><i style="background:#dc2626"></i>실패</span><span><i style="background:#ca8a04"></i>불안정</span><span><i style="background:#9ca3af"></i>진입만·미실행</span><span><i style="background:#e5e7eb;border:1px dashed #9ca3af"></i>제외</span></div>
+    <div class="legend"><span><i style="background:#4ade80"></i>정상</span><span><i style="background:#dc2626"></i>실패</span><span><i style="background:#ca8a04"></i>불안정</span><span><i style="background:#9ca3af"></i>진입만·미실행</span><span><i style="background:#fff;border:1px dashed #9ca3af"></i>미검증(지나는 spec 없음)·제외</span></div>
   </div>
   <div class="sb-wrap" id="sb-table"></div>
-  <div class="sb-foot"><span><b>네모 하나가 화면 하나</b>입니다. 올리면 이름·상태, 누르면 그 화면을 지나는 회귀 spec·마지막 실행·실패 내용을 봅니다.</span><span>정상 = 자기 상품 spec 마지막 실행 모두 통과 · 전제 단계로만 지나는 화면은 통과 spec 이 하나라도 있으면 정상 · 불안정 = 최근 10회에 실패 섞임 · 진입만 = 스모크(진입 확인)만 · 정상/대상 의 대상은 제외·홈을 뺀 화면</span></div>
+  <div class="sb-foot"><span><b>네모 하나가 화면 하나, 안의 칸 셋이 목록 · 생성 · 상세</b>입니다. 칸 색은 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 아직 어느 spec 도 지나지 않은 화면. 올리면 이름·칸별 상태, 누르면 그 화면을 지나는 회귀 spec·마지막 실행·실패 내용을 봅니다.</span><span>정상 = 자기 상품 spec 마지막 실행 모두 통과 · 전제 단계로만 지나는 화면은 통과 spec 이 하나라도 있으면 정상 · 불안정 = 최근 10회에 실패 섞임 · 진입만 = 스모크(진입 확인)만 · 정상/대상 의 대상은 제외·홈을 뺀 화면</span></div>
   <dialog class="sb-dlg" id="sb-dlg" aria-labelledby="sb-dlg-title"></dialog>
   <script type="application/json" id="sb-data">${jsonForHtml(board)}</script>
   <script>${SCREEN_BOARD_JS}</script>`;
@@ -308,6 +406,13 @@ const SCREEN_BOARD_JS = String.raw`
 'use strict';
 var data = JSON.parse(document.getElementById('sb-data').textContent);
 var L = ${JSON.stringify(SCREEN_STATUS_LABEL)};
+var P = ${JSON.stringify(SCREEN_PART_LABEL)}, PARTS = ${JSON.stringify(SCREEN_PARTS)};
+function partLabel(st){ return st === 'none' ? '미검증' : L[st]; }
+function partsText(s){ return s.status === 'home' ? 'Service Home' : PARTS.map(function(k){ return P[k]+' '+partLabel(s.parts[k]); }).join(' / '); }
+function partsHtml(s){
+  if (s.status === 'home') return '<span class="pts"><i class="pt home">홈</i></span>';
+  return '<span class="pts">'+PARTS.map(function(k){ var st = s.parts[k]; return '<i class="pt '+st+'" title="'+P[k]+' · '+partLabel(st)+'">'+P[k]+'</i>'; }).join('')+'</span>';
+}
 var $ = function(s){ return document.querySelector(s); };
 var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
 var cat = 'all', st = 'all', q = '', showHome = false, showExcl = true, names = false, opener = null;
@@ -360,14 +465,16 @@ function renderTable(){
       var catFail = g.list.reduce(function(n,p){ return n + (counts(visible(p)).fail||0); }, 0);
       return '<tbody>' + g.list.map(function(p, i){
         var scr = visible(p), n = counts(scr), target = scr.filter(function(s){ return TARGET[s.status]; }).length, pass = n.pass||0;
+        var cells = 0, cellsOk = 0;
+        scr.forEach(function(s){ if (!TARGET[s.status]) return; PARTS.forEach(function(k){ cells++; if (s.parts[k] === 'pass' || s.parts[k] === 'flaky') cellsOk++; }); });
         return '<tr class="'+(p.excluded?'excl':'')+'">'
           + (i === 0 ? '<th class="cat" rowspan="'+g.list.length+'">'+esc(g.c.name)+'<div class="d">'+g.list.length+'개 상품'+(catFail?' · <span class="f">실패 '+catFail+'</span>':'')+'</div></th>' : '')
           + '<th class="prod" title="'+esc(p.name)+'">'+esc(p.name)+'<div class="m">'+meta(p, scr)+'</div></th>'
           + '<td><div class="sb-grid'+(names?'':' mini')+'">' + scr.map(function(s){
               var hit = k && (s.name+' '+s.route).toLowerCase().includes(k);
-              return '<button class="scr '+s.status+(hit?' hit':'')+'" data-sb-scr="'+esc(p.id)+'|'+esc(s.route)+'" title="'+esc(s.name)+' · '+L[s.status]+' · '+esc(s.route)+'" aria-label="'+esc(s.name)+' '+L[s.status]+'"><span class="nm">'+esc(s.name)+'</span><span class="stt">'+L[s.status]+'</span></button>';
+              return '<button class="scr '+s.status+(hit?' hit':'')+'" data-sb-scr="'+esc(p.id)+'|'+esc(s.route)+'" title="'+esc(s.name)+' · '+L[s.status]+'\n'+esc(partsText(s))+'\n'+esc(s.route)+'" aria-label="'+esc(s.name)+' '+L[s.status]+'"><span class="nm">'+esc(s.name)+'</span>'+partsHtml(s)+'</button>';
             }).join('') + '</div></td>'
-          + '<td class="ratio">'+(target ? '<b>'+pass+'</b> / '+target+'<div class="mt"><i style="width:'+Math.round(pass/target*100)+'%"></i></div>' : '<span class="muted">—</span>')+'</td></tr>';
+          + '<td class="ratio">'+(target ? '<b>'+pass+'</b> / '+target+'<div class="cl" title="칸(목록·생성·상세) 중 검증된 칸">칸 '+cellsOk+'/'+cells+'</div><div class="mt"><i style="width:'+Math.round(pass/target*100)+'%"></i></div>' : '<span class="muted">—</span>')+'</td></tr>';
       }).join('') + '</tbody>';
     }).join('') + '</table>';
 }
@@ -387,7 +494,8 @@ function why(s){
 function detail(p, s){
   var w = why(s);
   var rows = s.specs.map(function(x){
-    return '<tr><td><span class="mono">'+esc(x.spec)+'</span> <span class="own '+(x.own?'':'no')+'">'+(x.own?'이 상품':'전제 단계')+'</span><br><span class="muted small">'+x.steps+'단계 지남 · 통과 '+x.passes+'/'+x.runs+(x.flaky?' · <span class="w">불안정</span>':'')+'</span></td>'
+    var where = x.parts.map(function(k){ return P[k]; }).concat(x.actions).join('·');
+    return '<tr><td><span class="mono">'+esc(x.spec)+'</span> <span class="own '+(x.own?'':'no')+'">'+(x.own?'이 상품':'전제 단계')+'</span><br><span class="muted small">'+(where ? where+' · ' : '')+x.steps+'단계 지남 · 통과 '+x.passes+'/'+x.runs+(x.flaky?' · <span class="w">불안정</span>':'')+'</span></td>'
       + '<td>'+(x.status ? '<span class="badge '+x.status+'">'+(x.status==='pass'?'PASS':'FAIL')+'</span><br><span class="muted small">'+fmt(x.started)+' · '+secs(x.seconds)+'</span>' : '<span class="muted">기록 없음</span>')
       + (x.error ? '<span class="err">'+esc(x.error).slice(0,300)+'</span>' : '')
       + (x.attachments.length ? '<br>'+x.attachments.map(function(a){ return '<a class="att" href="../'+esc(a)+'" title="'+esc(a)+'">'+esc(a.split('/').pop())+'</a>'; }).join(' ') : '')
@@ -397,6 +505,7 @@ function detail(p, s){
     + '<h3 id="sb-dlg-title">'+esc(s.name)+' <span class="sbdg '+s.status+'">'+L[s.status]+'</span>'+(s.level != null ? ' <span class="lv l'+s.level+'">L'+s.level+'</span>' : '')+'</h3>'
     + '<div class="rt mono muted">'+esc(s.route)+'</div></div>'
     + '<div class="dlg-b"><div class="why '+s.status+'"><b>'+esc(w[0])+'</b>'+esc(w[1]).replace(/\n/g,'<br>')+'</div>'
+    + (s.status === 'home' || s.status === 'excluded' ? '' : '<h4>칸별 상태</h4><div class="same pts-row">'+PARTS.map(function(k){ var st = s.parts[k]; return '<span class="sbdg '+(st === 'none' ? 'unrun' : st)+'">'+P[k]+' · '+partLabel(st)+'</span>'; }).join(' ')+'</div>')
     + (s.decision ? '<h4>판단 (data/coverage-decisions.yaml)</h4><div class="why"><b>'+esc(s.decision.decision)+'</b>'+esc(s.decision.note||'')+'</div>' : '')
     + '<h4>이 화면을 지나는 회귀 spec '+s.specs.length+'개</h4>'
     + (rows ? '<table class="dlg-t"><thead><tr><th>spec</th><th>마지막 실행</th></tr></thead><tbody>'+rows+'</tbody></table>' : '<p class="muted">없음</p>')
