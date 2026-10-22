@@ -16,7 +16,7 @@
  *
  * 화면 하나는 콘솔 관례대로 목록 → 생성 · 상세 의 세 칸(ScreenPart)으로 펼친다(2026-10-22). 서비스 맵은 목록 route 만 가지므로
  * 칸은 시나리오 단계로 판정한다: route 가 …/detail 이면 상세, 목표(goal)가 생성·만든다·등록이면 생성, 그 외는 목록.
- * route 없는 단계(생성 버튼을 누른다 등)는 바로 앞 단계의 화면에 있는 것으로 본다. 수정·삭제는 칸이 아니라 그 spec 의 동작으로 적는다.
+ * route 없는 단계(생성 버튼을 누른다 등)는 바로 앞 단계의 화면에 있는 것으로 본다. 수정·삭제는 화면이 따로 없으니(모달) 칸이 아니라 그 화면의 동작(ScreenAction)으로 적는다 — 칩 오른쪽의 작은 글자.
  * 어느 spec 도 지나지 않는 칸은 none(미검증) — 점선 빈 칸. 화면 상태는 세 칸을 합친 spec 전체로, 칸 상태는 그 칸을 지나는 spec 만으로 판정.
  *
  * 화면·상태 계산은 순수 함수(buildScreenBoard), 표는 브라우저에서 그린다(필터·검색·상세 패널). 외부 요청 없음.
@@ -41,7 +41,15 @@ export const SCREEN_STATUS_LABEL: Record<ScreenStatus, string> = {
 /** 화면 하나를 펼친 세 칸: 목록 화면, 생성 화면, 상세 화면 */
 export type ScreenPart = 'list' | 'create' | 'detail';
 export const SCREEN_PARTS: readonly ScreenPart[] = ['list', 'create', 'detail'];
-export const SCREEN_PART_LABEL: Record<ScreenPart, string> = { list: '목록', create: '생성', detail: '상세' };
+export const SCREEN_PART_LABEL: Record<ScreenPart, string> = {
+  list: '목록',
+  create: '생성',
+  detail: '상세',
+};
+/** 화면이 따로 없는 쓰기 동작(모달): 그 화면에서 했는지만 표시 */
+export type ScreenAction = 'edit' | 'delete';
+export const SCREEN_ACTIONS: readonly ScreenAction[] = ['edit', 'delete'];
+export const SCREEN_ACTION_LABEL: Record<ScreenAction, string> = { edit: '수정', delete: '삭제' };
 /** 칸 상태: 화면 상태 + none(그 칸을 지나는 spec 없음) */
 export type PartStatus = ScreenStatus | 'none';
 
@@ -94,6 +102,8 @@ export interface BoardScreen {
   specs: BoardSpec[];
   /** 칸별 상태(목록·생성·상세). 홈 화면은 list 칸 하나만 home, 나머지 none */
   parts: Record<ScreenPart, PartStatus>;
+  /** 동작별 상태(수정·삭제): 그 동작을 하는 spec 만으로 판정, 없으면 none */
+  actions: Record<ScreenAction, PartStatus>;
 }
 
 export interface BoardProduct {
@@ -151,14 +161,18 @@ const CREATE_RE = /생성|만든다|만들어|등록|발급|신청/;
 const EDIT_RE = /수정|변경|바꿔|바꾼|편집|갱신/;
 const DELETE_RE = /삭제|해지|제거|지운다|지우고/;
 
-/** 단계 하나가 어느 칸에 있고 무엇을 하는가. route 가 …/detail(/…) 이면 상세, 목표가 생성이면 생성, 그 외 목록 */
-export function classifyStep(goal: string, route: string): { part: ScreenPart; actions: string[] } {
+/**
+ * 단계 하나가 어느 칸에 있고 무엇을 하는가. route 가 …/detail(/…) 이면 상세, 목표가 생성이면 생성, 그 외 목록.
+ * 수정·삭제는 칸이 아니라 동작(actions).
+ */
+export function classifyStep(goal: string, route: string): { parts: ScreenPart[]; actions: string[] } {
   const actions: string[] = [];
   if (EDIT_RE.test(goal)) actions.push('수정');
   if (DELETE_RE.test(goal)) actions.push('삭제');
-  if (/\/detail(\/|$)/.test(route)) return { part: 'detail', actions };
-  if (CREATE_RE.test(goal)) return { part: 'create', actions };
-  return { part: 'list', actions };
+  const parts: ScreenPart[] = [
+    /\/detail(\/|$)/.test(route) ? 'detail' : CREATE_RE.test(goal) ? 'create' : 'list',
+  ];
+  return { parts, actions };
 }
 
 /** spec 의 단계들이 이 화면(목록 route)에서 지나는 칸과 동작. route 없는 단계는 바로 앞 단계의 화면에 있는 것으로 본다 */
@@ -174,7 +188,7 @@ export function specPartsOnScreen(
     const route = s.route ?? current;
     if (!route || !routeMatches(screenRoute, route)) continue;
     const c = classifyStep(s.goal, route);
-    parts.add(c.part);
+    for (const p of c.parts) parts.add(p);
     for (const a of c.actions) actions.add(a);
   }
   return {
@@ -239,6 +253,11 @@ export function buildScreenBoard(
         if (!sub.length) return status === 'smoke' && part === 'list' ? 'smoke' : 'none';
         return judgeScreen(row, sub, false);
       };
+      const actionStatus = (label: string): PartStatus => {
+        if (status === 'excluded' || status === 'home') return 'none';
+        const sub = specs.filter((s) => s.actions.includes(label));
+        return sub.length ? judgeScreen(row, sub, false) : 'none';
+      };
       return {
         name: row.name,
         route: row.route,
@@ -247,7 +266,12 @@ export function buildScreenBoard(
         reason: row.reason ?? (m.excluded ? `모수 제외: ${m.excluded}` : undefined),
         decision: row.decision,
         specs,
-        parts: { list: partStatus('list'), create: partStatus('create'), detail: partStatus('detail') },
+        parts: {
+          list: partStatus('list'),
+          create: partStatus('create'),
+          detail: partStatus('detail'),
+        },
+        actions: { edit: actionStatus('수정'), delete: actionStatus('삭제') },
       };
     });
     products.push({ id, category: m.category, name: m.service, excluded: m.excluded, screens });
@@ -327,9 +351,10 @@ export const SCREEN_BOARD_CSS = `
   table.sb th.prod { font-weight:600; color:#1f2937; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   table.sb th.prod .m { font-size:11px; font-weight:400; color:#9ca3af; margin-top:2px; white-space:nowrap } .m .f { color:#b91c1c; font-weight:600 } .m .w { color:#a16207 } .m .g { color:#6b7280 } .m .ok { color:#15803d }
   table.sb tr.excl th.prod { color:#9ca3af }
-  .sb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:6px }
-  .scr { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; border:1px solid #dfe5e2; border-radius:6px; padding:6px 8px; background:#fbfdfc; font:inherit; color:#1f2937; cursor:pointer }
-  .scr .nm { font-size:12px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  /* 기본 보기: 하위 리소스 이름 + 칸 넷을 한 줄 칩으로. 이름이 있어야 Virtual Server 의 Image·Server Group 을 알아본다(2026-10-22) */
+  .sb-grid { display:flex; flex-wrap:wrap; gap:4px }
+  .scr { min-width:0; display:inline-flex; align-items:center; gap:7px; text-align:left; border:1px solid #dfe5e2; border-radius:6px; padding:2px 3px 2px 8px; background:#fbfdfc; font:inherit; color:#1f2937; cursor:pointer }
+  .scr .nm { font-size:12px; font-weight:500; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   .scr:hover { border-color:#6b8fcf; box-shadow:0 0 0 2px #e0e9fa }
   .scr.fail { border-color:#f1b7bc; background:#fff1f2; box-shadow:inset 3px 0 #dc2626 }
   .scr.flaky { border-color:#ead9b0; background:#fffbeb; box-shadow:inset 3px 0 #ca8a04 }
@@ -338,12 +363,17 @@ export const SCREEN_BOARD_CSS = `
   .scr.excluded { border-style:dashed; border-color:#e5e7eb; background:#fff; color:#9ca3af }
   .scr.home { border-color:#e5e7eb; background:#fff; color:#9ca3af }
   .scr.hit { box-shadow:0 0 0 2px #93c5fd }
-  /* 화면 하나 = 칸 셋(목록·생성·상세). 칸 색이 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 지나는 spec 없음 */
+  /* 화면 하나 = 칸 셋(목록·생성·상세) + 동작(수정·삭제) 글자. 칸 색이 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 지나는 spec 없음 */
   .scr .pts { display:inline-flex; gap:2px; flex:none }
-  .pt { display:inline-flex; align-items:center; justify-content:center; width:26px; height:19px; font-size:10px; font-style:normal; font-weight:600; letter-spacing:-.5px; border-radius:3px; background:#4ade80; color:#14532d; box-sizing:border-box }
+  .pt { display:inline-flex; align-items:center; justify-content:center; width:25px; height:19px; font-size:10px; font-style:normal; font-weight:600; letter-spacing:-.5px; border-radius:3px; background:#4ade80; color:#14532d; box-sizing:border-box }
   .pt.fail { background:#dc2626; color:#fff } .pt.flaky { background:#eab308; color:#422006 } .pt.smoke { background:#cbd5e1; color:#334155 }
   .pt.unrun { background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#f1f5f9 3px,#f1f5f9 6px); color:#334155 }
-  .pt.none { background:#fff; border:1px dashed #d1d5db; color:#b3bac4; font-weight:400 } .pt.excluded { background:#fff; border:1px dashed #e5e7eb; color:#c4c8cf; font-weight:400 } .pt.home { background:#f3f4f6; color:#9ca3af; width:54px }
+  .pt.none { background:#fff; border:1px dashed #d1d5db; color:#b3bac4; font-weight:400 } .pt.excluded { background:#fff; border:1px dashed #e5e7eb; color:#c4c8cf; font-weight:400 } .pt.home { background:#f3f4f6; color:#6b7280; width:64px } .scr.home .nm { display:none } .scr.home { padding-left:3px }
+  /* 동작(수정·삭제): 화면이 없으니 칸이 아니라 작은 글자. 초록 = 통과 spec 이 이 화면에서 했음, 빨강 = 실패, 회색 = 안 함 */
+  .scr .acs { display:inline-flex; gap:4px; margin-left:1px; padding-left:6px; border-left:1px solid #e5e7eb; line-height:1 }
+  .ac { font-size:10px; font-style:normal; font-weight:600; letter-spacing:-.3px; color:#c4c8cf }
+  .ac.pass { color:#15803d } .ac.flaky { color:#a16207 } .ac.fail { color:#dc2626 } .ac.unrun { color:#64748b } .ac.smoke { color:#6b7280 }
+  .mini .scr .acs { display:none }
   /* 기본 보기: 이름 없이 칸 셋만. 한 화면에 카테고리·상품·화면이 다 보이게 */
   .sb-grid.mini { display:flex; flex-wrap:wrap; gap:3px }
   .mini .scr { padding:1px; gap:0; border-radius:4px; border:1px solid #e5e7eb; background:#fff; box-shadow:none }
@@ -380,7 +410,7 @@ export function screenBoardBlock(board: ScreenBoard): string {
     `<button class="${st}" data-sb-status="${st}"><span class="k">${k}</span><span class="v">${v}<small>개</small></span>${extra}</button>`;
   return `
   <div class="sb-sum" aria-label="화면 상태 요약">
-    ${tile('all', '검증 대상 화면', target, `<span class="x">카테고리 ${board.categories.length} · 상품 ${productCount}${n.home ? ` · Service Home ${n.home}개 숨김` : ''}</span><span class="x">칸 ${parts.total} (목록·생성·상세) · 검증 ${parts.verified} · 실패 ${parts.fail} · 미검증 ${parts.none}</span>`)}
+    ${tile('all', '검증 대상 화면', target, `<span class="x">카테고리 ${board.categories.length} · 상품 ${productCount}${n.home ? ` · Service Home ${n.home}` : ''}</span><span class="x">칸 ${parts.total} (목록·생성·상세) · 검증 ${parts.verified} · 실패 ${parts.fail} · 미검증 ${parts.none}</span>`)}
     ${tile('pass', SCREEN_STATUS_LABEL.pass, n.pass)}${tile('fail', SCREEN_STATUS_LABEL.fail, n.fail)}${tile('flaky', SCREEN_STATUS_LABEL.flaky, n.flaky)}${tile('smoke', SCREEN_STATUS_LABEL.smoke, n.smoke)}${tile('unrun', SCREEN_STATUS_LABEL.unrun, n.unrun)}${tile('excluded', SCREEN_STATUS_LABEL.excluded, n.excluded)}
   </div>
   <nav class="sb-cats" id="sb-cats" aria-label="카테고리"></nav>
@@ -388,14 +418,14 @@ export function screenBoardBlock(board: ScreenBoard): string {
     <div class="t">상품별 화면 <span id="sb-count"></span></div>
     <input id="sb-q" type="search" placeholder="상품·화면·route 검색" aria-label="상품 또는 화면 검색">
     <select id="sb-st" aria-label="상태로 상품 찾기"><option value="all">모든 상품</option><option value="fail">실패 포함</option><option value="flaky">불안정 포함</option><option value="smoke">진입만 포함</option><option value="unrun">미실행 포함</option><option value="pass">검증 대상 전체 정상</option><option value="none">검증 안 된 상품(정상 0)</option></select>
-    <label class="chk"><input type="checkbox" id="sb-names"> 화면 이름 보기</label>
-    <label class="chk"><input type="checkbox" id="sb-home"> Service Home 보기</label>
+    <label class="chk"><input type="checkbox" id="sb-names" checked> 화면 이름 보기</label>
+    <label class="chk"><input type="checkbox" id="sb-home" checked> Service Home(상품 메인) 보기</label>
     <label class="chk"><input type="checkbox" id="sb-excl" checked> 제외 화면 보기</label>
     <button class="reset" id="sb-reset">초기화</button>
     <div class="legend"><span><i style="background:#4ade80"></i>정상</span><span><i style="background:#dc2626"></i>실패</span><span><i style="background:#ca8a04"></i>불안정</span><span><i style="background:#9ca3af"></i>진입만·미실행</span><span><i style="background:#fff;border:1px dashed #9ca3af"></i>미검증(지나는 spec 없음)·제외</span></div>
   </div>
   <div class="sb-wrap" id="sb-table"></div>
-  <div class="sb-foot"><span><b>네모 하나가 화면 하나, 안의 칸 셋이 목록 · 생성 · 상세</b>입니다. 칸 색은 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 아직 어느 spec 도 지나지 않은 화면. 올리면 이름·칸별 상태, 누르면 그 화면을 지나는 회귀 spec·마지막 실행·실패 내용을 봅니다.</span><span>정상 = 자기 상품 spec 마지막 실행 모두 통과 · 전제 단계로만 지나는 화면은 통과 spec 이 하나라도 있으면 정상 · 불안정 = 최근 10회에 실패 섞임 · 진입만 = 스모크(진입 확인)만 · 정상/대상 의 대상은 제외·홈을 뺀 화면</span></div>
+  <div class="sb-foot"><span><b>네모 하나가 화면 하나, 안의 칸 셋이 목록 · 생성 · 상세</b>, 오른쪽 작은 글자가 그 화면에서 한 수정 · 삭제(화면이 따로 없는 모달 동작)입니다. 칸 색은 그 칸을 지나는 spec 의 상태, 점선 빈 칸은 아직 어느 spec 도 지나지 않은 화면, 회색 글자는 아직 안 한 동작. 올리면 이름·칸별 상태, 누르면 그 화면을 지나는 회귀 spec·마지막 실행·실패 내용을 봅니다.</span><span>정상 = 자기 상품 spec 마지막 실행 모두 통과 · 전제 단계로만 지나는 화면은 통과 spec 이 하나라도 있으면 정상 · 불안정 = 최근 10회에 실패 섞임 · 진입만 = 스모크(진입 확인)만 · 정상/대상 의 대상은 제외·홈을 뺀 화면</span></div>
   <dialog class="sb-dlg" id="sb-dlg" aria-labelledby="sb-dlg-title"></dialog>
   <script type="application/json" id="sb-data">${jsonForHtml(board)}</script>
   <script>${SCREEN_BOARD_JS}</script>`;
@@ -407,15 +437,17 @@ const SCREEN_BOARD_JS = String.raw`
 var data = JSON.parse(document.getElementById('sb-data').textContent);
 var L = ${JSON.stringify(SCREEN_STATUS_LABEL)};
 var P = ${JSON.stringify(SCREEN_PART_LABEL)}, PARTS = ${JSON.stringify(SCREEN_PARTS)};
+var A = ${JSON.stringify(SCREEN_ACTION_LABEL)}, ACTIONS = ${JSON.stringify(SCREEN_ACTIONS)};
 function partLabel(st){ return st === 'none' ? '미검증' : L[st]; }
-function partsText(s){ return s.status === 'home' ? 'Service Home' : PARTS.map(function(k){ return P[k]+' '+partLabel(s.parts[k]); }).join(' / '); }
+function partsText(s){ return s.status === 'home' ? '상품 메인(대시보드)' : PARTS.map(function(k){ return P[k]+' '+partLabel(s.parts[k]); }).join(' / ') + ' · 동작: ' + ACTIONS.map(function(k){ return A[k]+' '+(s.actions[k] === 'none' ? '안 함' : L[s.actions[k]]); }).join(' / '); }
 function partsHtml(s){
-  if (s.status === 'home') return '<span class="pts"><i class="pt home">홈</i></span>';
-  return '<span class="pts">'+PARTS.map(function(k){ var st = s.parts[k]; return '<i class="pt '+st+'" title="'+P[k]+' · '+partLabel(st)+'">'+P[k]+'</i>'; }).join('')+'</span>';
+  if (s.status === 'home') return '<span class="pts"><i class="pt home" title="상품 메인(대시보드)">상품 메인</i></span>';
+  var acs = s.status === 'excluded' ? '' : '<span class="acs">'+ACTIONS.map(function(k){ var st = s.actions[k]; return '<i class="ac '+st+'" title="'+A[k]+' · '+(st === 'none' ? '이 화면에서 안 함' : L[st])+'">'+A[k]+'</i>'; }).join('')+'</span>';
+  return '<span class="pts">'+PARTS.map(function(k){ var st = s.parts[k]; return '<i class="pt '+st+'" title="'+P[k]+' · '+partLabel(st)+'">'+P[k]+'</i>'; }).join('')+'</span>'+acs;
 }
 var $ = function(s){ return document.querySelector(s); };
 var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
-var cat = 'all', st = 'all', q = '', showHome = false, showExcl = true, names = false, opener = null;
+var cat = 'all', st = 'all', q = '', showHome = true, showExcl = true, names = true, opener = null;
 var TARGET = { pass:1, fail:1, flaky:1, unrun:1, smoke:1 };
 function fmt(iso){ if(!iso) return ''; var d = new Date(iso), p = function(n){ return String(n).padStart(2,'0'); }; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 function secs(s){ if(s == null) return ''; var t = Math.round(s), m = Math.floor(t/60); return m ? m+'분 '+(t%60)+'초' : t+'초'; }
@@ -488,7 +520,7 @@ function why(s){
     case 'unrun': return ['미실행', '시나리오는 있지만 실행 기록이 없습니다: '+judged.map(function(x){ return x.spec; }).join(', ')];
     case 'smoke': return ['진입 확인만', '스모크(화면 진입·제목 확인)만 있고 생성·수정·삭제를 검증하는 시나리오가 없습니다. 더 할지는 data/coverage-decisions.yaml 에 적습니다.'];
     case 'excluded': return ['제외', s.reason || '장부 메모의 사유로 제외'];
-    default: return ['Service Home', '서비스 대시보드 화면. 검증 대상이 아닙니다.'];
+    default: return ['상품 메인(Service Home)', '상품 대시보드 화면. 스모크가 진입만 확인하며 정상/대상 집계에는 넣지 않습니다.'];
   }
 }
 function detail(p, s){
@@ -505,7 +537,7 @@ function detail(p, s){
     + '<h3 id="sb-dlg-title">'+esc(s.name)+' <span class="sbdg '+s.status+'">'+L[s.status]+'</span>'+(s.level != null ? ' <span class="lv l'+s.level+'">L'+s.level+'</span>' : '')+'</h3>'
     + '<div class="rt mono muted">'+esc(s.route)+'</div></div>'
     + '<div class="dlg-b"><div class="why '+s.status+'"><b>'+esc(w[0])+'</b>'+esc(w[1]).replace(/\n/g,'<br>')+'</div>'
-    + (s.status === 'home' || s.status === 'excluded' ? '' : '<h4>칸별 상태</h4><div class="same pts-row">'+PARTS.map(function(k){ var st = s.parts[k]; return '<span class="sbdg '+(st === 'none' ? 'unrun' : st)+'">'+P[k]+' · '+partLabel(st)+'</span>'; }).join(' ')+'</div>')
+    + (s.status === 'home' || s.status === 'excluded' ? '' : '<h4>칸별 상태</h4><div class="same pts-row">'+PARTS.map(function(k){ var st = s.parts[k]; return '<span class="sbdg '+(st === 'none' ? 'unrun' : st)+'">'+P[k]+' · '+partLabel(st)+'</span>'; }).join(' ')+'</div><h4>이 화면에서 한 동작 (화면이 따로 없는 모달)</h4><div class="same pts-row">'+ACTIONS.map(function(k){ var st = s.actions[k]; return '<span class="sbdg '+(st === 'none' ? 'unrun' : st)+'">'+A[k]+' · '+(st === 'none' ? '안 함' : L[st])+'</span>'; }).join(' ')+'</div>')
     + (s.decision ? '<h4>판단 (data/coverage-decisions.yaml)</h4><div class="why"><b>'+esc(s.decision.decision)+'</b>'+esc(s.decision.note||'')+'</div>' : '')
     + '<h4>이 화면을 지나는 회귀 spec '+s.specs.length+'개</h4>'
     + (rows ? '<table class="dlg-t"><thead><tr><th>spec</th><th>마지막 실행</th></tr></thead><tbody>'+rows+'</tbody></table>' : '<p class="muted">없음</p>')

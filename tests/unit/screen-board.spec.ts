@@ -60,15 +60,15 @@ test.describe('화면 상태판', () => {
   });
 
   test('단계 → 칸(목록·생성·상세)·동작(수정·삭제)', () => {
-    expect(classifyStep('VPC 목록 화면으로 이동한다', '/vpc/vpc/list')).toEqual({ part: 'list', actions: [] });
-    expect(classifyStep('VPC 생성 버튼을 눌러 생성 화면을 연다', '/vpc/vpc/list').part).toBe('create');
+    expect(classifyStep('VPC 목록 화면으로 이동한다', '/vpc/vpc/list')).toEqual({ parts: ['list'], actions: [] });
+    expect(classifyStep('VPC 생성 버튼을 눌러 생성 화면을 연다', '/vpc/vpc/list').parts).toEqual(['create']);
     expect(classifyStep('설명을 바꿔 반영을 확인하고 되돌린다', '/vpc/vpc/detail')).toEqual({
-      part: 'detail',
+      parts: ['detail'],
       actions: ['수정'],
     });
     // 상세 아래 탭도 상세 칸. 생성 낱말이 있어도 route 가 먼저
-    expect(classifyStep('IP 대역 추가 후 삭제한다', '/vpc/vpc/detail/ip-range')).toEqual({ part: 'detail', actions: ['삭제'] });
-    expect(classifyStep('VPC {{name}} 을 삭제한다', '/vpc/vpc/list')).toEqual({ part: 'list', actions: ['삭제'] });
+    expect(classifyStep('IP 대역 추가 후 삭제한다', '/vpc/vpc/detail/ip-range')).toEqual({ parts: ['detail'], actions: ['삭제'] });
+    expect(classifyStep('VPC {{name}} 을 삭제한다', '/vpc/vpc/list')).toEqual({ parts: ['list'], actions: ['삭제'] });
     // route 없는 단계는 바로 앞 단계의 화면에 있는 것으로. 다른 화면의 단계는 세지 않는다
     expect(
       specPartsOnScreen('/vpc/vpc/list', [
@@ -193,12 +193,14 @@ test.describe('화면 상태판', () => {
     const by = (route: string) => vpc.screens.find((s) => s.route === route)!;
     expect(by('/vpc/vpc/list').status).toBe('pass'); // 자기 spec 통과, DBaaS 실패는 전제 단계
     expect(by('/vpc/vpc/list').parts).toEqual({ list: 'pass', create: 'pass', detail: 'pass' });
+    expect(by('/vpc/vpc/list').actions).toEqual({ edit: 'pass', delete: 'none' });
     expect(by('/vpc/vpc/list').specs[0]).toMatchObject({ spec: 'networking.vpc.create-delete', parts: ['list', 'create', 'detail'], actions: ['수정'] });
     expect(by('/vpc/vpc/list').specs[1]).toMatchObject({ spec: 'database.mysql', parts: ['list'] });
     expect(by('/vpc/subnet/list').status).toBe('fail'); // 전제 단계 spec 만 있고 통과한 것이 없음
     expect(by('/vpc/subnet/list').parts).toEqual({ list: 'none', create: 'fail', detail: 'none' });
     expect(by('/vpc/port/list').status).toBe('smoke');
     expect(by('/vpc/port/list').parts).toEqual({ list: 'smoke', create: 'none', detail: 'none' });
+    expect(by('/vpc/port/list').actions).toEqual({ edit: 'none', delete: 'none' });
     expect(by('/vpc/dashboard').status).toBe('home');
     expect(by('/vpc/dashboard').parts).toEqual({ list: 'home', create: 'none', detail: 'none' });
     const mysql = board.products.find((p) => p.name === 'MySQL')!.screens[0]!;
