@@ -564,3 +564,13 @@
 - DBaaS 7차(진행 중): MySQL·MariaDB·EPAS 에 PostgreSQL 과 같은 `ops`(backup·parameter·archive·sync·restart·maintenance·ipAcl·stopStart[·audit]) 를 steps[5] 로 붙였다(`src/console/dbaas.ts` 팩토리 그대로).
   MySQL 은 Audit Log API 가 카탈로그에 없어 audit 제외, 파라미터는 max_connections·wait_timeout·connect_timeout. 순서: 공유 VPC(`SHARED_VPC`/`SHARED_SUBNET`) 하나로 `DBAAS_SOFT=1` 프로브 → 라벨 수정 → run-stacks 본 실행 → 대응표 매핑.
 - 세션: 10-14 07:19 로그인 → 19:16~19:21 만료(≈12h, keep-alive 로그의 "약 35.1시간" 은 브라우저 첫 로그인 기준이라 틀림). 21:15 재로그인 → 10-15 09:19 keep-alive 까지 OK(docs/session-log.md).
+
+### 9.25 대시보드 첫 화면: 카테고리 · 상품 · 화면별 정상 여부 (2026-10-22)
+
+- 사용자 요청: 디자인 시안 `reports/screen-status-dashboard.html`(예시 데이터, 미추적) 처럼 **카테고리 → 상품 → 화면** 이 한눈에 보이게, 화면 하나는 작은 색 네모로.
+- `src/report/screen-board.ts`(신규): 상품별 판단표(`buildProductMatrix`) + 실행 기록으로 화면마다 상태 하나를 붙인다. `buildScreenBoard` 는 순수 함수, 표는 브라우저 JS 가 그린다(필터·검색·상세 패널·`<dialog>`), 외부 요청 없음. `tests/unit/screen-board.spec.ts`.
+  상태: 정상(자기 상품 spec 마지막 실행 모두 통과) · 실패 · 불안정(최근 10회 실패 섞임) · 미실행 · 진입만(스모크만) · 제외(장부 사유/모수 제외) · 홈(Service Home, 기본 숨김).
+  **전제 단계 규칙**: 자기 상품 spec 이 없고 다른 상품 spec 이 전제로만 지나는 화면(VPC·Subnet 등)은 통과 spec 이 하나라도 있으면 정상 — DBaaS teardown 실패가 VPC 화면을 빨갛게 만들지 않게.
+  "자기 상품" = 시나리오 yaml `service` 가 그 상품인 spec.
+- 대시보드(`src/report/dashboard.ts`) 첫 섹션 `#screens` 로 들어가고 요약·전체 보기 모두에 보인다. 기본은 18px 색 네모(초록 정상·빨강 실패·노랑 불안정·회색 진입만·빗금 미실행·점선 제외), `화면 이름 보기` 로 이름 칩 전환. 요약 타일 클릭 = 상태 필터.
+- 10-22 10:42 기준: 검증 대상 147 화면(홈 83 숨김) — 정상 70 · 실패 7 · 불안정 2 · 진입만 68 · 미실행 0 · 제외 46. 실패 7 = Container Registry(KI-001 되돌림 단계) · DBaaS 3종(teardown 90초, 재실행 필요) · Load Balancer 3 화면(멤버 수정 modal).

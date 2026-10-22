@@ -38,6 +38,7 @@ import {
   type ProductOperations,
 } from './operations';
 import type { ProductMatrix } from './product-matrix';
+import { buildScreenBoard, SCREEN_BOARD_CSS, screenBoardBlock } from './screen-board';
 import type { RunRecord } from './run-record';
 
 export const EXPLORE_DIR = path.resolve(process.cwd(), 'recordings', 'explore');
@@ -783,6 +784,9 @@ export function renderDashboardHtml(input: DashboardInput): string {
     `실행하며 찾은 것: 제품 결함 <b>${productIssues.length}건</b>${productIssues.length ? ` (${productIssues.map((i) => esc(i.id)).join(', ')})` : ''} · API 카탈로그에 없는 콘솔 전용 쓰기 동작 <b>${consoleOnlyWriteCount}개</b> · 공개 API 없는 상품 ${noApiProducts}개`,
   ].filter(Boolean);
 
+  // 첫 화면: 카테고리·상품·화면별 정상 여부(2026-10-22, src/report/screen-board.ts)
+  const board = buildScreenBoard(input.matrix ?? [], records, new Set(flakySpecs));
+
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -851,6 +855,7 @@ export function renderDashboardHtml(input: DashboardInput): string {
   body.demo #coverage details, body.demo #coverage .legend, body.demo #products details, body.demo #products > p, body.demo #products .legend { display:none }
   body.demo .card .v { font-size:32px } body.demo ul.hl { font-size:15px } body.demo #suites tbody tr:nth-child(n+6) { display:none } body.demo section { padding:20px 24px }
   @media (max-width:800px) { main{padding:8px 16px} .barcell{display:none} }
+${SCREEN_BOARD_CSS}
 </style>
 </head>
 <body>
@@ -860,9 +865,14 @@ export function renderDashboardHtml(input: DashboardInput): string {
     <span class="view" title="요약: 데모·보고용으로 핵심만 · 전체: 모든 표와 설명"><button data-view="demo">요약</button><button data-view="full">전체</button></span>
     <span class="muted">${lastSuite ? `마지막 스위트 ${esc(lastSuite.suite_id)} · ${esc(fmtTime(lastSuite.started))} · ${lastSuite.specs} spec · 탭 ${lastSuite.max_tabs} · ${lastSuite.wall_minutes}분` : '스위트 요약 없음'} · 마지막 실행 ${lastRun ? esc(fmtTime(lastRun.started)) + ' ' + esc(lastRun.spec) : '없음'} · 생성 ${esc(input.generated)}</span>
   </div>
-  <nav><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs" data-demo="hide">spec 상태</a><a href="#failures" data-demo="hide">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#matrix" data-demo="hide">상품별 판단표</a><a href="#products">화면 vs API</a><a href="#parity" data-demo="hide">API 대응</a><a href="#explore" data-demo="hide">탐색</a><a href="#findings" data-demo="hide">발견 사항</a><a href="#runs" data-demo="hide">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
+  <nav><a href="#screens">화면 상태</a><a href="#summary">요약</a><a href="#actions">조치 필요</a><a href="#specs" data-demo="hide">spec 상태</a><a href="#failures" data-demo="hide">실패 분류</a><a href="#suites">스위트 이력</a><a href="#coverage">커버리지</a><a href="#matrix" data-demo="hide">상품별 판단표</a><a href="#products">화면 vs API</a><a href="#parity" data-demo="hide">API 대응</a><a href="#explore" data-demo="hide">탐색</a><a href="#findings" data-demo="hide">발견 사항</a><a href="#runs" data-demo="hide">실행 기록</a><a href="#issues">알려진 이슈</a></nav>
 </header>
 <main>
+<section id="screens">
+  <h2>화면별 동작 상태 — 카테고리 · 상품 · 화면 <small>서비스 맵의 모든 화면 · 상태는 그 화면을 지나는 회귀 spec 의 마지막 실행으로 판정(src/report/screen-board.ts) · 네모 하나 = 화면 하나</small></h2>
+  ${screenBoardBlock(board)}
+</section>
+
 <section id="summary">
   <h2>요약 <small>원본: reports/runs · reports/suites · service-map/coverage.yaml · docs/api-ui-parity.md — <code>npm run results</code> 로 재생성</small></h2>
   <div class="cards">
