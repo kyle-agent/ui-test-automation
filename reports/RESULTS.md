@@ -1,6 +1,6 @@
 # 회귀 결과 정리
 
-> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-22 13:26, 실행 기록 759건.
+> 생성 파일입니다. 직접 고치지 말고 `npm run results` 로 다시 만듭니다 (원본: `reports/runs/*.json`, `service-map/coverage.yaml`, `data/known-issues.yaml`). 생성 시각 2026-10-22 14:31, 실행 기록 759건.
 
 ## 1. spec 별 최근 상태
 
@@ -100,26 +100,8 @@
 
 level: 0 없음 · 1 진입(스모크) · 2 CRUD · 3 동작 · 4 통합 의존 체인. 갱신 규칙은 README "회귀 스택 스위트" 절.
 
-- 서비스 89 · 화면 276 (Service Home 83, 그 외 193) · 스모크 진입 282
-- 목록 화면 100, 그중 리소스 키 있음 112 = 장부 리소스 111개
-- level ≥ 2 (CRUD 이상): **65/111** (59%) · level ≥ 3 (동작 이상): **62/111** (56%)
-
-| 카테고리 | 리소스 | L1 | L2 | L3 | L4 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| AI-ML | 3 | 3 | 0 | 0 | 0 |
-| Application Service | 4 | 2 | 0 | 2 | 0 |
-| Compute | 15 | 8 | 0 | 4 | 3 |
-| Container | 3 | 0 | 0 | 2 | 1 |
-| Data Analytics | 2 | 1 | 0 | 1 | 0 |
-| Database | 6 | 1 | 0 | 0 | 5 |
-| DevOps Tools | 1 | 0 | 0 | 1 | 0 |
-| Financial Management | 1 | 1 | 0 | 0 | 0 |
-| Hybrid Cloud | 3 | 3 | 0 | 0 | 0 |
-| Management | 14 | 6 | 0 | 8 | 0 |
-| Networking | 44 | 11 | 3 | 21 | 9 |
-| Security | 7 | 4 | 0 | 3 | 0 |
-| Storage | 8 | 6 | 0 | 2 | 0 |
-| **합계** | **111** | **46** | **3** | **44** | **18** |
+coverage.yaml 검증 실패 1건 (npm run coverage 로 확인)
+- 장부에 없음: domain (Application Service > Message Hub /messagehub/domain)
 
 ## 5. 콘솔 전용 쓰기 동작 (API 카탈로그에 없는 경로)
 
